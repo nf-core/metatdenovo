@@ -39,6 +39,14 @@ def modules = params.modules.clone()
 //
 include { INPUT_CHECK } from '../subworkflows/local/input_check' addParams( options: [:] )
 
+//
+// SUBWORKFLOW: Adapted from rnaseq!
+//
+def trimgalore_options    = modules['trimgalore']
+trimgalore_options.args  += params.trim_nextseq > 0 ? Utils.joinModuleArgs(["--nextseq ${params.trim_nextseq}"]) : ''
+
+include { FASTQC_TRIMGALORE } from '../subworkflows/local/fastqc_trimgalore' addParams( fastqc_options: modules['fastqc'], trimgalore_options: trimgalore_options )
+
 /*
 ========================================================================================
     IMPORT NF-CORE MODULES/SUBWORKFLOWS
@@ -83,6 +91,16 @@ workflow METATDENOVO {
         INPUT_CHECK.out.reads
     )
     ch_versions = ch_versions.mix(FASTQC.out.versions.first())
+
+    //
+    // SUBWORKFLOW: Read QC and trim adapters
+    //
+    FASTQC_TRIMGALORE (
+        INPUT_CHECK.out.reads,
+        params.skip_fastqc || params.skip_qc,
+        params.skip_trimming
+    )
+    ch_versions = ch_versions.mix(FASTQC_TRIMGALORE.out.versions)
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')

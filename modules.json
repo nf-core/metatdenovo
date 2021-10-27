@@ -11,6 +11,9 @@
             },
             "multiqc": {
                 "git_sha": "7b3315591a149609e27914965f858c9a7e071564"
+            },
+            "trimgalore": {
+                "git_sha": "3aacd46da2b221ed47aaa05c413a828538d2c2ae"
             }
         }
     }
