@@ -34,7 +34,7 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 // Don't overwrite global params.modules, create a copy instead and use that within the main script.
 def modules = params.modules.clone()
 
-include { MEGAHIT_INTERLEAVED } from '../modules/local/megahit/interleaved.nf' addParams( options: modules['megahit_interleaved'] )
+include { MEGAHIT_INTERLEAVED } from '../modules/local/megahit/interleaved.nf' addParams( options: modules['megahit'] )
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
