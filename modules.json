@@ -9,9 +9,6 @@
             "fastqc": {
                 "git_sha": "7b3315591a149609e27914965f858c9a7e071564"
             },
-            "megahit": {
-                "git_sha": "359f721cc957e484b62b6ce11e91456f4bbce084"
-            },
             "multiqc": {
                 "git_sha": "7b3315591a149609e27914965f858c9a7e071564"
             },
