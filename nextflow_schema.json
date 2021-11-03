@@ -52,7 +52,18 @@
             "properties": {
                 "diginorm": {
                     "type": "boolean",
-                    "description": "Perform digital normalization to reduce sequencing depth."
+                    "description": "Perform digital normalization to reduce sequencing depth.",
+                    "help_text": "Digital normalization is performed following the example in https://khmer-protocols.readthedocs.io/en/latest/mrnaseq/2-diginorm.html.\nThere are (hidden) parameters for the cutoff coverage and kmer length for `normalize-by-median.py`, set to defaults following the example above (cutoff: 20 and kmer length: 20)."
+                },
+                "diginorm_C": {
+                    "type": "integer",
+                    "description": "Median coverage to keep a read in first call of normalize-by-median.py, default 20.",
+                    "hidden": true
+                },
+                "diginorm_k": {
+                    "type": "integer",
+                    "description": "Kmer length in first call of normalize-by-median.py, default 20.",
+                    "hidden": true
                 }
             }
         },
