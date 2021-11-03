@@ -44,6 +44,18 @@
                 }
             }
         },
+        "optional_processing": {
+            "title": "Optional processing",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "diginorm": {
+                    "type": "boolean",
+                    "description": "Perform digital normalization to reduce sequencing depth."
+                }
+            }
+        },
         "read_trimming_options": {
             "title": "Read trimming options",
             "type": "object",
@@ -300,6 +312,9 @@
     "allOf": [
         {
             "$ref": "#/definitions/input_output_options"
+        },
+        {
+            "$ref": "#/definitions/optional_processing"
         },
         {
             "$ref": "#/definitions/read_trimming_options"
