@@ -125,17 +125,17 @@ workflow METATDENOVO {
     //
     ch_reads_to_assembly = Channel.empty()
     if ( params.diginorm ) {
-        DIGINORM(SEQTK_MERGEPE.out.reads.collect { it[1] }, [], 'all_samples')
+        DIGINORM(SEQTK_MERGEPE.out.reads.collect { meta, fastq -> fastq }, [], 'all_samples')
         ch_versions = ch_versions.mix(SEQTK_MERGEPE.out.versions)
         ch_reads_to_assembly = DIGINORM.out.reads
     } else {
-        ch_reads_to_assembly = SEQTK_MERGEPE.out.reads
+        ch_reads_to_assembly = SEQTK_MERGEPE.out.reads.map { meta, fastq -> fastq }
     }
 
     //
     // MODULE: Run Megahit on all interleaved fastq files
     //
-    MEGAHIT_INTERLEAVED(ch_reads_to_assembly.collect { it[1] }, 'all_samples')
+    MEGAHIT_INTERLEAVED(ch_reads_to_assembly.collect(), 'all_samples')
     ch_versions = ch_versions.mix(MEGAHIT_INTERLEAVED.out.versions)
 
 //    //

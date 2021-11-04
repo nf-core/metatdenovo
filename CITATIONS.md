@@ -13,7 +13,13 @@
 * [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)
 
 * [MultiQC](https://pubmed.ncbi.nlm.nih.gov/27312411/)
-    > Ewels P, Magnusson M, Lundin S, Käller M. MultiQC: summarize analysis results for multiple tools and samples in a single report. Bioinformatics. 2016 Oct 1;32(19):3047-8. doi: 10.1093/bioinformatics/btw354. Epub 2016 Jun 16. PubMed PMID: 27312411; PubMed Central PMCID: PMC5039924.
+
+> Ewels P, Magnusson M, Lundin S, Käller M. MultiQC: summarize analysis results for multiple tools and samples in a single report. Bioinformatics. 2016 Oct 1;32(19):3047-8. doi: 10.1093/bioinformatics/btw354. Epub 2016 Jun 16. PubMed PMID: 27312411; PubMed Central PMCID: PMC5039924.
+
+* [khmer](https://github.com/dib-lab/khmer)
+
+> Crusoe, Michael R., Hussien F. Alameldin, Sherine Awad, Elmar Boucher, Adam Caldwell, Reed Cartwright, Amanda Charbonneau, et al. 2015. “The Khmer Software Package: Enabling Efficient Nucleotide Sequence Analysis.” F1000Research 4 (September): 900. https://doi.org/10.12688/f1000research.6924.1.
+> Brown, C. Titus, Adina Howe, Qingpeng Zhang, Alexis B. Pyrkosz, and Timothy H. Brom. 2012. “A Reference-Free Algorithm for Computational Normalization of Shotgun Sequencing Data.” ArXiv:1203.4802 [q-Bio], May. http://arxiv.org/abs/1203.4802.
 
 ## Software packaging/containerisation tools
 
