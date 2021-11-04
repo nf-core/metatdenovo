@@ -24,9 +24,9 @@ process KHMER_NORMALIZEBYMEDIAN {
     val  name
 
     output:
-    path "${name}.fastq.gz", emit: reads
-    path "${name}.kh"      , emit: graph
-    path "versions.yml"    , emit: versions
+    path "${name}.nm.fastq.gz", emit: reads
+    path "${name}.nm.kh"      , emit: graph
+    path "versions.yml"       , emit: versions
 
     script:
     pe_args = pe_reads ? "--paired" : ""
@@ -37,8 +37,9 @@ process KHMER_NORMALIZEBYMEDIAN {
     normalize-by-median.py \\
         -M ${task.memory.toGiga()}e9 \\
         --gzip ${options.args} \\
-        --savegraph ${name}.kh \\
-        -o ${name}.fastq.gz \\
+        --savegraph ${name}.nm.kh \\
+        -o ${name}.nm.fastq.gz \\
+        ${options.args} \\
         ${pe_args} \\
         ${se_args} \\
         ${files}

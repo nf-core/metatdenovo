@@ -57,7 +57,8 @@
                 },
                 "diginorm_C": {
                     "type": "integer",
-                    "description": "Median coverage to keep a read in first call of normalize-by-median.py, default 20.",
+                    "description": "Median coverage to keep a read, default 20.",
+                    "help_text": "This parameter is passed to `normalize-by-median.py` as the value to `-C` and to `filter-abund.py` as value to both `-C` and `-Z`",
                     "hidden": true
                 },
                 "diginorm_k": {

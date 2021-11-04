@@ -54,8 +54,13 @@ include { FASTQC_TRIMGALORE } from '../subworkflows/local/fastqc_trimgalore' add
 //
 def diginorm_normalizebymedian_options   = modules['diginorm_normalizebymedian']
 diginorm_normalizebymedian_options.args += Utils.joinModuleArgs(["-C ${params.diginorm_C} -k ${params.diginorm_k}"])
+def diginorm_filterabund_options         = modules['diginorm_filterabund']
+diginorm_filterabund_options.args       += Utils.joinModuleArgs(["-C ${params.diginorm_C} -Z ${params.diginorm_C}"])
 
-include { DIGINORM } from '../subworkflows/local/diginorm' addParams(diginorm_normalizebymedian_options: diginorm_normalizebymedian_options)
+include { DIGINORM } from '../subworkflows/local/diginorm' addParams(
+    diginorm_normalizebymedian_options: diginorm_normalizebymedian_options, 
+    diginorm_filterabund_options: diginorm_filterabund_options
+)
 
 /*
 ========================================================================================
