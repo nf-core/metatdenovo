@@ -44,6 +44,19 @@
                 }
             }
         },
+        "reference_genome_options": {
+            "title": "Reference genome options",
+            "type": "object",
+            "fa_icon": "fas fa-dna",
+            "description": "Reference genome related files and options required for the workflow.",
+            "properties": {
+                "sequence_filter": {
+                    "type": "string",
+                    "description": "Fasta file with sequences to filter away before running assembly etc..",
+                    "help_text": "Read sequences matching this file will be filtered out from samples with BBDuk before mapping. If no file is specified, BBDuk will not be run."
+                }
+            }
+        },
         "optional_processing": {
             "title": "Optional processing",
             "type": "object",
@@ -324,6 +337,9 @@
     "allOf": [
         {
             "$ref": "#/definitions/input_output_options"
+        },
+        {
+            "$ref": "#/definitions/reference_genome_options"
         },
         {
             "$ref": "#/definitions/optional_processing"
