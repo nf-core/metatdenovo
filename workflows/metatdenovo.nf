@@ -74,10 +74,11 @@ multiqc_options.args += params.multiqc_title ? Utils.joinModuleArgs(["--title \"
 //
 // MODULE: Installed directly from nf-core/modules
 //
-include { FASTQC  } from '../modules/nf-core/modules/fastqc/main'  addParams( options: modules['fastqc'] )
+include { FASTQC        } from '../modules/nf-core/modules/fastqc/main'        addParams( options: modules['fastqc'] )
+include { BBMAP_BBDUK   } from '../modules/nf-core/modules/bbmap/bbduk/main'   addParams( options: modules['bbduk'] )
 include { SEQTK_MERGEPE } from '../modules/nf-core/modules/seqtk/mergepe/main' addParams( options: modules['seqtk_mergepe'] )
 //include { PRODIGAL } from '../modules/nf-core/modules/prodigal/main' addParams( options: modules['prodigal'] )
-include { MULTIQC } from '../modules/nf-core/modules/multiqc/main' addParams( options: multiqc_options   )
+include { MULTIQC       } from '../modules/nf-core/modules/multiqc/main' addParams( options: multiqc_options   )
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'  addParams( options: [publish_files : ['_versions.yml':'']] )
 
 /*
@@ -120,9 +121,22 @@ workflow METATDENOVO {
     ch_versions = ch_versions.mix(FASTQC_TRIMGALORE.out.versions)
 
     //
+    // MODULE: Run BBDuk to clean out whatever sequences the user supplied via params.sequence_filter
+    //
+    if ( params.sequence_filter ) {
+        BBMAP_BBDUK ( FASTQC_TRIMGALORE.out.reads, params.sequence_filter )
+        ch_clean_reads  = BBMAP_BBDUK.out.reads
+        ch_bbduk_logs = BBMAP_BBDUK.out.log.map { it[1] }
+        ch_versions   = ch_versions.mix(BBMAP_BBDUK.out.versions)
+    } else {
+        ch_clean_reads  = FASTQC_TRIMGALORE.out.reads
+        ch_bbduk_logs = []
+    }
+
+    //
     // MODULE: Interleave sequences
     //
-    SEQTK_MERGEPE(FASTQC_TRIMGALORE.out.reads)
+    SEQTK_MERGEPE(ch_clean_reads)
     ch_versions = ch_versions.mix(SEQTK_MERGEPE.out.versions)
 
     //
