@@ -52,14 +52,16 @@ include { FASTQC_TRIMGALORE } from '../subworkflows/local/fastqc_trimgalore' add
 //
 // SUBWORKFLOW: Perform digital normalization
 //
-def diginorm_normalizebymedian_options   = modules['diginorm_normalizebymedian']
-diginorm_normalizebymedian_options.args += Utils.joinModuleArgs(["-C ${params.diginorm_C} -k ${params.diginorm_k}"])
-def diginorm_filterabund_options         = modules['diginorm_filterabund']
-diginorm_filterabund_options.args       += Utils.joinModuleArgs(["-C ${params.diginorm_C} -Z ${params.diginorm_C}"])
+def diginorm_normalizebymedian_options    = modules['diginorm_normalizebymedian']
+diginorm_normalizebymedian_options.args  += Utils.joinModuleArgs(["-C ${params.diginorm_C} -k ${params.diginorm_k}"])
+def diginorm_filterabund_options          = modules['diginorm_filterabund']
+diginorm_filterabund_options.args        += Utils.joinModuleArgs(["-C ${params.diginorm_C} -Z ${params.diginorm_C}"])
+def diginorm_extractpairedreads_options   = modules['diginorm_extractpairedreads']
 
 include { DIGINORM } from '../subworkflows/local/diginorm' addParams(
-    diginorm_normalizebymedian_options: diginorm_normalizebymedian_options, 
-    diginorm_filterabund_options: diginorm_filterabund_options
+    diginorm_normalizebymedian_options:  diginorm_normalizebymedian_options, 
+    diginorm_filterabund_options:        diginorm_filterabund_options,
+    diginorm_extractpairedreads_options: diginorm_extractpairedreads_options
 )
 
 /*
@@ -138,15 +140,21 @@ workflow METATDENOVO {
     if ( params.diginorm ) {
         DIGINORM(SEQTK_MERGEPE.out.reads.collect { meta, fastq -> fastq }, [], 'all_samples')
         ch_versions = ch_versions.mix(SEQTK_MERGEPE.out.versions)
-        ch_reads_to_assembly = DIGINORM.out.reads
+        ch_pe_reads_to_assembly = DIGINORM.out.pairs
+        ch_se_reads_to_assembly = DIGINORM.out.singles
     } else {
-        ch_reads_to_assembly = SEQTK_MERGEPE.out.reads.map { meta, fastq -> fastq }
+        ch_pe_reads_to_assembly = SEQTK_MERGEPE.out.reads.map { meta, fastq -> fastq }
+        ch_se_reads_to_assembly = []
     }
 
     //
     // MODULE: Run Megahit on all interleaved fastq files
     //
-    MEGAHIT_INTERLEAVED(ch_reads_to_assembly.collect(), 'all_samples')
+    MEGAHIT_INTERLEAVED(
+        ch_pe_reads_to_assembly.collect(), 
+        ch_se_reads_to_assembly.collect(), 
+        'all_samples'
+    )
     ch_versions = ch_versions.mix(MEGAHIT_INTERLEAVED.out.versions)
 
 //    //

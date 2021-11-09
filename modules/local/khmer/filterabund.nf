@@ -24,6 +24,7 @@ process KHMER_FILTERABUND {
 
     output:
     path "${name}.fa.fastq.gz", emit: reads
+    path "${name}.fa.log"     , emit: log
     path "versions.yml"       , emit: versions
 
     script:
@@ -35,7 +36,7 @@ process KHMER_FILTERABUND {
         ${options.args} \\
         -o ${name}.fa.fastq.gz \\
         ${reads} \\
-        ${graph}
+        ${graph} 2>&1 | tee ${name}.fa.log
 
     cat <<-END_VERSIONS > versions.yml
     ${getProcessName(task.process)}:

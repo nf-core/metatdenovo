@@ -4,8 +4,8 @@ include { initOptions; saveFiles; getSoftwareName; getProcessName } from '../fun
 params.options = [:]
 options        = initOptions(params.options)
 
-process KHMER_NORMALIZEBYMEDIAN {
-    tag "${name}"
+process KHMER_EXTRACTPAIREDREADS {
+    tag "$name"
     label 'process_long'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
@@ -19,31 +19,23 @@ process KHMER_NORMALIZEBYMEDIAN {
     }
 
     input:
-    path pe_reads
-    path se_reads
+    path reads
     val  name
 
     output:
-    path "${name}.nm.fastq.gz", emit: reads
-    path "${name}.nm.kh"      , emit: graph
-    path "${name}.nm.log"     , emit: log
-    path "versions.yml"       , emit: versions
+    path "${name}.ep.pe.fastq.gz", emit: pairs
+    path "${name}.ep.se.fastq.gz", emit: singles
+    path "${name}.ep.log"        , emit: log
+    path "versions.yml"          , emit: versions
 
     script:
-    pe_args = pe_reads ? "--paired" : ""
-    se_args = se_reads ? "--unpaired-reads ${se_reads}" : ""
-    files   = pe_reads ? pe_reads : se_reads
-
+    
     """
-    normalize-by-median.py \\
-        -M ${task.memory.toGiga()}e9 \\
+    extract-paired-reads.py \\
         --gzip ${options.args} \\
-        --savegraph ${name}.nm.kh \\
-        -o ${name}.nm.fastq.gz \\
-        ${options.args} \\
-        ${pe_args} \\
-        ${se_args} \\
-        ${files} 2>&1 | tee ${name}.nm.log
+        -p ${name}.ep.pe.fastq.gz \\
+        -s ${name}.ep.se.fastq.gz \\
+        ${reads} 2>&1 | tee ${name}.ep.log
 
     cat <<-END_VERSIONS > versions.yml
     ${getProcessName(task.process)}:
