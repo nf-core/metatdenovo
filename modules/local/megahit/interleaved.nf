@@ -20,6 +20,7 @@ process MEGAHIT_INTERLEAVED {
 
     input:
     path intl_pe_reads
+    path se_reads
     val  assembly
 
     output:
@@ -31,10 +32,12 @@ process MEGAHIT_INTERLEAVED {
     path "versions.yml"                                            , emit: versions
 
     script:
+    single_ends = se_reads ? "-r ${se_reads.join(',')}" : ""
     
     """
     megahit \\
         --12 ${intl_pe_reads.join(',')} \\
+        ${single_ends} \\
         -t $task.cpus \\
         $options.args \\
         --out-prefix $assembly
