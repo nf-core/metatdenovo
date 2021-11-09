@@ -78,6 +78,7 @@ multiqc_options.args += params.multiqc_title ? Utils.joinModuleArgs(["--title \"
 //
 include { FASTQC        } from '../modules/nf-core/modules/fastqc/main'        addParams( options: modules['fastqc'] )
 include { BBMAP_BBDUK   } from '../modules/nf-core/modules/bbmap/bbduk/main'   addParams( options: modules['bbduk'] )
+include { BBMAP_INDEX   } from '../modules/nf-core/modules/bbmap/index/main'   addParams( options: modules['bbmap_index'] )
 include { SEQTK_MERGEPE } from '../modules/nf-core/modules/seqtk/mergepe/main' addParams( options: modules['seqtk_mergepe'] )
 //include { PRODIGAL } from '../modules/nf-core/modules/prodigal/main' addParams( options: modules['prodigal'] )
 include { MULTIQC       } from '../modules/nf-core/modules/multiqc/main' addParams( options: multiqc_options   )
@@ -155,7 +156,14 @@ workflow METATDENOVO {
         ch_se_reads_to_assembly.collect(), 
         'all_samples'
     )
+    ch_assembly_contigs = MEGAHIT_INTERLEAVED.out.contigs
     ch_versions = ch_versions.mix(MEGAHIT_INTERLEAVED.out.versions)
+
+    //
+    // MODULE: Create a BBMap index
+    //
+    BBMAP_INDEX(ch_assembly_contigs)
+    ch_versions   = ch_versions.mix(BBMAP_INDEX.out.versions)
 
 //    //
 //    // MODULE: Call Prodigal
