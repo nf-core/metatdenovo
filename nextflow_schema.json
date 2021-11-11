@@ -44,6 +44,43 @@
                 }
             }
         },
+        "reference_genome_options": {
+            "title": "Reference genome options",
+            "type": "object",
+            "fa_icon": "fas fa-dna",
+            "description": "Reference genome related files and options required for the workflow.",
+            "properties": {
+                "sequence_filter": {
+                    "type": "string",
+                    "description": "Fasta file with sequences to filter away before running assembly etc..",
+                    "help_text": "Read sequences matching this file will be filtered out from samples with BBDuk before mapping. If no file is specified, BBDuk will not be run."
+                }
+            }
+        },
+        "optional_processing": {
+            "title": "Optional processing",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "diginorm": {
+                    "type": "boolean",
+                    "description": "Perform digital normalization to reduce sequencing depth.",
+                    "help_text": "Digital normalization is performed following the example in https://khmer-protocols.readthedocs.io/en/latest/mrnaseq/2-diginorm.html.\nThere are (hidden) parameters for the cutoff coverage and kmer length for `normalize-by-median.py`, set to defaults following the example above (cutoff: 20 and kmer length: 20)."
+                },
+                "diginorm_C": {
+                    "type": "integer",
+                    "description": "Median coverage to keep a read, default 20.",
+                    "help_text": "This parameter is passed to `normalize-by-median.py` as the value to `-C` and to `filter-abund.py` as value to both `-C` and `-Z`",
+                    "hidden": true
+                },
+                "diginorm_k": {
+                    "type": "integer",
+                    "description": "Kmer length in first call of normalize-by-median.py, default 20.",
+                    "hidden": true
+                }
+            }
+        },
         "read_trimming_options": {
             "title": "Read trimming options",
             "type": "object",
@@ -300,6 +337,12 @@
     "allOf": [
         {
             "$ref": "#/definitions/input_output_options"
+        },
+        {
+            "$ref": "#/definitions/reference_genome_options"
+        },
+        {
+            "$ref": "#/definitions/optional_processing"
         },
         {
             "$ref": "#/definitions/read_trimming_options"

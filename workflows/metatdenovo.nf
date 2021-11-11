@@ -49,6 +49,21 @@ trimgalore_options.args  += params.trim_nextseq > 0 ? Utils.joinModuleArgs(["--n
 
 include { FASTQC_TRIMGALORE } from '../subworkflows/local/fastqc_trimgalore' addParams( fastqc_options: modules['fastqc'], trimgalore_options: trimgalore_options )
 
+//
+// SUBWORKFLOW: Perform digital normalization
+//
+def diginorm_normalizebymedian_options    = modules['diginorm_normalizebymedian']
+diginorm_normalizebymedian_options.args  += Utils.joinModuleArgs(["-C ${params.diginorm_C} -k ${params.diginorm_k}"])
+def diginorm_filterabund_options          = modules['diginorm_filterabund']
+diginorm_filterabund_options.args        += Utils.joinModuleArgs(["-C ${params.diginorm_C} -Z ${params.diginorm_C}"])
+def diginorm_extractpairedreads_options   = modules['diginorm_extractpairedreads']
+
+include { DIGINORM } from '../subworkflows/local/diginorm' addParams(
+    diginorm_normalizebymedian_options:  diginorm_normalizebymedian_options, 
+    diginorm_filterabund_options:        diginorm_filterabund_options,
+    diginorm_extractpairedreads_options: diginorm_extractpairedreads_options
+)
+
 /*
 ========================================================================================
     IMPORT NF-CORE MODULES/SUBWORKFLOWS
@@ -61,10 +76,12 @@ multiqc_options.args += params.multiqc_title ? Utils.joinModuleArgs(["--title \"
 //
 // MODULE: Installed directly from nf-core/modules
 //
-include { FASTQC  } from '../modules/nf-core/modules/fastqc/main'  addParams( options: modules['fastqc'] )
+include { FASTQC        } from '../modules/nf-core/modules/fastqc/main'        addParams( options: modules['fastqc'] )
+include { BBMAP_BBDUK   } from '../modules/nf-core/modules/bbmap/bbduk/main'   addParams( options: modules['bbduk'] )
 include { SEQTK_MERGEPE } from '../modules/nf-core/modules/seqtk/mergepe/main' addParams( options: modules['seqtk_mergepe'] )
 include { PROKKA } from '../modules/nf-core/modules/prokka/main' addParams( options: modules['prokka'] )
-include { MULTIQC } from '../modules/nf-core/modules/multiqc/main' addParams( options: multiqc_options   )
+//include { PRODIGAL } from '../modules/nf-core/modules/prodigal/main' addParams( options: modules['prodigal'] )
+include { MULTIQC       } from '../modules/nf-core/modules/multiqc/main' addParams( options: multiqc_options   )
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'  addParams( options: [publish_files : ['_versions.yml':'']] )
 
 /*
@@ -89,14 +106,6 @@ workflow METATDENOVO {
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
 
     //
-    // MODULE: Run FastQC
-    //
-    FASTQC (
-        INPUT_CHECK.out.reads
-    )
-    ch_versions = ch_versions.mix(FASTQC.out.versions.first())
-
-    //
     // SUBWORKFLOW: Read QC and trim adapters
     //
     FASTQC_TRIMGALORE (
@@ -107,16 +116,46 @@ workflow METATDENOVO {
     ch_versions = ch_versions.mix(FASTQC_TRIMGALORE.out.versions)
 
     //
+    // MODULE: Run BBDuk to clean out whatever sequences the user supplied via params.sequence_filter
+    //
+    if ( params.sequence_filter ) {
+        BBMAP_BBDUK ( FASTQC_TRIMGALORE.out.reads, params.sequence_filter )
+        ch_clean_reads  = BBMAP_BBDUK.out.reads
+        ch_bbduk_logs = BBMAP_BBDUK.out.log.map { it[1] }
+        ch_versions   = ch_versions.mix(BBMAP_BBDUK.out.versions)
+    } else {
+        ch_clean_reads  = FASTQC_TRIMGALORE.out.reads
+        ch_bbduk_logs = []
+    }
+
+    //
     // MODULE: Interleave sequences
     //
-    SEQTK_MERGEPE(FASTQC_TRIMGALORE.out.reads)
-    ch_reads4assembly = SEQTK_MERGEPE.out.reads
+    SEQTK_MERGEPE(ch_clean_reads)
     ch_versions = ch_versions.mix(SEQTK_MERGEPE.out.versions)
+
+    //
+    // SUBWORKFLOW: Perform digital normalization
+    //
+    ch_reads_to_assembly = Channel.empty()
+    if ( params.diginorm ) {
+        DIGINORM(SEQTK_MERGEPE.out.reads.collect { meta, fastq -> fastq }, [], 'all_samples')
+        ch_versions = ch_versions.mix(SEQTK_MERGEPE.out.versions)
+        ch_pe_reads_to_assembly = DIGINORM.out.pairs
+        ch_se_reads_to_assembly = DIGINORM.out.singles
+    } else {
+        ch_pe_reads_to_assembly = SEQTK_MERGEPE.out.reads.map { meta, fastq -> fastq }
+        ch_se_reads_to_assembly = []
+    }
 
     //
     // MODULE: Run Megahit on all interleaved fastq files
     //
-    MEGAHIT_INTERLEAVED(ch_reads4assembly.collect { it[1] }, 'all_samples')
+    MEGAHIT_INTERLEAVED(
+        ch_pe_reads_to_assembly.collect(), 
+        ch_se_reads_to_assembly.collect(), 
+        'all_samples'
+    )
     ch_versions = ch_versions.mix(MEGAHIT_INTERLEAVED.out.versions)
 
     //
@@ -124,6 +163,12 @@ workflow METATDENOVO {
     //
     PROKKA(MEGAHIT_INTERLEAVED.out.contigs.splitFasta( size: 10.MB, file: true).map { [[id: 'part_of_all_samples'], it] }, [], [] )
     ch_versions = ch_versions.mix(PROKKA.out.versions)
+
+//    //
+//    // MODULE: Call Prodigal
+//    //
+//    PRODIGAL([ [id: 'full_assembly' ], MEGAHIT_INTERLEAVED.out.contigs)
+//    ch_versions = ch_versions.mix(PRODIGAL.out.versions)
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
@@ -140,7 +185,8 @@ workflow METATDENOVO {
     ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_custom_config.collect().ifEmpty([]))
     ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
     ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
-    ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
+    // Make sure we integrate FASTQC output from FASTQC_TRIMGALORE here!!!
+    //ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
 
     MULTIQC (
         ch_multiqc_files.collect()
