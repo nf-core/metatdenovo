@@ -119,6 +119,12 @@ workflow METATDENOVO {
     MEGAHIT_INTERLEAVED(ch_reads4assembly.collect { it[1] }, 'all_samples')
     ch_versions = ch_versions.mix(MEGAHIT_INTERLEAVED.out.versions)
 
+    //
+    // MODULE: Run PROKKA on Megahit output, but split the fasta file in chunks of 1000
+    //
+    PROKKA(MEGAHIT_INTERLEAVED.out.contigs.splitFasta( size: 10.MB, file: true).map { [[id: 'part_of_all_samples'], it] }, [], [] )
+    ch_versions = ch_versions.mix(PROKKA.out.versions)
+
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
     )
