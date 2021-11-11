@@ -78,6 +78,10 @@
                     "type": "integer",
                     "description": "Kmer length in first call of normalize-by-median.py, default 20.",
                     "hidden": true
+                },
+                "orf_caller": {
+                    "type": "string",
+                    "description": "Specify which ORF caller you would like to run."
                 }
             }
         },
