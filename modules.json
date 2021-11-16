@@ -3,7 +3,13 @@
     "homePage": "https://github.com/nf-core/metatdenovo",
     "repos": {
         "nf-core/modules": {
+            "bbmap/align": {
+                "git_sha": "8b4bfb12bb95930feafaf7b019c9cf82e2a1f0b2"
+            },
             "bbmap/bbduk": {
+                "git_sha": "49da8642876ae4d91128168cd0db4f1c858d7792"
+            },
+            "bbmap/index": {
                 "git_sha": "49da8642876ae4d91128168cd0db4f1c858d7792"
             },
             "custom/dumpsoftwareversions": {

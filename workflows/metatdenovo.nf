@@ -78,6 +78,8 @@ multiqc_options.args += params.multiqc_title ? Utils.joinModuleArgs(["--title \"
 //
 include { FASTQC        } from '../modules/nf-core/modules/fastqc/main'        addParams( options: modules['fastqc'] )
 include { BBMAP_BBDUK   } from '../modules/nf-core/modules/bbmap/bbduk/main'   addParams( options: modules['bbduk'] )
+include { BBMAP_INDEX   } from '../modules/nf-core/modules/bbmap/index/main'   addParams( options: modules['bbmap_index'] )
+include { BBMAP_ALIGN   } from '../modules/nf-core/modules/bbmap/align/main'   addParams( options: modules['bbmap_align'] )
 include { SEQTK_MERGEPE } from '../modules/nf-core/modules/seqtk/mergepe/main' addParams( options: modules['seqtk_mergepe'] )
 include { PROKKA } from '../modules/nf-core/modules/prokka/main' addParams( options: modules['prokka'] )
 //include { PRODIGAL } from '../modules/nf-core/modules/prodigal/main' addParams( options: modules['prodigal'] )
@@ -156,10 +158,23 @@ workflow METATDENOVO {
         ch_se_reads_to_assembly.collect(), 
         'all_samples'
     )
+    ch_assembly_contigs = MEGAHIT_INTERLEAVED.out.contigs
     ch_versions = ch_versions.mix(MEGAHIT_INTERLEAVED.out.versions)
 
     //
-    // MODULE: Run PROKKA on Megahit output, but split the fasta file in chunks of 1000
+    // MODULE: Create a BBMap index
+    //
+    BBMAP_INDEX(ch_assembly_contigs)
+    ch_versions   = ch_versions.mix(BBMAP_INDEX.out.versions)
+
+    //
+    // MODULE: Call BBMap with the index once per sample
+    //
+    BBMAP_ALIGN(ch_clean_reads, BBMAP_INDEX.out.index)
+    ch_versions   = ch_versions.mix(BBMAP_ALIGN.out.versions)
+
+    //
+    // MODULE: Run PROKKA on Megahit output, but split the fasta file in chunks of 10 MiB
     //
     PROKKA(MEGAHIT_INTERLEAVED.out.contigs.splitFasta( size: 10.MB, file: true).map { [[id: 'part_of_all_samples'], it] }, [], [] )
     ch_versions = ch_versions.mix(PROKKA.out.versions)
