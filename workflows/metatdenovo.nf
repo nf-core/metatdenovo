@@ -35,7 +35,7 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 def modules = params.modules.clone()
 
 include { MEGAHIT_INTERLEAVED } from '../modules/local/megahit/interleaved.nf' addParams( options: modules['megahit'] )
-include { UNPIGZ as UNPIGZ_MEGAHIT_CONTIGS } from '../modules/local/unpigz.nf' addParams( options: modules['megahit'])
+include { UNPIGZ as UNPIGZ_MEGAHIT_CONTIGS } from '../modules/local/unpigz.nf' addParams( options: modules['unpigz_megahit_contigs'])
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -74,6 +74,10 @@ include { DIGINORM } from '../subworkflows/local/diginorm' addParams(
 def multiqc_options   = modules['multiqc']
 multiqc_options.args += params.multiqc_title ? Utils.joinModuleArgs(["--title \"$params.multiqc_title\""]) : ''
 
+params.prodigal_trainingfile = file("../test_prodigal/training_file.trn")
+def prodigal_options   = modules['prodigal']
+prodigal_options.args += params.prodigal_trainingfile ? Utils.joinModuleArgs("-t $params.prodigal_trainingfile") : ""
+
 //
 // MODULE: Installed directly from nf-core/modules
 //
@@ -83,7 +87,7 @@ include { BBMAP_INDEX   } from '../modules/nf-core/modules/bbmap/index/main'   a
 include { BBMAP_ALIGN   } from '../modules/nf-core/modules/bbmap/align/main'   addParams( options: modules['bbmap_align'] )
 include { SEQTK_MERGEPE } from '../modules/nf-core/modules/seqtk/mergepe/main' addParams( options: modules['seqtk_mergepe'] )
 include { PROKKA } from '../modules/nf-core/modules/prokka/main' addParams( options: modules['prokka'] )
-include { PRODIGAL } from '../modules/nf-core/modules/prodigal/main' addParams( options: modules['prodigal'] )
+include { PRODIGAL } from '../modules/nf-core/modules/prodigal/main' addParams( options: prodigal_options )
 include { MULTIQC       } from '../modules/nf-core/modules/multiqc/main' addParams( options: multiqc_options   )
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'  addParams( options: [publish_files : ['_versions.yml':'']] )
 
@@ -162,10 +166,6 @@ workflow METATDENOVO {
     ch_assembly_contigs = MEGAHIT_INTERLEAVED.out.contigs
     ch_versions = ch_versions.mix(MEGAHIT_INTERLEAVED.out.versions)
 
-    UNPIGZ_MEGAHIT_CONTIGS(ch_assembly_contigs)
-    ch_assembly_contigs_unzipped = UNPIGZ_MEGAHIT_CONTIGS.out.gunzip
-    ch_versions = ch_versions.mix(UNPIGZ_MEGAHIT_CONTIGS.out.versions)
-
     //
     // MODULE: Create a BBMap index
     //
@@ -187,13 +187,16 @@ workflow METATDENOVO {
     //
     // MODULE: Call Prodigal
     //
-    /** Waiting for gunzip module
+    UNPIGZ_MEGAHIT_CONTIGS(ch_assembly_contigs)
+    //ch_assembly_contigs_unzipped = UNPIGZ_MEGAHIT_CONTIGS.out.gunzip
+    ch_versions = ch_versions.mix(UNPIGZ_MEGAHIT_CONTIGS.out.versions)
+
     PRODIGAL(
-        ch_assembly_contigs.collect { [ [ id: 'all_samples' ], it ] },
+        UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] },
+        //[ [ id: 'all_samples' ], UNPIGZ_MEGAHIT_CONTIGS.out.test ],
         'gff'
     )
     ch_versions = ch_versions.mix(PRODIGAL.out.versions)
-    **/
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')

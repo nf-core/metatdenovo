@@ -8,11 +8,10 @@ process UNPIGZ {
         'quay.io/biocontainers/pigz:2.3.4' }"
 
     input:
-
     path file
     
     output:
-    path "$gunzip", emit: gunzip
+    path "$gunzip",      emit: unzipped
     path "versions.yml", emit: versions
 
     script:
@@ -21,6 +20,7 @@ process UNPIGZ {
 
     """
     unpigz \\
+        -c \\
         -p $task.cpus \\
         ${file} > $gunzip
         
