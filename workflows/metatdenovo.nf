@@ -92,11 +92,7 @@ include { BBMAP_INDEX   } from '../modules/nf-core/modules/bbmap/index/main'   a
 include { BBMAP_ALIGN   } from '../modules/nf-core/modules/bbmap/align/main'   addParams( options: modules['bbmap_align'] )
 include { SEQTK_MERGEPE } from '../modules/nf-core/modules/seqtk/mergepe/main' addParams( options: modules['seqtk_mergepe'] )
 include { PROKKA } from '../modules/nf-core/modules/prokka/main' addParams( options: modules['prokka'] )
-<<<<<<< HEAD
 include { PRODIGAL } from '../modules/nf-core/modules/prodigal/main' addParams( options: prodigal_options )
-=======
-include { PRODIGAL } from '../modules/nf-core/modules/prodigal/main' addParams( options: modules['prodigal'] )
->>>>>>> b85e0bbc45a84d7cf5a8531177e4da77e7ec4247
 include { MULTIQC       } from '../modules/nf-core/modules/multiqc/main' addParams( options: multiqc_options   )
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'  addParams( options: [publish_files : ['_versions.yml':'']] )
 
@@ -196,7 +192,6 @@ workflow METATDENOVO {
     //
     // MODULE: Call Prodigal
     //
-<<<<<<< HEAD
     UNPIGZ_MEGAHIT_CONTIGS(ch_assembly_contigs)
     //ch_assembly_contigs_unzipped = UNPIGZ_MEGAHIT_CONTIGS.out.gunzip
     ch_versions = ch_versions.mix(UNPIGZ_MEGAHIT_CONTIGS.out.versions)
@@ -213,14 +208,7 @@ workflow METATDENOVO {
     ch_prodigal_fna = PRODIGAL.out.nucleotide_fasta
     ch_versions = ch_versions.mix(PRODIGAL.out.versions)
     }
-=======
-    PRODIGAL(
-        [id: 'full_assembly' ], 
-        MEGAHIT_INTERLEAVED.out.contigs
-    )
-    ch_versions = ch_versions.mix(PRODIGAL.out.versions)
-
->>>>>>> b85e0bbc45a84d7cf5a8531177e4da77e7ec4247
+    
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
     )
