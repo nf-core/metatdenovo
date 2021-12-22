@@ -9,6 +9,11 @@ def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
 // Validate input parameters
 WorkflowMetatdenovo.initialise(params, log)
 
+// Validate parameters Orfcaller:
+def valid_params = [
+    orf_caller  : ['prodigal']
+    ]
+
 // Check input path parameters to see if they exist
 def checkPathParamList = [ params.input, params.multiqc_config ]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
@@ -190,14 +195,19 @@ workflow METATDENOVO {
     UNPIGZ_MEGAHIT_CONTIGS(ch_assembly_contigs)
     //ch_assembly_contigs_unzipped = UNPIGZ_MEGAHIT_CONTIGS.out.gunzip
     ch_versions = ch_versions.mix(UNPIGZ_MEGAHIT_CONTIGS.out.versions)
-
-    PRODIGAL(
+    
+    ch_prodigal = Channel.empty()
+    if(params.orf_caller == 'prodigal'){
+        PRODIGAL(
         UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] },
         //[ [ id: 'all_samples' ], UNPIGZ_MEGAHIT_CONTIGS.out.test ],
         'gff'
     )
+    ch_prodigal_gff = PRODIGAL.out.gene_annotations
+    ch_prodigal_aa  = PRODIGAL.out.amino_acid_fasta
+    ch_prodigal_fna = PRODIGAL.out.nucleotide_fasta
     ch_versions = ch_versions.mix(PRODIGAL.out.versions)
-
+    }
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
     )
