@@ -79,7 +79,7 @@ include { DIGINORM } from '../subworkflows/local/diginorm' addParams(
 def multiqc_options   = modules['multiqc']
 multiqc_options.args += params.multiqc_title ? Utils.joinModuleArgs(["--title \"$params.multiqc_title\""]) : ''
 
-params.prodigal_trainingfile = file("../test_prodigal/training_file.trn")
+//params.prodigal_trainingfile = file("../test_prodigal/training_file.trn")
 def prodigal_options   = modules['prodigal']
 prodigal_options.args += params.prodigal_trainingfile ? Utils.joinModuleArgs("-t $params.prodigal_trainingfile") : ""
 
@@ -197,17 +197,17 @@ workflow METATDENOVO {
     ch_versions = ch_versions.mix(UNPIGZ_MEGAHIT_CONTIGS.out.versions)
     
     ch_prodigal = Channel.empty()
-    if(params.orf_caller == 'prodigal'){
+    if( params.orf_caller == 'prodigal'){
         PRODIGAL(
         UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] },
         //[ [ id: 'all_samples' ], UNPIGZ_MEGAHIT_CONTIGS.out.test ],
         'gff'
-    )
-    ch_prodigal_gff = PRODIGAL.out.gene_annotations
-    ch_prodigal_aa  = PRODIGAL.out.amino_acid_fasta
-    ch_prodigal_fna = PRODIGAL.out.nucleotide_fasta
-    ch_versions = ch_versions.mix(PRODIGAL.out.versions)
-    }
+        )
+        ch_prodigal_gff = PRODIGAL.out.gene_annotations
+        ch_prodigal_aa  = PRODIGAL.out.amino_acid_fasta
+        ch_prodigal_fna = PRODIGAL.out.nucleotide_fasta
+        ch_versions = ch_versions.mix(PRODIGAL.out.versions)
+        }
     
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
