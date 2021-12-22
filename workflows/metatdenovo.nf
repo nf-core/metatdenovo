@@ -79,7 +79,6 @@ include { DIGINORM } from '../subworkflows/local/diginorm' addParams(
 def multiqc_options   = modules['multiqc']
 multiqc_options.args += params.multiqc_title ? Utils.joinModuleArgs(["--title \"$params.multiqc_title\""]) : ''
 
-//params.prodigal_trainingfile = file("../test_prodigal/training_file.trn")
 def prodigal_options   = modules['prodigal']
 prodigal_options.args += params.prodigal_trainingfile ? Utils.joinModuleArgs("-t $params.prodigal_trainingfile") : ""
 
