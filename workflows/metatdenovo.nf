@@ -12,7 +12,7 @@ WorkflowMetatdenovo.initialise(params, log)
 // Validate parameters Orfcaller:
 def valid_params = [
     orf_caller  : ['prodigal']
-    ]
+]
 
 // Check input path parameters to see if they exist
 def checkPathParamList = [ params.input, params.multiqc_config ]
@@ -90,8 +90,8 @@ include { BBMAP_BBDUK   } from '../modules/nf-core/modules/bbmap/bbduk/main'   a
 include { BBMAP_INDEX   } from '../modules/nf-core/modules/bbmap/index/main'   addParams( options: modules['bbmap_index'] )
 include { BBMAP_ALIGN   } from '../modules/nf-core/modules/bbmap/align/main'   addParams( options: modules['bbmap_align'] )
 include { SEQTK_MERGEPE } from '../modules/nf-core/modules/seqtk/mergepe/main' addParams( options: modules['seqtk_mergepe'] )
-include { PROKKA } from '../modules/nf-core/modules/prokka/main' addParams( options: modules['prokka'] )
-include { PRODIGAL } from '../modules/nf-core/modules/prodigal/main' addParams( options: prodigal_options )
+include { PROKKA        } from '../modules/nf-core/modules/prokka/main' addParams( options: modules['prokka'] )
+include { PRODIGAL      } from '../modules/nf-core/modules/prodigal/main' addParams( options: prodigal_options )
 include { MULTIQC       } from '../modules/nf-core/modules/multiqc/main' addParams( options: multiqc_options   )
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'  addParams( options: [publish_files : ['_versions.yml':'']] )
 
@@ -196,17 +196,17 @@ workflow METATDENOVO {
     ch_versions = ch_versions.mix(UNPIGZ_MEGAHIT_CONTIGS.out.versions)
     
     ch_prodigal = Channel.empty()
-    if( params.orf_caller == 'prodigal'){
+    if( params.orf_caller == 'prodigal' ) {
         PRODIGAL(
-        UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] },
-        //[ [ id: 'all_samples' ], UNPIGZ_MEGAHIT_CONTIGS.out.test ],
-        'gff'
+            UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] },
+            //[ [ id: 'all_samples' ], UNPIGZ_MEGAHIT_CONTIGS.out.test ],
+            'gff'
         )
         ch_prodigal_gff = PRODIGAL.out.gene_annotations
         ch_prodigal_aa  = PRODIGAL.out.amino_acid_fasta
         ch_prodigal_fna = PRODIGAL.out.nucleotide_fasta
         ch_versions = ch_versions.mix(PRODIGAL.out.versions)
-        }
+    }
     
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
