@@ -13,6 +13,7 @@ WorkflowMetatdenovo.initialise(params, log)
 def valid_params = [
     orf_caller  : ['prodigal']
 ]
+ORF_CALLER_PRODIGAL = 'prodigal'
 
 // Check input path parameters to see if they exist
 def checkPathParamList = [ params.input, params.multiqc_config ]
@@ -195,7 +196,7 @@ workflow METATDENOVO {
     ch_versions = ch_versions.mix(UNPIGZ_MEGAHIT_CONTIGS.out.versions)
     
     ch_prodigal = Channel.empty()
-    if( params.orf_caller == 'prodigal' ) {
+    if( params.orf_caller == ORF_CALLER_PRODIGAL ) {
         PRODIGAL(
             UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] },
             'gff'
