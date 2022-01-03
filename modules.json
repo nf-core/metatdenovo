@@ -27,6 +27,21 @@
             "prokka": {
                 "git_sha": "49da8642876ae4d91128168cd0db4f1c858d7792"
             },
+            "samtools/flagstat": {
+                "git_sha": "20d8250d9f39ddb05dfb437603aaf99b5c0b2b41"
+            },
+            "samtools/idxstats": {
+                "git_sha": "20d8250d9f39ddb05dfb437603aaf99b5c0b2b41"
+            },
+            "samtools/index": {
+                "git_sha": "0fafaeebf52cc5ab554b83297ed02a48d852a848"
+            },
+            "samtools/sort": {
+                "git_sha": "9d0cad583b9a71a6509b754fdf589cbfbed08961"
+            },
+            "samtools/stats": {
+                "git_sha": "20d8250d9f39ddb05dfb437603aaf99b5c0b2b41"
+            },
             "seqtk/mergepe": {
                 "git_sha": "94025957118a2e1a3c72a3d8d6971777327e0315"
             },

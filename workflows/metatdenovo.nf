@@ -83,6 +83,7 @@ params.prodigal_trainingfile = file("../test_prodigal/training_file.trn")
 def prodigal_options   = modules['prodigal']
 prodigal_options.args += params.prodigal_trainingfile ? Utils.joinModuleArgs("-t $params.prodigal_trainingfile") : ""
 
+
 //
 // MODULE: Installed directly from nf-core/modules
 //
@@ -90,9 +91,12 @@ include { FASTQC        } from '../modules/nf-core/modules/fastqc/main'        a
 include { BBMAP_BBDUK   } from '../modules/nf-core/modules/bbmap/bbduk/main'   addParams( options: modules['bbduk'] )
 include { BBMAP_INDEX   } from '../modules/nf-core/modules/bbmap/index/main'   addParams( options: modules['bbmap_index'] )
 include { BBMAP_ALIGN   } from '../modules/nf-core/modules/bbmap/align/main'   addParams( options: modules['bbmap_align'] )
+include { BAM_SORT_SAMTOOLS } from '../subworkflows/nf-core/bam_sort_samtools' addParams( sort_options: modules['samtools_sort_genomes'], index_options: modules['samtools_index_genomes'], stats_options: modules['samtools_index_genomes'] )
 include { SEQTK_MERGEPE } from '../modules/nf-core/modules/seqtk/mergepe/main' addParams( options: modules['seqtk_mergepe'] )
 include { PROKKA } from '../modules/nf-core/modules/prokka/main' addParams( options: modules['prokka'] )
 include { PRODIGAL } from '../modules/nf-core/modules/prodigal/main' addParams( options: prodigal_options )
+include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS_CDS } from '../modules/nf-core/modules/subread/featurecounts/main' addParams( options: modules['subread_featurecounts_cds'] )
+include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS } from '../modules/nf-core/modules/subread/featurecounts/main' addParams( options: modules['subread_featurecounts'] )
 include { MULTIQC       } from '../modules/nf-core/modules/multiqc/main' addParams( options: multiqc_options   )
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'  addParams( options: [publish_files : ['_versions.yml':'']] )
 
@@ -182,7 +186,7 @@ workflow METATDENOVO {
     //
     BBMAP_ALIGN(ch_clean_reads, BBMAP_INDEX.out.index)
     ch_versions   = ch_versions.mix(BBMAP_ALIGN.out.versions)
-
+    
     //
     // MODULE: Run PROKKA on Megahit output, but split the fasta file in chunks of 10 MiB
     //
@@ -193,29 +197,43 @@ workflow METATDENOVO {
     // MODULE: Call Prodigal
     //
     UNPIGZ_MEGAHIT_CONTIGS(ch_assembly_contigs)
-    //ch_assembly_contigs_unzipped = UNPIGZ_MEGAHIT_CONTIGS.out.gunzip
     ch_versions = ch_versions.mix(UNPIGZ_MEGAHIT_CONTIGS.out.versions)
     
     ch_prodigal = Channel.empty()
     if(params.orf_caller == 'prodigal'){
         PRODIGAL(
         UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] },
-        //[ [ id: 'all_samples' ], UNPIGZ_MEGAHIT_CONTIGS.out.test ],
         'gff'
     )
     ch_prodigal_gff = PRODIGAL.out.gene_annotations
     ch_prodigal_aa  = PRODIGAL.out.amino_acid_fasta
     ch_prodigal_fna = PRODIGAL.out.nucleotide_fasta
-    ch_versions = ch_versions.mix(PRODIGAL.out.versions)
+    ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
     }
     
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
     )
-
+    
+    //
+    // MODULE: FeatureCounts
+    //
+    BAM_SORT_SAMTOOLS ( UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] } )
+    //BAM_SORT_SAMTOOLS ( BBMAP_ALIGN.out.bam )
+    //    ch_versions = ch_versions.mix(BAM_SORT_SAMTOOLS.out.versions)
+        
+    //BAM_SORT_SAMTOOLS
+    //    .combine(ch_prodigal_gff)
+    //    .set { ch_featurecounts }
+    
+    ch_cds_counts = Channel.empty()
+    //FEATURECOUNTS_CDS ( ch_featurecounts )
+    //ch_versions = ch_versions.mix(FEATURECOUNTS_CDS.out.versions)
+    // FEATURECOUNTS ( ch_featurecounts) 
     //
     // MODULE: MultiQC
     //
+
     workflow_summary    = WorkflowMetatdenovo.paramsSummaryMultiqc(workflow, summary_params)
     ch_workflow_summary = Channel.value(workflow_summary)
 
