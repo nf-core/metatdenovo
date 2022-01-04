@@ -64,6 +64,17 @@ include { DIGINORM } from '../subworkflows/local/diginorm' addParams(
     diginorm_extractpairedreads_options: diginorm_extractpairedreads_options
 )
 
+//
+// SUBWORKFLOW: Consisting of nf-core/modules
+//
+def prokka_options              = modules['prokka']
+def cat_options                 = modules['cat_cat']
+
+include { PROKKA_CAT } from '../subworkflows/local/prokka_cat' addParams(
+    prokka_options: prokka_options,
+    cat_options:    cat_options
+)
+
 /*
 ========================================================================================
     IMPORT NF-CORE MODULES/SUBWORKFLOWS
@@ -79,7 +90,6 @@ multiqc_options.args += params.multiqc_title ? Utils.joinModuleArgs(["--title \"
 include { FASTQC        } from '../modules/nf-core/modules/fastqc/main'        addParams( options: modules['fastqc'] )
 include { BBMAP_BBDUK   } from '../modules/nf-core/modules/bbmap/bbduk/main'   addParams( options: modules['bbduk'] )
 include { SEQTK_MERGEPE } from '../modules/nf-core/modules/seqtk/mergepe/main' addParams( options: modules['seqtk_mergepe'] )
-include { PROKKA } from '../modules/nf-core/modules/prokka/main' addParams( options: modules['prokka'] )
 //include { PRODIGAL } from '../modules/nf-core/modules/prodigal/main' addParams( options: modules['prodigal'] )
 include { MULTIQC       } from '../modules/nf-core/modules/multiqc/main' addParams( options: multiqc_options   )
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'  addParams( options: [publish_files : ['_versions.yml':'']] )
@@ -159,10 +169,10 @@ workflow METATDENOVO {
     ch_versions = ch_versions.mix(MEGAHIT_INTERLEAVED.out.versions)
 
     //
-    // MODULE: Run PROKKA on Megahit output, but split the fasta file in chunks of 1000
+    // SUBWORKFLOW: Run PROKKA on Megahit output, but split the fasta file in chunks of 1000, then concatenate and compress output.
     //
-    PROKKA(MEGAHIT_INTERLEAVED.out.contigs.splitFasta( size: 10.MB, file: true).map { [[id: 'part_of_all_samples'], it] }, [], [] )
-    ch_versions = ch_versions.mix(PROKKA.out.versions)
+    PROKKA_CAT(MEGAHIT_INTERLEAVED.out.contigs)
+    ch_versions = ch_versions.mix(PROKKA_CAT.out.versions)
 
 //    //
 //    // MODULE: Call Prodigal
