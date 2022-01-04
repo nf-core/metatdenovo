@@ -81,7 +81,7 @@
                 },
                 "orf_caller": {
                     "type": "string",
-                    "description": "Specify which ORF caller you would like to run.",
+                    "description": "possible alternatives: prodigal, default: prodigal.",
                     "default": "prodigal"
                 }
             }
