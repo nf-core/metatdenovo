@@ -83,6 +83,12 @@
                     "type": "string",
                     "description": "possible alternatives: prodigal, default: prodigal.",
                     "default": "prodigal"
+                },
+                "training_file": {
+                    "type": "string",
+                    "default": "-t $params.prodigal_trainingfile",
+                    "hidden": true,
+                    "description": "add a training file to prodigal"
                 }
             }
         },
