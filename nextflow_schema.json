@@ -81,8 +81,13 @@
                 },
                 "orf_caller": {
                     "type": "string",
-                    "description": "Specify which ORF caller you would like to run.",
+                    "description": "Specify which ORF caller you would like to run, possible alternatives: prodigal, default: prodigal.",
                     "default": "prodigal"
+                },
+                "training_file": {
+                    "type": "string",
+                    "hidden": true,
+                    "description": "add a trainingfile to prodigal"
                 }
             }
         },
