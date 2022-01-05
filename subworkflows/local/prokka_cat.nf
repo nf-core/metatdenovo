@@ -17,7 +17,7 @@ workflow PROKKA_CAT {
     main:
         ch_versions = Channel.empty()
 
-        PROKKA  (contigs.splitFasta( by: 10, file: true).map { contigs -> [[id: contigs.getBaseName()], contigs] }, [], [] )
+        PROKKA  (contigs.splitFasta(size: 10.MB, file: true).map { contigs -> [[id: contigs.getBaseName()], contigs] }, [], [] )
         ch_versions = ch_versions.mix(PROKKA.out.versions)
         GFF_CAT (PROKKA.out.gff.collect{it[1]}, 'prokka.gff.gz')
         FAA_CAT (PROKKA.out.faa.collect{it[1]}, 'prokka.faa.gz')  
