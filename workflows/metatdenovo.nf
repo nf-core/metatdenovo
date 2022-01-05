@@ -11,9 +11,10 @@ WorkflowMetatdenovo.initialise(params, log)
 
 // Validate parameters Orfcaller:
 def valid_params = [
-    orf_caller  : ['prodigal']
+    orf_caller  : ['prodigal','prokka']
 ]
 ORF_CALLER_PRODIGAL = 'prodigal'
+ORF_CALLER_PROKKA   = 'prokka'
 
 // Check input path parameters to see if they exist
 def checkPathParamList = [ params.input, params.multiqc_config ]
@@ -196,8 +197,10 @@ workflow METATDENOVO {
     //
     // SUBWORKFLOW: Run PROKKA on Megahit output, but split the fasta file in chunks of 10 MB, then concatenate and compress output.
     //
-    PROKKA_CAT(MEGAHIT_INTERLEAVED.out.contigs)
-    ch_versions = ch_versions.mix(PROKKA_CAT.out.versions)
+    if (params.orf_caller == ORF_CALLER_PROKKA) {
+        PROKKA_CAT(MEGAHIT_INTERLEAVED.out.contigs)
+        ch_versions = ch_versions.mix(PROKKA_CAT.out.versions)
+    }
 
     //
     // MODULE: Call Prodigal
