@@ -9,6 +9,12 @@ def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
 // Validate input parameters
 WorkflowMetatdenovo.initialise(params, log)
 
+// Validate parameters Orfcaller:
+def valid_params = [
+    orf_caller  : ['prodigal']
+]
+ORF_CALLER_PRODIGAL = 'prodigal'
+
 // Check input path parameters to see if they exist
 def checkPathParamList = [ params.input, params.multiqc_config ]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
@@ -35,6 +41,7 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 def modules = params.modules.clone()
 
 include { MEGAHIT_INTERLEAVED } from '../modules/local/megahit/interleaved.nf' addParams( options: modules['megahit'] )
+include { UNPIGZ as UNPIGZ_MEGAHIT_CONTIGS } from '../modules/local/unpigz.nf' addParams( options: modules['unpigz_megahit_contigs'])
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -73,6 +80,9 @@ include { DIGINORM } from '../subworkflows/local/diginorm' addParams(
 def multiqc_options   = modules['multiqc']
 multiqc_options.args += params.multiqc_title ? Utils.joinModuleArgs(["--title \"$params.multiqc_title\""]) : ''
 
+def prodigal_options   = modules['prodigal']
+prodigal_options.args += params.prodigal_trainingfile ? Utils.joinModuleArgs("-t $params.prodigal_trainingfile") : ""
+
 //
 // MODULE: Installed directly from nf-core/modules
 //
@@ -81,8 +91,8 @@ include { BBMAP_BBDUK   } from '../modules/nf-core/modules/bbmap/bbduk/main'   a
 include { BBMAP_INDEX   } from '../modules/nf-core/modules/bbmap/index/main'   addParams( options: modules['bbmap_index'] )
 include { BBMAP_ALIGN   } from '../modules/nf-core/modules/bbmap/align/main'   addParams( options: modules['bbmap_align'] )
 include { SEQTK_MERGEPE } from '../modules/nf-core/modules/seqtk/mergepe/main' addParams( options: modules['seqtk_mergepe'] )
-include { PROKKA } from '../modules/nf-core/modules/prokka/main' addParams( options: modules['prokka'] )
-//include { PRODIGAL } from '../modules/nf-core/modules/prodigal/main' addParams( options: modules['prodigal'] )
+include { PROKKA        } from '../modules/nf-core/modules/prokka/main' addParams( options: modules['prokka'] )
+include { PRODIGAL      } from '../modules/nf-core/modules/prodigal/main' addParams( options: prodigal_options )
 include { MULTIQC       } from '../modules/nf-core/modules/multiqc/main' addParams( options: multiqc_options   )
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'  addParams( options: [publish_files : ['_versions.yml':'']] )
 
@@ -179,12 +189,24 @@ workflow METATDENOVO {
     PROKKA(MEGAHIT_INTERLEAVED.out.contigs.splitFasta( size: 10.MB, file: true).map { [[id: 'part_of_all_samples'], it] }, [], [] )
     ch_versions = ch_versions.mix(PROKKA.out.versions)
 
-//    //
-//    // MODULE: Call Prodigal
-//    //
-//    PRODIGAL([ [id: 'full_assembly' ], MEGAHIT_INTERLEAVED.out.contigs)
-//    ch_versions = ch_versions.mix(PRODIGAL.out.versions)
-
+    //
+    // MODULE: Call Prodigal
+    //
+    UNPIGZ_MEGAHIT_CONTIGS(ch_assembly_contigs)
+    ch_versions = ch_versions.mix(UNPIGZ_MEGAHIT_CONTIGS.out.versions)
+    
+    ch_prodigal = Channel.empty()
+    if( params.orf_caller == ORF_CALLER_PRODIGAL ) {
+        PRODIGAL(
+            UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] },
+            'gff'
+        )
+        ch_prodigal_gff = PRODIGAL.out.gene_annotations
+        ch_prodigal_aa  = PRODIGAL.out.amino_acid_fasta
+        ch_prodigal_fna = PRODIGAL.out.nucleotide_fasta
+        ch_versions = ch_versions.mix(PRODIGAL.out.versions)
+    }
+    
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
     )
