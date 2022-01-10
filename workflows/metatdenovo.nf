@@ -9,12 +9,13 @@ def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
 // Validate input parameters
 WorkflowMetatdenovo.initialise(params, log)
 
-// Validate parameters Orfcaller:
-def valid_params = [
-    orf_caller  : ['prodigal','prokka']
-]
+// Validate parameters for orf_caller:
 ORF_CALLER_PRODIGAL = 'prodigal'
 ORF_CALLER_PROKKA   = 'prokka'
+
+def valid_params = [
+    orf_caller  : [ORF_CALLER_PRODIGAL, ORF_CALLER_PROKKA]
+]
 
 // Check input path parameters to see if they exist
 def checkPathParamList = [ params.input, params.multiqc_config ]
