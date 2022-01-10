@@ -77,7 +77,7 @@ include { DIGINORM } from '../subworkflows/local/diginorm' addParams(
 // SUBWORKFLOW: Consisting of nf-core/modules
 //
 def prokka_options              = modules['prokka']
-def cat_options                 = modules['cat_cat']
+def cat_options                 = modules['prokka_cat']
 
 include { PROKKA_CAT } from '../subworkflows/local/prokka_cat' addParams(
     prokka_options: prokka_options,
