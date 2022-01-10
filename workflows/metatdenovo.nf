@@ -9,11 +9,13 @@ def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
 // Validate input parameters
 WorkflowMetatdenovo.initialise(params, log)
 
-// Validate parameters Orfcaller:
-def valid_params = [
-    orf_caller  : ['prodigal']
-]
+// Validate parameters for orf_caller:
 ORF_CALLER_PRODIGAL = 'prodigal'
+ORF_CALLER_PROKKA   = 'prokka'
+
+def valid_params = [
+    orf_caller  : [ORF_CALLER_PRODIGAL, ORF_CALLER_PROKKA]
+]
 
 // Check input path parameters to see if they exist
 def checkPathParamList = [ params.input, params.multiqc_config ]
@@ -71,6 +73,17 @@ include { DIGINORM } from '../subworkflows/local/diginorm' addParams(
     diginorm_extractpairedreads_options: diginorm_extractpairedreads_options
 )
 
+//
+// SUBWORKFLOW: Consisting of nf-core/modules
+//
+def prokka_options              = modules['prokka']
+def cat_options                 = modules['prokka_cat']
+
+include { PROKKA_CAT } from '../subworkflows/local/prokka_cat' addParams(
+    prokka_options: prokka_options,
+    cat_options:    cat_options
+)
+
 /*
 ========================================================================================
     IMPORT NF-CORE MODULES/SUBWORKFLOWS
@@ -91,7 +104,6 @@ include { BBMAP_BBDUK   } from '../modules/nf-core/modules/bbmap/bbduk/main'   a
 include { BBMAP_INDEX   } from '../modules/nf-core/modules/bbmap/index/main'   addParams( options: modules['bbmap_index'] )
 include { BBMAP_ALIGN   } from '../modules/nf-core/modules/bbmap/align/main'   addParams( options: modules['bbmap_align'] )
 include { SEQTK_MERGEPE } from '../modules/nf-core/modules/seqtk/mergepe/main' addParams( options: modules['seqtk_mergepe'] )
-include { PROKKA        } from '../modules/nf-core/modules/prokka/main' addParams( options: modules['prokka'] )
 include { PRODIGAL      } from '../modules/nf-core/modules/prodigal/main' addParams( options: prodigal_options )
 include { MULTIQC       } from '../modules/nf-core/modules/multiqc/main' addParams( options: multiqc_options   )
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'  addParams( options: [publish_files : ['_versions.yml':'']] )
@@ -184,10 +196,12 @@ workflow METATDENOVO {
     ch_versions   = ch_versions.mix(BBMAP_ALIGN.out.versions)
 
     //
-    // MODULE: Run PROKKA on Megahit output, but split the fasta file in chunks of 10 MiB
+    // SUBWORKFLOW: Run PROKKA on Megahit output, but split the fasta file in chunks of 10 MB, then concatenate and compress output.
     //
-    PROKKA(MEGAHIT_INTERLEAVED.out.contigs.splitFasta( size: 10.MB, file: true).map { [[id: 'part_of_all_samples'], it] }, [], [] )
-    ch_versions = ch_versions.mix(PROKKA.out.versions)
+    if (params.orf_caller == ORF_CALLER_PROKKA) {
+        PROKKA_CAT(MEGAHIT_INTERLEAVED.out.contigs)
+        ch_versions = ch_versions.mix(PROKKA_CAT.out.versions)
+    }
 
     //
     // MODULE: Call Prodigal
