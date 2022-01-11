@@ -16,10 +16,10 @@
                 "git_sha": "c4549c0ecd1b02473471b507fd88a9fd5289d91c"
             },
             "custom/dumpsoftwareversions": {
-                "git_sha": "84f2302920078b0cf7716b2a2e5fcc0be5c4531d"
+                "git_sha": "20d8250d9f39ddb05dfb437603aaf99b5c0b2b41"
             },
             "fastqc": {
-                "git_sha": "7b3315591a149609e27914965f858c9a7e071564"
+                "git_sha": "9d0cad583b9a71a6509b754fdf589cbfbed08961"
             },
             "multiqc": {
                 "git_sha": "7b3315591a149609e27914965f858c9a7e071564"
@@ -37,7 +37,7 @@
                 "git_sha": "9d0cad583b9a71a6509b754fdf589cbfbed08961"
             },
             "trimgalore": {
-                "git_sha": "3aacd46da2b221ed47aaa05c413a828538d2c2ae"
+                "git_sha": "20d8250d9f39ddb05dfb437603aaf99b5c0b2b41"
             }
         }
     }
