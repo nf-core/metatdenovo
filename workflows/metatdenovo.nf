@@ -83,6 +83,8 @@ multiqc_options.args += params.multiqc_title ? Utils.joinModuleArgs(["--title \"
 def prodigal_options   = modules['prodigal']
 prodigal_options.args += params.prodigal_trainingfile ? Utils.joinModuleArgs("-t $params.prodigal_trainingfile") : ""
 
+subread_featurecounts_options_cds        = modules['subread_featurecounts_cds']
+
 //
 // MODULE: Installed directly from nf-core/modules
 //
@@ -90,9 +92,10 @@ include { FASTQC        } from '../modules/nf-core/modules/fastqc/main'        a
 include { BBMAP_BBDUK   } from '../modules/nf-core/modules/bbmap/bbduk/main'   addParams( options: modules['bbduk'] )
 include { BBMAP_INDEX   } from '../modules/nf-core/modules/bbmap/index/main'   addParams( options: modules['bbmap_index'] )
 include { BBMAP_ALIGN   } from '../modules/nf-core/modules/bbmap/align/main'   addParams( options: modules['bbmap_align'] )
-include { BAM_SORT_SAMTOOLS } from '../subworkflows/nf-core/bam_sort_samtools' addParams( sort_options: modules['samtools_sort_genomes'], index_options: modules['samtools_index_genomes'], stats_options: modules['samtools_index_genomes'] )
+//include { BAM_SORT_SAMTOOLS } from '../subworkflows/nf-core/bam_sort_samtools/main' addParams( sort_options: modules['samtools_sort_genomes'], index_options: modules['samtools_index_genomes'], stats_options: modules['samtools_index_genomes'] )
+include { BAM_SORT_SAMTOOLS } from '../subworkflows/nf-core/bam_sort_samtools/main' addParams( options: modules['bam_sort_samtools'])
 include { SEQTK_MERGEPE } from '../modules/nf-core/modules/seqtk/mergepe/main' addParams( options: modules['seqtk_mergepe'] )
-include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS_CDS } from '../modules/nf-core/modules/subread/featurecounts/main' addParams( options: modules['subread_featurecounts_cds'] )
+//include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS_CDS   } from '../modules/nf-core/modules/subread/featurecounts/main' addParams( options: subread_featurecounts_options_cds )
 include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS } from '../modules/nf-core/modules/subread/featurecounts/main' addParams( options: modules['subread_featurecounts'] )
 include { PROKKA        } from '../modules/nf-core/modules/prokka/main' addParams( options: modules['prokka'] )
 include { PRODIGAL      } from '../modules/nf-core/modules/prodigal/main' addParams( options: prodigal_options )
@@ -186,12 +189,6 @@ workflow METATDENOVO {
     BBMAP_ALIGN ( ch_clean_reads, BBMAP_INDEX.out.index )
     ch_versions = ch_versions.mix(BBMAP_ALIGN.out.versions)
     
-    ch_alignment = BBMAP_ALIGN.out.bam
-    ch_alignment.view()
-    ch_indexing  = BBMAP_INDEX.out.index
-    ch_to_sort   = ch_alignment.mix(BBMAP_INDEX.out.index)
-
-    
     //
     // SUBWORKFLOW: sort bam file
     //
@@ -216,7 +213,7 @@ workflow METATDENOVO {
             UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] },
             'gff'
         )
-        ch_prodigal_gff = PRODIGAL.out.gene_annotations
+        ch_prodigal_gff = PRODIGAL.out.gene_annotations.map { it[1] }
         ch_prodigal_aa  = PRODIGAL.out.amino_acid_fasta
         ch_prodigal_fna = PRODIGAL.out.nucleotide_fasta
         ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
@@ -229,15 +226,15 @@ workflow METATDENOVO {
     //
     // MODULE: FeatureCounts
     //
-        
-    //BAM_SORT_SAMTOOLS
-    //    .combine(ch_prodigal_gff)
-    //    .set { ch_featurecounts }
     
-    ch_cds_counts = Channel.empty()
-    //FEATURECOUNTS_CDS ( ch_featurecounts )
-    //ch_versions = ch_versions.mix(FEATURECOUNTS_CDS.out.versions)
-    // FEATURECOUNTS ( ch_featurecounts) 
+    //BAM_SORT_SAMTOOLS.out.bam
+    //    .combine(ch_prodigal_gff)
+    /    .set { ch_featurecounts }
+    
+    //ch_cds_counts = Channel.empty() 
+    
+    //FEATURECOUNTS ( ch_featurecounts)
+    //ch_versions   = ch_versions.mix(FEATURECOUNTS.out.versions)
     //
     // MODULE: MultiQC
     //
