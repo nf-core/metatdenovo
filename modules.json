@@ -4,13 +4,13 @@
     "repos": {
         "nf-core/modules": {
             "bbmap/align": {
-                "git_sha": "8b4bfb12bb95930feafaf7b019c9cf82e2a1f0b2"
+                "git_sha": "9d0cad583b9a71a6509b754fdf589cbfbed08961"
             },
             "bbmap/bbduk": {
-                "git_sha": "49da8642876ae4d91128168cd0db4f1c858d7792"
+                "git_sha": "9d0cad583b9a71a6509b754fdf589cbfbed08961"
             },
             "bbmap/index": {
-                "git_sha": "49da8642876ae4d91128168cd0db4f1c858d7792"
+                "git_sha": "20d8250d9f39ddb05dfb437603aaf99b5c0b2b41"
             },
             "cat/cat": {
                 "git_sha": "c4549c0ecd1b02473471b507fd88a9fd5289d91c"
@@ -22,22 +22,22 @@
                 "git_sha": "9d0cad583b9a71a6509b754fdf589cbfbed08961"
             },
             "multiqc": {
-                "git_sha": "7b3315591a149609e27914965f858c9a7e071564"
-            },
-            "prodigal": {
                 "git_sha": "20d8250d9f39ddb05dfb437603aaf99b5c0b2b41"
             },
+            "prodigal": {
+                "git_sha": "d473a247d2e0c619b0df877ea19d9a5a98c8e3c8"
+            },
             "prokka": {
-                "git_sha": "49da8642876ae4d91128168cd0db4f1c858d7792"
+                "git_sha": "d473a247d2e0c619b0df877ea19d9a5a98c8e3c8"
             },
             "seqtk/mergepe": {
-                "git_sha": "94025957118a2e1a3c72a3d8d6971777327e0315"
+                "git_sha": "9d0cad583b9a71a6509b754fdf589cbfbed08961"
             },
             "subread/featurecounts": {
                 "git_sha": "9d0cad583b9a71a6509b754fdf589cbfbed08961"
             },
             "trimgalore": {
-                "git_sha": "20d8250d9f39ddb05dfb437603aaf99b5c0b2b41"
+                "git_sha": "9d0cad583b9a71a6509b754fdf589cbfbed08961"
             }
         }
     }
