@@ -1,22 +1,11 @@
-// Import generic module functions
-include { initOptions; saveFiles; getSoftwareName; getProcessName } from './functions'
-
-params.options = [:]
-options        = initOptions(params.options)
-
 process MEGAHIT_INTERLEAVED {
     tag "$assembly"
     label 'process_high'
-    publishDir "${params.outdir}",
-        mode: params.publish_dir_mode,
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process)) }
 
     conda (params.enable_conda ? "bioconda::megahit=1.2.9 conda-forge::pigz=2.6" : null)
-    if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
-        container "https://depot.galaxyproject.org/singularity/mulled-v2-0f92c152b180c7cd39d9b0e6822f8c89ccb59c99:8ec213d21e5d03f9db54898a2baeaf8ec729b447-0"
-    } else {
-        container "quay.io/biocontainers/mulled-v2-0f92c152b180c7cd39d9b0e6822f8c89ccb59c99:8ec213d21e5d03f9db54898a2baeaf8ec729b447-0"
-    }
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'https://depot.galaxyproject.org/singularity/mulled-v2-0f92c152b180c7cd39d9b0e6822f8c89ccb59c99:8ec213d21e5d03f9db54898a2baeaf8ec729b447-0' :
+        'quay.io/biocontainers/mulled-v2-0f92c152b180c7cd39d9b0e6822f8c89ccb59c99:8ec213d21e5d03f9db54898a2baeaf8ec729b447-0' }"
 
     input:
     path intl_pe_reads
@@ -32,6 +21,9 @@ process MEGAHIT_INTERLEAVED {
     path "versions.yml"                                            , emit: versions
 
     script:
+    def args = task.ext.args ?: ''
+    def args2 = task.ext.args2 ?: ''
+    def prefix = task.ext.prefix ?: ''
     single_ends = se_reads ? "-r ${se_reads.join(',')}" : ""
     
     """
@@ -39,19 +31,19 @@ process MEGAHIT_INTERLEAVED {
         --12 ${intl_pe_reads.join(',')} \\
         ${single_ends} \\
         -t $task.cpus \\
-        $options.args \\
+        $args \\
         --out-prefix $assembly
 
     pigz \\
         --no-name \\
         -p $task.cpus \\
-        $options.args2 \\
+        $args2 \\
         megahit_out/*.fa \\
         megahit_out/intermediate_contigs/*.fa
 
     cat <<-END_VERSIONS > versions.yml
-    ${getProcessName(task.process)}:
-        ${getSoftwareName(task.process)}: \$(echo \$(megahit -v 2>&1) | sed 's/MEGAHIT v//')
+    "${task.process}":
+        megahit_interleaved: \$(echo \$(megahit -v 2>&1) | sed 's/MEGAHIT v//')
     END_VERSIONS
     """
 }
