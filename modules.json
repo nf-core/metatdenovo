@@ -33,9 +33,6 @@
             "seqtk/mergepe": {
                 "git_sha": "9d0cad583b9a71a6509b754fdf589cbfbed08961"
             },
-            "subread/featurecounts": {
-                "git_sha": "9d0cad583b9a71a6509b754fdf589cbfbed08961"
-            },
             "trimgalore": {
                 "git_sha": "9d0cad583b9a71a6509b754fdf589cbfbed08961"
             }

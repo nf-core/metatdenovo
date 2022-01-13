@@ -153,8 +153,8 @@ workflow METATDENOVO {
     // MODULE: Run Megahit on all interleaved fastq files
     //
     MEGAHIT_INTERLEAVED(
-        ch_pe_reads_to_assembly.collect(), 
-        ch_se_reads_to_assembly.collect(), 
+        ch_pe_reads_to_assembly.collect(),
+        ch_se_reads_to_assembly.collect(),
         'all_samples'
     )
     ch_assembly_contigs = MEGAHIT_INTERLEAVED.out.contigs
@@ -185,7 +185,7 @@ workflow METATDENOVO {
     //
     UNPIGZ_MEGAHIT_CONTIGS(ch_assembly_contigs)
     ch_versions = ch_versions.mix(UNPIGZ_MEGAHIT_CONTIGS.out.versions)
-    
+
     ch_prodigal = Channel.empty()
     if( params.orf_caller == ORF_CALLER_PRODIGAL ) {
         PRODIGAL(
@@ -197,7 +197,7 @@ workflow METATDENOVO {
         ch_prodigal_fna = PRODIGAL.out.nucleotide_fasta
         ch_versions = ch_versions.mix(PRODIGAL.out.versions)
     }
-    
+
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
     )

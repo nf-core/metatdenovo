@@ -20,7 +20,7 @@ process KHMER_FILTERABUND {
     def args = task.ext.args ?: ''
     def args2 = task.ext.args2 ?: ''
     def prefix = task.ext.prefix ?: ''
-    
+
     """
     filter-abund.py \\
         --gzip \\
