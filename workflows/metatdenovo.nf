@@ -41,8 +41,8 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 //
 // MODULE: local
 //
-include { MEGAHIT_INTERLEAVED } from '../modules/local/megahit/interleaved.nf' addParams( options: modules['megahit'] )
-include { UNPIGZ as UNPIGZ_MEGAHIT_CONTIGS } from '../modules/local/unpigz.nf' addParams( options: modules['unpigz_megahit_contigs'])
+include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved.nf'
+include { UNPIGZ as UNPIGZ_MEGAHIT_CONTIGS } from '../modules/local/unpigz.nf'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -52,36 +52,20 @@ include { INPUT_CHECK } from '../subworkflows/local/input_check'
 //
 // SUBWORKFLOW: Adapted from rnaseq!
 //
-def trimgalore_options    = modules['trimgalore']
-trimgalore_options.args  += params.trim_nextseq > 0 ? Utils.joinModuleArgs(["--nextseq ${params.trim_nextseq}"]) : ''
 
-include { FASTQC_TRIMGALORE } from '../subworkflows/local/fastqc_trimgalore' addParams( fastqc_options: modules['fastqc'], trimgalore_options: trimgalore_options )
+include { FASTQC_TRIMGALORE } from '../subworkflows/local/fastqc_trimgalore'
 
 //
 // SUBWORKFLOW: Perform digital normalization
 //
-def diginorm_normalizebymedian_options    = modules['diginorm_normalizebymedian']
-diginorm_normalizebymedian_options.args  += Utils.joinModuleArgs(["-C ${params.diginorm_C} -k ${params.diginorm_k}"])
-def diginorm_filterabund_options          = modules['diginorm_filterabund']
-diginorm_filterabund_options.args        += Utils.joinModuleArgs(["-C ${params.diginorm_C} -Z ${params.diginorm_C}"])
-def diginorm_extractpairedreads_options   = modules['diginorm_extractpairedreads']
 
-include { DIGINORM } from '../subworkflows/local/diginorm' addParams(
-    diginorm_normalizebymedian_options:  diginorm_normalizebymedian_options, 
-    diginorm_filterabund_options:        diginorm_filterabund_options,
-    diginorm_extractpairedreads_options: diginorm_extractpairedreads_options
-)
+include { DIGINORM } from '../subworkflows/local/diginorm'
 
 //
 // SUBWORKFLOW: Consisting of nf-core/modules
 //
-def prokka_options              = modules['prokka']
-def cat_options                 = modules['prokka_cat']
 
-include { PROKKA_CAT } from '../subworkflows/local/prokka_cat' addParams(
-    prokka_options: prokka_options,
-    cat_options:    cat_options
-)
+include { PROKKA_CAT } from '../subworkflows/local/prokka_cat'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -89,23 +73,17 @@ include { PROKKA_CAT } from '../subworkflows/local/prokka_cat' addParams(
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-def multiqc_options   = modules['multiqc']
-multiqc_options.args += params.multiqc_title ? Utils.joinModuleArgs(["--title \"$params.multiqc_title\""]) : ''
-
-def prodigal_options   = modules['prodigal']
-prodigal_options.args += params.prodigal_trainingfile ? Utils.joinModuleArgs("-t $params.prodigal_trainingfile") : ""
-
 //
 // MODULE: Installed directly from nf-core/modules
 //
-include { FASTQC        } from '../modules/nf-core/modules/fastqc/main'        addParams( options: modules['fastqc'] )
-include { BBMAP_BBDUK   } from '../modules/nf-core/modules/bbmap/bbduk/main'   addParams( options: modules['bbduk'] )
-include { BBMAP_INDEX   } from '../modules/nf-core/modules/bbmap/index/main'   addParams( options: modules['bbmap_index'] )
-include { BBMAP_ALIGN   } from '../modules/nf-core/modules/bbmap/align/main'   addParams( options: modules['bbmap_align'] )
-include { SEQTK_MERGEPE } from '../modules/nf-core/modules/seqtk/mergepe/main' addParams( options: modules['seqtk_mergepe'] )
-include { PRODIGAL      } from '../modules/nf-core/modules/prodigal/main' addParams( options: prodigal_options )
-include { MULTIQC       } from '../modules/nf-core/modules/multiqc/main' addParams( options: multiqc_options   )
-include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'  addParams( options: [publish_files : ['_versions.yml':'']] )
+include { FASTQC                      } from '../modules/nf-core/modules/fastqc/main'
+include { BBMAP_BBDUK                 } from '../modules/nf-core/modules/bbmap/bbduk/main'
+include { BBMAP_INDEX                 } from '../modules/nf-core/modules/bbmap/index/main'
+include { BBMAP_ALIGN                 } from '../modules/nf-core/modules/bbmap/align/main'
+include { SEQTK_MERGEPE               } from '../modules/nf-core/modules/seqtk/mergepe/main'
+include { PRODIGAL                    } from '../modules/nf-core/modules/prodigal/main'
+include { MULTIQC                     } from '../modules/nf-core/modules/multiqc/main'
+include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
