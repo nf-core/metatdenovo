@@ -1,7 +1,7 @@
 /*
-========================================================================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     VALIDATE INPUTS
-========================================================================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
 def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
@@ -9,11 +9,13 @@ def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
 // Validate input parameters
 WorkflowMetatdenovo.initialise(params, log)
 
-// Validate parameters Orfcaller:
-def valid_params = [
-    orf_caller  : ['prodigal']
-]
+// Validate parameters for orf_caller:
 ORF_CALLER_PRODIGAL = 'prodigal'
+ORF_CALLER_PROKKA   = 'prokka'
+
+def valid_params = [
+    orf_caller  : [ORF_CALLER_PRODIGAL, ORF_CALLER_PROKKA]
+]
 
 // Check input path parameters to see if they exist
 def checkPathParamList = [ params.input, params.multiqc_config ]
@@ -23,89 +25,76 @@ for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true
 if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input samplesheet not specified!' }
 
 /*
-========================================================================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     CONFIG FILES
-========================================================================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
 ch_multiqc_config        = file("$projectDir/assets/multiqc_config.yaml", checkIfExists: true)
 ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multiqc_config) : Channel.empty()
 
 /*
-========================================================================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     IMPORT LOCAL MODULES/SUBWORKFLOWS
-========================================================================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-
-// Don't overwrite global params.modules, create a copy instead and use that within the main script.
-def modules = params.modules.clone()
-
-include { MEGAHIT_INTERLEAVED } from '../modules/local/megahit/interleaved.nf' addParams( options: modules['megahit'] )
-include { UNPIGZ as UNPIGZ_MEGAHIT_CONTIGS } from '../modules/local/unpigz.nf' addParams( options: modules['unpigz_megahit_contigs'])
+//
+// MODULE: local
+//
+include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved.nf'
+include { UNPIGZ as UNPIGZ_MEGAHIT_CONTIGS } from '../modules/local/unpigz.nf'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
-include { INPUT_CHECK } from '../subworkflows/local/input_check' addParams( options: [:] )
+include { INPUT_CHECK } from '../subworkflows/local/input_check'
 
 //
 // SUBWORKFLOW: Adapted from rnaseq!
 //
-def trimgalore_options    = modules['trimgalore']
-trimgalore_options.args  += params.trim_nextseq > 0 ? Utils.joinModuleArgs(["--nextseq ${params.trim_nextseq}"]) : ''
 
-include { FASTQC_TRIMGALORE } from '../subworkflows/local/fastqc_trimgalore' addParams( fastqc_options: modules['fastqc'], trimgalore_options: trimgalore_options )
+include { FASTQC_TRIMGALORE } from '../subworkflows/local/fastqc_trimgalore'
 
 //
 // SUBWORKFLOW: Perform digital normalization
 //
-def diginorm_normalizebymedian_options    = modules['diginorm_normalizebymedian']
-diginorm_normalizebymedian_options.args  += Utils.joinModuleArgs(["-C ${params.diginorm_C} -k ${params.diginorm_k}"])
-def diginorm_filterabund_options          = modules['diginorm_filterabund']
-diginorm_filterabund_options.args        += Utils.joinModuleArgs(["-C ${params.diginorm_C} -Z ${params.diginorm_C}"])
-def diginorm_extractpairedreads_options   = modules['diginorm_extractpairedreads']
 
-include { DIGINORM } from '../subworkflows/local/diginorm' addParams(
-    diginorm_normalizebymedian_options:  diginorm_normalizebymedian_options, 
-    diginorm_filterabund_options:        diginorm_filterabund_options,
-    diginorm_extractpairedreads_options: diginorm_extractpairedreads_options
-)
+include { DIGINORM } from '../subworkflows/local/diginorm'
+
+//
+// SUBWORKFLOW: Consisting of nf-core/modules
+//
+
+include { PROKKA_CAT } from '../subworkflows/local/prokka_cat'
 
 /*
-========================================================================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     IMPORT NF-CORE MODULES/SUBWORKFLOWS
-========================================================================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-def multiqc_options   = modules['multiqc']
-multiqc_options.args += params.multiqc_title ? Utils.joinModuleArgs(["--title \"$params.multiqc_title\""]) : ''
-
-def prodigal_options   = modules['prodigal']
-prodigal_options.args += params.prodigal_trainingfile ? Utils.joinModuleArgs("-t $params.prodigal_trainingfile") : ""
-
-subread_featurecounts_options_cds        = modules['subread_featurecounts_cds']
+//subread_featurecounts_options_cds        = modules['subread_featurecounts_cds']
 
 //
 // MODULE: Installed directly from nf-core/modules
 //
-include { FASTQC        } from '../modules/nf-core/modules/fastqc/main'        addParams( options: modules['fastqc'] )
-include { BBMAP_BBDUK   } from '../modules/nf-core/modules/bbmap/bbduk/main'   addParams( options: modules['bbduk'] )
-include { BBMAP_INDEX   } from '../modules/nf-core/modules/bbmap/index/main'   addParams( options: modules['bbmap_index'] )
-include { BBMAP_ALIGN   } from '../modules/nf-core/modules/bbmap/align/main'   addParams( options: modules['bbmap_align'] )
-//include { BAM_SORT_SAMTOOLS } from '../subworkflows/nf-core/bam_sort_samtools/main' addParams( sort_options: modules['samtools_sort_genomes'], index_options: modules['samtools_index_genomes'], stats_options: modules['samtools_index_genomes'] )
-include { BAM_SORT_SAMTOOLS } from '../subworkflows/nf-core/bam_sort_samtools/main' addParams( options: modules['bam_sort_samtools'])
-include { SEQTK_MERGEPE } from '../modules/nf-core/modules/seqtk/mergepe/main' addParams( options: modules['seqtk_mergepe'] )
+include { FASTQC                      } from '../modules/nf-core/modules/fastqc/main'
+include { BBMAP_BBDUK                 } from '../modules/nf-core/modules/bbmap/bbduk/main'
+include { BBMAP_INDEX                 } from '../modules/nf-core/modules/bbmap/index/main'
+include { BBMAP_ALIGN                 } from '../modules/nf-core/modules/bbmap/align/main'
+include { SEQTK_MERGEPE               } from '../modules/nf-core/modules/seqtk/mergepe/main'
+//include { BAM_SORT_SAMTOOLS } from '../subworkflows/nf-core/bam_sort_samtools/main' addParams(  sort_options: modules['samtools_sort_genomes'], index_options: modules['samtools_index_genomes'], stats_options: modules['samtools_index_genomes'] )
+//include { BAM_SORT_SAMTOOLS } from '../subworkflows/nf-core/bam_sort_samtools/main' addParams( options: modules['bam_sort_samtools'])
 //include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS_CDS   } from '../modules/nf-core/modules/subread/featurecounts/main' addParams( options: subread_featurecounts_options_cds )
-include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS } from '../modules/nf-core/modules/subread/featurecounts/main' addParams( options: modules['subread_featurecounts'] )
-include { PROKKA        } from '../modules/nf-core/modules/prokka/main' addParams( options: modules['prokka'] )
-include { PRODIGAL      } from '../modules/nf-core/modules/prodigal/main' addParams( options: prodigal_options )
-include { MULTIQC       } from '../modules/nf-core/modules/multiqc/main' addParams( options: multiqc_options   )
-include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'  addParams( options: [publish_files : ['_versions.yml':'']] )
+//include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS } from '../modules/nf-core/modules/subread/featurecounts/main' addParams( options: modules['subread_featurecounts'] )
+include { PRODIGAL                    } from '../modules/nf-core/modules/prodigal/main'
+include { MULTIQC                     } from '../modules/nf-core/modules/multiqc/main'
+include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
 
 /*
-========================================================================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN MAIN WORKFLOW
-========================================================================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
 // Info required for completion email and summary
@@ -170,8 +159,8 @@ workflow METATDENOVO {
     // MODULE: Run Megahit on all interleaved fastq files
     //
     MEGAHIT_INTERLEAVED(
-        ch_pe_reads_to_assembly.collect(), 
-        ch_se_reads_to_assembly.collect(), 
+        ch_pe_reads_to_assembly.collect(),
+        ch_se_reads_to_assembly.collect(),
         'all_samples'
     )
     ch_assembly_contigs = MEGAHIT_INTERLEAVED.out.contigs
@@ -196,17 +185,19 @@ workflow METATDENOVO {
     ch_versions = ch_versions.mix(BAM_SORT_SAMTOOLS.out.versions)
     
     //
-    // MODULE: Run PROKKA on Megahit output, but split the fasta file in chunks of 10 MiB
+    // SUBWORKFLOW: Run PROKKA on Megahit output, but split the fasta file in chunks of 10 MB, then concatenate and compress output.
     //
-    PROKKA(MEGAHIT_INTERLEAVED.out.contigs.splitFasta( size: 10.MB, file: true).map { [[id: 'part_of_all_samples'], it] }, [], [] )
-    ch_versions = ch_versions.mix(PROKKA.out.versions)
+    if (params.orf_caller == ORF_CALLER_PROKKA) {
+        PROKKA_CAT(MEGAHIT_INTERLEAVED.out.contigs)
+        ch_versions = ch_versions.mix(PROKKA_CAT.out.versions)
+    }
 
     //
     // MODULE: Call Prodigal
     //
     UNPIGZ_MEGAHIT_CONTIGS(ch_assembly_contigs)
     ch_versions = ch_versions.mix(UNPIGZ_MEGAHIT_CONTIGS.out.versions)
-    
+
     ch_prodigal = Channel.empty()
     if( params.orf_caller == ORF_CALLER_PRODIGAL ) {
         PRODIGAL(
@@ -218,7 +209,7 @@ workflow METATDENOVO {
         ch_prodigal_fna = PRODIGAL.out.nucleotide_fasta
         ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
     }
-    
+
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
     )
@@ -258,9 +249,9 @@ workflow METATDENOVO {
 }
 
 /*
-========================================================================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     COMPLETION EMAIL AND SUMMARY
-========================================================================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
 workflow.onComplete {
@@ -271,7 +262,7 @@ workflow.onComplete {
 }
 
 /*
-========================================================================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     THE END
-========================================================================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
