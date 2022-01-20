@@ -73,17 +73,21 @@ include { PROKKA_CAT } from '../subworkflows/local/prokka_cat'
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
+//subread_featurecounts_options_cds        = modules['subread_featurecounts_cds']
+
 //
 // MODULE: Installed directly from nf-core/modules
 //
-include { FASTQC                      } from '../modules/nf-core/modules/fastqc/main'
-include { BBMAP_BBDUK                 } from '../modules/nf-core/modules/bbmap/bbduk/main'
-include { BBMAP_INDEX                 } from '../modules/nf-core/modules/bbmap/index/main'
-include { BBMAP_ALIGN                 } from '../modules/nf-core/modules/bbmap/align/main'
-include { SEQTK_MERGEPE               } from '../modules/nf-core/modules/seqtk/mergepe/main'
-include { PRODIGAL                    } from '../modules/nf-core/modules/prodigal/main'
-include { MULTIQC                     } from '../modules/nf-core/modules/multiqc/main'
-include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
+include { FASTQC                                     } from '../modules/nf-core/modules/fastqc/main'
+include { BBMAP_BBDUK                                } from '../modules/nf-core/modules/bbmap/bbduk/main'
+include { BBMAP_INDEX                                } from '../modules/nf-core/modules/bbmap/index/main'
+include { BBMAP_ALIGN                                } from '../modules/nf-core/modules/bbmap/align/main'
+include { SEQTK_MERGEPE                              } from '../modules/nf-core/modules/seqtk/mergepe/main'
+include { BAM_SORT_SAMTOOLS                          } from '../subworkflows/nf-core/bam_sort_samtools/main'
+include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS_CDS } from '../modules/nf-core/modules/subread/featurecounts/main'
+include { PRODIGAL                                   } from '../modules/nf-core/modules/prodigal/main'
+include { MULTIQC                                    } from '../modules/nf-core/modules/multiqc/main'
+include { CUSTOM_DUMPSOFTWAREVERSIONS                } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -169,9 +173,15 @@ workflow METATDENOVO {
     //
     // MODULE: Call BBMap with the index once per sample
     //
-    BBMAP_ALIGN(ch_clean_reads, BBMAP_INDEX.out.index)
-    ch_versions   = ch_versions.mix(BBMAP_ALIGN.out.versions)
-
+    BBMAP_ALIGN ( ch_clean_reads, BBMAP_INDEX.out.index )
+    ch_versions = ch_versions.mix(BBMAP_ALIGN.out.versions)
+    
+    //
+    // SUBWORKFLOW: sort bam file
+    //
+    BAM_SORT_SAMTOOLS ( BBMAP_ALIGN.out.bam )
+    ch_versions = ch_versions.mix(BAM_SORT_SAMTOOLS.out.versions)
+    
     //
     // SUBWORKFLOW: Run PROKKA on Megahit output, but split the fasta file in chunks of 10 MB, then concatenate and compress output.
     //
@@ -192,19 +202,31 @@ workflow METATDENOVO {
             UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] },
             'gff'
         )
-        ch_prodigal_gff = PRODIGAL.out.gene_annotations
+        ch_CDS_gff      = PRODIGAL.out.gene_annotations.map { it[1] }
         ch_prodigal_aa  = PRODIGAL.out.amino_acid_fasta
         ch_prodigal_fna = PRODIGAL.out.nucleotide_fasta
-        ch_versions = ch_versions.mix(PRODIGAL.out.versions)
+        ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
     }
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
     )
-
+    
+    //
+    // MODULE: FeatureCounts
+    //
+    
+    BAM_SORT_SAMTOOLS.out.bam
+        .combine(ch_CDS_gff)
+        .set { ch_featurecounts }
+     
+    FEATURECOUNTS_CDS ( ch_featurecounts)
+    ch_versions       = ch_versions.mix(FEATURECOUNTS_CDS.out.versions)
+    
     //
     // MODULE: MultiQC
     //
+
     workflow_summary    = WorkflowMetatdenovo.paramsSummaryMultiqc(workflow, summary_params)
     ch_workflow_summary = Channel.value(workflow_summary)
 
