@@ -10,11 +10,12 @@ def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
 WorkflowMetatdenovo.initialise(params, log)
 
 // Validate parameters for orf_caller:
-ORF_CALLER_PRODIGAL = 'prodigal'
-ORF_CALLER_PROKKA   = 'prokka'
+ORF_CALLER_PRODIGAL     = 'prodigal'
+ORF_CALLER_PROKKA       = 'prokka'
+ORF_CALLER_TRANSDECODER = 'transdecoder'
 
 def valid_params = [
-    orf_caller  : [ORF_CALLER_PRODIGAL, ORF_CALLER_PROKKA]
+    orf_caller  : [ORF_CALLER_PRODIGAL, ORF_CALLER_PROKKA, ORF_CALLER_TRANSDECODER]
 ]
 
 // Check input path parameters to see if they exist
@@ -73,7 +74,6 @@ include { PROKKA_CAT } from '../subworkflows/local/prokka_cat'
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-//subread_featurecounts_options_cds        = modules['subread_featurecounts_cds']
 
 //
 // MODULE: Installed directly from nf-core/modules
@@ -88,6 +88,8 @@ include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS_CDS } from '../modules/nf-core/
 include { PRODIGAL                                   } from '../modules/nf-core/modules/prodigal/main'
 include { MULTIQC                                    } from '../modules/nf-core/modules/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS                } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
+include { TRANSDECODER_LONGORF                       } from '../modules/nf-core/modules/transdecoder/longorf/main'
+include { TRANSDECODER_PREDICT                       } from '../modules/nf-core/modules/transdecoder/predict/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -212,6 +214,22 @@ workflow METATDENOVO {
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
     )
     
+    //
+    // MODULE: Transdecoder Longorf
+    //
+    
+    ch_transdecoder_longorf = Channel.empty()
+    if( params.orf_caller == ORF_CALLER_TRANSDECODER ) {
+        TRANSDECODER_LONGORF(
+            UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] }
+        )
+        TRANSDECODER_PREDICT(
+            UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] },
+            TRANSDECODER_LONGORF.out.fold
+        )
+        ch_CDS_gff = TRANSDECODER_PREDICT.out.gff.map { it[1] }
+    }
+
     //
     // MODULE: FeatureCounts
     //
