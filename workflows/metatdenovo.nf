@@ -214,7 +214,7 @@ workflow METATDENOVO {
     )
     
     //
-    // MODULE: Transdecoder Longorf
+    // SUBWORKFLOW: run TRANSDECODER on UNPIGZ_MEGAHIT output. Orf caller alternative for eukaryotes.
     //
     
     ch_transdecoder_longorf = Channel.empty()
