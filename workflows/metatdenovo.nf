@@ -66,7 +66,8 @@ include { DIGINORM } from '../subworkflows/local/diginorm'
 // SUBWORKFLOW: Consisting of nf-core/modules
 //
 
-include { PROKKA_CAT } from '../subworkflows/local/prokka_cat'
+include { PROKKA_CAT   } from '../subworkflows/local/prokka_cat'
+include { TRANSDECODER } from '../subworkflows/local/transdecoder'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -88,8 +89,6 @@ include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS_CDS } from '../modules/nf-core/
 include { PRODIGAL                                   } from '../modules/nf-core/modules/prodigal/main'
 include { MULTIQC                                    } from '../modules/nf-core/modules/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS                } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
-include { TRANSDECODER_LONGORF                       } from '../modules/nf-core/modules/transdecoder/longorf/main'
-include { TRANSDECODER_PREDICT                       } from '../modules/nf-core/modules/transdecoder/predict/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -220,14 +219,10 @@ workflow METATDENOVO {
     
     ch_transdecoder_longorf = Channel.empty()
     if( params.orf_caller == ORF_CALLER_TRANSDECODER ) {
-        TRANSDECODER_LONGORF(
+        TRANSDECODER(
             UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] }
         )
-        TRANSDECODER_PREDICT(
-            UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] },
-            TRANSDECODER_LONGORF.out.fold
-        )
-        ch_CDS_gff = TRANSDECODER_PREDICT.out.gff.map { it[1] }
+        ch_CDS_gff = TRANSDECODER.out.gff.map { it[1] }
     }
 
     //
