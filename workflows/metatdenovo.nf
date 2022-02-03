@@ -10,11 +10,12 @@ def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
 WorkflowMetatdenovo.initialise(params, log)
 
 // Validate parameters for orf_caller:
-ORF_CALLER_PRODIGAL = 'prodigal'
-ORF_CALLER_PROKKA   = 'prokka'
+ORF_CALLER_PRODIGAL     = 'prodigal'
+ORF_CALLER_PROKKA       = 'prokka'
+ORF_CALLER_TRANSDECODER = 'transdecoder'
 
 def valid_params = [
-    orf_caller  : [ORF_CALLER_PRODIGAL, ORF_CALLER_PROKKA]
+    orf_caller  : [ORF_CALLER_PRODIGAL, ORF_CALLER_PROKKA, ORF_CALLER_TRANSDECODER]
 ]
 
 // Check input path parameters to see if they exist
@@ -65,7 +66,8 @@ include { DIGINORM } from '../subworkflows/local/diginorm'
 // SUBWORKFLOW: Consisting of nf-core/modules
 //
 
-include { PROKKA_CAT } from '../subworkflows/local/prokka_cat'
+include { PROKKA_CAT   } from '../subworkflows/local/prokka_cat'
+include { TRANSDECODER } from '../subworkflows/local/transdecoder'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -73,7 +75,6 @@ include { PROKKA_CAT } from '../subworkflows/local/prokka_cat'
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-//subread_featurecounts_options_cds        = modules['subread_featurecounts_cds']
 
 //
 // MODULE: Installed directly from nf-core/modules
@@ -212,6 +213,18 @@ workflow METATDENOVO {
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
     )
     
+    //
+    // SUBWORKFLOW: run TRANSDECODER on UNPIGZ_MEGAHIT output. Orf caller alternative for eukaryotes.
+    //
+    
+    ch_transdecoder_longorf = Channel.empty()
+    if( params.orf_caller == ORF_CALLER_TRANSDECODER ) {
+        TRANSDECODER(
+            UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] }
+        )
+        ch_CDS_gff = TRANSDECODER.out.gff.map { it[1] }
+    }
+
     //
     // MODULE: FeatureCounts
     //

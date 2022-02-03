@@ -51,6 +51,12 @@
             "subread/featurecounts": {
                 "git_sha": "9d0cad583b9a71a6509b754fdf589cbfbed08961"
             },
+            "transdecoder/longorf": {
+                "git_sha": "a74e8436cceab0552ad59ce39e54b19c2025c5d8"
+            },
+            "transdecoder/predict": {
+                "git_sha": "aa97b1be3ef60828fc6c913110b4442abec07e08"
+            },
             "trimgalore": {
                 "git_sha": "9d0cad583b9a71a6509b754fdf589cbfbed08961"
             }
