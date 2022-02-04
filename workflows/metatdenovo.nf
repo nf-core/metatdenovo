@@ -189,6 +189,7 @@ workflow METATDENOVO {
     if (params.orf_caller == ORF_CALLER_PROKKA) {
         PROKKA_CAT(MEGAHIT_INTERLEAVED.out.contigs)
         ch_versions = ch_versions.mix(PROKKA_CAT.out.versions)
+        ch_gff      = PROKKA_CAT.out.gff
     }
 
     //
@@ -202,8 +203,8 @@ workflow METATDENOVO {
         PRODIGAL(
             UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] },
             'gff'
-        )
-        ch_CDS_gff      = PRODIGAL.out.gene_annotations.map { it[1] }
+        ) 
+        ch_gff          = PRODIGAL.out.gene_annotations.map { it[1] }
         ch_prodigal_aa  = PRODIGAL.out.amino_acid_fasta
         ch_prodigal_fna = PRODIGAL.out.nucleotide_fasta
         ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
@@ -222,7 +223,7 @@ workflow METATDENOVO {
         TRANSDECODER(
             UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] }
         )
-        ch_CDS_gff = TRANSDECODER.out.gff.map { it[1] }
+        ch_gff = TRANSDECODER.out.gff.map { it[1] }
     }
 
     //
@@ -230,7 +231,7 @@ workflow METATDENOVO {
     //
     
     BAM_SORT_SAMTOOLS.out.bam
-        .combine(ch_CDS_gff)
+        .combine(ch_gff)
         .set { ch_featurecounts }
      
     FEATURECOUNTS_CDS ( ch_featurecounts)
