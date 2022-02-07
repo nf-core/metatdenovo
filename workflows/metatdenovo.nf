@@ -176,13 +176,13 @@ workflow METATDENOVO {
     //
     BBMAP_ALIGN ( ch_clean_reads, BBMAP_INDEX.out.index )
     ch_versions = ch_versions.mix(BBMAP_ALIGN.out.versions)
-    
+
     //
     // SUBWORKFLOW: sort bam file
     //
     BAM_SORT_SAMTOOLS ( BBMAP_ALIGN.out.bam )
     ch_versions = ch_versions.mix(BAM_SORT_SAMTOOLS.out.versions)
-    
+
     //
     // SUBWORKFLOW: Run PROKKA on Megahit output, but split the fasta file in chunks of 10 MB, then concatenate and compress output.
     //
@@ -203,7 +203,7 @@ workflow METATDENOVO {
         PRODIGAL(
             UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] },
             'gff'
-        ) 
+        )
         ch_gff          = PRODIGAL.out.gene_annotations.map { it[1] }
         ch_prodigal_aa  = PRODIGAL.out.amino_acid_fasta
         ch_prodigal_fna = PRODIGAL.out.nucleotide_fasta
@@ -213,11 +213,11 @@ workflow METATDENOVO {
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
     )
-    
+
     //
     // SUBWORKFLOW: run TRANSDECODER on UNPIGZ_MEGAHIT output. Orf caller alternative for eukaryotes.
     //
-    
+
     ch_transdecoder_longorf = Channel.empty()
     if( params.orf_caller == ORF_CALLER_TRANSDECODER ) {
         TRANSDECODER(
@@ -229,14 +229,14 @@ workflow METATDENOVO {
     //
     // MODULE: FeatureCounts
     //
-    
+
     BAM_SORT_SAMTOOLS.out.bam
         .combine(ch_gff)
         .set { ch_featurecounts }
-     
+
     FEATURECOUNTS_CDS ( ch_featurecounts)
     ch_versions       = ch_versions.mix(FEATURECOUNTS_CDS.out.versions)
-    
+
     //
     // MODULE: MultiQC
     //
