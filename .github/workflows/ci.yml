@@ -16,7 +16,7 @@ jobs:
   test:
     name: Run workflow tests
     # Only run on push if this is the nf-core dev branch (merged PRs)
-    if: ${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/metatdenovo') }}
+    if: ${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'LNUc-EEMiS/metatdenovo') }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -48,3 +48,24 @@ jobs:
         # Remember that you can parallelise this by using strategy.matrix
         run: |
           nextflow run ${GITHUB_WORKSPACE} -profile test,docker
+
+  profiles:
+    name: Run workflow profile
+    # Only run on push if this is the nf-core dev branch (merged PRs)
+    if: ${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/ampliseq') }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # Run remaining test profiles with minimum nextflow version
+        profile: [test_filter, test_diginorm, test_prokka, test_transdecoder]
+    steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@v2
+
+      - name: Install Nextflow
+        run: |
+          wget -qO- get.nextflow.io | bash
+          sudo mv nextflow /usr/local/bin/
+      - name: Run pipeline with ${{ matrix.profile }} test profile
+        run: |
+          nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.profile }},docker

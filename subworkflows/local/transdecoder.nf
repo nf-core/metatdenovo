@@ -8,10 +8,10 @@ include { TRANSDECODER_PREDICT as PREDICT } from '../../modules/nf-core/modules/
 workflow TRANSDECODER {
     take:
         contigs       // channel: [ val(meta), [ contigs ] ]
-    
+
     main:
         ch_versions  = Channel.empty()
-    
+
         LONGORF (contigs)
         PREDICT (contigs, LONGORF.out.folder)
         ch_versions = ch_versions.mix(LONGORF.out.versions)
@@ -21,7 +21,7 @@ workflow TRANSDECODER {
         cds      = PREDICT.out.cds
         pep      = PREDICT.out.pep
         bed      = PREDICT.out.bed
-        
+
         versions = ch_versions
 
 }
