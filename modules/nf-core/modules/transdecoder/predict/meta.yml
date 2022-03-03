@@ -54,6 +54,11 @@ output:
       type: bed file
       description: bed file
       pattern: "*{bed}"
+  - folder:
+      type: folder
+      description: contains output from transdecoder
+      pattern: "*"
+
 
 authors:
   - "@Danilo2771"

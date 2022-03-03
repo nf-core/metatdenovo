@@ -16,6 +16,7 @@ process TRANSDECODER_PREDICT {
     tuple val(meta), path("*.transdecoder.gff3") , emit: gff3
     tuple val(meta), path("*.transdecoder.cds")  , emit: cds
     tuple val(meta), path("*.transdecoder.bed")  , emit: bed
+    path("${meta.id}/")                          , emit: folder
     path "versions.yml"                          , emit: versions
 
     script:

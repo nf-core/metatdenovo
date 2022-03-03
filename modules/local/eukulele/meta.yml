@@ -1,0 +1,51 @@
+name: eukulele
+description: EUKulele is a tool for taxonomical annotation in eukaryotes
+keywords:
+  - eukaryotes
+  - tax annotation
+tools:
+  - eukulele:
+      description: Easy taxonomic annotation for eukaryotic microbes
+      homepage: https://github.com/AlexanderLabWHOI/EUKulele
+      documentation: https://eukulele.readthedocs.io/en/latest/index.html
+      tool_dev_url: https://github.com/AlexanderLabWHOI/EUKulele
+      doi: "arXiv:2011.00089v1"
+      licence: ['MIT']
+
+input:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+  - contig_dir:
+      type: directory
+      description: directory contains contigs
+      pattern: "*"
+
+output:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+  - taxonomy_extimation:
+      type: file
+      description: metat-estimated-taxonomy.out
+      pattern: "*.{out}"
+  - taxonomy_counts:
+      type: folder
+      description: taxonomy counts from contigs
+      pattern: "output_all_*_counts.{csv}"
+  - diamond:
+      type: file
+      description: alignment with diamond to reference database
+      patter: "*"
+
+
+authors:
+  - "@Danilo2771"

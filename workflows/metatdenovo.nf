@@ -44,7 +44,7 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 //
 include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved.nf'
 include { UNPIGZ as UNPIGZ_MEGAHIT_CONTIGS } from '../modules/local/unpigz.nf'
-
+include { EUKULELE                         } from '../modules/local/eukulele/main.nf'
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
@@ -68,7 +68,7 @@ include { DIGINORM } from '../subworkflows/local/diginorm'
 
 include { PROKKA_CAT   } from '../subworkflows/local/prokka_cat'
 include { TRANSDECODER } from '../subworkflows/local/transdecoder'
-
+include { SUB_EUKULELE } from '../subworkflows/local/folder_eu'
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     IMPORT NF-CORE MODULES/SUBWORKFLOWS
@@ -236,7 +236,17 @@ workflow METATDENOVO {
 
     FEATURECOUNTS_CDS ( ch_featurecounts)
     ch_versions       = ch_versions.mix(FEATURECOUNTS_CDS.out.versions)
+    
+    //
+    // SUBWORKFLOW: Eukulele
+    //
 
+    ch_unpigz_contigs = UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] }
+    if( params.skip_eukulele) {} 
+    else {
+        SUB_EUKULELE(ch_unpigz_contigs)
+        }
+    
     //
     // MODULE: MultiQC
     //
