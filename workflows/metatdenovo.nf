@@ -14,8 +14,15 @@ ORF_CALLER_PRODIGAL     = 'prodigal'
 ORF_CALLER_PROKKA       = 'prokka'
 ORF_CALLER_TRANSDECODER = 'transdecoder'
 
+// validate parameters for eukulele database:
+EUKULELE_DB_PHYLODB     = 'phylodb'
+EUKULELE_DB_MMETSP      = 'mmetsp'
+EUKULELE_DB_EUKPROT     = 'eukprot'
+EUKULELE_DB_EUKZOO      = 'eukzoo'
+
 def valid_params = [
-    orf_caller  : [ORF_CALLER_PRODIGAL, ORF_CALLER_PROKKA, ORF_CALLER_TRANSDECODER]
+    orf_caller  : [ORF_CALLER_PRODIGAL, ORF_CALLER_PROKKA, ORF_CALLER_TRANSDECODER],
+    eukulele_db : [EUKULELE_DB_PHYLODB, EUKULELE_DB_MMETSP, EUKULELE_DB_EUKPROT, EUKULELE_DB_EUKZOO ]
 ]
 
 // Check input path parameters to see if they exist
@@ -44,7 +51,7 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 //
 include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved.nf'
 include { UNPIGZ as UNPIGZ_MEGAHIT_CONTIGS } from '../modules/local/unpigz.nf'
-include { EUKULELE                         } from '../modules/local/eukulele/main.nf'
+
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
@@ -68,7 +75,7 @@ include { DIGINORM } from '../subworkflows/local/diginorm'
 
 include { PROKKA_CAT   } from '../subworkflows/local/prokka_cat'
 include { TRANSDECODER } from '../subworkflows/local/transdecoder'
-include { SUB_EUKULELE } from '../subworkflows/local/folder_eu'
+include { SUB_EUKULELE } from '../subworkflows/local/eukulele'
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     IMPORT NF-CORE MODULES/SUBWORKFLOWS
@@ -242,10 +249,21 @@ workflow METATDENOVO {
     //
 
     ch_unpigz_contigs = UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] }
-    if( params.skip_eukulele) {} 
-    else {
-        SUB_EUKULELE(ch_unpigz_contigs)
+    
+    if( !params.skip_eukulele){
+        if( params.eukulele_db == EUKULELE_DB_PHYLODB ){
+            SUB_EUKULELE(ch_unpigz_contigs)
         }
+        else if( params.eukulele_db == EUKULELE_DB_MMETSP){
+            SUB_EUKULELE(ch_unpigz_contigs)
+        }
+        else if( params.eukulele_db == EUKULELE_DB_EUKPROT){
+            SUB_EUKULELE(ch_unpigz_contigs)
+        }
+        else if( params.eukulele_db == EUKULELE_DB_EUKZOO){
+            SUB_EUKULELE(ch_unpigz_contigs)
+        }
+    }
     
     //
     // MODULE: MultiQC

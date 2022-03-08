@@ -15,17 +15,13 @@ process EUKULELE {
     tuple val(meta), path("${meta.id}/taxonomy_counts/${meta.id}_all_*_counts.csv"), emit: taxonomy_counts
     tuple val(meta), path("${meta.id}/mets_full/diamond/*")                        , emit: diamond
     
-    path "versions.yml"                                                          , emit: versions
+    path "versions.yml"                                                            , emit: versions
 
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
     
     """
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        eukulele: \$(echo \$(EUKulele --version 2>&1) | sed 's/Running EUKulele with command line arguments, as no valid configuration file was provided.//; s/The current EUKulele version is//g')
-    END_VERSIONS
     rc=0
     
     EUKulele \\
@@ -35,8 +31,12 @@ process EUKULELE {
         --CPUs ${task.cpus} \\
         -s \\
         $contigs_fasta || rc=\$? 
-    
-    echo "EUKulele done, rc: \$rc"
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        eukulele: \$(echo \$(EUKulele --version 2>&1) | sed 's/Running EUKulele with command line arguments, as no valid configuration file was provided.//; s/The current EUKulele version is//g')
+    END_VERSIONS
+
     if [ \$rc -le 1 ]; then
         exit 0
     else

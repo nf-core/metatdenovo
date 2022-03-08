@@ -1,4 +1,4 @@
-process STAGE_FASTA_DIR {
+process MV_DIR {
     input:
     tuple val(meta), path(fasta_file)
 
