@@ -197,6 +197,7 @@ workflow METATDENOVO {
         PROKKA_CAT(MEGAHIT_INTERLEAVED.out.contigs)
         ch_versions = ch_versions.mix(PROKKA_CAT.out.versions)
         ch_gff      = PROKKA_CAT.out.gff
+        ch_eukulele = PROKKA_CAT.out.faa
     }
 
     //
@@ -214,6 +215,7 @@ workflow METATDENOVO {
         ch_gff          = PRODIGAL.out.gene_annotations.map { it[1] }
         ch_prodigal_aa  = PRODIGAL.out.amino_acid_fasta
         ch_prodigal_fna = PRODIGAL.out.nucleotide_fasta
+        ch_eukulele     = PRODIGAL.out.amino_acid_fasta
         ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
     }
 
@@ -230,7 +232,8 @@ workflow METATDENOVO {
         TRANSDECODER(
             UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] }
         )
-        ch_gff = TRANSDECODER.out.gff.map { it[1] }
+        ch_gff      = TRANSDECODER.out.gff.map { it[1] }
+        ch_eukulele = TRANSDECODER.out.pep
     }
 
     //
@@ -247,22 +250,18 @@ workflow METATDENOVO {
     //
     // SUBWORKFLOW: Eukulele
     //
-
+    
+    if (params.eukulele_pathdb) {
+        ch_eukulele_pathdb = Channel.fromPath(params.eukulele_pathdb)
+    }
+    else {
+        ch_eukulele_pathdb = Channel.fromPath('.')
+    }
+    
     ch_unpigz_contigs = UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] }
     
     if( !params.skip_eukulele){
-        if( params.eukulele_db == EUKULELE_DB_PHYLODB ){
-            SUB_EUKULELE(ch_unpigz_contigs)
-        }
-        else if( params.eukulele_db == EUKULELE_DB_MMETSP){
-            SUB_EUKULELE(ch_unpigz_contigs)
-        }
-        else if( params.eukulele_db == EUKULELE_DB_EUKPROT){
-            SUB_EUKULELE(ch_unpigz_contigs)
-        }
-        else if( params.eukulele_db == EUKULELE_DB_EUKZOO){
-            SUB_EUKULELE(ch_unpigz_contigs)
-        }
+            SUB_EUKULELE(ch_eukulele, ch_eukulele_pathdb)
     }
     
     //
@@ -277,6 +276,7 @@ workflow METATDENOVO {
     ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_custom_config.collect().ifEmpty([]))
     ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
     ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
+    
     // Make sure we integrate FASTQC output from FASTQC_TRIMGALORE here!!!
     //ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
 

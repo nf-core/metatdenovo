@@ -9,6 +9,7 @@ process EUKULELE {
     
     input:
     tuple val(meta), path(contigs_fasta)
+    path(db)
 
     output:
     tuple val(meta), path("${meta.id}/taxonomy_estimation/*.out")                  , emit: taxonomy_extimation
@@ -27,6 +28,7 @@ process EUKULELE {
     EUKulele \\
         $args \\
         -m mets \\
+        --reference_dir $db \\
         -o $prefix \\
         --CPUs ${task.cpus} \\
         -s \\
