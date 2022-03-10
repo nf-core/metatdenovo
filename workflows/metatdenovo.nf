@@ -251,17 +251,9 @@ workflow METATDENOVO {
     // SUBWORKFLOW: Eukulele
     //
     
-    if (params.eukulele_pathdb) {
-        ch_eukulele_pathdb = Channel.fromPath(params.eukulele_pathdb)
-    }
-    else {
-        ch_eukulele_pathdb = Channel.fromPath('.')
-    }
-    
-    ch_unpigz_contigs = UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] }
-    
     if( !params.skip_eukulele){
-            SUB_EUKULELE(ch_eukulele, ch_eukulele_pathdb)
+        ch_eukulele_dbpath = Channel.fromPath(params.eukulele_dbpath)
+        SUB_EUKULELE(ch_eukulele, ch_eukulele_dbpath)
     }
     
     //
