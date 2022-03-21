@@ -253,7 +253,12 @@ workflow METATDENOVO {
     
     if( !params.skip_eukulele){
         ch_eukulele_dbpath = Channel.fromPath(params.eukulele_dbpath)
-        SUB_EUKULELE(ch_eukulele, ch_eukulele_dbpath)
+        if( params.eukulele_dbpath == '~/eukulele'){
+            SUB_EUKULELE(ch_eukulele, ch_eukulele_dbpath)
+        }
+        else {
+            SUB_EUKULELE(ch_eukulele, ch_eukulele_dbpath)
+        }
     }
     
     //
