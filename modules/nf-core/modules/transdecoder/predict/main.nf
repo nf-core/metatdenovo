@@ -29,7 +29,7 @@ process TRANSDECODER_PREDICT {
         -O ${prefix} \\
         -t \\
         $fasta
-
+    
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         transdecoder: \$(echo \$(TransDecoder.Predict --version) | sed -e "s/TransDecoder.Predict //g")

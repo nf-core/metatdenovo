@@ -49,8 +49,8 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 //
 // MODULE: local
 //
-include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved.nf'
-include { UNPIGZ as UNPIGZ_MEGAHIT_CONTIGS } from '../modules/local/unpigz.nf'
+include { MEGAHIT_INTERLEAVED               } from '../modules/local/megahit/interleaved.nf'
+include { UNPIGZ as UNPIGZ_MEGAHIT_CONTIGS  } from '../modules/local/unpigz.nf'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -75,7 +75,13 @@ include { DIGINORM } from '../subworkflows/local/diginorm'
 
 include { PROKKA_CAT   } from '../subworkflows/local/prokka_cat'
 include { TRANSDECODER } from '../subworkflows/local/transdecoder'
+
+//
+// SUBWORKFLOW: Consisting of local/modules
+//
+
 include { SUB_EUKULELE } from '../subworkflows/local/eukulele'
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     IMPORT NF-CORE MODULES/SUBWORKFLOWS
@@ -197,17 +203,21 @@ workflow METATDENOVO {
         PROKKA_CAT(MEGAHIT_INTERLEAVED.out.contigs)
         ch_versions = ch_versions.mix(PROKKA_CAT.out.versions)
         ch_gff      = PROKKA_CAT.out.gff
-        ch_eukulele = PROKKA_CAT.out.faa
+        ch_protein  = PROKKA_CAT.out.faa
+        UNPIGZ_MEGAHIT_CONTIGS(ch_protein)
+        MEGAHIT_INTERLEAVED.out.contigs.collect { [ [ id: 'all_samples' ]] }
+            .combine(UNPIGZ_MEGAHIT_CONTIGS.out.unzipped)
+            .set{ ch_eukulele }
     }
 
     //
     // MODULE: Call Prodigal
     //
-    UNPIGZ_MEGAHIT_CONTIGS(ch_assembly_contigs)
-    ch_versions = ch_versions.mix(UNPIGZ_MEGAHIT_CONTIGS.out.versions)
-
+    
     ch_prodigal = Channel.empty()
     if( params.orf_caller == ORF_CALLER_PRODIGAL ) {
+        UNPIGZ_MEGAHIT_CONTIGS(ch_assembly_contigs)
+        ch_versions = ch_versions.mix(UNPIGZ_MEGAHIT_CONTIGS.out.versions)
         PRODIGAL(
             UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] },
             'gff'
@@ -229,11 +239,13 @@ workflow METATDENOVO {
 
     ch_transdecoder_longorf = Channel.empty()
     if( params.orf_caller == ORF_CALLER_TRANSDECODER ) {
+        UNPIGZ_MEGAHIT_CONTIGS(ch_assembly_contigs)
         TRANSDECODER(
             UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] }
         )
         ch_gff      = TRANSDECODER.out.gff.map { it[1] }
         ch_eukulele = TRANSDECODER.out.pep
+        ch_eukulele.view()
     }
 
     //
@@ -253,12 +265,7 @@ workflow METATDENOVO {
     
     if( !params.skip_eukulele){
         ch_eukulele_dbpath = Channel.fromPath(params.eukulele_dbpath)
-        if( params.eukulele_dbpath == '~/eukulele'){
-            SUB_EUKULELE(ch_eukulele, ch_eukulele_dbpath)
-        }
-        else {
-            SUB_EUKULELE(ch_eukulele, ch_eukulele_dbpath)
-        }
+        SUB_EUKULELE(ch_eukulele, ch_eukulele_dbpath)
     }
     
     //
