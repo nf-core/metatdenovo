@@ -17,14 +17,13 @@ workflow SUB_EUKULELE {
             input2 = "https://www.dropbox.com/s/w1uv1j9qr63z3ac/taxonomy_table.txt"
         }
     }
-
+   
     take:
         contigs
         db
 
     main:
         ch_versions = Channel.empty()
-        ch_eukulele_pathdb = Channel.empty()
         
         if( params.eukulele_dbpath == '~/eukulele'){ 
             WGET_DB         ( input1, input2 )
@@ -45,5 +44,5 @@ workflow SUB_EUKULELE {
     taxonomy_counts     = EUKULELE.out.taxonomy_counts
     diamond             = EUKULELE.out.diamond
         
-       // versions            = ch_versions
+    versions            = ch_versions
 }
