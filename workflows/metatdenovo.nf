@@ -226,6 +226,7 @@ workflow METATDENOVO {
         ch_prodigal_aa  = PRODIGAL.out.amino_acid_fasta
         ch_prodigal_fna = PRODIGAL.out.nucleotide_fasta
         ch_eukulele     = PRODIGAL.out.amino_acid_fasta
+        ch_eukulele.view()
         ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
     }
 
@@ -265,7 +266,7 @@ workflow METATDENOVO {
     
     if( !params.skip_eukulele){
         ch_eukulele_dbpath = Channel.fromPath(params.eukulele_dbpath)
-        SUB_EUKULELE(ch_eukulele, ch_eukulele_dbpath)
+        SUB_EUKULELE(ch_eukulele)
     }
     
     //
