@@ -44,7 +44,7 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 //
 include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved.nf'
 include { UNPIGZ as UNPIGZ_MEGAHIT_CONTIGS } from '../modules/local/unpigz.nf'
-
+include { UNPIGZ as UNPIGZ_FASTA_PROTEIN   } from '../modules/local/unpigz.nf'
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
@@ -68,6 +68,12 @@ include { DIGINORM } from '../subworkflows/local/diginorm'
 
 include { PROKKA_CAT   } from '../subworkflows/local/prokka_cat'
 include { TRANSDECODER } from '../subworkflows/local/transdecoder'
+
+//
+// SUBWORKFLOW: Consisting of local modules
+//
+
+include { EGGNOG } from '../subworkflows/local/eggnog'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -190,22 +196,27 @@ workflow METATDENOVO {
         PROKKA_CAT(MEGAHIT_INTERLEAVED.out.contigs)
         ch_versions = ch_versions.mix(PROKKA_CAT.out.versions)
         ch_gff      = PROKKA_CAT.out.gff
+        ch_protein  = PROKKA_CAT.out.faa
+        UNPIGZ_FASTA_PROTEIN(ch_protein)
+        MEGAHIT_INTERLEAVED.out.contigs.collect { [ [ id: 'all_samples' ]] }
+            .combine(UNPIGZ_FASTA_PROTEIN.out.unzipped)
+            .set{ ch_aa }
     }
 
     //
     // MODULE: Call Prodigal
     //
-    UNPIGZ_MEGAHIT_CONTIGS(ch_assembly_contigs)
-    ch_versions = ch_versions.mix(UNPIGZ_MEGAHIT_CONTIGS.out.versions)
 
     ch_prodigal = Channel.empty()
     if( params.orf_caller == ORF_CALLER_PRODIGAL ) {
+        UNPIGZ_MEGAHIT_CONTIGS(ch_assembly_contigs)
+        ch_versions = ch_versions.mix(UNPIGZ_MEGAHIT_CONTIGS.out.versions)
         PRODIGAL(
             UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] },
             'gff'
         )
         ch_gff          = PRODIGAL.out.gene_annotations.map { it[1] }
-        ch_prodigal_aa  = PRODIGAL.out.amino_acid_fasta
+        ch_aa           = PRODIGAL.out.amino_acid_fasta
         ch_prodigal_fna = PRODIGAL.out.nucleotide_fasta
         ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
     }
@@ -220,10 +231,21 @@ workflow METATDENOVO {
 
     ch_transdecoder_longorf = Channel.empty()
     if( params.orf_caller == ORF_CALLER_TRANSDECODER ) {
+        UNPIGZ_MEGAHIT_CONTIGS(ch_assembly_contigs)
         TRANSDECODER(
             UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] }
         )
         ch_gff = TRANSDECODER.out.gff.map { it[1] }
+        ch_aa  = TRANSDECODER.out.pep
+    }
+
+    //
+    // SUBWORKFLOW: run eggnog_mapper on the ORF-called amino acid sequences
+    //
+
+    if (params.eggnog) {
+        EGGNOG(ch_aa)
+        ch_versions = ch_versions.mix(EGGNOG.out.versions)
     }
 
     //
