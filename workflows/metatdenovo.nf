@@ -265,7 +265,6 @@ workflow METATDENOVO {
     //
     
     if( !params.skip_eukulele){
-        ch_eukulele_dbpath = Channel.fromPath(params.eukulele_dbpath)
         SUB_EUKULELE(ch_eukulele)
     }
     
