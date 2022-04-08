@@ -17,23 +17,14 @@ process EGGNOG_DOWNLOAD {
 
     script:
     def args = task.ext.args ?: ''
-    target = params.eggnog_dbpath
     
     """
     
-    if [ ! -e $target ]; then
-        mkdir $target
-        download_eggnog_data.py \\
-            $args \\
-            -y \\
-            --data_dir $target
-        echo "Downloaded database to $target" >> eggnog_dbdwnl.log
-    else
-        echo "$target already present" >> eggnog_dbdwnl.log
-    fi
+    download_eggnog_data.py \\
+        $args \\
+        -y \\
+        --data_dir ./
 
-    ln -s $target ./
-    
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         eggnog: \$( echo \$(emapper.py --version 2>&1)| sed 's/.* emapper-//' )

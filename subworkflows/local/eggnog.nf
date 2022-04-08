@@ -11,9 +11,19 @@ workflow EGGNOG {
 
     main:
         ch_versions = Channel.empty()
-
-        EGGNOG_DOWNLOAD()
-        EGGNOG_MAPPER(faa, EGGNOG_DOWNLOAD.out.db)
+        
+        String directoryName = "eggnog"
+        File directory = new File(directoryName)
+        if (! directory.exists()){
+            directory.mkdir()
+            EGGNOG_DOWNLOAD()
+            EGGNOG_DOWNLOAD.out.db.moveTo('./eggnog')
+            ch_dbpath = Channel.fromPath(params.eggnog_dbpath)
+            EGGNOG_MAPPER(faa, EGGNOG_DOWNLOAD.out.db)
+        } else {
+            ch_dbpath = Channel.fromPath(params.eggnog_dbpath)
+            EGGNOG_MAPPER(faa, ch_dbpath)
+        }
 
         ch_versions = ch_versions.mix(EGGNOG_MAPPER.out.versions)
 
