@@ -226,7 +226,6 @@ workflow METATDENOVO {
         ch_prodigal_aa  = PRODIGAL.out.amino_acid_fasta
         ch_prodigal_fna = PRODIGAL.out.nucleotide_fasta
         ch_eukulele     = PRODIGAL.out.amino_acid_fasta
-        ch_eukulele.view()
         ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
     }
 

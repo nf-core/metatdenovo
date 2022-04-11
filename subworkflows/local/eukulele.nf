@@ -12,17 +12,23 @@ workflow SUB_EUKULELE {
         fastaprot
 
     main:
+        ch_versions = Channel.empty() 
         
-        ch_database = Channel.fromPath(params.eukulele_dbpath)
+        MV_DIR(fastaprot) 
         
-        MV_DIR(fastaprot)
+        String directoryName = "eukulele"
+        File directory = new File(directoryName)
         
-        if( ! ch_database ){
+        if(! directory.exists()){
+            directory.mkdir()
             EUKULELE_DB( )
-            EUKULELE(MV_DIR.out.contigs_dir, EUKULELE_DB.out.db)
-            } else {
-                EUKULELE(MV_DIR.out.contigs_dir, ch_database)
+            EUKULELE_DB.out.database.mklink('./eukulele')
+            EUKULELE(MV_DIR.out.contigs_dir, EUKULELE_DB.out.database)
+        } else {
+            ch_database = Channel.fromPath(params.eukulele_dbpath)
+            EUKULELE(MV_DIR.out.contigs_dir, ch_database)
         }
+        
 
     emit:
        taxonomy_estimation = EUKULELE.out.taxonomy_extimation
