@@ -13,9 +13,16 @@ workflow SUB_EUKULELE {
 
     main:
         
-        EUKULELE_DB( )
+        ch_database = Channel.fromPath(params.eukulele_dbpath)
+        
         MV_DIR(fastaprot)
-        EUKULELE(MV_DIR.out.contigs_dir, EUKULELE_DB.out.db)
+        
+        if( ! ch_database ){
+            EUKULELE_DB( )
+            EUKULELE(MV_DIR.out.contigs_dir, EUKULELE_DB.out.db)
+            } else {
+                EUKULELE(MV_DIR.out.contigs_dir, ch_database)
+        }
 
     emit:
        taxonomy_estimation = EUKULELE.out.taxonomy_extimation
