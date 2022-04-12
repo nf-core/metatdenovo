@@ -45,6 +45,7 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved.nf'
 include { UNPIGZ as UNPIGZ_MEGAHIT_CONTIGS } from '../modules/local/unpigz.nf'
 include { COLLECT_FEATURECOUNTS            } from '../modules/local/collect_featurecounts.nf'
+include { COLLECT_STATS                    } from '../modules/local/collect_stats.nf'
 
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
@@ -245,6 +246,12 @@ workflow METATDENOVO {
     //ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
 
     //
+    // MODULE: Collect statistics from mapping analysis
+    //
+
+    COLLECT_STATS (BBMAP_BBDUK.out.log, COLLECT_FEATURECOUNTS.out.counts, FASTQC_TRIMGALORE.out.log, 
+    
+    //
     // MODULE: MultiQC
     //
 
@@ -281,6 +288,4 @@ workflow.onComplete {
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    THE END
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
+uu*/
