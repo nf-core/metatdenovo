@@ -12,7 +12,7 @@ workflow EGGNOG {
     main:
         ch_versions = Channel.empty()
         
-        String directoryName = "eggnog"
+        String directoryName = params.eggnog_dbpath
         File directory = new File(directoryName)
         if (! directory.exists()){
             directory.mkdir()
