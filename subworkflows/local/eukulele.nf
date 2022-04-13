@@ -16,7 +16,7 @@ workflow SUB_EUKULELE {
         
         MV_DIR(fastaprot) 
         
-        String directoryName = "eukulele"
+        String directoryName = params.eukulele_dbpath
         File directory = new File(directoryName)
         
         if(! directory.exists()){

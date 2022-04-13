@@ -29,7 +29,7 @@ process EUKULELE {
         $args \\
         -m mets \\
         --reference_dir $db \\
-        -o $prefix \\
+        -o ${meta.id} \\
         --CPUs ${task.cpus} \\
         -s \\
         $contigs_fasta || rc=\$? 
