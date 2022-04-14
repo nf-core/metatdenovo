@@ -254,7 +254,7 @@ workflow METATDENOVO {
         FASTQC_TRIMGALORE.out.trim_log.map { meta, fastq -> fastq[0] }.collect(),
         BAM_SORT_SAMTOOLS.out.idxstats.collect()  { it[1] },
         ch_cds_counts,
-        ch_bbduk_logs)
+        ch_bbduk_logs.collect())
     
     //
     // MODULE: MultiQC

@@ -35,12 +35,21 @@ def initOptions(Map args) {
 // Tidy up and join elements of a list to return a path string
 //
 def getPathFromList(path_list) {
+    def paths = path_list.findAll { item -> !item?.trim().isEmpty() }      // Remove empty entries
+    paths     = paths.collect { it.trim().replaceAll("^[/]+|[/]+\$", "") } // Trim whitespace and trailing slashes
+    return paths.join('/')
+}
+
+//
+// Function to save/publish module results
+//
+def saveFiles(Map args) {
     def ioptions  = initOptions(args.options)
     def path_list = [ ioptions.publish_dir ?: args.publish_dir ]
 
     // Do not publish versions.yml unless running from pytest workflow
-     if (args.filename.equals('versions.yml') && !System.getenv("NF_CORE_MODULES_TEST")) {
-         return null
+    if (args.filename.equals('versions.yml') && !System.getenv("NF_CORE_MODULES_TEST")) {
+        return null
     }
     if (ioptions.publish_by_meta) {
         def key_list = ioptions.publish_by_meta instanceof List ? ioptions.publish_by_meta : args.publish_by_meta
