@@ -39,15 +39,18 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
     IMPORT LOCAL MODULES/SUBWORKFLOWS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
+
 //
 // MODULE: local
 //
 include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved.nf'
 include { UNPIGZ as UNPIGZ_MEGAHIT_CONTIGS } from '../modules/local/unpigz.nf'
 include { UNPIGZ as UNPIGZ_FASTA_PROTEIN   } from '../modules/local/unpigz.nf'
+
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
+
 include { INPUT_CHECK } from '../subworkflows/local/input_check'
 
 //
@@ -271,6 +274,7 @@ workflow METATDENOVO {
     ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_custom_config.collect().ifEmpty([]))
     ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
     ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
+
     // Make sure we integrate FASTQC output from FASTQC_TRIMGALORE here!!!
     //ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
 

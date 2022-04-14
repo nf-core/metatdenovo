@@ -26,6 +26,7 @@ process EGGNOG_MAPPER {
     script:
     def args = task.ext.args   ?: ''
     prefix   = task.ext.prefix ?: "${meta.id}"
+
     """
     emapper.py \\
         $args \\

@@ -6,7 +6,7 @@ process EGGNOG_DOWNLOAD {
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/eggnog-mapper:2.1.6--pyhdfd78af_0':
         'quay.io/biocontainers/eggnog-mapper:2.1.6--pyhdfd78af_0' }"
-    
+
     output:
     path("./eggnog/")    , emit: db
     path("*.dmnd")       , emit: proteins, optional: true
@@ -17,9 +17,9 @@ process EGGNOG_DOWNLOAD {
 
     script:
     def args = task.ext.args ?: ''
-    
+
     """
-    
+
     download_eggnog_data.py \\
         $args \\
         -y \\
@@ -29,17 +29,21 @@ process EGGNOG_DOWNLOAD {
     "${task.process}":
         eggnog: \$( echo \$(emapper.py --version 2>&1)| sed 's/.* emapper-//' )
     END_VERSIONS
+
     """
 
     stub:
+
     """
+
     touch eggnog.db
     touch eggnog.taxa.db
     touch eggnog.taxa.db.traverse.pkl
-    
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         eggnog: \$( echo \$(emapper.py --version 2>&1)| sed 's/.* emapper-//' )
     END_VERSIONS
+
     """
 }
