@@ -22,7 +22,7 @@ process COLLECT_STATS {
 
     output:
     path "overall_stats.tsv", emit: overall_stats
-    path "versions.yml     ", emit: versions
+    path "versions.yml"     , emit: versions
 
     script:
 
@@ -67,7 +67,7 @@ process COLLECT_STATS {
             pivot_longer(2:ncol(.), names_to = 'm', values_to = 'v') %>%
             union(
                 # Total observation after featureCounts
-                tibble(file = Sys.glob('summary_table.tsv.gz')) %>%
+                tibble(file = Sys.glob('counts*.tsv.gz')) %>%
                     mutate(d = map(file, function(f) fread(cmd = sprintf("gunzip -c %s", f), sep = '\\t'))) %>%
                     as_tibble() %>%
                     unnest(d) %>%

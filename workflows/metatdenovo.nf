@@ -242,8 +242,8 @@ workflow METATDENOVO {
     //
     
     COLLECT_FEATURECOUNTS ( FEATURECOUNTS_CDS.out.counts.map { it[1] })
-    //ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
     ch_cds_counts = COLLECT_FEATURECOUNTS.out.counts
+    ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
     
     //
     // MODULE: Collect statistics from mapping analysis
@@ -254,8 +254,10 @@ workflow METATDENOVO {
         FASTQC_TRIMGALORE.out.trim_log.map { meta, fastq -> fastq[0] }.collect(),
         BAM_SORT_SAMTOOLS.out.idxstats.collect()  { it[1] },
         ch_cds_counts,
-        ch_bbduk_logs.collect())
-    
+        ch_bbduk_logs.collect()
+    )
+    ch_versions = ch_versions.mix(COLLECT_STATS.out.versions)
+
     //
     // MODULE: MultiQC
     //
@@ -293,4 +295,4 @@ workflow.onComplete {
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-uu*/
+*/
