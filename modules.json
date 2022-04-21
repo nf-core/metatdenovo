@@ -21,6 +21,9 @@
             "fastqc": {
                 "git_sha": "9d0cad583b9a71a6509b754fdf589cbfbed08961"
             },
+            "hmmer/hmmsearch": {
+                "git_sha": "f0800157544a82ae222931764483331a81812012"
+            },
             "multiqc": {
                 "git_sha": "20d8250d9f39ddb05dfb437603aaf99b5c0b2b41"
             },
