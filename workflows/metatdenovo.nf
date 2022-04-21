@@ -89,6 +89,7 @@ include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS_CDS } from '../modules/nf-core/
 include { PRODIGAL                                   } from '../modules/nf-core/modules/prodigal/main'
 include { MULTIQC                                    } from '../modules/nf-core/modules/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS                } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
+include { HMMER_HMMSEARCH as HMMER                   } from '../modules/nf-core/modules/hmmer/hmmsearch/main.nf'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -226,6 +227,19 @@ workflow METATDENOVO {
         ch_gff = TRANSDECODER.out.gff.map { it[1] }
     }
 
+    //
+    // MODULE: Hmmsearch on orf caller output
+    //
+    if( params.hmmsearch) {
+        ch_filepath = ch_prodigal_aa.map { it[0] }
+            .combine(Channel.fromPath(params.hmmfilepath))
+        ch_fasta = ch_prodigal_aa.map { it[1] }
+        ch_filepath.combine(ch_fasta)
+                   .set { ch_hmmer }
+
+        HMMER(ch_hmmer)
+    }
+    
     //
     // MODULE: FeatureCounts
     //
