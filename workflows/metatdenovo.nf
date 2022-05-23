@@ -191,6 +191,7 @@ workflow METATDENOVO {
         PROKKA_CAT(MEGAHIT_INTERLEAVED.out.contigs)
         ch_versions = ch_versions.mix(PROKKA_CAT.out.versions)
         ch_gff      = PROKKA_CAT.out.gff
+        ch_hmmr_aa  = PROKKA_CAT.out.faa
     }
 
     //
@@ -206,7 +207,7 @@ workflow METATDENOVO {
             'gff'
         )
         ch_gff          = PRODIGAL.out.gene_annotations.map { it[1] }
-        ch_prodigal_aa  = PRODIGAL.out.amino_acid_fasta
+        ch_hmmr_aa      = PRODIGAL.out.amino_acid_fasta
         ch_prodigal_fna = PRODIGAL.out.nucleotide_fasta
         ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
     }
@@ -225,15 +226,16 @@ workflow METATDENOVO {
             UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] }
         )
         ch_gff = TRANSDECODER.out.gff.map { it[1] }
+        ch_hmmr_aa = TRANSDECODER.out.pep
     }
 
     //
     // MODULE: Hmmsearch on orf caller output
     //
     if( params.hmmsearch) {
-        ch_filepath = ch_prodigal_aa.map { it[0] }
+        ch_filepath = ch_hmmr_aa.map { it[0] }
             .combine(Channel.fromPath(params.hmmfilepath))
-        ch_fasta = ch_prodigal_aa.map { it[1] }
+        ch_fasta = ch_hmmr_aa.map { it[1] }
         ch_filepath.combine(ch_fasta)
                    .set { ch_hmmer }
 
