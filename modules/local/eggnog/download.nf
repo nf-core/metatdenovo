@@ -8,7 +8,7 @@ process EGGNOG_DOWNLOAD {
         'quay.io/biocontainers/eggnog-mapper:2.1.6--pyhdfd78af_0' }"
 
     output:
-    path("./eggnog/")    , emit: db
+    path("./eggnog")     , emit: db
     path("*.dmnd")       , emit: proteins, optional: true
     path("hmmer/")       , emit: hmmer   , optional: true
     path("mmseqs/")      , emit: mmseqs  , optional: true
@@ -19,11 +19,12 @@ process EGGNOG_DOWNLOAD {
     def args = task.ext.args ?: ''
 
     """
+    mkdir eggnog
 
     download_eggnog_data.py \\
         $args \\
         -y \\
-        --data_dir ./
+        --data_dir ./eggnog/
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
@@ -36,9 +37,9 @@ process EGGNOG_DOWNLOAD {
 
     """
 
-    touch eggnog.db
-    touch eggnog.taxa.db
-    touch eggnog.taxa.db.traverse.pkl
+    touch ./eggnog/eggnog.db
+    touch ./eggnog/eggnog.taxa.db
+    touch ./eggnog/eggnog.taxa.db.traverse.pkl
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

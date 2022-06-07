@@ -201,9 +201,11 @@ workflow METATDENOVO {
         ch_gff      = PROKKA_CAT.out.gff
         ch_protein  = PROKKA_CAT.out.faa
         UNPIGZ_FASTA_PROTEIN(ch_protein)
-        MEGAHIT_INTERLEAVED.out.contigs.collect { [ [ id: 'all_samples' ]] }
+        if ( params.eggnog ) {
+            MEGAHIT_INTERLEAVED.out.contigs.collect { [ [ id: 'all_samples' ]] }
             .combine(UNPIGZ_FASTA_PROTEIN.out.unzipped)
             .set{ ch_aa }
+        }
     }
 
     //

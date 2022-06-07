@@ -17,7 +17,6 @@ workflow EGGNOG {
         if (! directory.exists()){
             directory.mkdir()
             EGGNOG_DOWNLOAD()
-            EGGNOG_DOWNLOAD.out.db.mklink(params.eggnog_dbpath)
             EGGNOG_MAPPER(faa, EGGNOG_DOWNLOAD.out.db)
         } else {
             ch_dbpath = Channel.fromPath(params.eggnog_dbpath)
