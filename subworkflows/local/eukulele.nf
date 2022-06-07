@@ -22,11 +22,13 @@ workflow SUB_EUKULELE {
         if(! directory.exists()){
             directory.mkdir()
             EUKULELE_DB( )
-            EUKULELE_DB.out.database.mklink('./eukulele')
-            EUKULELE(MV_DIR.out.contigs_dir, EUKULELE_DB.out.database)
+            if ( params.eukulele_db == 'mmetsp' ) {
+                EUKULELE(MV_DIR.out.contigs_dir, EUKULELE_DB.out.mmetsp_db)
+            } else 
+                EUKULELE(MV_DIR.out.contigs_dir, EUKULELE_DB.out.phylo_db)
         } else {
-            ch_database = Channel.fromPath(params.eukulele_dbpath)
-            EUKULELE(MV_DIR.out.contigs_dir, ch_database)
+                ch_database = Channel.fromPath(params.eukulele_dbpath)
+                EUKULELE(MV_DIR.out.contigs_dir, ch_database)
         }
         
 

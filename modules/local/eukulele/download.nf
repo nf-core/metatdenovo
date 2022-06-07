@@ -2,16 +2,18 @@ process EUKULELE_DB {
     tag '$meta.id'
     label 'process_long'
     
-    conda (params.enable_conda ? "bioconda::eukulele=2.0.1" : null)
+    conda (params.enable_conda ? "bioconda::eukulele=2.0.3" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/eukulele:2.0.1--pyh723bec7_1' :
-        'quay.io/biocontainers/eukulele:eukulele:2.0.1--pyh723bec7_1' }"
+        'https://depot.galaxyproject.org/singularity/eukulele:2.0.3--pyh723bec7_0' :
+        'quay.io/biocontainers/eukulele:2.0.3--pyh723bec7_0' }"
 
     input:
     
     output:
     path "versions.yml", emit: version
-    path("*")          , emit: database
+    path("phylodb/")   , emit: phylo_db , optional: true
+    path("mmetsp/")    , emit: mmetsp_db, optional: true
+
     
     script:
     def args = task.ext.args ?: ''
