@@ -90,7 +90,7 @@
                     "hidden": true
                 },
                 "eggnog": {
-                    "type": "string",
+                    "type": "boolean",
                     "description": "enable eggnog functional annotation"
                 },
                 "eggnog_dbpath": {
