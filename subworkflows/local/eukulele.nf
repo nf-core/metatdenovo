@@ -12,31 +12,29 @@ workflow SUB_EUKULELE {
         fastaprot
 
     main:
-        ch_versions = Channel.empty() 
-        
-        MV_DIR(fastaprot) 
-        
+        ch_versions = Channel.empty()
+
+        MV_DIR(fastaprot)
+
         String directoryName = params.eukulele_dbpath
         File directory = new File(directoryName)
-        
+
         if(! directory.exists()){
             directory.mkdir()
             EUKULELE_DB( )
             if ( params.eukulele_db == 'mmetsp' ) {
                 EUKULELE(MV_DIR.out.contigs_dir, EUKULELE_DB.out.mmetsp_db)
-            } else 
+            } else
                 EUKULELE(MV_DIR.out.contigs_dir, EUKULELE_DB.out.phylo_db)
         } else {
                 ch_database = Channel.fromPath(params.eukulele_dbpath)
                 EUKULELE(MV_DIR.out.contigs_dir, ch_database)
         }
-        
 
     emit:
-       taxonomy_estimation = EUKULELE.out.taxonomy_extimation
-       taxonomy_counts     = EUKULELE.out.taxonomy_counts
-       diamond             = EUKULELE.out.diamond
-       
-       versions            = EUKULELE.out.versions
+        taxonomy_estimation = EUKULELE.out.taxonomy_extimation
+        taxonomy_counts     = EUKULELE.out.taxonomy_counts
+        diamond             = EUKULELE.out.diamond
 
+        versions            = EUKULELE.out.versions
 }

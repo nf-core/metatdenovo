@@ -1,12 +1,12 @@
 process EUKULELE {
     tag "$meta.id"
     label 'process_high'
-    
+
     conda (params.enable_conda ? "bioconda::eukulele=2.0.2-0" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/eukulele:2.0.2--pyh723bec7_0' :
         'quay.io/biocontainers/eukulele:2.0.2--pyh723bec7_0' }"
-    
+
     input:
     tuple val(meta), path(contigs_fasta)
     path(db)
@@ -15,16 +15,16 @@ process EUKULELE {
     tuple val(meta), path("${meta.id}/taxonomy_estimation/*.out")                  , emit: taxonomy_extimation
     tuple val(meta), path("${meta.id}/taxonomy_counts/${meta.id}_all_*_counts.csv"), emit: taxonomy_counts
     tuple val(meta), path("${meta.id}/mets_full/diamond/*")                        , emit: diamond
-    
+
     path "versions.yml"                                                            , emit: versions
 
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
-    
+
     """
     rc=0
-    
+
     EUKulele \\
         $args \\
         -m mets \\
@@ -32,7 +32,7 @@ process EUKULELE {
         -o ${meta.id} \\
         --CPUs ${task.cpus} \\
         -s \\
-        $contigs_fasta || rc=\$? 
+        $contigs_fasta || rc=\$?
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

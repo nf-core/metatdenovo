@@ -213,7 +213,7 @@ workflow METATDENOVO {
     //
     // MODULE: Call Prodigal
     //
-    
+
     ch_prodigal = Channel.empty()
     if( params.orf_caller == ORF_CALLER_PRODIGAL ) {
         UNPIGZ_MEGAHIT_CONTIGS(ch_assembly_contigs)
@@ -258,15 +258,15 @@ workflow METATDENOVO {
 
     FEATURECOUNTS_CDS ( ch_featurecounts)
     ch_versions       = ch_versions.mix(FEATURECOUNTS_CDS.out.versions)
-    
+
     //
     // SUBWORKFLOW: Eukulele
     //
-    
+
     if( !params.skip_eukulele){
         SUB_EUKULELE(ch_eukulele)
     }
-    
+
     //
     // MODULE: MultiQC
     //
@@ -279,7 +279,7 @@ workflow METATDENOVO {
     ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_custom_config.collect().ifEmpty([]))
     ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
     ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
-    
+
     // Make sure we integrate FASTQC output from FASTQC_TRIMGALORE here!!!
     //ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
 
