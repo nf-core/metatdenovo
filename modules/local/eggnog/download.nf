@@ -41,6 +41,8 @@ process EGGNOG_DOWNLOAD {
     touch ./eggnog/eggnog.taxa.db
     touch ./eggnog/eggnog.taxa.db.traverse.pkl
 
+    cp ./eggnog/* ./
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         eggnog: \$( echo \$(emapper.py --version 2>&1)| sed 's/.* emapper-//' )

@@ -15,7 +15,6 @@ workflow EGGNOG {
         String directoryName = params.eggnog_dbpath
         File directory = new File(directoryName)
         if (! directory.exists()){
-            directory.mkdir()
             EGGNOG_DOWNLOAD()
             EGGNOG_MAPPER(faa, EGGNOG_DOWNLOAD.out.db)
         } else {
