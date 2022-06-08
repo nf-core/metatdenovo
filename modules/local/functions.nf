@@ -66,13 +66,13 @@ def saveFiles(Map args) {
     }
     if (ioptions.publish_files instanceof Map) {
         for (ext in ioptions.publish_files) {
-             if (args.filename.endsWith(ext.key)) {
-                 def ext_list = path_list.collect()
-                 ext_list.add(ext.value)
-                 return "${getPathFromList(ext_list)}/$args.filename"
-                }
+            if (args.filename.endsWith(ext.key)) {
+                def ext_list = path_list.collect()
+                ext_list.add(ext.value)
+                return "${getPathFromList(ext_list)}/$args.filename"
             }
-        } else if (ioptions.publish_files == null) {
+        }
+    } else if (ioptions.publish_files == null) {
             return "${getPathFromList(path_list)}/$args.filename"
         }
     }

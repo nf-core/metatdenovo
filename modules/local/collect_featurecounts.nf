@@ -24,7 +24,7 @@ process COLLECT_FEATURECOUNTS {
     script:
     def software = getSoftwareName(task.process)
     def args     = task.ext.args ?: ''
-    
+
     """
     #!/usr/bin/env Rscript
 

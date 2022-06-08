@@ -240,11 +240,11 @@ workflow METATDENOVO {
     //
     // MODULE: Collect featurecounts output counts in one table
     //
-    
+
     COLLECT_FEATURECOUNTS ( FEATURECOUNTS_CDS.out.counts.map { it[1] })
     ch_cds_counts = COLLECT_FEATURECOUNTS.out.counts
     ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
-    
+
     //
     // MODULE: Collect statistics from mapping analysis
     //
