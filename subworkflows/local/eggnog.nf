@@ -14,12 +14,20 @@ workflow EGGNOG {
 
         String directoryName = params.eggnog_dbpath
         File directory = new File(directoryName)
+        String eggnogDB = params.eggnog_dbpath + "/eggnog.db"
+        File test = new File(eggnogDB)
+
         if (! directory.exists()){
             EGGNOG_DOWNLOAD()
             EGGNOG_MAPPER(faa, EGGNOG_DOWNLOAD.out.db)
         } else {
+            if (! test.exists()){
+                EGGNOG_DOWNLOAD()
+                EGGNOG_MAPPER(faa, EGGNOG_DOWNLOAD.out.db)
+            }  else {
             ch_dbpath = Channel.fromPath(params.eggnog_dbpath)
             EGGNOG_MAPPER(faa, ch_dbpath)
+            }
         }
 
         ch_versions = ch_versions.mix(EGGNOG_MAPPER.out.versions)
