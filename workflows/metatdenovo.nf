@@ -155,7 +155,7 @@ workflow METATDENOVO {
     ch_reads_to_assembly = Channel.empty()
     if ( params.diginorm ) {
         DIGINORM(SEQTK_MERGEPE.out.reads.collect { meta, fastq -> fastq }, [], 'all_samples')
-        ch_versions = ch_versions.mix(SEQTK_MERGEPE.out.versions)
+        ch_versions = ch_versions.mix(DIGINORM.out.versions)
         ch_pe_reads_to_assembly = DIGINORM.out.pairs
         ch_se_reads_to_assembly = DIGINORM.out.singles
     } else {
