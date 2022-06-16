@@ -51,6 +51,7 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 //
 include { MEGAHIT_INTERLEAVED               } from '../modules/local/megahit/interleaved.nf'
 include { UNPIGZ as UNPIGZ_MEGAHIT_CONTIGS  } from '../modules/local/unpigz.nf'
+include { FORMAT_TAX                        } from '../modules/local/format_tax.nf'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -265,6 +266,14 @@ workflow METATDENOVO {
 
     if( !params.skip_eukulele){
         SUB_EUKULELE(ch_eukulele)
+    }
+
+    //
+    // MODULE: FORMAT TAX. Format taxonomy as output from database
+    //
+    
+    if( !params.skip_eukulele){
+        FORMAT_TAX(SUB_EUKULELE.out.taxonomy_estimation.map { it[1] } )
     }
 
     //
