@@ -237,6 +237,7 @@ workflow METATDENOVO {
 
     FEATURECOUNTS_CDS ( ch_featurecounts)
     ch_versions       = ch_versions.mix(FEATURECOUNTS_CDS.out.versions)
+    
     //
     // MODULE: Collect featurecounts output counts in one table
     //

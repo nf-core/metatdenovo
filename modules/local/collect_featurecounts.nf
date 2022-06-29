@@ -41,14 +41,16 @@ process COLLECT_FEATURECOUNTS {
             d = purrr::map(
                 f,
                 function(file) {
-                        fread(file, sep = '\\t', skip = 1) %>%
+                        fread(file, sep = '\t', skip = 1) %>%
                             melt(measure.vars = c(ncol(.)), variable.name = 'sample', value.name = 'count') %>%
                             lazy_dt() %>%
                             filter(count > 0) %>%
                             mutate(
-                                sample = str_remove(sample, '.sorted.bam'),
-                                r = count/Length
+                                sample = str_remove(sample, '_T1task.sort.bam'),
+                                r = count/Length,
+                                Geneid = str_remove( Geneid, 'cds.' )
                             ) %>%
+                            rename( orf = Geneid ) %>%
                             group_by(sample) %>% mutate(tpm = r/sum(r) * 1e6) %>% ungroup() %>%
                             select(-r) %>%
                             as_tibble()
@@ -59,15 +61,8 @@ process COLLECT_FEATURECOUNTS {
             select(-f) %>%
             write_tsv("counts${options.suffix}.tsv.gz")
 
-        write(
-            sprintf(
-                "${getProcessName(task.process)}:\n    R: %s.%s\n    dplyr: %s\n    dtplyr: %s\n    data.table: %s\n",
-                R.Version()\$major, R.Version()\$minor,
-                packageVersion('dplyr'),
-                packageVersion('dtplyr'),
-                packageVersion('data.table')
-            ),
-            'versions.yml'
-        )
+        writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")), paste0("    dplyr: ", packageVersion('dplyr')),
+            paste0("    dtplyr: ", packageVersion('dtplyr')), paste0("    data.table: ", packageVersion('data.table')) ), "versions.yml")
+
         """
 }
