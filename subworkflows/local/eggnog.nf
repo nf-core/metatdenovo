@@ -14,7 +14,7 @@ workflow EGGNOG {
 
         String directoryName = params.eggnog_dbpath
         File directory = new File(directoryName)
-        String eggnogDB = params.eggnog_dbpath + "/eggnog.db"
+        String eggnogDB = params.eggnog_dbpath + "eggnog.db"
         File test = new File(eggnogDB)
 
         if (! directory.exists()){
