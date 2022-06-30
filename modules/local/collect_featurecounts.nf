@@ -41,25 +41,24 @@ process COLLECT_FEATURECOUNTS {
             d = purrr::map(
                 f,
                 function(file) {
-                        fread(file, sep = '\t', skip = 1) %>%
-                            melt(measure.vars = c(ncol(.)), variable.name = 'sample', value.name = 'count') %>%
-                            lazy_dt() %>%
-                            filter(count > 0) %>%
-                            mutate(
-                                sample = str_remove(sample, '_T1task.sort.bam'),
-                                r = count/Length,
-                                Geneid = str_remove( Geneid, 'cds.' )
-                            ) %>%
-                            rename( orf = Geneid ) %>%
-                            group_by(sample) %>% mutate(tpm = r/sum(r) * 1e6) %>% ungroup() %>%
-                            select(-r) %>%
-                            as_tibble()
-                        }
-                    )
-            ) %>%
-            tidyr::unnest(d) %>%
-            select(-f) %>%
-            write_tsv("counts${options.suffix}.tsv.gz")
+                    fread(file, sep = '\\t', skip = 1) %>%
+                        melt(measure.vars = c(ncol(.)), variable.name = 'sample', value.name = 'count') %>%
+                        lazy_dt() %>%
+                        filter(count > 0) %>%
+                        mutate(
+                            sample = str_remove(sample, '_T1task.sort.bam'),
+                            r = count/Length
+                        ) %>%
+                        group_by(sample) %>%
+                        mutate(tpm = r/sum(r) * 1e6) %>% ungroup() %>%
+                        select(-r) %>%
+                        as_tibble()
+                }
+            )
+        ) %>%
+        tidyr::unnest(d) %>%
+        select(-f) %>%
+        write_tsv("counts${options.suffix}.tsv.gz")
 
         writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")), paste0("    dplyr: ", packageVersion('dplyr')),
             paste0("    dtplyr: ", packageVersion('dtplyr')), paste0("    data.table: ", packageVersion('data.table')) ), "versions.yml")

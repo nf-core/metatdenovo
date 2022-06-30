@@ -45,6 +45,7 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved.nf'
 include { UNPIGZ as UNPIGZ_MEGAHIT_CONTIGS } from '../modules/local/unpigz.nf'
 include { COLLECT_FEATURECOUNTS            } from '../modules/local/collect_featurecounts.nf'
+include { COLLECT_FEATURECOUNTS_EUK        } from '../modules/local/collect_featurecounts_euk.nf'
 include { COLLECT_STATS                    } from '../modules/local/collect_stats.nf'
 
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -242,9 +243,19 @@ workflow METATDENOVO {
     // MODULE: Collect featurecounts output counts in one table
     //
 
-    COLLECT_FEATURECOUNTS ( FEATURECOUNTS_CDS.out.counts.map { it[1] })
-    ch_cds_counts = COLLECT_FEATURECOUNTS.out.counts
-    ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
+    if ( params.orf_caller == ORF_CALLER_PROKKA) {
+        COLLECT_FEATURECOUNTS ( FEATURECOUNTS_CDS.out.counts.collect() { it[1] })
+        ch_cds_counts = COLLECT_FEATURECOUNTS.out.counts
+        ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
+    } else if ( params.orf_caller == ORF_CALLER_PRODIGAL) {
+        COLLECT_FEATURECOUNTS ( FEATURECOUNTS_CDS.out.counts.collect() { it[1] })
+        ch_cds_counts = COLLECT_FEATURECOUNTS.out.counts
+        ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
+    } else if ( params.orf_caller == ORF_CALLER_TRANSDECODER) {
+        COLLECT_FEATURECOUNTS_EUK ( FEATURECOUNTS_CDS.out.counts.collect() { it[1] })
+        ch_cds_counts = COLLECT_FEATURECOUNTS_EUK.out.counts
+        ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTS_EUK.out.versions)
+    }
 
     //
     // MODULE: Collect statistics from mapping analysis
