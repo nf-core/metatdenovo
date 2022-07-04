@@ -1,12 +1,4 @@
-// Import generic module functions
-include { initOptions; saveFiles; getSoftwareName; getProcessName } from './functions'
-
-params.options = [:]
-options        = initOptions(params.options)
-
-
 process COLLECT_FEATURECOUNTS {
-    tag "counts${options.suffix}.tsv.gz"
     label 'process_high'
 
     conda (params.enable_conda ? "conda-forge::r-tidyverse=1.3.1 conda-forge::r-data.table=1.14.0 conda-forge::r-dtplyr=1.1.0" : null)
@@ -22,7 +14,6 @@ process COLLECT_FEATURECOUNTS {
         path "versions.yml", emit: versions
 
     script:
-    def software = getSoftwareName(task.process)
     def args     = task.ext.args ?: ''
 
     """
@@ -49,6 +40,7 @@ process COLLECT_FEATURECOUNTS {
                             sample = str_remove(sample, '_T1task.sort.bam'),
                             r = count/Length
                         ) %>%
+                        rename( orf = Geneid, chr = Chr, start = Start, end = End, strand = Strand, length = Length ) %>%
                         group_by(sample) %>%
                         mutate(tpm = r/sum(r) * 1e6) %>% ungroup() %>%
                         select(-r) %>%
@@ -58,7 +50,7 @@ process COLLECT_FEATURECOUNTS {
         ) %>%
         tidyr::unnest(d) %>%
         select(-f) %>%
-        write_tsv("counts${options.suffix}.tsv.gz")
+        write_tsv("counts.tsv.gz")
 
         writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")), paste0("    dplyr: ", packageVersion('dplyr')),
             paste0("    dtplyr: ", packageVersion('dtplyr')), paste0("    data.table: ", packageVersion('data.table')) ), "versions.yml")

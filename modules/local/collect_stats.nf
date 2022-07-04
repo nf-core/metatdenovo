@@ -1,9 +1,3 @@
-// Import generic module functions
-include { initOptions; saveFiles; getSoftwareName; getProcessName } from './functions'
-
-params.options = [:]
-options        = initOptions(params.options)
-
 process COLLECT_STATS {
     label 'process_low'
 
@@ -92,19 +86,10 @@ process COLLECT_STATS {
         pivot_wider(names_from = m, values_from = v) %>%
         write_tsv('overall_stats.tsv')
 
-    write(
-        sprintf(
-            "${getProcessName(task.process)}:\n    R: %s.%s\n    dplyr: %s\n    dtplyr: %s\n    data.table: %s\n    readr: %s\n    purrr: %s\n    tidyr: %s\n    stringr: %s\n",
-            R.Version()\$major, R.Version()\$minor,
-            packageVersion('dplyr'),
-            packageVersion('dtplyr'),
-            packageVersion('data.table'),
-            packageVersion('readr'),
-            packageVersion('purrr'),
-            packageVersion('tidyr'),
-            packageVersion('stringr')
-        ),
-        'versions.yml'
-    )
+        writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")), paste0("    dplyr: ", packageVersion('dplyr')),
+            paste0("    dtplyr: ", packageVersion('dtplyr')), paste0("    data.table: ", packageVersion('data.table')), paste0("    readr: ", packageVersion('readr')), 
+            paste0("    purrr: ", packageVersion('purrr')), paste0("    tidyr: ", packageVersion('tidyr')), paste0("    stringr: ", packageVersion('stringr')) ), 
+            "versions.yml")
+
     """
 }

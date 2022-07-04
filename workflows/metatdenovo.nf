@@ -226,6 +226,7 @@ workflow METATDENOVO {
             UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] }
         )
         ch_gff = TRANSDECODER.out.gff.map { it[1] }
+        ch_versions     = ch_versions.mix(TRANSDECODER.out.versions)
     }
 
     //
@@ -256,7 +257,10 @@ workflow METATDENOVO {
         ch_cds_counts = COLLECT_FEATURECOUNTS_EUK.out.counts
         ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTS_EUK.out.versions)
     }
-
+    ch_fcs = Channel.empty()
+    ch_fcs = ch_fcs.mix(
+        ch_cds_counts).collect()
+    
     //
     // MODULE: Collect statistics from mapping analysis
     //
@@ -265,10 +269,10 @@ workflow METATDENOVO {
         FASTQC_TRIMGALORE.out.trim_log.map { meta, fastq -> meta.id }.collect(),
         FASTQC_TRIMGALORE.out.trim_log.map { meta, fastq -> fastq[0] }.collect(),
         BAM_SORT_SAMTOOLS.out.idxstats.collect()  { it[1] },
-        ch_cds_counts,
+        ch_fcs,
         ch_bbduk_logs.collect()
     )
-    ch_versions = ch_versions.mix(COLLECT_STATS.out.versions)
+    ch_versions     = ch_versions.mix(COLLECT_STATS.out.versions)
 
     //
     // MODULE: MultiQC
