@@ -246,7 +246,6 @@ workflow METATDENOVO {
         )
         ch_gff      = TRANSDECODER.out.gff.map { it[1] }
         ch_eukulele = TRANSDECODER.out.pep
-        ch_eukulele.view()
     }
 
     //
