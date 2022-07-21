@@ -34,7 +34,7 @@ process COLLECT_STATS {
     TYPE_ORDER = c('n_trimmed', 'n_non_contaminated', 'idxs_n_mapped', 'idxs_n_unmapped', 'n_feature_count')
 
     # Collect stats for each sample, create a table in long format that can be appended to
-    t <- tibble(sample = c("${samples.join('", "')}")) %>%
+     t <- tibble(sample = c("${samples.join('", "')}")) %>%
         mutate(
             # N. after trimming
             t = map(

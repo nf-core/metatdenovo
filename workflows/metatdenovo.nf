@@ -264,7 +264,7 @@ workflow METATDENOVO {
     //
     // MODULE: Collect statistics from mapping analysis
     //
-
+    
     COLLECT_STATS (
         FASTQC_TRIMGALORE.out.trim_log.map { meta, fastq -> meta.id }.collect(),
         FASTQC_TRIMGALORE.out.trim_log.map { meta, fastq -> fastq[0] }.collect(),
