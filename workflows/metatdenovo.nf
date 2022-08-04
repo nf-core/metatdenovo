@@ -238,6 +238,7 @@ workflow METATDENOVO {
         ch_fasta = ch_hmmr_aa.map { it[1] }
         ch_filepath.combine(ch_fasta)
                    .set { ch_hmmer }
+        ch_hmmer.view()
 
         HMMER(ch_hmmer)
     }
