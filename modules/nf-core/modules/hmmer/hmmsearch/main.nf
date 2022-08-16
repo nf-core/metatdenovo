@@ -8,13 +8,13 @@ process HMMER_HMMSEARCH {
         'quay.io/biocontainers/hmmer:3.3.2--h1b792b2_1' }"
 
     input:
-    tuple val(meta), path(hmmfile), path(seqdb), val(write_align), val(write_target), val(write_domain)
+    tuple val(meta), path(seqdb)
+    path hmmfolder
+    file hmmnamelist
+    
 
     output:
-    tuple val(meta), path('*.txt.gz')    , emit: output
-    tuple val(meta), path('*.sto.gz')   , emit: alignments    , optional: true
-    tuple val(meta), path('*.tbl.gz')   , emit: target_summary, optional: true
-    tuple val(meta), path('*.domtbl.gz'), emit: domain_summary, optional: true
+    tuple val(meta), path('*.tblout'), emit: tblout
     path "versions.yml"              , emit: versions
 
     when:
@@ -23,25 +23,15 @@ process HMMER_HMMSEARCH {
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
-    output = "${prefix}.txt"
-    alignment = write_align ? "-A ${prefix}.sto" : ''
-    target_summary = write_target ? "--tblout ${prefix}.tbl" : ''
-    domain_summary = write_domain ? "--domtblout ${prefix}.domtbl" :  ''
+    
     """
-    hmmsearch \\
-        $args \\
-        --cpu $task.cpus \\
-        -o $output \\
-        $alignment \\
-        $target_summary \\
-        $domain_summary \\
-        $hmmfile \\
-        $seqdb
+    for profile in "${hmmnamelist}"; do \\
+        hmmsearch \\
+        --tblout \$profile".tblout" \\
+        "${hmmfolder}""/"\$profile".hmm" \\
+        $seqdb; \\
+        done
 
-    gzip --no-name *.txt \\
-        ${write_align ? '*.sto' : ''} \\
-        ${write_target ? '*.tbl' : ''} \\
-        ${write_domain ? '*.domtbl' : ''}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

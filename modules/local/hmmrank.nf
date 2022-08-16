@@ -12,8 +12,8 @@ process HMMRANK {
 
     output:
 
-    path "hmmrank"    , emit: x
-    path "version.yml", emit: versions
+    path "hmmrank.out", emit: x
+    //path "version.yml", emit: versions
 
     script:
 
@@ -28,10 +28,11 @@ process HMMRANK {
     library(stringr)
 
     # Read all the tblout files
+    files <- tibble(f = Sys.glob('*.tblout'))
     tlist <- list()
     i <- 1
-    for ( tbloutfile in grep('\\.tblout', opt$args, value=TRUE) ) {
-      p <- basename(tbloutfile) %>% str_remove('\\..*')
+    for ( tbloutfile in files ) {
+      p <- basename(tbloutfile)
       t <- read_fwf(
         tbloutfile, fwf_cols(content = c(1, NA)), 
         col_types = cols(content = col_character()), 
@@ -41,9 +42,9 @@ process HMMRANK {
         separate(
           content, 
           c('accno', 't0', 'profile', 't1', 'evalue', 'score', 'bias', 'f0', 'f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'rest'), 
-          '\\s+',  extra='merge', convert = FALSE
+          '\\\s+',  extra='merge', convert = FALSE
         ) %>%
-        transmute(accno, profile, evalue = as.double(evalue), score = as.double(score)) %>%
+        transmute(accno, profile, hmm_profile = t1, evalue = as.double(evalue), score = as.double(score)) %>%
         data.table()
       if ( nrow(t) > 0 ) {
         tlist[[i]] <- t
@@ -56,19 +57,20 @@ process HMMRANK {
       write("No results found, exiting", stderr())
       quit(save = 'no', status = 0)
     }
+
     setkey(tblout, profile, accno)
 
-    # Filter away entries with lower score than the minimum
     tblout <- lazy_dt(tblout) %>%
-        group_by(accno, profile) %>%
-        filter(score >= min(min_score, max_score)) %>%
+        group_by(accno) %>% 
+        arrange(desc(score), evalue, profile) %>%
+        mutate(rank = row_number()) %>%
+        rename(orf = accno) %>%
         ungroup() %>%
-        select(-max_score) %>%
-        as.data.table()
+        as_tibble()
 
     # write output
     write_tsv(
-        tblout %>% arrange(accno, rank),
+        tblout,
         'hmmrank.out'
         )
     """

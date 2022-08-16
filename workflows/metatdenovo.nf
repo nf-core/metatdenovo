@@ -44,6 +44,7 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 //
 include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved.nf'
 include { UNPIGZ as UNPIGZ_MEGAHIT_CONTIGS } from '../modules/local/unpigz.nf'
+include { HMMRANK                          } from '../modules/local/hmmrank.nf'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -233,14 +234,10 @@ workflow METATDENOVO {
     // MODULE: Hmmsearch on orf caller output
     //
     if( params.hmmsearch) {
-        ch_filepath = ch_hmmr_aa.map { it[0] }
-            .combine(Channel.fromPath(params.hmmfilepath))
-        ch_fasta = ch_hmmr_aa.map { it[1] }
-        ch_filepath.combine(ch_fasta)
-                   .set { ch_hmmer }
-        ch_hmmer.view()
+        ch_hmmrpath = Channel.fromPath(params.hmmfilepath)
+        HMMER(ch_hmmr_aa, ch_hmmrpath, params.hmmlist )
 
-        HMMER(ch_hmmer)
+        //HMMRANK( HMMER.out.tblout.map { it[1] } )
     }
     
     //
