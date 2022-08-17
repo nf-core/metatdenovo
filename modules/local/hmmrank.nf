@@ -66,6 +66,7 @@ process HMMRANK {
         mutate(rank = row_number()) %>%
         rename(orf = accno) %>%
         ungroup() %>%
+        filter(!is.na(orf)) %>%
         as_tibble()
 
     # write output

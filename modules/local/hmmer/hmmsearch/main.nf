@@ -1,5 +1,4 @@
 process HMMER_HMMSEARCH {
-    tag "$meta.id"
     label 'process_medium'
 
     conda (params.enable_conda ? "bioconda::hmmer=3.3.2" : null)
@@ -9,8 +8,7 @@ process HMMER_HMMSEARCH {
 
     input:
     tuple val(meta), path(seqdb)
-    path hmmfolder
-    file hmmnamelist
+    path hmmname
     
 
     output:
@@ -25,13 +23,10 @@ process HMMER_HMMSEARCH {
     def prefix = task.ext.prefix ?: "${meta.id}"
     
     """
-    for profile in "${hmmnamelist}"; do \\
-        hmmsearch \\
-        --tblout \$profile".tblout" \\
-        "${hmmfolder}""/"\$profile".hmm" \\
-        $seqdb; \\
-        done
-
+    hmmsearch \\
+        --tblout $hmmname".tblout" \\
+        $hmmname \\
+        $seqdb
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

@@ -234,10 +234,9 @@ workflow METATDENOVO {
     // MODULE: Hmmsearch on orf caller output
     //
     if( params.hmmsearch) {
-        ch_hmmrpath = Channel.fromPath(params.hmmfilepath)
-        HMMER(ch_hmmr_aa, ch_hmmrpath, params.hmmlist )
-
-        //HMMRANK( HMMER.out.tblout.map { it[1] } )
+        ch_hmmrpath = Channel.fromPath(params.hmmpath)
+        HMMER(ch_hmmr_aa, ch_hmmrpath )
+        HMMRANK( HMMER.out.tblout.collect() { it[1] } )
     }
     
     //
