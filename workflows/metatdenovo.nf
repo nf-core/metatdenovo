@@ -43,7 +43,7 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 // MODULE: local
 //
 include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved.nf'
-include { UNPIGZ as UNPIGZ_MEGAHIT_CONTIGS } from '../modules/local/unpigz.nf'
+include { UNPIGZ as UNPIGZ_CONTIGS } from '../modules/local/unpigz.nf'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -89,6 +89,7 @@ include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS_CDS } from '../modules/nf-core/
 include { PRODIGAL                                   } from '../modules/nf-core/modules/prodigal/main'
 include { MULTIQC                                    } from '../modules/nf-core/modules/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS                } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
+include { SPADES                                     } from '../modules/nf-core/modules/spades/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -155,15 +156,23 @@ workflow METATDENOVO {
     }
 
     //
-    // MODULE: Run Megahit on all interleaved fastq files
+    // MODULE: Run Megahit or RNAspades on all interleaved fastq files
     //
-    MEGAHIT_INTERLEAVED(
-        ch_pe_reads_to_assembly.collect(),
-        ch_se_reads_to_assembly.collect(),
-        'all_samples'
-    )
-    ch_assembly_contigs = MEGAHIT_INTERLEAVED.out.contigs
-    ch_versions = ch_versions.mix(MEGAHIT_INTERLEAVED.out.versions)
+    if ( params.rnaspades ) {
+        SPADES( SEQTK_MERGEPE.out.reads.collect(),
+                'all_samples'
+        )
+       ch_assembly_contigs = SPADES.out.transcripts
+       ch_versions = ch_versions.mix(SPADES.out.versions)
+    } else {
+        MEGAHIT_INTERLEAVED(
+            ch_pe_reads_to_assembly.collect(),
+            ch_se_reads_to_assembly.collect(),
+            'all_samples'
+        )
+        ch_assembly_contigs = MEGAHIT_INTERLEAVED.out.contigs
+        ch_versions = ch_versions.mix(MEGAHIT_INTERLEAVED.out.versions)
+    }
 
     //
     // MODULE: Create a BBMap index
@@ -187,7 +196,7 @@ workflow METATDENOVO {
     // SUBWORKFLOW: Run PROKKA on Megahit output, but split the fasta file in chunks of 10 MB, then concatenate and compress output.
     //
     if (params.orf_caller == ORF_CALLER_PROKKA) {
-        PROKKA_CAT(MEGAHIT_INTERLEAVED.out.contigs)
+        PROKKA_CAT(ch_assembly_contigs)
         ch_versions = ch_versions.mix(PROKKA_CAT.out.versions)
         ch_gff      = PROKKA_CAT.out.gff
     }
@@ -195,13 +204,13 @@ workflow METATDENOVO {
     //
     // MODULE: Call Prodigal
     //
-    UNPIGZ_MEGAHIT_CONTIGS(ch_assembly_contigs)
-    ch_versions = ch_versions.mix(UNPIGZ_MEGAHIT_CONTIGS.out.versions)
+    UNPIGZ_CONTIGS(ch_assembly_contigs)
+    ch_versions = ch_versions.mix(UNPIGZ_CONTIGS.out.versions)
 
     ch_prodigal = Channel.empty()
     if( params.orf_caller == ORF_CALLER_PRODIGAL ) {
         PRODIGAL(
-            UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] },
+            UNPIGZ_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] },
             'gff'
         )
         ch_gff          = PRODIGAL.out.gene_annotations.map { it[1] }
@@ -221,7 +230,7 @@ workflow METATDENOVO {
     ch_transdecoder_longorf = Channel.empty()
     if( params.orf_caller == ORF_CALLER_TRANSDECODER ) {
         TRANSDECODER(
-            UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] }
+            UNPIGZ_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] }
         )
         ch_gff = TRANSDECODER.out.gff.map { it[1] }
     }
@@ -249,6 +258,7 @@ workflow METATDENOVO {
     ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_custom_config.collect().ifEmpty([]))
     ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
     ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
+    
     // Make sure we integrate FASTQC output from FASTQC_TRIMGALORE here!!!
     //ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
 

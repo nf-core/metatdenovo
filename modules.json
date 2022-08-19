@@ -48,6 +48,9 @@
             "seqtk/mergepe": {
                 "git_sha": "9d0cad583b9a71a6509b754fdf589cbfbed08961"
             },
+            "spades": {
+                "git_sha": "682f789f93070bd047868300dd018faf3d434e7c"
+            },
             "subread/featurecounts": {
                 "git_sha": "9d0cad583b9a71a6509b754fdf589cbfbed08961"
             },

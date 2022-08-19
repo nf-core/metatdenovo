@@ -13,10 +13,10 @@ process PRODIGAL {
 
     output:
     tuple val(meta), path("${prefix}.${output_format}"), emit: gene_annotations
-    tuple val(meta), path("${prefix}.fna"), emit: nucleotide_fasta
-    tuple val(meta), path("${prefix}.faa"), emit: amino_acid_fasta
-    tuple val(meta), path("${prefix}_all.txt"), emit: all_gene_annotations
-    path "versions.yml"           , emit: versions
+    tuple val(meta), path("${prefix}.fna")             , emit: nucleotide_fasta
+    tuple val(meta), path("${prefix}.faa")             , emit: amino_acid_fasta
+    tuple val(meta), path("${prefix}_all.txt")         , emit: all_gene_annotations
+    path "versions.yml"                                , emit: versions
 
     script:
     def args = task.ext.args   ?: ''
