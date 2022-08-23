@@ -14,8 +14,13 @@ ORF_CALLER_PRODIGAL     = 'prodigal'
 ORF_CALLER_PROKKA       = 'prokka'
 ORF_CALLER_TRANSDECODER = 'transdecoder'
 
+
+// Validate parameters for assembler:
+RNASPADES = 'rnaspades'
+MEGAHIT   = 'megahit'
 def valid_params = [
-    orf_caller  : [ORF_CALLER_PRODIGAL, ORF_CALLER_PROKKA, ORF_CALLER_TRANSDECODER]
+    orf_caller  : [ORF_CALLER_PRODIGAL, ORF_CALLER_PROKKA, ORF_CALLER_TRANSDECODER],
+    assembler   : [RNASPADES, MEGAHIT ]
 ]
 
 // Check input path parameters to see if they exist
@@ -42,7 +47,7 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 //
 // MODULE: local
 //
-include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved.nf'
+include { MEGAHIT_INTERLEAVED      } from '../modules/local/megahit/interleaved.nf'
 include { UNPIGZ as UNPIGZ_CONTIGS } from '../modules/local/unpigz.nf'
 
 //
@@ -158,20 +163,22 @@ workflow METATDENOVO {
     //
     // MODULE: Run Megahit or RNAspades on all interleaved fastq files
     //
-    if ( params.rnaspades ) {
-        SPADES( SEQTK_MERGEPE.out.reads.collect(),
+    if ( params.assembler == RNASPADES ) {
+        SPADES( FASTQC_TRIMGALORE.out.reads.map { meta, fastq -> [ meta, fastq, [], [] ] },
                 'all_samples'
         )
        ch_assembly_contigs = SPADES.out.transcripts
        ch_versions = ch_versions.mix(SPADES.out.versions)
-    } else {
-        MEGAHIT_INTERLEAVED(
-            ch_pe_reads_to_assembly.collect(),
-            ch_se_reads_to_assembly.collect(),
-            'all_samples'
-        )
-        ch_assembly_contigs = MEGAHIT_INTERLEAVED.out.contigs
-        ch_versions = ch_versions.mix(MEGAHIT_INTERLEAVED.out.versions)
+    }
+    
+    if ( params.assembler == MEGAHIT ) {
+    MEGAHIT_INTERLEAVED(
+        ch_pe_reads_to_assembly.collect(),
+        ch_se_reads_to_assembly.collect(),
+        'all_samples'
+    )
+    ch_assembly_contigs = MEGAHIT_INTERLEAVED.out.contigs
+    ch_versions = ch_versions.mix(MEGAHIT_INTERLEAVED.out.versions)
     }
 
     //
