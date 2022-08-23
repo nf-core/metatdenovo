@@ -8,8 +8,8 @@ process HMMER_HMMSEARCH {
 
     input:
     tuple val(meta), path(seqdb)
-    path hmmname
-    
+    path hmmdir
+    val  hmmpattern
 
     output:
     tuple val(meta), path('*.tblout'), emit: tblout
@@ -24,8 +24,8 @@ process HMMER_HMMSEARCH {
     
     """
     hmmsearch \\
-        --tblout $hmmname".tblout" \\
-        $hmmname \\
+        --tblout $hmmdir/$hmmpattern".tblout" \\
+        $hmmdir/$hmmpattern \\
         $seqdb
 
     cat <<-END_VERSIONS > versions.yml

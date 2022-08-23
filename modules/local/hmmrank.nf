@@ -19,7 +19,7 @@ process HMMRANK {
 
     """
     #!/usr/bin/env Rscript
-    library(optparse)
+    library(tidyverse)
     library(readr)
     library(dplyr)
     library(dtplyr)
@@ -70,9 +70,6 @@ process HMMRANK {
         as_tibble()
 
     # write output
-    write_tsv(
-        tblout,
-        'hmmrank.out'
-        )
+    write_tsv(tblout,'hmmrank.out')
     """
 }

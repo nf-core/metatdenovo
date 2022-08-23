@@ -45,6 +45,7 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved.nf'
 include { UNPIGZ as UNPIGZ_MEGAHIT_CONTIGS } from '../modules/local/unpigz.nf'
 include { HMMRANK                          } from '../modules/local/hmmrank.nf'
+include { HMMER_HMMSEARCH as HMMSEARCH     } from '../modules/local/hmmer/hmmsearch/main.nf'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -90,7 +91,6 @@ include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS_CDS } from '../modules/nf-core/
 include { PRODIGAL                                   } from '../modules/nf-core/modules/prodigal/main'
 include { MULTIQC                                    } from '../modules/nf-core/modules/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS                } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
-include { HMMER_HMMSEARCH as HMMER                   } from '../modules/nf-core/modules/hmmer/hmmsearch/main.nf'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -234,9 +234,9 @@ workflow METATDENOVO {
     // MODULE: Hmmsearch on orf caller output
     //
     if( params.hmmsearch) {
-        ch_hmmrpath = Channel.fromPath(params.hmmpath)
-        HMMER(ch_hmmr_aa, ch_hmmrpath )
-        HMMRANK( HMMER.out.tblout.collect() { it[1] } )
+        ch_hmmdir = Channel.fromPath(params.hmmdir)
+        HMMSEARCH(ch_hmmr_aa, ch_hmmdir, params.hmmpattern )
+        HMMRANK( HMMSEARCH.out.tblout.collect() { it[1] } )
     }
     
     //
