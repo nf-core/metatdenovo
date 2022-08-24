@@ -22,15 +22,15 @@ process SPADES {
 
     script:
     def args = task.ext.args ?: ''
-    def prefix = task.ext.prefix ?: "${assembly}"
     def maxmem = task.memory.toGiga()
-    def illumina_reads = "-1 ${illumina[0]} -2 ${illumina[1]}   
+
     """
     spades.py \\
         $args \\
         --threads $task.cpus \\
         --memory $maxmem \\
-        $illumina_reads \\
+        --pe-12 1  --pe-12 2  \\
+        --12 $illumina \\
         -o ./
     
     mv spades.log ${assembly}.spades.log

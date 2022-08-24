@@ -164,7 +164,7 @@ workflow METATDENOVO {
     // MODULE: Run Megahit or RNAspades on all interleaved fastq files
     //
     if ( params.assembler == RNASPADES ) {
-        SPADES( FASTQC_TRIMGALORE.out.reads.map { meta, fastq -> [ meta, fastq, [], [] ] },
+        SPADES( SEQTK_MERGEPE.out.reads.collect(),
                 'all_samples'
         )
        ch_assembly_contigs = SPADES.out.transcripts
