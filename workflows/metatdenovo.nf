@@ -260,7 +260,7 @@ workflow METATDENOVO {
     ch_fcs = Channel.empty()
     ch_fcs = ch_fcs.mix(
         ch_cds_counts).collect()
-    
+
     //
     // MODULE: Collect statistics from mapping analysis
     //
