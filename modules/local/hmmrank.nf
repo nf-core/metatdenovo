@@ -28,7 +28,7 @@ process HMMRANK {
     library(stringr)
 
     # Read all the tblout files
-    files <- tibble(f = Sys.glob('*.tblout'))
+    files <- tibble(f = Sys.glob('*.tbl.gz'))
     tlist <- list()
     i <- 1
     for ( tbloutfile in files ) {

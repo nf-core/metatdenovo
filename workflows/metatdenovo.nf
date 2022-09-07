@@ -25,6 +25,12 @@ for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true
 // Check mandatory parameters
 if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input samplesheet not specified!' }
 
+// If the user supplied hmm files, we will run hmmsearch and then rank the results.
+// Create a channel for hmm files.
+if ( params.hmmsearch ) {
+    ch_hmms = Channel.fromPath("$params.hmmdir/*.hmm")
+}
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     CONFIG FILES
@@ -45,7 +51,6 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved.nf'
 include { UNPIGZ as UNPIGZ_MEGAHIT_CONTIGS } from '../modules/local/unpigz.nf'
 include { HMMRANK                          } from '../modules/local/hmmrank.nf'
-include { HMMER_HMMSEARCH as HMMSEARCH     } from '../modules/local/hmmer/hmmsearch/main.nf'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -91,6 +96,7 @@ include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS_CDS } from '../modules/nf-core/
 include { PRODIGAL                                   } from '../modules/nf-core/modules/prodigal/main'
 include { MULTIQC                                    } from '../modules/nf-core/modules/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS                } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
+include { HMMER_HMMSEARCH as HMMSEARCH               } from '../modules/nf-core/modules/hmmer/hmmsearch/main.nf'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -192,7 +198,7 @@ workflow METATDENOVO {
         PROKKA_CAT(MEGAHIT_INTERLEAVED.out.contigs)
         ch_versions = ch_versions.mix(PROKKA_CAT.out.versions)
         ch_gff      = PROKKA_CAT.out.gff
-        ch_hmmr_aa  = PROKKA_CAT.out.faa
+        ch_hmm_aa   = PROKKA_CAT.out.faa
     }
 
     //
@@ -208,7 +214,7 @@ workflow METATDENOVO {
             'gff'
         )
         ch_gff          = PRODIGAL.out.gene_annotations.map { it[1] }
-        ch_hmmr_aa      = PRODIGAL.out.amino_acid_fasta
+        ch_hmm_aa       = PRODIGAL.out.amino_acid_fasta
         ch_prodigal_fna = PRODIGAL.out.nucleotide_fasta
         ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
     }
@@ -226,17 +232,24 @@ workflow METATDENOVO {
         TRANSDECODER(
             UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] }
         )
-        ch_gff = TRANSDECODER.out.gff.map { it[1] }
-        ch_hmmr_aa = TRANSDECODER.out.pep
+        ch_gff    = TRANSDECODER.out.gff.map { it[1] }
+        ch_hmm_aa = TRANSDECODER.out.pep
     }
-
+    ch_hmm_aa.map { it[1] }
+        .set { ch_test }
+    
     //
     // MODULE: Hmmsearch on orf caller output
     //
     if( params.hmmsearch) {
-        ch_hmmdir = Channel.fromPath(params.hmmdir)
-        HMMSEARCH(ch_hmmr_aa, ch_hmmdir, params.hmmpattern )
-        HMMRANK( HMMSEARCH.out.tblout.collect() { it[1] } )
+
+        ch_hmmstage = Channel.fromPath(params.hmmdir).combine(ch_hmm_aa.map { it[1] })
+        ch_hmmstage
+            .map { [ [ id: 'all_samples' ], it[0], it[1], false, false, false ] }
+            .set { ch_hmmdir }
+        HMMSEARCH( ch_hmmdir )
+        HMMSEARCH.out.target_summary.collect() { it[1] }.view()
+        HMMRANK( HMMSEARCH.out.target_summary.map() { it[1] } )
     }
     
     //
