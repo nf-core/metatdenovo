@@ -37,7 +37,8 @@ process EGGNOG_DOWNLOAD {
 
     """
 
-    touch ./eggnog/eggnog.db
+    touch ./eggnog/eggnog.db.gz
+    unpigz -c ./eggnog/eggnog.db.gz >./eggnog/eggnog.db
     touch ./eggnog/eggnog.taxa.db
     touch ./eggnog/eggnog.taxa.db.traverse.pkl
 
