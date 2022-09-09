@@ -21,8 +21,8 @@ EUKULELE_DB_EUKPROT     = 'eukprot'
 EUKULELE_DB_EUKZOO      = 'eukzoo'
 
 def valid_params = [
-    orf_caller  : [ORF_CALLER_PRODIGAL, ORF_CALLER_PROKKA, ORF_CALLER_TRANSDECODER],
-    eukulele_db : [EUKULELE_DB_PHYLODB, EUKULELE_DB_MMETSP, EUKULELE_DB_EUKPROT, EUKULELE_DB_EUKZOO ]
+    orf_caller      : [ORF_CALLER_PRODIGAL, ORF_CALLER_PROKKA, ORF_CALLER_TRANSDECODER],
+    eukulele_db     : [EUKULELE_DB_PHYLODB, EUKULELE_DB_MMETSP, EUKULELE_DB_EUKPROT, EUKULELE_DB_EUKZOO ]
 ]
 
 // Check input path parameters to see if they exist
@@ -50,7 +50,7 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 // MODULE: local
 //
 include { MEGAHIT_INTERLEAVED               } from '../modules/local/megahit/interleaved.nf'
-include { UNPIGZ as UNPIGZ_MEGAHIT_CONTIGS  } from '../modules/local/unpigz.nf'
+include { UNPIGZ as UNPIGZ_CONTIGS          } from '../modules/local/unpigz.nf'
 include { FORMAT_TAX                        } from '../modules/local/format_tax.nf'
 
 //
@@ -205,9 +205,9 @@ workflow METATDENOVO {
         ch_versions = ch_versions.mix(PROKKA_CAT.out.versions)
         ch_gff      = PROKKA_CAT.out.gff
         ch_protein  = PROKKA_CAT.out.faa
-        UNPIGZ_MEGAHIT_CONTIGS(ch_protein)
+        UNPIGZ_CONTIGS(ch_protein)
         MEGAHIT_INTERLEAVED.out.contigs.collect { [ [ id: 'all_samples' ]] }
-            .combine(UNPIGZ_MEGAHIT_CONTIGS.out.unzipped)
+            .combine(UNPIGZ_CONTIGS.out.unzipped)
             .set{ ch_eukulele }
     }
 
@@ -217,10 +217,10 @@ workflow METATDENOVO {
 
     ch_prodigal = Channel.empty()
     if( params.orf_caller == ORF_CALLER_PRODIGAL ) {
-        UNPIGZ_MEGAHIT_CONTIGS(ch_assembly_contigs)
-        ch_versions = ch_versions.mix(UNPIGZ_MEGAHIT_CONTIGS.out.versions)
+        UNPIGZ_CONTIGS(ch_assembly_contigs)
+        ch_versions = ch_versions.mix(UNPIGZ_CONTIGS.out.versions)
         PRODIGAL(
-            UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] },
+            UNPIGZ_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] },
             'gff'
         )
         ch_gff          = PRODIGAL.out.gene_annotations.map { it[1] }
@@ -235,14 +235,14 @@ workflow METATDENOVO {
     )
 
     //
-    // SUBWORKFLOW: run TRANSDECODER on UNPIGZ_MEGAHIT output. Orf caller alternative for eukaryotes.
+    // SUBWORKFLOW: run TRANSDECODER on UNPIGZ output. Orf caller alternative for eukaryotes.
     //
 
     ch_transdecoder_longorf = Channel.empty()
     if( params.orf_caller == ORF_CALLER_TRANSDECODER ) {
-        UNPIGZ_MEGAHIT_CONTIGS(ch_assembly_contigs)
+        UNPIGZ_CONTIGS(ch_assembly_contigs)
         TRANSDECODER(
-            UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] }
+            UNPIGZ_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] }
         )
         ch_gff      = TRANSDECODER.out.gff.map { it[1] }
         ch_eukulele = TRANSDECODER.out.pep
@@ -271,9 +271,9 @@ workflow METATDENOVO {
     // MODULE: FORMAT TAX. Format taxonomy as output from database
     //
     
-    if( !params.skip_eukulele){
-        FORMAT_TAX(SUB_EUKULELE.out.taxonomy_estimation.map { it[1] } )
-    }
+    //if( !params.skip_eukulele){
+    //    FORMAT_TAX(SUB_EUKULELE.out.taxonomy_estimation.map { it[1] } )
+    //}
 
     //
     // MODULE: MultiQC

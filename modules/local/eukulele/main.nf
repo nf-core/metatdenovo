@@ -12,7 +12,7 @@ process EUKULELE {
     path(db)
 
     output:
-    tuple val(meta), path("${meta.id}/taxonomy_estimation/*.out")                  , emit: taxonomy_extimation
+    tuple val(meta), path("${meta.id}/taxonomy_estimation/*.out")                  , emit: taxonomy_estimation
     tuple val(meta), path("${meta.id}/taxonomy_counts/${meta.id}_all_*_counts.csv"), emit: taxonomy_counts
     tuple val(meta), path("${meta.id}/mets_full/diamond/*")                        , emit: diamond
 
@@ -24,15 +24,16 @@ process EUKULELE {
 
     """
     rc=0
+    mkdir contigs
+    mv ${contigs_fasta} contigs
 
     EUKulele \\
         $args \\
-        -m mets \\
         --reference_dir $db \\
         -o ${meta.id} \\
         --CPUs ${task.cpus} \\
         -s \\
-        $contigs_fasta || rc=\$?
+        contigs || rc=\$?
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
