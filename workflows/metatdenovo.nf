@@ -44,8 +44,10 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 //
 include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved.nf'
 include { UNPIGZ as UNPIGZ_MEGAHIT_CONTIGS } from '../modules/local/unpigz.nf'
+include { COLLECT_FEATURECOUNTS            } from '../modules/local/collect_featurecounts.nf'
+include { COLLECT_FEATURECOUNTS_EUK        } from '../modules/local/collect_featurecounts_euk.nf'
+include { COLLECT_STATS                    } from '../modules/local/collect_stats.nf'
 
-//
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
 include { INPUT_CHECK } from '../subworkflows/local/input_check'
@@ -224,6 +226,7 @@ workflow METATDENOVO {
             UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] }
         )
         ch_gff = TRANSDECODER.out.gff.map { it[1] }
+        ch_versions     = ch_versions.mix(TRANSDECODER.out.versions)
     }
 
     //
@@ -236,6 +239,40 @@ workflow METATDENOVO {
 
     FEATURECOUNTS_CDS ( ch_featurecounts)
     ch_versions       = ch_versions.mix(FEATURECOUNTS_CDS.out.versions)
+    
+    //
+    // MODULE: Collect featurecounts output counts in one table
+    //
+
+    if ( params.orf_caller == ORF_CALLER_PROKKA) {
+        COLLECT_FEATURECOUNTS ( FEATURECOUNTS_CDS.out.counts.collect() { it[1] })
+        ch_cds_counts = COLLECT_FEATURECOUNTS.out.counts
+        ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
+    } else if ( params.orf_caller == ORF_CALLER_PRODIGAL) {
+        COLLECT_FEATURECOUNTS ( FEATURECOUNTS_CDS.out.counts.collect() { it[1] })
+        ch_cds_counts = COLLECT_FEATURECOUNTS.out.counts
+        ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
+    } else if ( params.orf_caller == ORF_CALLER_TRANSDECODER) {
+        COLLECT_FEATURECOUNTS_EUK ( FEATURECOUNTS_CDS.out.counts.collect() { it[1] })
+        ch_cds_counts = COLLECT_FEATURECOUNTS_EUK.out.counts
+        ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTS_EUK.out.versions)
+    }
+    ch_fcs = Channel.empty()
+    ch_fcs = ch_fcs.mix(
+        ch_cds_counts).collect()
+
+    //
+    // MODULE: Collect statistics from mapping analysis
+    //
+    
+    COLLECT_STATS (
+        FASTQC_TRIMGALORE.out.trim_log.map { meta, fastq -> meta.id }.collect(),
+        FASTQC_TRIMGALORE.out.trim_log.map { meta, fastq -> fastq[0] }.collect(),
+        BAM_SORT_SAMTOOLS.out.idxstats.collect()  { it[1] },
+        ch_fcs,
+        ch_bbduk_logs.collect()
+    )
+    ch_versions     = ch_versions.mix(COLLECT_STATS.out.versions)
 
     //
     // MODULE: MultiQC
@@ -273,7 +310,5 @@ workflow.onComplete {
 }
 
 /*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    THE END
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
