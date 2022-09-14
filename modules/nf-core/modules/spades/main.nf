@@ -1,5 +1,5 @@
 process SPADES {
-    tag "$assembly"
+    tag "$meta.id"
     label 'process_high'
 
     conda (params.enable_conda ? 'bioconda::spades=3.15.4' : null)
@@ -8,52 +8,61 @@ process SPADES {
         'quay.io/biocontainers/spades:3.15.4--h95f258a_0' }"
 
     input:
-    tuple val(meta), path(illumina)
-    val assembly
+    tuple val(meta), path(illumina), path(pacbio), path(nanopore)
+    path  hmm
 
     output:
     tuple val(meta), path('*.scaffolds.fa.gz')    , optional:true, emit: scaffolds
     tuple val(meta), path('*.contigs.fa.gz')      , optional:true, emit: contigs
-    path('*.transcripts.fa.gz')                   , optional:true, emit: transcripts
+    tuple val(meta), path('*.transcripts.fa.gz')  , optional:true, emit: transcripts
     tuple val(meta), path('*.gene_clusters.fa.gz'), optional:true, emit: gene_clusters
     tuple val(meta), path('*.assembly.gfa.gz')    , optional:true, emit: gfa
     tuple val(meta), path('*.log')                , emit: log
     path  "versions.yml"                          , emit: versions
 
+    when:
+    task.ext.when == null || task.ext.when
+
     script:
     def args = task.ext.args ?: ''
+    def prefix = task.ext.prefix ?: "${meta.id}"
     def maxmem = task.memory.toGiga()
-
+    def illumina_reads = illumina ? ( meta.single_end ? "-s $illumina" : "-1 ${illumina[0]} -2 ${illumina[1]}" ) : ""
+    def pacbio_reads = pacbio ? "--pacbio $pacbio" : ""
+    def nanopore_reads = nanopore ? "--nanopore $nanopore" : ""
+    def custom_hmms = hmm ? "--custom-hmms $hmm" : ""
     """
     spades.py \\
         $args \\
         --threads $task.cpus \\
         --memory $maxmem \\
-        --pe-12 1  --pe-12 2  \\
-        --12 $illumina \\
+        $custom_hmms \\
+        $illumina_reads \\
+        $pacbio_reads \\
+        $nanopore_reads \\
         -o ./
-    
-    mv spades.log ${assembly}.spades.log
+    mv spades.log ${prefix}.spades.log
 
     if [ -f scaffolds.fasta ]; then
-        mv scaffolds.fasta ${assembly}.scaffolds.fa
-        gzip -n ${assembly}.scaffolds.fa
+        mv scaffolds.fasta ${prefix}.scaffolds.fa
+        gzip -n ${prefix}.scaffolds.fa
     fi
     if [ -f contigs.fasta ]; then
-        mv contigs.fasta ${assembly}.contigs.fa
-        gzip -n ${assembly}.contigs.fa
+        mv contigs.fasta ${prefix}.contigs.fa
+        gzip -n ${prefix}.contigs.fa
     fi
     if [ -f transcripts.fasta ]; then
-        mv transcripts.fasta ${assembly}.transcripts.fa
-        gzip -n ${assembly}.transcripts.fa
+        mv transcripts.fasta ${prefix}.transcripts.fa
+        gzip -n ${prefix}.transcripts.fa
     fi
     if [ -f assembly_graph_with_scaffolds.gfa ]; then
-        mv assembly_graph_with_scaffolds.gfa ${assembly}.assembly.gfa
-        gzip -n ${assembly}.assembly.gfa
+        mv assembly_graph_with_scaffolds.gfa ${prefix}.assembly.gfa
+        gzip -n ${prefix}.assembly.gfa
     fi
+
     if [ -f gene_clusters.fasta ]; then
-        mv gene_clusters.fasta ${assembly}.gene_clusters.fa
-        gzip -n ${assembly}.gene_clusters.fa
+        mv gene_clusters.fasta ${prefix}.gene_clusters.fa
+        gzip -n ${prefix}.gene_clusters.fa
     fi
 
     cat <<-END_VERSIONS > versions.yml

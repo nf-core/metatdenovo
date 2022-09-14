@@ -160,17 +160,22 @@ workflow METATDENOVO {
         ch_se_reads_to_assembly = []
     }
 
+    ch_pacbio = []
+    ch_nanopore = []
+    ch_hmm = [] 
+    ch_spades = SEQTK_MERGEPE.out.reads.map { [ [ id: 'all_samples' ], it[1],  [], [] ] } 
+    
+
     //
     // MODULE: Run Megahit or RNAspades on all interleaved fastq files
     //
     if ( params.assembler == RNASPADES ) {
-        SPADES( SEQTK_MERGEPE.out.reads.collect(),
-                'all_samples'
-        )
-       ch_assembly_contigs = SPADES.out.transcripts
-       ch_versions = ch_versions.mix(SPADES.out.versions)
-    }
-    
+        ch_spades = FASTQC_TRIMGALORE.out.reads.map { meta, fastq -> [ [ id: 'all_samples' ], fastq, [], [] ] }
+        SPADES( ch_spades, [] )
+        ch_assembly_contigs = SPADES.out.transcripts.map { it[1] }
+        ch_assembly_contigs.view()
+        ch_versions = ch_versions.mix(SPADES.out.versions)
+    } 
     if ( params.assembler == MEGAHIT ) {
     MEGAHIT_INTERLEAVED(
         ch_pe_reads_to_assembly.collect(),
