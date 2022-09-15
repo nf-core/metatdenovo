@@ -235,21 +235,18 @@ workflow METATDENOVO {
         ch_gff    = TRANSDECODER.out.gff.map { it[1] }
         ch_hmm_aa = TRANSDECODER.out.pep
     }
-    ch_hmm_aa.map { it[1] }
-        .set { ch_test }
     
     //
     // MODULE: Hmmsearch on orf caller output
     //
     if( params.hmmsearch) {
-
-        ch_hmmstage = Channel.fromPath(params.hmmdir).combine(ch_hmm_aa.map { it[1] })
-        ch_hmmstage
-            .map { [ [ id: 'all_samples' ], it[0], it[1], false, false, false ] }
+        
+        ch_hmmstage = Channel.fromPath(params.hmmdir).combine(ch_hmm_aa.map { it[1] } )
+            .map { [ [id: it[0].baseName ], it[0], it[1], true, true, false ] }
             .set { ch_hmmdir }
         HMMSEARCH( ch_hmmdir )
         HMMSEARCH.out.target_summary.collect() { it[1] }.view()
-        HMMRANK( HMMSEARCH.out.target_summary.map() { it[1] } )
+        HMMRANK( HMMSEARCH.out.target_summary.collect() { it[1] } )
     }
     
     //
