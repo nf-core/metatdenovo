@@ -8,10 +8,6 @@ on:
   release:
     types: [published]
 
-env:
-  NXF_ANSI_LOG: false
-  CAPSULE_LOG: none
-
 jobs:
   test:
     name: Run workflow tests
@@ -34,6 +30,7 @@ jobs:
 
       - name: Install Nextflow
         env:
+          CAPSULE_LOG: none
           NXF_VER: ${{ matrix.NXF_VER }}
           # Uncomment only if the edge release is more recent than the latest stable release
           # See https://github.com/nextflow-io/nextflow/issues/2467
@@ -41,6 +38,7 @@ jobs:
         run: |
           wget -qO- get.nextflow.io | bash
           sudo mv nextflow /usr/local/bin/
+          nextflow self-update
 
       - name: Run pipeline with test data
         # TODO nf-core: You can customise CI pipeline run tests as required
