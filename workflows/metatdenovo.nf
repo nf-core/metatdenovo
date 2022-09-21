@@ -49,7 +49,6 @@ include { UNPIGZ as UNPIGZ_MEGAHIT_CONTIGS } from '../modules/local/unpigz.nf'
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
 include { INPUT_CHECK } from '../subworkflows/local/input_check'
-<<<<<<< HEAD
 
 //
 // SUBWORKFLOW: Adapted from rnaseq!
