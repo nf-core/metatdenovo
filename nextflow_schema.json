@@ -100,6 +100,33 @@
                 }
             }
         },
+        "eukulele": {
+            "title": "Eukulele",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "eukulele_method": {
+                    "type": "string",
+                    "default": "mets",
+                    "description": "Specify which method to use for EUKulele"
+                },
+                "skip_eukulele": {
+                    "type": "boolean",
+                    "description": "skip eukulele run"
+                },
+                "eukulele_dbpath": {
+                    "type": "string",
+                    "default": "./eukulele",
+                    "description": "Specify EUKulele database folder"
+                },
+                "eukulele_db": {
+                    "type": "string",
+                    "default": "phylodb",
+                    "description": "Specify database for EUKulele run"
+                }
+            }
+        },
         "read_trimming_options": {
             "title": "Read trimming options",
             "type": "object",
@@ -333,6 +360,9 @@
         },
         {
             "$ref": "#/definitions/optional_processing"
+        },
+        {
+            "$ref": "#/definitions/eukulele"
         },
         {
             "$ref": "#/definitions/read_trimming_options"

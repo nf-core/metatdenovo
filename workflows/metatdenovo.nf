@@ -14,8 +14,15 @@ ORF_CALLER_PRODIGAL     = 'prodigal'
 ORF_CALLER_PROKKA       = 'prokka'
 ORF_CALLER_TRANSDECODER = 'transdecoder'
 
+// validate parameters for eukulele database:
+EUKULELE_DB_PHYLODB     = 'phylodb'
+EUKULELE_DB_MMETSP      = 'mmetsp'
+EUKULELE_DB_EUKPROT     = 'eukprot'
+EUKULELE_DB_EUKZOO      = 'eukzoo'
+
 def valid_params = [
-    orf_caller  : [ORF_CALLER_PRODIGAL, ORF_CALLER_PROKKA, ORF_CALLER_TRANSDECODER]
+    orf_caller      : [ORF_CALLER_PRODIGAL, ORF_CALLER_PROKKA, ORF_CALLER_TRANSDECODER],
+    eukulele_db     : [EUKULELE_DB_PHYLODB, EUKULELE_DB_MMETSP, EUKULELE_DB_EUKPROT, EUKULELE_DB_EUKZOO ]
 ]
 
 // Check input path parameters to see if they exist
@@ -43,9 +50,14 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 //
 // MODULE: local
 //
+
 include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved.nf'
-include { UNPIGZ as UNPIGZ_MEGAHIT_CONTIGS } from '../modules/local/unpigz.nf'
 include { UNPIGZ as UNPIGZ_FASTA_PROTEIN   } from '../modules/local/unpigz.nf'
+include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz.nf'
+include { FORMAT_TAX                       } from '../modules/local/format_tax.nf'
+include { COLLECT_FEATURECOUNTS            } from '../modules/local/collect_featurecounts.nf'
+include { COLLECT_FEATURECOUNTS_EUK        } from '../modules/local/collect_featurecounts_euk.nf'
+include { COLLECT_STATS                    } from '../modules/local/collect_stats.nf'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -77,6 +89,8 @@ include { TRANSDECODER } from '../subworkflows/local/transdecoder'
 //
 
 include { EGGNOG } from '../subworkflows/local/eggnog'
+include { SUB_EUKULELE } from '../subworkflows/local/eukulele'
+
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -200,12 +214,11 @@ workflow METATDENOVO {
         ch_versions = ch_versions.mix(PROKKA_CAT.out.versions)
         ch_gff      = PROKKA_CAT.out.gff
         ch_protein  = PROKKA_CAT.out.faa
-        UNPIGZ_FASTA_PROTEIN(ch_protein)
-        if ( params.eggnog ) {
-            MEGAHIT_INTERLEAVED.out.contigs.collect { [ [ id: 'all_samples' ]] }
-            .combine(UNPIGZ_FASTA_PROTEIN.out.unzipped)
-            .set{ ch_aa }
-        }
+
+        UNPIGZ_CONTIGS(ch_protein)
+        MEGAHIT_INTERLEAVED.out.contigs.collect { [ [ id: 'all_samples' ]] }
+            .combine(UNPIGZ_CONTIGS.out.unzipped)
+            .set{ ch_eukulele }
     }
 
     //
@@ -214,15 +227,17 @@ workflow METATDENOVO {
 
     ch_prodigal = Channel.empty()
     if( params.orf_caller == ORF_CALLER_PRODIGAL ) {
-        UNPIGZ_MEGAHIT_CONTIGS(ch_assembly_contigs)
-        ch_versions = ch_versions.mix(UNPIGZ_MEGAHIT_CONTIGS.out.versions)
+
+        UNPIGZ_CONTIGS(ch_assembly_contigs)
+        ch_versions = ch_versions.mix(UNPIGZ_CONTIGS.out.versions)
         PRODIGAL(
-            UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] },
+            UNPIGZ_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] },
             'gff'
         )
         ch_gff          = PRODIGAL.out.gene_annotations.map { it[1] }
         ch_aa           = PRODIGAL.out.amino_acid_fasta
         ch_prodigal_fna = PRODIGAL.out.nucleotide_fasta
+        ch_eukulele     = PRODIGAL.out.amino_acid_fasta
         ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
     }
 
@@ -231,17 +246,18 @@ workflow METATDENOVO {
     )
 
     //
-    // SUBWORKFLOW: run TRANSDECODER on UNPIGZ_MEGAHIT output. Orf caller alternative for eukaryotes.
+    // SUBWORKFLOW: run TRANSDECODER on UNPIGZ output. Orf caller alternative for eukaryotes.
     //
 
     ch_transdecoder_longorf = Channel.empty()
     if( params.orf_caller == ORF_CALLER_TRANSDECODER ) {
-        UNPIGZ_MEGAHIT_CONTIGS(ch_assembly_contigs)
+        UNPIGZ_CONTIGS(ch_assembly_contigs)
         TRANSDECODER(
-            UNPIGZ_MEGAHIT_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] }
+            UNPIGZ_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] }
         )
         ch_gff = TRANSDECODER.out.gff.map { it[1] }
-        ch_aa  = TRANSDECODER.out.pep
+        ch_eukulele = TRANSDECODER.out.pep
+        ch_versions     = ch_versions.mix(TRANSDECODER.out.versions)
     }
 
     //
@@ -263,6 +279,56 @@ workflow METATDENOVO {
 
     FEATURECOUNTS_CDS ( ch_featurecounts)
     ch_versions       = ch_versions.mix(FEATURECOUNTS_CDS.out.versions)
+    
+    //
+    // MODULE: Collect featurecounts output counts in one table
+    //
+
+    if ( params.orf_caller == ORF_CALLER_PROKKA) {
+        COLLECT_FEATURECOUNTS ( FEATURECOUNTS_CDS.out.counts.collect() { it[1] })
+        ch_cds_counts = COLLECT_FEATURECOUNTS.out.counts
+        ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
+    } else if ( params.orf_caller == ORF_CALLER_PRODIGAL) {
+        COLLECT_FEATURECOUNTS ( FEATURECOUNTS_CDS.out.counts.collect() { it[1] })
+        ch_cds_counts = COLLECT_FEATURECOUNTS.out.counts
+        ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
+    } else if ( params.orf_caller == ORF_CALLER_TRANSDECODER) {
+        COLLECT_FEATURECOUNTS_EUK ( FEATURECOUNTS_CDS.out.counts.collect() { it[1] })
+        ch_cds_counts = COLLECT_FEATURECOUNTS_EUK.out.counts
+        ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTS_EUK.out.versions)
+    }
+    ch_fcs = Channel.empty()
+    ch_fcs = ch_fcs.mix(
+        ch_cds_counts).collect()
+
+    //
+    // MODULE: Collect statistics from mapping analysis
+    //
+    
+    COLLECT_STATS (
+        FASTQC_TRIMGALORE.out.trim_log.map { meta, fastq -> meta.id }.collect(),
+        FASTQC_TRIMGALORE.out.trim_log.map { meta, fastq -> fastq[0] }.collect(),
+        BAM_SORT_SAMTOOLS.out.idxstats.collect()  { it[1] },
+        ch_fcs,
+        ch_bbduk_logs.collect()
+    )
+    ch_versions     = ch_versions.mix(COLLECT_STATS.out.versions)
+
+    //
+    // SUBWORKFLOW: Eukulele
+    //
+
+    if( !params.skip_eukulele){
+        SUB_EUKULELE(ch_eukulele)
+    }
+
+    //
+    // MODULE: FORMAT TAX. Format taxonomy as output from database
+    //
+    
+    //if( !params.skip_eukulele){
+    //    FORMAT_TAX(SUB_EUKULELE.out.taxonomy_estimation.map { it[1] } )
+    //}
 
     //
     // MODULE: MultiQC
@@ -301,7 +367,5 @@ workflow.onComplete {
 }
 
 /*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    THE END
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */

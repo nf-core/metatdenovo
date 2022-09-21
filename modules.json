@@ -4,31 +4,31 @@
     "repos": {
         "nf-core/modules": {
             "bbmap/align": {
-                "git_sha": "9d0cad583b9a71a6509b754fdf589cbfbed08961"
+                "git_sha": "848ee9a215d02d80be033bfa60881700f2bd914c"
             },
             "bbmap/bbduk": {
-                "git_sha": "9d0cad583b9a71a6509b754fdf589cbfbed08961"
+                "git_sha": "848ee9a215d02d80be033bfa60881700f2bd914c"
             },
             "bbmap/index": {
                 "git_sha": "20d8250d9f39ddb05dfb437603aaf99b5c0b2b41"
             },
             "cat/cat": {
-                "git_sha": "c4549c0ecd1b02473471b507fd88a9fd5289d91c"
+                "git_sha": "eeda4136c096688d04cc40bb3c70d948213ed641"
             },
             "custom/dumpsoftwareversions": {
-                "git_sha": "20d8250d9f39ddb05dfb437603aaf99b5c0b2b41"
+                "git_sha": "5e7b1ef9a5a2d9258635bcbf70fcf37dacd1b247"
             },
             "fastqc": {
-                "git_sha": "9d0cad583b9a71a6509b754fdf589cbfbed08961"
+                "git_sha": "49b18b1639f4f7104187058866a8fab33332bdfe"
             },
             "multiqc": {
-                "git_sha": "20d8250d9f39ddb05dfb437603aaf99b5c0b2b41"
+                "git_sha": "90aef30f432332bdf0ce9f4b9004aa5d5c4960bb"
             },
             "prodigal": {
                 "git_sha": "d473a247d2e0c619b0df877ea19d9a5a98c8e3c8"
             },
             "prokka": {
-                "git_sha": "d473a247d2e0c619b0df877ea19d9a5a98c8e3c8"
+                "git_sha": "92c420e7d00090c29f9c2f5123bae0c3bb54947d"
             },
             "samtools/flagstat": {
                 "git_sha": "20d8250d9f39ddb05dfb437603aaf99b5c0b2b41"
@@ -46,19 +46,19 @@
                 "git_sha": "20d8250d9f39ddb05dfb437603aaf99b5c0b2b41"
             },
             "seqtk/mergepe": {
-                "git_sha": "9d0cad583b9a71a6509b754fdf589cbfbed08961"
+                "git_sha": "90aef30f432332bdf0ce9f4b9004aa5d5c4960bb"
             },
             "subread/featurecounts": {
-                "git_sha": "9d0cad583b9a71a6509b754fdf589cbfbed08961"
+                "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d"
             },
             "transdecoder/longorf": {
-                "git_sha": "a74e8436cceab0552ad59ce39e54b19c2025c5d8"
+                "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d"
             },
             "transdecoder/predict": {
-                "git_sha": "aa97b1be3ef60828fc6c913110b4442abec07e08"
+                "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d"
             },
             "trimgalore": {
-                "git_sha": "9d0cad583b9a71a6509b754fdf589cbfbed08961"
+                "git_sha": "85ec13ff1fc2196c5a507ea497de468101baabed"
             }
         }
     }
