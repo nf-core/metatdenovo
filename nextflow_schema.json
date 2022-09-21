@@ -100,7 +100,7 @@
                 "eukulele_method": {
                     "type": "string",
                     "default": "mets",
-                    "description": "Specify wichi method to use for EUKulele"
+                    "description": "Specify which method to use for EUKulele"
                 },
                 "skip_eukulele": {
                     "type": "boolean",
