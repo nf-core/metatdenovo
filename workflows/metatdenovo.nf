@@ -279,7 +279,7 @@ workflow METATDENOVO {
 
     FEATURECOUNTS_CDS ( ch_featurecounts)
     ch_versions       = ch_versions.mix(FEATURECOUNTS_CDS.out.versions)
-    
+
     //
     // MODULE: Collect featurecounts output counts in one table
     //
@@ -304,7 +304,7 @@ workflow METATDENOVO {
     //
     // MODULE: Collect statistics from mapping analysis
     //
-    
+
     COLLECT_STATS (
         FASTQC_TRIMGALORE.out.trim_log.map { meta, fastq -> meta.id }.collect(),
         FASTQC_TRIMGALORE.out.trim_log.map { meta, fastq -> fastq[0] }.collect(),
@@ -325,7 +325,7 @@ workflow METATDENOVO {
     //
     // MODULE: FORMAT TAX. Format taxonomy as output from database
     //
-    
+
     //if( !params.skip_eukulele){
     //    FORMAT_TAX(SUB_EUKULELE.out.taxonomy_estimation.map { it[1] } )
     //}
