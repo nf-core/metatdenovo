@@ -88,6 +88,15 @@
                     "type": "string",
                     "description": "Specify a training file for prodigal. By default prodigal will learn from the input sequences.",
                     "hidden": true
+                },
+                "eggnog": {
+                    "type": "boolean",
+                    "description": "enable eggnog functional annotation"
+                },
+                "eggnog_dbpath": {
+                    "type": "string",
+                    "default": "./eggnog/",
+                    "description": "Specify eggnog database path"
                 }
             }
         },

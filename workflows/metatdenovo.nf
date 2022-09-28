@@ -46,19 +46,23 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
     IMPORT LOCAL MODULES/SUBWORKFLOWS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
+
 //
 // MODULE: local
 //
 
-include { MEGAHIT_INTERLEAVED               } from '../modules/local/megahit/interleaved.nf'
-include { UNPIGZ as UNPIGZ_CONTIGS          } from '../modules/local/unpigz.nf'
-include { FORMAT_TAX                        } from '../modules/local/format_tax.nf'
+include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved.nf'
+include { UNPIGZ as UNPIGZ_FASTA_PROTEIN   } from '../modules/local/unpigz.nf'
+include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz.nf'
+include { FORMAT_TAX                       } from '../modules/local/format_tax.nf'
 include { COLLECT_FEATURECOUNTS            } from '../modules/local/collect_featurecounts.nf'
 include { COLLECT_FEATURECOUNTS_EUK        } from '../modules/local/collect_featurecounts_euk.nf'
 include { COLLECT_STATS                    } from '../modules/local/collect_stats.nf'
 
+//
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
+
 include { INPUT_CHECK } from '../subworkflows/local/input_check'
 
 //
@@ -81,10 +85,12 @@ include { PROKKA_CAT   } from '../subworkflows/local/prokka_cat'
 include { TRANSDECODER } from '../subworkflows/local/transdecoder'
 
 //
-// SUBWORKFLOW: Consisting of local/modules
+// SUBWORKFLOW: Consisting of local modules
 //
 
+include { EGGNOG } from '../subworkflows/local/eggnog'
 include { SUB_EUKULELE } from '../subworkflows/local/eukulele'
+
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -163,7 +169,7 @@ workflow METATDENOVO {
     ch_reads_to_assembly = Channel.empty()
     if ( params.diginorm ) {
         DIGINORM(SEQTK_MERGEPE.out.reads.collect { meta, fastq -> fastq }, [], 'all_samples')
-        ch_versions = ch_versions.mix(SEQTK_MERGEPE.out.versions)
+        ch_versions = ch_versions.mix(DIGINORM.out.versions)
         ch_pe_reads_to_assembly = DIGINORM.out.pairs
         ch_se_reads_to_assembly = DIGINORM.out.singles
     } else {
@@ -208,6 +214,7 @@ workflow METATDENOVO {
         ch_versions = ch_versions.mix(PROKKA_CAT.out.versions)
         ch_gff      = PROKKA_CAT.out.gff
         ch_protein  = PROKKA_CAT.out.faa
+
         UNPIGZ_CONTIGS(ch_protein)
         MEGAHIT_INTERLEAVED.out.contigs.collect { [ [ id: 'all_samples' ]] }
             .combine(UNPIGZ_CONTIGS.out.unzipped)
@@ -220,6 +227,7 @@ workflow METATDENOVO {
 
     ch_prodigal = Channel.empty()
     if( params.orf_caller == ORF_CALLER_PRODIGAL ) {
+
         UNPIGZ_CONTIGS(ch_assembly_contigs)
         ch_versions = ch_versions.mix(UNPIGZ_CONTIGS.out.versions)
         PRODIGAL(
@@ -227,7 +235,7 @@ workflow METATDENOVO {
             'gff'
         )
         ch_gff          = PRODIGAL.out.gene_annotations.map { it[1] }
-        ch_prodigal_aa  = PRODIGAL.out.amino_acid_fasta
+        ch_aa           = PRODIGAL.out.amino_acid_fasta
         ch_prodigal_fna = PRODIGAL.out.nucleotide_fasta
         ch_eukulele     = PRODIGAL.out.amino_acid_fasta
         ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
@@ -247,9 +255,18 @@ workflow METATDENOVO {
         TRANSDECODER(
             UNPIGZ_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] }
         )
-        ch_gff      = TRANSDECODER.out.gff.map { it[1] }
+        ch_gff = TRANSDECODER.out.gff.map { it[1] }
         ch_eukulele = TRANSDECODER.out.pep
         ch_versions     = ch_versions.mix(TRANSDECODER.out.versions)
+    }
+
+    //
+    // SUBWORKFLOW: run eggnog_mapper on the ORF-called amino acid sequences
+    //
+
+    if (params.eggnog) {
+        EGGNOG(ch_aa)
+        ch_versions = ch_versions.mix(EGGNOG.out.versions)
     }
 
     //
@@ -262,7 +279,7 @@ workflow METATDENOVO {
 
     FEATURECOUNTS_CDS ( ch_featurecounts)
     ch_versions       = ch_versions.mix(FEATURECOUNTS_CDS.out.versions)
-    
+
     //
     // MODULE: Collect featurecounts output counts in one table
     //
@@ -287,7 +304,7 @@ workflow METATDENOVO {
     //
     // MODULE: Collect statistics from mapping analysis
     //
-    
+
     COLLECT_STATS (
         FASTQC_TRIMGALORE.out.trim_log.map { meta, fastq -> meta.id }.collect(),
         FASTQC_TRIMGALORE.out.trim_log.map { meta, fastq -> fastq[0] }.collect(),
@@ -308,7 +325,7 @@ workflow METATDENOVO {
     //
     // MODULE: FORMAT TAX. Format taxonomy as output from database
     //
-    
+
     //if( !params.skip_eukulele){
     //    FORMAT_TAX(SUB_EUKULELE.out.taxonomy_estimation.map { it[1] } )
     //}
