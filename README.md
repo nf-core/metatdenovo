@@ -21,7 +21,7 @@
 The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool to run tasks across multiple compute infrastructures in a very portable manner. It uses Docker/Singularity containers making installation trivial and results highly reproducible. The [Nextflow DSL2](https://www.nextflow.io/docs/latest/dsl2.html) implementation of this pipeline uses one container per process which makes it much easier to maintain and update software dependencies. Where possible, these processes have been submitted to and installed from [nf-core/modules](https://github.com/nf-core/modules) in order to make them available to all nf-core pipelines, and to everyone within the Nextflow community!
 
 <!-- TODO nf-core: Add full-sized test dataset and amend the paragraph below if applicable -->
-On release, automated continuous integration tests run the pipeline on a full-sized dataset on the AWS cloud infrastructure. This ensures that the pipeline runs on AWS, has sensible resource allocation defaults set to run on real-world datasets, and permits the persistent storage of results to benchmark between pipeline releases and other analysis sources. The results obtained from the full-sized test can be viewed on the [nf-core website](https://nf-co.re/metatdenovo/results) e.g. the results for running the pipeline with --assembler will be in a folder called orf_caller and so on.
+On release, automated continuous integration tests run the pipeline on a full-sized dataset on the AWS cloud infrastructure. This ensures that the pipeline runs on AWS, has sensible resource allocation defaults set to run on real-world datasets, and permits the persistent storage of results to benchmark between pipeline releases and other analysis sources. The results obtained from the full-sized test can be viewed on the [nf-core website](https://nf-co.re/metatdenovo/results) e.g. the results for running the pipeline with --assembler will be in a folder called assembly and so on.
 
 ## Pipeline summary
 
@@ -29,21 +29,21 @@ On release, automated continuous integration tests run the pipeline on a full-si
 1. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
 2. Present QC for raw reads ([`MultiQC`](http://multiqc.info/))
 3. Quality trimming and adapters removal for raw reads ( [`Trimm Galore!`](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/))
-4. Merge pair-end for cleaned reads ( [`Seqtk`](https://github.com/lh3/seqtk))
-5. Choice of de novo assembly program route:
-    1. [`RNAspade`](https://cab.spbu.ru/software/rnaspades/) Suggested for Eukaryotes de novo assembly
-    2. [`Megahit`](https://github.com/voutcn/megahit) Suggested for Prokaryotes de novo assembly
-6. Orf caller step:
+4. Merge trimmed, pair-end reads ( [`Seqtk`](https://github.com/lh3/seqtk))
+5. Choice of de novo assembly:
+    1. [`RNAspade`](https://cab.spbu.ru/software/rnaspades/) suggested for Eukaryotes de novo assembly
+    2. [`Megahit`](https://github.com/voutcn/megahit) suggested for Prokaryotes de novo assembly
+6. Choice of orf caller:
     1. [`TransDecoder`](https://github.com/TransDecoder/TransDecoder) suggested for Eukaryotes
     2. [`Prokka`](https://github.com/tseemann/prokka) suggested for Prokaryotes
     3. [`Prodigal`](https://github.com/hyattpd/Prodigal) suggested for Prokaryotes
-7. quantification route:
+7. Quantification of genes identified in assemblies:
     1. generate index of assembly [`BBmap index`](https://sourceforge.net/projects/bbmap/) 
     2. Mapping cleaned reads to the assembly for quantification [`BBmap`](https://sourceforge.net/projects/bbmap/) 
-    3. Get raw counts per orf samples [`Featurecounts`](http://subread.sourceforge.net) -> TSV table with collected featurecounts output 
-8. taxonomical annotation route:
+    3. Get raw counts per each gene present in the assembly [`Featurecounts`](http://subread.sourceforge.net) -> TSV table with collected featurecounts output 
+8. Taxonomical annotation:
     1. [`EUKulele`](https://github.com/AlexanderLabWHOI/EUKulele) -> Reformat TSV output "Reformat_tax.R"
-9. Functional annotation routes:
+9. Choice of functional annotation:
     1. [`Eggnog-mapper`](http://eggnog-mapper.embl.de)
     2. [`Run-DBcan`](https://github.com/linnabrown/run_dbcan)
     3. [`Hmmsearch`](https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch) -> Hmmrank.R it allows to sort the hmmprofiles based on rank.
