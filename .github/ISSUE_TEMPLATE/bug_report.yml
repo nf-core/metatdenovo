@@ -1,7 +1,9 @@
+
 name: Bug report
 description: Report something that is broken or incorrect
 labels: bug
 body:
+
   - type: markdown
     attributes:
       value: |
