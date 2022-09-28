@@ -98,7 +98,6 @@ include { SUB_EUKULELE } from '../subworkflows/local/eukulele'
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-
 //
 // MODULE: Installed directly from nf-core/modules
 //
