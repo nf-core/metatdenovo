@@ -337,16 +337,14 @@ workflow METATDENOVO {
     ch_workflow_summary = Channel.value(workflow_summary)
 
     ch_multiqc_files = Channel.empty()
-    ch_multiqc_files = ch_multiqc_files.mix(Channel.from(ch_multiqc_config))
-    ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_custom_config.collect().ifEmpty([]))
-    ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
     ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
-
-    // Make sure we integrate FASTQC output from FASTQC_TRIMGALORE here!!!
-    //ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
+    ch_multiqc_files = ch_multiqc_files.mix(FASTQC_TRIMGALORE.out.trim_zip.collect{it[1]}.ifEmpty([]))
 
     MULTIQC (
-        ch_multiqc_files.collect()
+        ch_multiqc_files,
+        ch_multiqc_config,
+        ch_multiqc_custom_config.collect().ifEmpty([]),
+        ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml')
     )
     multiqc_report = MULTIQC.out.report.toList()
     ch_versions    = ch_versions.mix(MULTIQC.out.versions)

@@ -25,25 +25,25 @@
                 "git_sha": "90aef30f432332bdf0ce9f4b9004aa5d5c4960bb"
             },
             "prodigal": {
-                "git_sha": "d473a247d2e0c619b0df877ea19d9a5a98c8e3c8"
+                "git_sha": "90aef30f432332bdf0ce9f4b9004aa5d5c4960bb"
             },
             "prokka": {
                 "git_sha": "92c420e7d00090c29f9c2f5123bae0c3bb54947d"
             },
             "samtools/flagstat": {
-                "git_sha": "20d8250d9f39ddb05dfb437603aaf99b5c0b2b41"
+                "git_sha": "bbb99cb8d679555cc01c98766de7869f83283545"
             },
             "samtools/idxstats": {
-                "git_sha": "20d8250d9f39ddb05dfb437603aaf99b5c0b2b41"
+                "git_sha": "f0a86eaf5bf6ca73c5571193edd00c25bfa308f5"
             },
             "samtools/index": {
-                "git_sha": "0fafaeebf52cc5ab554b83297ed02a48d852a848"
+                "git_sha": "897c33d5da084b61109500ee44c01da2d3e4e773"
             },
             "samtools/sort": {
-                "git_sha": "e751e5040af57e1b4e06ed4e0f3efe6de25c1683"
+                "git_sha": "d5d785b3d8b422cda9c6d84a23f629a8e9ff8cd8"
             },
             "samtools/stats": {
-                "git_sha": "20d8250d9f39ddb05dfb437603aaf99b5c0b2b41"
+                "git_sha": "f4eab7945952dc4934224309701a49913ea05ae6"
             },
             "seqtk/mergepe": {
                 "git_sha": "90aef30f432332bdf0ce9f4b9004aa5d5c4960bb"

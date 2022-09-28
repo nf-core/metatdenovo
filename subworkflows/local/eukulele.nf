@@ -3,7 +3,7 @@
 //
 
 include { EUKULELE      } from '../../modules/local/eukulele/main'
-//include { MV_DIR        } from '../../modules/local/mvdir'
+include { MV_DIR        } from '../../modules/local/mvdir'
 include { EUKULELE_DB   } from '../../modules/local/eukulele/download'
 include { FORMAT_TAX    } from '../../modules/local/format_tax'
 
@@ -15,7 +15,7 @@ workflow SUB_EUKULELE {
     main:
         ch_versions = Channel.empty()
 
-        //MV_DIR(fastaprot)
+        MV_DIR(fastaprot)
 
         String directoryName = params.eukulele_dbpath
         File directory = new File(directoryName)
