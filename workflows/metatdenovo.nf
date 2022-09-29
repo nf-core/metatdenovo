@@ -283,19 +283,18 @@ workflow METATDENOVO {
         EGGNOG(ch_aa)
         ch_versions = ch_versions.mix(EGGNOG.out.versions)
     }
-    
+
     //
     // MODULE: Hmmsearch on orf caller output
     //
     if( params.hmmsearch) {
-        
-        ch_hmmstage = ch_hmmrs.combine(ch_hmm_aa.map { it[1] } )
+        ch_hmmstage = Channel.fromPath(params.hmmdir).combine(ch_hmm_aa.map { it[1] } )
             .map { [ [id: it[0].baseName ], it[0], it[1], true, true, false ] }
             .set { ch_hmmdir }
         HMMSEARCH( ch_hmmdir )
         HMMRANK( HMMSEARCH.out.target_summary.collect() { it[1] } )
     }
-    
+
     //
     // MODULE: FeatureCounts
     //
