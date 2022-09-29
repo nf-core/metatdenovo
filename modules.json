@@ -25,7 +25,7 @@
                 "git_sha": "20d8250d9f39ddb05dfb437603aaf99b5c0b2b41"
             },
             "prodigal": {
-                "git_sha": "d473a247d2e0c619b0df877ea19d9a5a98c8e3c8"
+                "git_sha": "90aef30f432332bdf0ce9f4b9004aa5d5c4960bb"
             },
             "prokka": {
                 "git_sha": "d473a247d2e0c619b0df877ea19d9a5a98c8e3c8"
