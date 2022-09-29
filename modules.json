@@ -10,13 +10,13 @@
                 "git_sha": "848ee9a215d02d80be033bfa60881700f2bd914c"
             },
             "bbmap/index": {
-                "git_sha": "20d8250d9f39ddb05dfb437603aaf99b5c0b2b41"
+                "git_sha": "848ee9a215d02d80be033bfa60881700f2bd914c"
             },
             "cat/cat": {
                 "git_sha": "eeda4136c096688d04cc40bb3c70d948213ed641"
             },
             "custom/dumpsoftwareversions": {
-                "git_sha": "5e7b1ef9a5a2d9258635bcbf70fcf37dacd1b247"
+                "git_sha": "82501fe6d0d12614db67751d30af98d16e63dc59"
             },
             "fastqc": {
                 "git_sha": "49b18b1639f4f7104187058866a8fab33332bdfe"
@@ -28,25 +28,25 @@
                 "git_sha": "90aef30f432332bdf0ce9f4b9004aa5d5c4960bb"
             },
             "prodigal": {
-                "git_sha": "d473a247d2e0c619b0df877ea19d9a5a98c8e3c8"
+                "git_sha": "90aef30f432332bdf0ce9f4b9004aa5d5c4960bb"
             },
             "prokka": {
-                "git_sha": "92c420e7d00090c29f9c2f5123bae0c3bb54947d"
+                "git_sha": "ec22f9a9079bd93ff8ec152349ead5f684edeb9f"
             },
             "samtools/flagstat": {
-                "git_sha": "20d8250d9f39ddb05dfb437603aaf99b5c0b2b41"
+                "git_sha": "bbb99cb8d679555cc01c98766de7869f83283545"
             },
             "samtools/idxstats": {
-                "git_sha": "20d8250d9f39ddb05dfb437603aaf99b5c0b2b41"
+                "git_sha": "f0a86eaf5bf6ca73c5571193edd00c25bfa308f5"
             },
             "samtools/index": {
-                "git_sha": "0fafaeebf52cc5ab554b83297ed02a48d852a848"
+                "git_sha": "897c33d5da084b61109500ee44c01da2d3e4e773"
             },
             "samtools/sort": {
-                "git_sha": "e751e5040af57e1b4e06ed4e0f3efe6de25c1683"
+                "git_sha": "d5d785b3d8b422cda9c6d84a23f629a8e9ff8cd8"
             },
             "samtools/stats": {
-                "git_sha": "20d8250d9f39ddb05dfb437603aaf99b5c0b2b41"
+                "git_sha": "f4eab7945952dc4934224309701a49913ea05ae6"
             },
             "seqtk/mergepe": {
                 "git_sha": "90aef30f432332bdf0ce9f4b9004aa5d5c4960bb"
@@ -61,7 +61,7 @@
                 "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d"
             },
             "trimgalore": {
-                "git_sha": "85ec13ff1fc2196c5a507ea497de468101baabed"
+                "git_sha": "bfbdc4f79bb26bc698d30b74abd081db8af77f4d"
             }
         }
     }

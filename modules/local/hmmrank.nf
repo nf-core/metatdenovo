@@ -12,8 +12,8 @@ process HMMRANK {
 
     output:
 
-    path "hmmrank.out", emit: x
-    //path "version.yml", emit: versions
+    path "hmmrank.out" , emit: x
+    path "versions.yml", emit: versions
 
     script:
 
@@ -52,7 +52,7 @@ process HMMRANK {
       }
     }
     if ( length(tlist) > 0  ) {
-      tblout <- rbindlist(tlist)
+      tblout <- bind_rows(tlist)
     } else {
       write("No results found, exiting", stderr())
       quit(save = 'no', status = 0)
@@ -71,5 +71,8 @@ process HMMRANK {
 
     # write output
     write_tsv(tblout,'hmmrank.out')
+    
+    writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")), paste0("    dplyr: ", packageVersion('dplyr')),
+        paste0("    dtplyr: ", packageVersion('dtplyr')), paste0("    data.table: ", packageVersion('data.table')) ), "versions.yml")
     """
 }
