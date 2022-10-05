@@ -13,6 +13,9 @@ process COLLECT_FEATURECOUNTS_EUK {
         path "*.tsv.gz"    , emit: counts
         path "versions.yml", emit: versions
 
+    when:
+    task.ext.when == null || task.ext.when
+
     script:
     def args     = task.ext.args ?: ''
 

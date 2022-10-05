@@ -18,6 +18,9 @@ process COLLECT_STATS {
     path "overall_stats.tsv", emit: overall_stats
     path "versions.yml"     , emit: versions
 
+    when:
+    task.ext.when == null || task.ext.when
+
     script:
 
     """
