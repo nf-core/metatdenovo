@@ -10,7 +10,9 @@ import argparse
 
 
 def parse_args(args=None):
-    Description = "Reformat nf-core/metatdenovo samplesheet file and check its contents."
+    Description = (
+        "Reformat nf-core/metatdenovo samplesheet file and check its contents."
+    )
     Epilog = "Example usage: python check_samplesheet.py <FILE_IN> <FILE_OUT>"
 
     parser = argparse.ArgumentParser(description=Description, epilog=Epilog)
@@ -61,7 +63,11 @@ def check_samplesheet(file_in, file_out):
         HEADER = ["sample", "fastq_1", "fastq_2"]
         header = [x.strip('"') for x in fin.readline().strip().split(",")]
         if header[: len(HEADER)] != HEADER:
-            print("ERROR: Please check samplesheet header -> {} != {}".format(",".join(header), ",".join(HEADER)))
+            print(
+                "ERROR: Please check samplesheet header -> {} != {}".format(
+                    ",".join(header), ",".join(HEADER)
+                )
+            )
             sys.exit(1)
 
         ## Check sample entries
@@ -78,7 +84,9 @@ def check_samplesheet(file_in, file_out):
             num_cols = len([x for x in lspl if x])
             if num_cols < MIN_COLS:
                 print_error(
-                    "Invalid number of populated columns (minimum = {})!".format(MIN_COLS),
+                    "Invalid number of populated columns (minimum = {})!".format(
+                        MIN_COLS
+                    ),
                     "Line",
                     line,
                 )
@@ -128,11 +136,19 @@ def check_samplesheet(file_in, file_out):
             for sample in sorted(sample_mapping_dict.keys()):
 
                 ## Check that multiple runs of the same sample are of the same datatype
-                if not all(x[0] == sample_mapping_dict[sample][0][0] for x in sample_mapping_dict[sample]):
-                    print_error("Multiple runs of a sample must be of the same datatype!", "Sample: {}".format(sample))
+                if not all(
+                    x[0] == sample_mapping_dict[sample][0][0]
+                    for x in sample_mapping_dict[sample]
+                ):
+                    print_error(
+                        "Multiple runs of a sample must be of the same datatype!",
+                        "Sample: {}".format(sample),
+                    )
 
                 for idx, val in enumerate(sample_mapping_dict[sample]):
-                    fout.write(",".join(["{}_T{}".format(sample, idx + 1)] + val) + "\n")
+                    fout.write(
+                        ",".join(["{}_T{}".format(sample, idx + 1)] + val) + "\n"
+                    )
     else:
         print_error("No entries to process!", "Samplesheet: {}".format(file_in))
 
