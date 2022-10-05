@@ -35,9 +35,17 @@ if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input sample
 // If the user supplied hmm files, we will run hmmsearch and then rank the results.
 // Create a channel for hmm files.
 if ( params.hmmsearch ) {
-    Channel
-        .fromPath(params.hmmdir + params.hmmpattern)
-        .set { ch_hmmrs }
+    if ( params.hmmdir ) {
+        Channel
+            .fromPath(params.hmmdir + params.hmmpattern)
+            .set { ch_hmmrs }
+    } else if ( params.hmmfiles ) {
+        Channel
+            .fromPath(params.hmmfiles)
+            .set { ch_hmmrs }
+    } else {
+        // Warn of missing params
+    }
 }
 
 /*
@@ -288,7 +296,7 @@ workflow METATDENOVO {
     // MODULE: Hmmsearch on orf caller output
     //
     if( params.hmmsearch) {
-        ch_hmmstage = Channel.fromPath(params.hmmdir).combine(ch_hmm_aa.map { it[1] } )
+        ch_hmmstage = ch_hmmrs.combine(ch_hmm_aa.map { it[1] } )
             .map { [ [id: it[0].baseName ], it[0], it[1], true, true, false ] }
             .set { ch_hmmdir }
         HMMSEARCH( ch_hmmdir )

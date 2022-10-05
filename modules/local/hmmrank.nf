@@ -19,12 +19,9 @@ process HMMRANK {
 
     """
     #!/usr/bin/env Rscript
-    library(tidyverse)
     library(readr)
     library(dplyr)
-    library(dtplyr)
     library(tidyr)
-    library(data.table)
     library(stringr)
 
     # Read all the tblout files
@@ -44,8 +41,7 @@ process HMMRANK {
           c('accno', 't0', 'profile', 't1', 'evalue', 'score', 'bias', 'f0', 'f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'rest'), 
           '\\\s+',  extra='merge', convert = FALSE
         ) %>%
-        transmute(accno, profile, hmm_profile = t1, evalue = as.double(evalue), score = as.double(score)) %>%
-        data.table()
+        transmute(accno, profile, hmm_profile = t1, evalue = as.double(evalue), score = as.double(score))
       if ( nrow(t) > 0 ) {
         tlist[[i]] <- t
         i <- i + 1
@@ -58,21 +54,17 @@ process HMMRANK {
       quit(save = 'no', status = 0)
     }
 
-    setkey(tblout, profile, accno)
-
-    tblout <- lazy_dt(tblout) %>%
+    tblout <- tblout %>%
         group_by(accno) %>% 
         arrange(desc(score), evalue, profile) %>%
         mutate(rank = row_number()) %>%
         rename(orf = accno) %>%
         ungroup() %>%
-        filter(!is.na(orf)) %>%
-        as_tibble()
+        filter(!is.na(orf)) %>% as_tibble()
 
     # write output
     write_tsv(tblout,'hmmrank.out')
     
-    writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")), paste0("    dplyr: ", packageVersion('dplyr')),
-        paste0("    dtplyr: ", packageVersion('dtplyr')), paste0("    data.table: ", packageVersion('data.table')) ), "versions.yml")
+    writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")), paste0("    dplyr: ", packageVersion('dplyr')) ), "versions.yml")
     """
 }
