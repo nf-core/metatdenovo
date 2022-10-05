@@ -9,7 +9,7 @@ tools:
       documentation: https://eukulele.readthedocs.io/en/latest/index.html
       tool_dev_url: https://github.com/AlexanderLabWHOI/EUKulele
       doi: "arXiv:2011.00089v1"
-      licence: ['MIT']
+      licence: ["MIT"]
 
 input:
   - meta:
@@ -44,7 +44,6 @@ output:
       type: file
       description: alignment with diamond to reference database
       patter: "*"
-
 
 authors:
   - "@Danilo2771"

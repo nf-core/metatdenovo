@@ -16,9 +16,9 @@ workflow PROKKA_CAT {
 
         PROKKA  (contigs.splitFasta(size: 10.MB, file: true).map { contigs -> [[id: contigs.getBaseName()], contigs] }, [], [] )
         ch_versions = ch_versions.mix(PROKKA.out.versions)
-        GFF_CAT (PROKKA.out.gff.collect{it[1]}, 'prokka.gff.gz')
-        FAA_CAT (PROKKA.out.faa.collect{it[1]}, 'prokka.faa.gz')
-        FNA_CAT (PROKKA.out.fna.collect{it[1]}, 'prokka.fna.gz')
+        GFF_CAT (PROKKA.out.gff.collect().map { [ [ id: 'prokka.gff.gz' ], it[1] ] } )
+        FAA_CAT (PROKKA.out.faa.collect().map { [ [ id: 'prokka.faa.gz' ], it[1] ] } )
+        FNA_CAT (PROKKA.out.fna.collect().map { [ [ id: 'prokka.fna.gz' ], it[1] ] } )
         ch_versions = ch_versions.mix(FNA_CAT.out.versions)
 
     emit:

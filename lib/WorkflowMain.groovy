@@ -62,7 +62,7 @@ class WorkflowMain {
         log.info paramsSummaryLog(workflow, params, log)
 
         // Check that a -profile or Nextflow config has been provided to run the pipeline
-        NfcoreTemplate.checkConfigProvided(workflow, log)
+        //NfcoreTemplate.checkConfigProvided(workflow, log)
 
         // Check that conda channels are set-up correctly
         if (params.enable_conda) {

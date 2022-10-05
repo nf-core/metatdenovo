@@ -211,8 +211,8 @@ workflow METATDENOVO {
     if (params.orf_caller == ORF_CALLER_PROKKA) {
         PROKKA_CAT(MEGAHIT_INTERLEAVED.out.contigs)
         ch_versions = ch_versions.mix(PROKKA_CAT.out.versions)
-        ch_gff      = PROKKA_CAT.out.gff
-        ch_protein  = PROKKA_CAT.out.faa
+        ch_gff      = PROKKA_CAT.out.gff.map { it[1] }
+        ch_protein  = PROKKA_CAT.out.faa.map { it[1] }
 
         UNPIGZ_CONTIGS(ch_protein)
         MEGAHIT_INTERLEAVED.out.contigs.collect { [ [ id: 'all_samples' ]] }
@@ -337,16 +337,14 @@ workflow METATDENOVO {
     ch_workflow_summary = Channel.value(workflow_summary)
 
     ch_multiqc_files = Channel.empty()
-    ch_multiqc_files = ch_multiqc_files.mix(Channel.from(ch_multiqc_config))
-    ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_custom_config.collect().ifEmpty([]))
-    ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
     ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
-
-    // Make sure we integrate FASTQC output from FASTQC_TRIMGALORE here!!!
-    //ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
+    ch_multiqc_files = ch_multiqc_files.mix(FASTQC_TRIMGALORE.out.trim_zip.collect{it[1]}.ifEmpty([]))
 
     MULTIQC (
-        ch_multiqc_files.collect()
+        ch_multiqc_files,
+        ch_multiqc_config,
+        ch_multiqc_custom_config.collect().ifEmpty([]),
+        ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml')
     )
     multiqc_report = MULTIQC.out.report.toList()
     ch_versions    = ch_versions.mix(MULTIQC.out.versions)
