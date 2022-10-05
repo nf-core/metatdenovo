@@ -1,6 +1,6 @@
 process MV_DIR {
     label 'process_single'
-    
+
     input:
     tuple val(meta), path(fasta_file)
 

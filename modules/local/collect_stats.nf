@@ -37,7 +37,7 @@ process COLLECT_STATS {
     TYPE_ORDER = c('n_trimmed', 'n_non_contaminated', 'idxs_n_mapped', 'idxs_n_unmapped', 'n_feature_count')
 
     # Collect stats for each sample, create a table in long format that can be appended to
-     t <- tibble(sample = c("${samples.join('", "')}")) %>%
+    t <- tibble(sample = c("${samples.join('", "')}")) %>%
         mutate(
             # N. after trimming
             t = map(
@@ -90,8 +90,8 @@ process COLLECT_STATS {
         write_tsv('overall_stats.tsv')
 
         writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")), paste0("    dplyr: ", packageVersion('dplyr')),
-            paste0("    dtplyr: ", packageVersion('dtplyr')), paste0("    data.table: ", packageVersion('data.table')), paste0("    readr: ", packageVersion('readr')), 
-            paste0("    purrr: ", packageVersion('purrr')), paste0("    tidyr: ", packageVersion('tidyr')), paste0("    stringr: ", packageVersion('stringr')) ), 
+            paste0("    dtplyr: ", packageVersion('dtplyr')), paste0("    data.table: ", packageVersion('data.table')), paste0("    readr: ", packageVersion('readr')),
+            paste0("    purrr: ", packageVersion('purrr')), paste0("    tidyr: ", packageVersion('tidyr')), paste0("    stringr: ", packageVersion('stringr')) ),
             "versions.yml")
 
     """
