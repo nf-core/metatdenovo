@@ -233,7 +233,7 @@ workflow METATDENOVO {
         ch_hmm_aa   = PROKKA_CAT.out.faa
         ch_aa       = PROKKA_CAT.out.faa.map { it[1] }
 
-        UNPIGZ_CONTIGS(ch_protein)
+        UNPIGZ_CONTIGS(ch_aa)
         MEGAHIT_INTERLEAVED.out.contigs.collect { [ [ id: 'all_samples' ]] }
             .combine(UNPIGZ_CONTIGS.out.unzipped)
             .set{ ch_eukulele }
