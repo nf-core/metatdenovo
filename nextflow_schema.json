@@ -10,9 +10,7 @@
             "type": "object",
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
-            "required": [
-                "input"
-            ],
+            "required": ["input"],
             "properties": {
                 "input": {
                     "type": "string",
@@ -88,6 +86,42 @@
                     "type": "string",
                     "description": "Specify a training file for prodigal. By default prodigal will learn from the input sequences.",
                     "hidden": true
+                },
+                "eggnog": {
+                    "type": "boolean",
+                    "description": "enable eggnog functional annotation"
+                },
+                "eggnog_dbpath": {
+                    "type": "string",
+                    "default": "./eggnog/",
+                    "description": "Specify eggnog database path"
+                }
+            }
+        },
+        "eukulele": {
+            "title": "Eukulele",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "eukulele_method": {
+                    "type": "string",
+                    "default": "mets",
+                    "description": "Specify which method to use for EUKulele"
+                },
+                "skip_eukulele": {
+                    "type": "boolean",
+                    "description": "skip eukulele run"
+                },
+                "eukulele_dbpath": {
+                    "type": "string",
+                    "default": "./eukulele",
+                    "description": "Specify EUKulele database folder"
+                },
+                "eukulele_db": {
+                    "type": "string",
+                    "default": "phylodb",
+                    "description": "Specify database for EUKulele run"
                 }
             }
         },
@@ -324,6 +358,9 @@
         },
         {
             "$ref": "#/definitions/optional_processing"
+        },
+        {
+            "$ref": "#/definitions/eukulele"
         },
         {
             "$ref": "#/definitions/read_trimming_options"

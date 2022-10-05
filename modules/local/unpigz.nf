@@ -23,10 +23,9 @@ process UNPIGZ {
         -c \\
         -p $task.cpus \\
         ${file} > $gunzip
-
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        pigz: \$(pigz --version 2>/dev/null | sed 's/pigz //')
+        pigz: 2.3.4  \$( pigz --version)
     END_VERSIONS
     """
 }
