@@ -115,7 +115,6 @@ include { SUB_EUKULELE } from '../subworkflows/local/eukulele'
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-
 //
 // MODULE: Installed directly from nf-core/modules
 //
@@ -230,9 +229,9 @@ workflow METATDENOVO {
     if (params.orf_caller == ORF_CALLER_PROKKA) {
         PROKKA_CAT(MEGAHIT_INTERLEAVED.out.contigs)
         ch_versions = ch_versions.mix(PROKKA_CAT.out.versions)
-        ch_gff      = PROKKA_CAT.out.gff
+        ch_gff      = PROKKA_CAT.out.gff.map { it[1] }
         ch_hmm_aa   = PROKKA_CAT.out.faa
-        ch_aa       = PROKKA_CAT.out.faa
+        ch_aa       = PROKKA_CAT.out.faa.map { it[1] }
 
         UNPIGZ_CONTIGS(ch_protein)
         MEGAHIT_INTERLEAVED.out.contigs.collect { [ [ id: 'all_samples' ]] }

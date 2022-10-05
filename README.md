@@ -16,20 +16,38 @@
 
 ## Introduction
 
-<!-- TODO nf-core: Write a 1-2 sentence summary of what data the pipeline is for and what it does -->
 **nf-core/metatdenovo** is a bioinformatics best-practice analysis pipeline for Assembly and annotation of metatranscriptomic data, both prokaryotic and eukaryotic.
 
 The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool to run tasks across multiple compute infrastructures in a very portable manner. It uses Docker/Singularity containers making installation trivial and results highly reproducible. The [Nextflow DSL2](https://www.nextflow.io/docs/latest/dsl2.html) implementation of this pipeline uses one container per process which makes it much easier to maintain and update software dependencies. Where possible, these processes have been submitted to and installed from [nf-core/modules](https://github.com/nf-core/modules) in order to make them available to all nf-core pipelines, and to everyone within the Nextflow community!
 
 <!-- TODO nf-core: Add full-sized test dataset and amend the paragraph below if applicable -->
-On release, automated continuous integration tests run the pipeline on a full-sized dataset on the AWS cloud infrastructure. This ensures that the pipeline runs on AWS, has sensible resource allocation defaults set to run on real-world datasets, and permits the persistent storage of results to benchmark between pipeline releases and other analysis sources. The results obtained from the full-sized test can be viewed on the [nf-core website](https://nf-co.re/metatdenovo/results).
+On release, automated continuous integration tests run the pipeline on a full-sized dataset on the AWS cloud infrastructure. This ensures that the pipeline runs on AWS, has sensible resource allocation defaults set to run on real-world datasets, and permits the persistent storage of results to benchmark between pipeline releases and other analysis sources. The results obtained from the full-sized test can be viewed on the [nf-core website](https://nf-co.re/metatdenovo/results) e.g. the results for running the pipeline with --assembler will be in a folder called assembly and so on.
 
 ## Pipeline summary
 
-<!-- TODO nf-core: Fill in short bullet-pointed list of the default steps in the pipeline -->
-
+![nf-core/rnaseq metro map](docs/images/nf-core-metatdenovo_metro_map.png)
 1. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
 2. Present QC for raw reads ([`MultiQC`](http://multiqc.info/))
+3. Quality trimming and adapters removal for raw reads ( [`Trimm Galore!`](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/))
+4. Merge trimmed, pair-end reads ( [`Seqtk`](https://github.com/lh3/seqtk))
+5. Choice of de novo assembly:
+    1. [`RNAspade`](https://cab.spbu.ru/software/rnaspades/) suggested for Eukaryotes de novo assembly
+    2. [`Megahit`](https://github.com/voutcn/megahit) suggested for Prokaryotes de novo assembly
+6. Choice of orf caller:
+    1. [`TransDecoder`](https://github.com/TransDecoder/TransDecoder) suggested for Eukaryotes
+    2. [`Prokka`](https://github.com/tseemann/prokka) suggested for Prokaryotes
+    3. [`Prodigal`](https://github.com/hyattpd/Prodigal) suggested for Prokaryotes
+7. Quantification of genes identified in assemblies:
+    1. generate index of assembly [`BBmap index`](https://sourceforge.net/projects/bbmap/) 
+    2. Mapping cleaned reads to the assembly for quantification [`BBmap`](https://sourceforge.net/projects/bbmap/) 
+    3. Get raw counts per each gene present in the assembly [`Featurecounts`](http://subread.sourceforge.net) -> TSV table with collected featurecounts output 
+8. Taxonomical annotation:
+    1. [`EUKulele`](https://github.com/AlexanderLabWHOI/EUKulele) -> Reformat TSV output "Reformat_tax.R"
+9. Choice of functional annotation:
+    1. [`Eggnog-mapper`](http://eggnog-mapper.embl.de)
+    2. [`Run-DBcan`](https://github.com/linnabrown/run_dbcan)
+    3. [`Hmmsearch`](https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch) -> Hmmrank.R it allows to sort the hmmprofiles based on rank.
+10 Summary statistics table. Collect_stats.R
 
 ## Quick Start
 
@@ -45,17 +63,17 @@ On release, automated continuous integration tests run the pipeline on a full-si
 
     Note that some form of configuration will be needed so that Nextflow knows how to fetch the required software. This is usually done in the form of a config profile (`YOURPROFILE` in the example command above). You can chain multiple config profiles in a comma-separated string.
 
-    > * The pipeline comes with config profiles called `docker`, `singularity`, `podman`, `shifter`, `charliecloud` and `conda` which instruct the pipeline to use the named tool for software management. For example, `-profile test,docker`.
-    > * Please check [nf-core/configs](https://github.com/nf-core/configs#documentation) to see if a custom config file to run nf-core pipelines already exists for your Institute. If so, you can simply use `-profile <institute>` in your command. This will enable either `docker` or `singularity` and set the appropriate execution settings for your local compute environment.
-    > * If you are using `singularity`, please use the [`nf-core download`](https://nf-co.re/tools/#downloading-pipelines-for-offline-use) command to download images first, before running the pipeline. Setting the [`NXF_SINGULARITY_CACHEDIR` or `singularity.cacheDir`](https://www.nextflow.io/docs/latest/singularity.html?#singularity-docker-hub) Nextflow options enables you to store and re-use the images from a central location for future pipeline runs.
-    > * If you are using `conda`, it is highly recommended to use the [`NXF_CONDA_CACHEDIR` or `conda.cacheDir`](https://www.nextflow.io/docs/latest/conda.html) settings to store the environments in a central location for future pipeline runs.
+    > - The pipeline comes with config profiles called `docker`, `singularity`, `podman`, `shifter`, `charliecloud` and `conda` which instruct the pipeline to use the named tool for software management. For example, `-profile test,docker`.
+    > - Please check [nf-core/configs](https://github.com/nf-core/configs#documentation) to see if a custom config file to run nf-core pipelines already exists for your Institute. If so, you can simply use `-profile <institute>` in your command. This will enable either `docker` or `singularity` and set the appropriate execution settings for your local compute environment.
+    > - If you are using `singularity` and are persistently observing issues downloading Singularity images directly due to timeout or network issues, then you can use the `--singularity_pull_docker_container` parameter to pull and convert the Docker image instead. Alternatively, you can use the [`nf-core download`](https://nf-co.re/tools/#downloading-pipelines-for-offline-use) command to download images first, before running the pipeline. Setting the [`NXF_SINGULARITY_CACHEDIR` or `singularity.cacheDir`](https://www.nextflow.io/docs/latest/singularity.html?#singularity-docker-hub) Nextflow options enables you to store and re-use the images from a central location for future pipeline runs.
+    > - If you are using `conda`, it is highly recommended to use the [`NXF_CONDA_CACHEDIR` or `conda.cacheDir`](https://www.nextflow.io/docs/latest/conda.html) settings to store the environments in a central location for future pipeline runs.
 
 4. Start running your own analysis!
 
     <!-- TODO nf-core: Update the example "typical command" below used to run the pipeline -->
 
     ```console
-    nextflow run nf-core/metatdenovo -profile <docker/singularity/podman/shifter/charliecloud/conda/institute> --input samplesheet.csv --genome GRCh37
+    nextflow run nf-core/metatdenovo -profile <docker/singularity/podman/shifter/charliecloud/conda/institute> --input samplesheet.csv
     ```
 
 ## Documentation
@@ -67,6 +85,7 @@ The nf-core/metatdenovo pipeline comes with documentation about the pipeline [us
 nf-core/metatdenovo was originally written by Daniel Lundin.
 
 We thank the following people for their extensive assistance in the development of this pipeline:
+Emelie Nilsson ([`emnilsson`](https://github.com/emnilsson)) and Danilo Di Leo ([`Danilo2771`](https://github.com/Danilo2771))
 
 <!-- TODO nf-core: If applicable, make list of people who have also contributed -->
 
@@ -82,6 +101,7 @@ For further information or help, don't hesitate to get in touch on the [Slack `#
 <!-- If you use  nf-core/metatdenovo for your analysis, please cite it using the following doi: [10.5281/zenodo.XXXXXX](https://doi.org/10.5281/zenodo.XXXXXX) -->
 
 <!-- TODO nf-core: Add bibliography of tools and data used in your pipeline -->
+
 An extensive list of references for the tools used by the pipeline can be found in the [`CITATIONS.md`](CITATIONS.md) file.
 
 You can cite the `nf-core` publication as follows:
