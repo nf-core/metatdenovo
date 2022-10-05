@@ -211,8 +211,8 @@ workflow METATDENOVO {
     if (params.orf_caller == ORF_CALLER_PROKKA) {
         PROKKA_CAT(MEGAHIT_INTERLEAVED.out.contigs)
         ch_versions = ch_versions.mix(PROKKA_CAT.out.versions)
-        ch_gff      = PROKKA_CAT.out.gff
-        ch_protein  = PROKKA_CAT.out.faa
+        ch_gff      = PROKKA_CAT.out.gff.map { it[1] }
+        ch_protein  = PROKKA_CAT.out.faa.map { it[1] }
 
         UNPIGZ_CONTIGS(ch_protein)
         MEGAHIT_INTERLEAVED.out.contigs.collect { [ [ id: 'all_samples' ]] }
