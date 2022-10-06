@@ -37,6 +37,22 @@ for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true
 // Check mandatory parameters
 if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input samplesheet not specified!' }
 
+// If the user supplied hmm files, we will run hmmsearch and then rank the results.
+// Create a channel for hmm files.
+if ( params.hmmsearch ) {
+    if ( params.hmmdir ) {
+        Channel
+            .fromPath(params.hmmdir + params.hmmpattern)
+            .set { ch_hmmrs }
+    } else if ( params.hmmfiles ) {
+        Channel
+            .fromPath(params.hmmfiles)
+            .set { ch_hmmrs }
+    } else {
+        // Warn of missing params
+    }
+}
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     CONFIG FILES
@@ -56,6 +72,7 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 // MODULE: local
 //
 include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved.nf'
+include { HMMRANK                          } from '../modules/local/hmmrank.nf'
 include { UNPIGZ as UNPIGZ_FASTA_PROTEIN   } from '../modules/local/unpigz.nf'
 include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz.nf'
 include { FORMAT_TAX                       } from '../modules/local/format_tax.nf'
@@ -115,6 +132,8 @@ include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS_CDS } from '../modules/nf-core/
 include { PRODIGAL                                   } from '../modules/nf-core/prodigal/main'
 include { MULTIQC                                    } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS                } from '../modules/nf-core/custom/dumpsoftwareversions/main'
+include { HMMER_HMMSEARCH as HMMSEARCH               } from '../modules/nf-core/modules/hmmer/hmmsearch/main.nf'
+include { SPADES                                     } from '../modules/nf-core/modules/spades/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -231,9 +250,10 @@ workflow METATDENOVO {
         PROKKA_CAT(ch_assembly_contigs)
         ch_versions = ch_versions.mix(PROKKA_CAT.out.versions)
         ch_gff      = PROKKA_CAT.out.gff.map { it[1] }
-        ch_protein  = PROKKA_CAT.out.faa.map { it[1] }
+        ch_hmm_aa   = PROKKA_CAT.out.faa
+        ch_aa       = PROKKA_CAT.out.faa.map { it[1] }
 
-        UNPIGZ_CONTIGS(ch_protein)
+        UNPIGZ_CONTIGS(ch_aa)
         MEGAHIT_INTERLEAVED.out.contigs.collect { [ [ id: 'all_samples' ]] }
             .combine(UNPIGZ_CONTIGS.out.unzipped)
             .set{ ch_eukulele }
@@ -253,6 +273,7 @@ workflow METATDENOVO {
             'gff'
         )
         ch_gff          = PRODIGAL.out.gene_annotations.map { it[1] }
+        ch_hmm_aa       = PRODIGAL.out.amino_acid_fasta
         ch_aa           = PRODIGAL.out.amino_acid_fasta
         ch_prodigal_fna = PRODIGAL.out.nucleotide_fasta
         ch_eukulele     = PRODIGAL.out.amino_acid_fasta
@@ -273,9 +294,12 @@ workflow METATDENOVO {
         TRANSDECODER(
             UNPIGZ_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] }
         )
-        ch_gff = TRANSDECODER.out.gff.map { it[1] }
+        ch_gff      = TRANSDECODER.out.gff.map { it[1] }
+        ch_hmm_aa   = TRANSDECODER.out.pep
+        ch_aa       = TRANSDECODER.out.pep
+        ch_gff      = TRANSDECODER.out.gff.map { it[1] }
         ch_eukulele = TRANSDECODER.out.pep
-        ch_versions     = ch_versions.mix(TRANSDECODER.out.versions)
+        ch_versions = ch_versions.mix(TRANSDECODER.out.versions)
     }
 
     //
@@ -285,6 +309,17 @@ workflow METATDENOVO {
     if (params.eggnog) {
         EGGNOG(ch_aa)
         ch_versions = ch_versions.mix(EGGNOG.out.versions)
+    }
+
+    //
+    // MODULE: Hmmsearch on orf caller output
+    //
+    if( params.hmmsearch) {
+        ch_hmmstage = ch_hmmrs.combine(ch_hmm_aa.map { it[1] } )
+            .map { [ [id: it[0].baseName ], it[0], it[1], true, true, false ] }
+            .set { ch_hmmdir }
+        HMMSEARCH( ch_hmmdir )
+        HMMRANK( HMMSEARCH.out.target_summary.collect() { it[1] } )
     }
 
     //
@@ -344,9 +379,9 @@ workflow METATDENOVO {
     // MODULE: FORMAT TAX. Format taxonomy as output from database
     //
 
-    //if( !params.skip_eukulele){
-    //    FORMAT_TAX(SUB_EUKULELE.out.taxonomy_estimation.map { it[1] } )
-    //}
+    if( !params.skip_eukulele){
+        FORMAT_TAX(SUB_EUKULELE.out.taxonomy_estimation.map { it[1] } )
+    }
 
     //
     // MODULE: MultiQC
