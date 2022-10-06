@@ -14,6 +14,10 @@ ORF_CALLER_PRODIGAL     = 'prodigal'
 ORF_CALLER_PROKKA       = 'prokka'
 ORF_CALLER_TRANSDECODER = 'transdecoder'
 
+// Validate parameters for assembler:
+RNASPADES = 'rnaspades'
+MEGAHIT   = 'megahit'
+
 // validate parameters for eukulele database:
 EUKULELE_DB_PHYLODB     = 'phylodb'
 EUKULELE_DB_MMETSP      = 'mmetsp'
@@ -22,7 +26,8 @@ EUKULELE_DB_EUKZOO      = 'eukzoo'
 
 def valid_params = [
     orf_caller      : [ORF_CALLER_PRODIGAL, ORF_CALLER_PROKKA, ORF_CALLER_TRANSDECODER],
-    eukulele_db     : [EUKULELE_DB_PHYLODB, EUKULELE_DB_MMETSP, EUKULELE_DB_EUKPROT, EUKULELE_DB_EUKZOO ]
+    assembler       : [RNASPADES, MEGAHIT],
+    eukulele_db     : [EUKULELE_DB_PHYLODB, EUKULELE_DB_MMETSP, EUKULELE_DB_EUKPROT, EUKULELE_DB_EUKZOO]
 ]
 
 // Check input path parameters to see if they exist
@@ -31,6 +36,22 @@ for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true
 
 // Check mandatory parameters
 if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input samplesheet not specified!' }
+
+// If the user supplied hmm files, we will run hmmsearch and then rank the results.
+// Create a channel for hmm files.
+if ( params.hmmsearch ) {
+    if ( params.hmmdir ) {
+        Channel
+            .fromPath(params.hmmdir + params.hmmpattern)
+            .set { ch_hmmrs }
+    } else if ( params.hmmfiles ) {
+        Channel
+            .fromPath(params.hmmfiles)
+            .set { ch_hmmrs }
+    } else {
+        // Warn of missing params
+    }
+}
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -50,8 +71,8 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 //
 // MODULE: local
 //
-
 include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved.nf'
+include { HMMRANK                          } from '../modules/local/hmmrank.nf'
 include { UNPIGZ as UNPIGZ_FASTA_PROTEIN   } from '../modules/local/unpigz.nf'
 include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz.nf'
 include { FORMAT_TAX                       } from '../modules/local/format_tax.nf'
@@ -111,6 +132,8 @@ include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS_CDS } from '../modules/nf-core/
 include { PRODIGAL                                   } from '../modules/nf-core/modules/prodigal/main'
 include { MULTIQC                                    } from '../modules/nf-core/modules/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS                } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
+include { HMMER_HMMSEARCH as HMMSEARCH               } from '../modules/nf-core/modules/hmmer/hmmsearch/main.nf'
+include { SPADES                                     } from '../modules/nf-core/modules/spades/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -176,9 +199,23 @@ workflow METATDENOVO {
         ch_se_reads_to_assembly = []
     }
 
+    ch_pacbio = []
+    ch_nanopore = []
+    ch_hmm = [] 
+    ch_spades = SEQTK_MERGEPE.out.reads.map { [ [ id: 'all_samples' ], it[1],  [], [] ] } 
+    
+
     //
-    // MODULE: Run Megahit on all interleaved fastq files
+    // MODULE: Run Megahit or RNAspades on all interleaved fastq files
     //
+    if ( params.assembler == RNASPADES ) {
+        ch_spades = FASTQC_TRIMGALORE.out.reads.map { meta, fastq -> [ [ id: 'all_samples' ], fastq, [], [] ] }
+        SPADES( ch_spades, [] )
+        ch_assembly_contigs = SPADES.out.transcripts.map { it[1] }
+        ch_assembly_contigs.view()
+        ch_versions = ch_versions.mix(SPADES.out.versions)
+    } 
+    if ( params.assembler == MEGAHIT ) {
     MEGAHIT_INTERLEAVED(
         ch_pe_reads_to_assembly.collect(),
         ch_se_reads_to_assembly.collect(),
@@ -186,6 +223,7 @@ workflow METATDENOVO {
     )
     ch_assembly_contigs = MEGAHIT_INTERLEAVED.out.contigs
     ch_versions = ch_versions.mix(MEGAHIT_INTERLEAVED.out.versions)
+    }
 
     //
     // MODULE: Create a BBMap index
@@ -209,12 +247,13 @@ workflow METATDENOVO {
     // SUBWORKFLOW: Run PROKKA on Megahit output, but split the fasta file in chunks of 10 MB, then concatenate and compress output.
     //
     if (params.orf_caller == ORF_CALLER_PROKKA) {
-        PROKKA_CAT(MEGAHIT_INTERLEAVED.out.contigs)
+        PROKKA_CAT(ch_assembly_contigs)
         ch_versions = ch_versions.mix(PROKKA_CAT.out.versions)
         ch_gff      = PROKKA_CAT.out.gff.map { it[1] }
-        ch_protein  = PROKKA_CAT.out.faa.map { it[1] }
+        ch_hmm_aa   = PROKKA_CAT.out.faa
+        ch_aa       = PROKKA_CAT.out.faa.map { it[1] }
 
-        UNPIGZ_CONTIGS(ch_protein)
+        UNPIGZ_CONTIGS(ch_aa)
         MEGAHIT_INTERLEAVED.out.contigs.collect { [ [ id: 'all_samples' ]] }
             .combine(UNPIGZ_CONTIGS.out.unzipped)
             .set{ ch_eukulele }
@@ -234,6 +273,7 @@ workflow METATDENOVO {
             'gff'
         )
         ch_gff          = PRODIGAL.out.gene_annotations.map { it[1] }
+        ch_hmm_aa       = PRODIGAL.out.amino_acid_fasta
         ch_aa           = PRODIGAL.out.amino_acid_fasta
         ch_prodigal_fna = PRODIGAL.out.nucleotide_fasta
         ch_eukulele     = PRODIGAL.out.amino_acid_fasta
@@ -254,9 +294,12 @@ workflow METATDENOVO {
         TRANSDECODER(
             UNPIGZ_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] }
         )
-        ch_gff = TRANSDECODER.out.gff.map { it[1] }
+        ch_gff      = TRANSDECODER.out.gff.map { it[1] }
+        ch_hmm_aa   = TRANSDECODER.out.pep
+        ch_aa       = TRANSDECODER.out.pep
+        ch_gff      = TRANSDECODER.out.gff.map { it[1] }
         ch_eukulele = TRANSDECODER.out.pep
-        ch_versions     = ch_versions.mix(TRANSDECODER.out.versions)
+        ch_versions = ch_versions.mix(TRANSDECODER.out.versions)
     }
 
     //
@@ -266,6 +309,17 @@ workflow METATDENOVO {
     if (params.eggnog) {
         EGGNOG(ch_aa)
         ch_versions = ch_versions.mix(EGGNOG.out.versions)
+    }
+
+    //
+    // MODULE: Hmmsearch on orf caller output
+    //
+    if( params.hmmsearch) {
+        ch_hmmstage = ch_hmmrs.combine(ch_hmm_aa.map { it[1] } )
+            .map { [ [id: it[0].baseName ], it[0], it[1], true, true, false ] }
+            .set { ch_hmmdir }
+        HMMSEARCH( ch_hmmdir )
+        HMMRANK( HMMSEARCH.out.target_summary.collect() { it[1] } )
     }
 
     //
@@ -325,9 +379,9 @@ workflow METATDENOVO {
     // MODULE: FORMAT TAX. Format taxonomy as output from database
     //
 
-    //if( !params.skip_eukulele){
-    //    FORMAT_TAX(SUB_EUKULELE.out.taxonomy_estimation.map { it[1] } )
-    //}
+    if( !params.skip_eukulele){
+        FORMAT_TAX(SUB_EUKULELE.out.taxonomy_estimation.map { it[1] } )
+    }
 
     //
     // MODULE: MultiQC
