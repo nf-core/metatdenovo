@@ -2,8 +2,8 @@
 // TRANSDECODER SUBWORKFLOW
 //
 
-include { TRANSDECODER_LONGORF as LONGORF } from '../../modules/nf-core/modules/transdecoder/longorf/main'
-include { TRANSDECODER_PREDICT as PREDICT } from '../../modules/nf-core/modules/transdecoder/predict/main'
+include { TRANSDECODER_LONGORF as LONGORF } from '../../modules/nf-core/transdecoder/longorf/main'
+include { TRANSDECODER_PREDICT as PREDICT } from '../../modules/nf-core/transdecoder/predict/main'
 
 workflow TRANSDECODER {
     take:
