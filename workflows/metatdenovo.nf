@@ -101,16 +101,16 @@ include { SUB_EUKULELE } from '../subworkflows/local/eukulele'
 //
 // MODULE: Installed directly from nf-core/modules
 //
-include { FASTQC                                     } from '../modules/nf-core/modules/fastqc/main'
-include { BBMAP_BBDUK                                } from '../modules/nf-core/modules/bbmap/bbduk/main'
-include { BBMAP_INDEX                                } from '../modules/nf-core/modules/bbmap/index/main'
-include { BBMAP_ALIGN                                } from '../modules/nf-core/modules/bbmap/align/main'
-include { SEQTK_MERGEPE                              } from '../modules/nf-core/modules/seqtk/mergepe/main'
+include { FASTQC                                     } from '../modules/nf-core/fastqc/main'
+include { BBMAP_BBDUK                                } from '../modules/nf-core/bbmap/bbduk/main'
+include { BBMAP_INDEX                                } from '../modules/nf-core/bbmap/index/main'
+include { BBMAP_ALIGN                                } from '../modules/nf-core/bbmap/align/main'
+include { SEQTK_MERGEPE                              } from '../modules/nf-core/seqtk/mergepe/main'
 include { BAM_SORT_SAMTOOLS                          } from '../subworkflows/nf-core/bam_sort_samtools/main'
-include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS_CDS } from '../modules/nf-core/modules/subread/featurecounts/main'
-include { PRODIGAL                                   } from '../modules/nf-core/modules/prodigal/main'
-include { MULTIQC                                    } from '../modules/nf-core/modules/multiqc/main'
-include { CUSTOM_DUMPSOFTWAREVERSIONS                } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
+include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS_CDS } from '../modules/nf-core/subread/featurecounts/main'
+include { PRODIGAL                                   } from '../modules/nf-core/prodigal/main'
+include { MULTIQC                                    } from '../modules/nf-core/multiqc/main'
+include { CUSTOM_DUMPSOFTWAREVERSIONS                } from '../modules/nf-core/custom/dumpsoftwareversions/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
