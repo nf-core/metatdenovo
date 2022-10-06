@@ -14,6 +14,10 @@ ORF_CALLER_PRODIGAL     = 'prodigal'
 ORF_CALLER_PROKKA       = 'prokka'
 ORF_CALLER_TRANSDECODER = 'transdecoder'
 
+// Validate parameters for assembler:
+RNASPADES = 'rnaspades'
+MEGAHIT   = 'megahit'
+
 // validate parameters for eukulele database:
 EUKULELE_DB_PHYLODB     = 'phylodb'
 EUKULELE_DB_MMETSP      = 'mmetsp'
@@ -22,7 +26,8 @@ EUKULELE_DB_EUKZOO      = 'eukzoo'
 
 def valid_params = [
     orf_caller      : [ORF_CALLER_PRODIGAL, ORF_CALLER_PROKKA, ORF_CALLER_TRANSDECODER],
-    eukulele_db     : [EUKULELE_DB_PHYLODB, EUKULELE_DB_MMETSP, EUKULELE_DB_EUKPROT, EUKULELE_DB_EUKZOO ]
+    assembler       : [RNASPADES, MEGAHIT],
+    eukulele_db     : [EUKULELE_DB_PHYLODB, EUKULELE_DB_MMETSP, EUKULELE_DB_EUKPROT, EUKULELE_DB_EUKZOO]
 ]
 
 // Check input path parameters to see if they exist
@@ -66,7 +71,6 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 //
 // MODULE: local
 //
-
 include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved.nf'
 include { HMMRANK                          } from '../modules/local/hmmrank.nf'
 include { UNPIGZ as UNPIGZ_FASTA_PROTEIN   } from '../modules/local/unpigz.nf'
@@ -129,6 +133,7 @@ include { PRODIGAL                                   } from '../modules/nf-core/
 include { MULTIQC                                    } from '../modules/nf-core/modules/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS                } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
 include { HMMER_HMMSEARCH as HMMSEARCH               } from '../modules/nf-core/modules/hmmer/hmmsearch/main.nf'
+include { SPADES                                     } from '../modules/nf-core/modules/spades/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -194,9 +199,23 @@ workflow METATDENOVO {
         ch_se_reads_to_assembly = []
     }
 
+    ch_pacbio = []
+    ch_nanopore = []
+    ch_hmm = [] 
+    ch_spades = SEQTK_MERGEPE.out.reads.map { [ [ id: 'all_samples' ], it[1],  [], [] ] } 
+    
+
     //
-    // MODULE: Run Megahit on all interleaved fastq files
+    // MODULE: Run Megahit or RNAspades on all interleaved fastq files
     //
+    if ( params.assembler == RNASPADES ) {
+        ch_spades = FASTQC_TRIMGALORE.out.reads.map { meta, fastq -> [ [ id: 'all_samples' ], fastq, [], [] ] }
+        SPADES( ch_spades, [] )
+        ch_assembly_contigs = SPADES.out.transcripts.map { it[1] }
+        ch_assembly_contigs.view()
+        ch_versions = ch_versions.mix(SPADES.out.versions)
+    } 
+    if ( params.assembler == MEGAHIT ) {
     MEGAHIT_INTERLEAVED(
         ch_pe_reads_to_assembly.collect(),
         ch_se_reads_to_assembly.collect(),
@@ -204,6 +223,7 @@ workflow METATDENOVO {
     )
     ch_assembly_contigs = MEGAHIT_INTERLEAVED.out.contigs
     ch_versions = ch_versions.mix(MEGAHIT_INTERLEAVED.out.versions)
+    }
 
     //
     // MODULE: Create a BBMap index
@@ -227,7 +247,7 @@ workflow METATDENOVO {
     // SUBWORKFLOW: Run PROKKA on Megahit output, but split the fasta file in chunks of 10 MB, then concatenate and compress output.
     //
     if (params.orf_caller == ORF_CALLER_PROKKA) {
-        PROKKA_CAT(MEGAHIT_INTERLEAVED.out.contigs)
+        PROKKA_CAT(ch_assembly_contigs)
         ch_versions = ch_versions.mix(PROKKA_CAT.out.versions)
         ch_gff      = PROKKA_CAT.out.gff.map { it[1] }
         ch_hmm_aa   = PROKKA_CAT.out.faa
