@@ -2,69 +2,86 @@
     "name": "nf-core/metatdenovo",
     "homePage": "https://github.com/nf-core/metatdenovo",
     "repos": {
-        "nf-core/modules": {
-            "bbmap/align": {
-                "git_sha": "848ee9a215d02d80be033bfa60881700f2bd914c"
-            },
-            "bbmap/bbduk": {
-                "git_sha": "848ee9a215d02d80be033bfa60881700f2bd914c"
-            },
-            "bbmap/index": {
-                "git_sha": "848ee9a215d02d80be033bfa60881700f2bd914c"
-            },
-            "cat/cat": {
-                "git_sha": "eeda4136c096688d04cc40bb3c70d948213ed641"
-            },
-            "custom/dumpsoftwareversions": {
-                "git_sha": "82501fe6d0d12614db67751d30af98d16e63dc59"
-            },
-            "fastqc": {
-                "git_sha": "49b18b1639f4f7104187058866a8fab33332bdfe"
-            },
-            "hmmer/hmmsearch": {
-                "git_sha": "f0800157544a82ae222931764483331a81812012"
-            },
-            "multiqc": {
-                "git_sha": "90aef30f432332bdf0ce9f4b9004aa5d5c4960bb"
-            },
-            "prodigal": {
-                "git_sha": "90aef30f432332bdf0ce9f4b9004aa5d5c4960bb"
-            },
-            "prokka": {
-                "git_sha": "ec22f9a9079bd93ff8ec152349ead5f684edeb9f"
-            },
-            "samtools/flagstat": {
-                "git_sha": "bbb99cb8d679555cc01c98766de7869f83283545"
-            },
-            "samtools/idxstats": {
-                "git_sha": "f0a86eaf5bf6ca73c5571193edd00c25bfa308f5"
-            },
-            "samtools/index": {
-                "git_sha": "897c33d5da084b61109500ee44c01da2d3e4e773"
-            },
-            "samtools/sort": {
-                "git_sha": "d5d785b3d8b422cda9c6d84a23f629a8e9ff8cd8"
-            },
-            "samtools/stats": {
-                "git_sha": "f4eab7945952dc4934224309701a49913ea05ae6"
-            },
-            "seqtk/mergepe": {
-                "git_sha": "90aef30f432332bdf0ce9f4b9004aa5d5c4960bb"
-            },
-            "spades": {
-                "git_sha": "682f789f93070bd047868300dd018faf3d434e7c"
-            },
-            "subread/featurecounts": {
-                "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d"
-            },
-            "transdecoder/longorf": {
-                "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d"
-            },
-            "transdecoder/predict": {
-                "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d"
-            },
-            "trimgalore": {
-                "git_sha": "bfbdc4f79bb26bc698d30b74abd081db8af77f4d"
+        "https://github.com/nf-core/modules.git": {
+            "modules": {
+                "nf-core": {
+                    "bbmap/align": {
+                        "branch": "master",
+                        "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
+                    },
+                    "bbmap/bbduk": {
+                        "branch": "master",
+                        "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
+                    },
+                    "bbmap/index": {
+                        "branch": "master",
+                        "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
+                    },
+                    "cat/cat": {
+                        "branch": "master",
+                        "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
+                    },
+                    "custom/dumpsoftwareversions": {
+                        "branch": "master",
+                        "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
+                    },
+                    "fastqc": {
+                        "branch": "master",
+                        "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
+                    },
+                    "multiqc": {
+                        "branch": "master",
+                        "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
+                    },
+                    "prodigal": {
+                        "branch": "master",
+                        "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
+                    },
+                    "prokka": {
+                        "branch": "master",
+                        "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
+                    },
+                    "samtools/flagstat": {
+                        "branch": "master",
+                        "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
+                    },
+                    "samtools/idxstats": {
+                        "branch": "master",
+                        "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
+                    },
+                    "samtools/index": {
+                        "branch": "master",
+                        "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
+                    },
+                    "samtools/sort": {
+                        "branch": "master",
+                        "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
+                    },
+                    "samtools/stats": {
+                        "branch": "master",
+                        "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
+                    },
+                    "seqtk/mergepe": {
+                        "branch": "master",
+                        "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
+                    },
+                    "subread/featurecounts": {
+                        "branch": "master",
+                        "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
+                    },
+                    "transdecoder/longorf": {
+                        "branch": "master",
+                        "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
+                    },
+                    "transdecoder/predict": {
+                        "branch": "master",
+                        "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
+                    },
+                    "trimgalore": {
+                        "branch": "master",
+                        "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
+                    }
+                }
             }
         }
     }

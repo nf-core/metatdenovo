@@ -14,6 +14,9 @@ process FORMAT_TAX {
     path "taxonomy_classification.tsv", emit: tax
     path "versions.yml"               , emit: versions
 
+    when:
+    task.ext.when == null || task.ext.when
+
     script:
     def args = task.ext.args ?: ''
 
@@ -33,14 +36,14 @@ process FORMAT_TAX {
 
     # create a table with taxonomy categories in each column
     tax <- list.files(pattern = "*.out") %>%
-               map_df(~read.table(.,  sep = "\t", header = TRUE))
+                map_df(~read.table(.,  sep = "\t", header = TRUE))
 
     tax <- tax[,-c(1,3,5,6,7,8)]
 
-    colnames(tax)[1] <- "orf" 
+    colnames(tax)[1] <- "orf"
 
-    tax <- tax %>% 
-            separate('full_classification',c("Domain","Phylum", "Class", "Order", "Family", "Genus", "Species"), ";") %>%  
+    tax <- tax %>%
+            separate('full_classification',c("Domain","Phylum", "Class", "Order", "Family", "Genus", "Species"), ";") %>%
             mutate(
                 Domain = ifelse(is.na(Domain)   | Domain == '',  sprintf("%s uncl.", Domain), Domain),
                 Phylum = ifelse(is.na(Phylum)   | Phylum == '',  sprintf("%s uncl.", Phylum), Phylum),
@@ -52,7 +55,7 @@ process FORMAT_TAX {
             ) %>%
             na.omit() %>%
             write_tsv('taxonomy_classification.tsv')
-    
+
     writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")),paste0("    dplyr: ", packageVersion("dplyr")) ), "versions.yml")
     """
 }

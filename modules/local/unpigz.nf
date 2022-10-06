@@ -14,6 +14,9 @@ process UNPIGZ {
     path "$gunzip",      emit: unzipped
     path "versions.yml", emit: versions
 
+    when:
+    task.ext.when == null || task.ext.when
+
     script:
 
     gunzip = file.toString() - '.gz'
