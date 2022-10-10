@@ -10,7 +10,9 @@
             "type": "object",
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
-            "required": ["input"],
+            "required": [
+                "input"
+            ],
             "properties": {
                 "input": {
                     "type": "string",
@@ -377,5 +379,27 @@
         {
             "$ref": "#/definitions/generic_options"
         }
-    ]
+    ],
+    "properties": {
+        "assembler": {
+            "type": "string",
+            "default": "megahit"
+        },
+        "hmmsearch": {
+            "type": "string",
+            "default": "false"
+        },
+        "hmmfiles": {
+            "type": "string",
+            "default": null
+        },
+        "hmmdir": {
+            "type": "string",
+            "default": null
+        },
+        "hmmpattern": {
+            "type": "string",
+            "default": "*.hmm"
+        }
+    }
 }
