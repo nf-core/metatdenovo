@@ -15,6 +15,9 @@ process HMMRANK {
     path "hmmrank.out" , emit: x
     path "versions.yml", emit: versions
 
+    when:
+    task.ext.when == null || task.ext.when
+
     script:
 
     """
