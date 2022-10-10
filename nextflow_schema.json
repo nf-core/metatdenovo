@@ -44,6 +44,32 @@
                 }
             }
         },
+        "hmmsearch_option": {
+            "type": "string",
+            "default": "false",
+            "title": "HMMSEARCH_OPTION",
+            "description": "run hmmsearch with options",
+            "properties": {
+                "hmmsearch": {
+                    "type": "boolean"
+                },
+                "hmmdir": {
+                    "type": "string",
+                    "default": "None",
+                    "description": "specify directory where the hmm files are"
+                },
+                "hmmfiles": {
+                    "type": "string",
+                    "default": "None",
+                    "description": "list of hmm files to run"
+                },
+                "hmmpattern": {
+                    "type": "string",
+                    "default": "*.hmm",
+                    "description": "specify which pattern hmm files end with"
+                }
+            }
+        },
         "reference_genome_options": {
             "title": "Reference genome options",
             "type": "object",
@@ -63,6 +89,11 @@
             "description": "",
             "default": "",
             "properties": {
+                "assembler": {
+                    "type": "string",
+                    "default": "megahit",
+                    "description": "Decide which assembler to use"
+                },
                 "diginorm": {
                     "type": "boolean",
                     "description": "Perform digital normalization to reduce sequencing depth.",
@@ -356,6 +387,9 @@
             "$ref": "#/definitions/input_output_options"
         },
         {
+            "$ref": "#/definitions/hmmsearch_option"
+        },
+        {
             "$ref": "#/definitions/reference_genome_options"
         },
         {
@@ -379,27 +413,5 @@
         {
             "$ref": "#/definitions/generic_options"
         }
-    ],
-    "properties": {
-        "assembler": {
-            "type": "string",
-            "default": "megahit"
-        },
-        "hmmsearch": {
-            "type": "string",
-            "default": "false"
-        },
-        "hmmfiles": {
-            "type": "string",
-            "default": null
-        },
-        "hmmdir": {
-            "type": "string",
-            "default": null
-        },
-        "hmmpattern": {
-            "type": "string",
-            "default": "*.hmm"
-        }
-    }
+    ]
 }
