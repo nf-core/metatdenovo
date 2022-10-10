@@ -68,19 +68,19 @@
                     "type": "string"
                 },
                 "save_trimmed": {
-                    "type": "string"
+                    "type": "boolean"
                 },
                 "skip_trimming": {
-                    "type": "string"
+                    "type": "boolean"
                 },
                 "skip_qc": {
-                    "type": "string"
+                    "type": "boolean"
                 },
                 "skip_fastqc": {
-                    "type": "string"
+                    "type": "boolean"
                 },
                 "diginorm": {
-                    "type": "string"
+                    "type": "boolean"
                 },
                 "diginorm_C": {
                     "type": "integer",
@@ -102,7 +102,7 @@
                     "type": "string"
                 },
                 "eggnog": {
-                    "type": "string"
+                    "type": "boolean"
                 },
                 "eggnog_dbpath": {
                     "type": "string",
@@ -113,7 +113,7 @@
                     "default": "phylodb"
                 },
                 "skip_eukulele": {
-                    "type": "string"
+                    "type": "boolean"
                 },
                 "eukulele_dbpath": {
                     "type": "string",
@@ -124,7 +124,7 @@
                     "default": "mets"
                 },
                 "hmmsearch": {
-                    "type": "string"
+                    "type": "boolean"
                 },
                 "hmmfiles": {
                     "type": "string"
