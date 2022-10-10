@@ -21,7 +21,7 @@
                     "pattern": "^\\S+\\.csv$",
                     "schema": "assets/schema_input.json",
                     "description": "Path to comma-separated file containing information about the samples in the experiment.",
-                    "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row. See [usage docs](https://nf-co.re/metatdenovo/usage#samplesheet-input).",
+                    "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row. See [usage docs](https://nf-co.re//usage#samplesheet-input).",
                     "fa_icon": "fas fa-file-csv"
                 },
                 "outdir": {
@@ -44,181 +44,97 @@
                 }
             }
         },
-        "hmmsearch_option": {
-            "type": "string",
-            "default": "false",
-            "title": "HMMSEARCH_OPTION",
-            "description": "run hmmsearch with options",
-            "properties": {
-                "hmmsearch": {
-                    "type": "boolean"
-                },
-                "hmmdir": {
-                    "type": "string",
-                    "default": "None",
-                    "description": "specify directory where the hmm files are"
-                },
-                "hmmfiles": {
-                    "type": "string",
-                    "default": "None",
-                    "description": "list of hmm files to run"
-                },
-                "hmmpattern": {
-                    "type": "string",
-                    "default": "*.hmm",
-                    "description": "specify which pattern hmm files end with"
-                }
-            }
-        },
-        "reference_genome_options": {
-            "title": "Reference genome options",
+        "options": {
+            "title": "options",
             "type": "object",
             "fa_icon": "fas fa-dna",
-            "description": "Reference genome related files and options required for the workflow.",
             "properties": {
+                "clip_r1": {
+                    "type": "string"
+                },
+                "clip_r2": {
+                    "type": "string"
+                },
+                "three_prime_clip_r1": {
+                    "type": "string"
+                },
+                "three_prime_clip_r2": {
+                    "type": "string"
+                },
+                "trim_nextseq": {
+                    "type": "string"
+                },
                 "sequence_filter": {
-                    "type": "string",
-                    "description": "Fasta file with sequences to filter away before running assembly etc..",
-                    "help_text": "Read sequences matching this file will be filtered out from samples with BBDuk before mapping. If no file is specified, BBDuk will not be run."
-                }
-            }
-        },
-        "optional_processing": {
-            "title": "Optional processing",
-            "type": "object",
-            "description": "",
-            "default": "",
-            "properties": {
-                "assembler": {
-                    "type": "string",
-                    "default": "megahit",
-                    "description": "Decide which assembler to use"
+                    "type": "string"
+                },
+                "save_trimmed": {
+                    "type": "string"
+                },
+                "skip_trimming": {
+                    "type": "string"
+                },
+                "skip_qc": {
+                    "type": "string"
+                },
+                "skip_fastqc": {
+                    "type": "string"
                 },
                 "diginorm": {
-                    "type": "boolean",
-                    "description": "Perform digital normalization to reduce sequencing depth.",
-                    "help_text": "Digital normalization is performed following the example in https://khmer-protocols.readthedocs.io/en/latest/mrnaseq/2-diginorm.html.\nThere are (hidden) parameters for the cutoff coverage and kmer length for `normalize-by-median.py`, set to defaults following the example above (cutoff: 20 and kmer length: 20)."
+                    "type": "string"
                 },
                 "diginorm_C": {
                     "type": "integer",
-                    "description": "Median coverage to keep a read, default 20.",
-                    "help_text": "This parameter is passed to `normalize-by-median.py` as the value to `-C` and to `filter-abund.py` as value to both `-C` and `-Z`",
-                    "hidden": true
+                    "default": 20
                 },
                 "diginorm_k": {
                     "type": "integer",
-                    "description": "Kmer length in first call of normalize-by-median.py, default 20.",
-                    "hidden": true
+                    "default": 20
+                },
+                "assembler": {
+                    "type": "string",
+                    "default": "megahit"
                 },
                 "orf_caller": {
                     "type": "string",
-                    "description": "Specify which ORF caller you would like to run, possible alternatives: prodigal, prokka, transdecoder, default: prodigal.",
                     "default": "prodigal"
                 },
                 "prodigal_trainingfile": {
-                    "type": "string",
-                    "description": "Specify a training file for prodigal. By default prodigal will learn from the input sequences.",
-                    "hidden": true
+                    "type": "string"
                 },
                 "eggnog": {
-                    "type": "boolean",
-                    "description": "enable eggnog functional annotation"
+                    "type": "string"
                 },
                 "eggnog_dbpath": {
                     "type": "string",
-                    "default": "./eggnog/",
-                    "description": "Specify eggnog database path"
-                }
-            }
-        },
-        "eukulele": {
-            "title": "Eukulele",
-            "type": "object",
-            "description": "",
-            "default": "",
-            "properties": {
-                "eukulele_method": {
-                    "type": "string",
-                    "default": "mets",
-                    "description": "Specify which method to use for EUKulele"
-                },
-                "skip_eukulele": {
-                    "type": "boolean",
-                    "description": "skip eukulele run"
-                },
-                "eukulele_dbpath": {
-                    "type": "string",
-                    "default": "./eukulele",
-                    "description": "Specify EUKulele database folder"
+                    "default": "./"
                 },
                 "eukulele_db": {
                     "type": "string",
-                    "default": "phylodb",
-                    "description": "Specify database for EUKulele run"
-                }
-            }
-        },
-        "read_trimming_options": {
-            "title": "Read trimming options",
-            "type": "object",
-            "fa_icon": "fas fa-cut",
-            "description": "Options to adjust read trimming criteria.",
-            "properties": {
-                "clip_r1": {
-                    "type": "integer",
-                    "description": "Instructs Trim Galore to remove bp from the 5' end of read 1 (or single-end reads).",
-                    "fa_icon": "fas fa-cut"
+                    "default": "phylodb"
                 },
-                "clip_r2": {
-                    "type": "integer",
-                    "description": "Instructs Trim Galore to remove bp from the 5' end of read 2 (paired-end reads only).",
-                    "fa_icon": "fas fa-cut"
+                "skip_eukulele": {
+                    "type": "string"
                 },
-                "three_prime_clip_r1": {
-                    "type": "integer",
-                    "description": "Instructs Trim Galore to remove bp from the 3' end of read 1 AFTER adapter/quality trimming has been performed.",
-                    "fa_icon": "fas fa-cut"
+                "eukulele_dbpath": {
+                    "type": "string",
+                    "default": "./eukulele"
                 },
-                "three_prime_clip_r2": {
-                    "type": "integer",
-                    "description": "Instructs Trim Galore to remove bp from the 3' end of read 2 AFTER adapter/quality trimming has been performed.",
-                    "fa_icon": "fas fa-cut"
+                "eukulele_method": {
+                    "type": "string",
+                    "default": "mets"
                 },
-                "trim_nextseq": {
-                    "type": "integer",
-                    "description": "Instructs Trim Galore to apply the --nextseq=X option, to trim based on quality after removing poly-G tails.",
-                    "help_text": "This enables the option Cutadapt `--nextseq-trim=3'CUTOFF` option via Trim Galore, which will set a quality cutoff (that is normally given with -q instead), but qualities of G bases are ignored. This trimming is in common for the NextSeq- and NovaSeq-platforms, where basecalls without any signal are called as high-quality G bases.",
-                    "fa_icon": "fas fa-cut"
+                "hmmsearch": {
+                    "type": "string"
                 },
-                "skip_trimming": {
-                    "type": "boolean",
-                    "description": "Skip the adapter trimming step.",
-                    "help_text": "Use this if your input FastQ files have already been trimmed outside of the workflow or if you're very confident that there is no adapter contamination in your data.",
-                    "fa_icon": "fas fa-fast-forward"
+                "hmmfiles": {
+                    "type": "string"
                 },
-                "save_trimmed": {
-                    "type": "boolean",
-                    "description": "Save the trimmed FastQ files in the results directory.",
-                    "help_text": "By default, trimmed FastQ files will not be saved to the results directory. Specify this flag (or set to true in your config file) to copy these files to the results directory when complete.",
-                    "fa_icon": "fas fa-save"
-                }
-            }
-        },
-        "process_skipping_options": {
-            "title": "Process skipping options",
-            "type": "object",
-            "fa_icon": "fas fa-fast-forward",
-            "description": "Options to skip various steps within the workflow.",
-            "properties": {
-                "skip_fastqc": {
-                    "type": "boolean",
-                    "description": "Skip FastQC.",
-                    "fa_icon": "fas fa-fast-forward"
+                "hmmdir": {
+                    "type": "string"
                 },
-                "skip_qc": {
-                    "type": "boolean",
-                    "fa_icon": "fas fa-fast-forward",
-                    "description": "Skip all QC steps except for MultiQC."
+                "hmmpattern": {
+                    "type": "string",
+                    "default": "*.hmm"
                 }
             }
         },
@@ -387,22 +303,7 @@
             "$ref": "#/definitions/input_output_options"
         },
         {
-            "$ref": "#/definitions/hmmsearch_option"
-        },
-        {
-            "$ref": "#/definitions/reference_genome_options"
-        },
-        {
-            "$ref": "#/definitions/optional_processing"
-        },
-        {
-            "$ref": "#/definitions/eukulele"
-        },
-        {
-            "$ref": "#/definitions/read_trimming_options"
-        },
-        {
-            "$ref": "#/definitions/process_skipping_options"
+            "$ref": "#/definitions/options"
         },
         {
             "$ref": "#/definitions/institutional_config_options"
