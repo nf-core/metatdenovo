@@ -32,33 +32,33 @@ process HMMRANK {
     tlist <- list()
     i <- 1
     for ( tbloutfile in files ) {
-      p <- basename(tbloutfile)
-      t <- read_fwf(
-        tbloutfile, fwf_cols(content = c(1, NA)), 
-        col_types = cols(content = col_character()), 
+        p <- basename(tbloutfile)
+        t <- read_fwf(
+        tbloutfile, fwf_cols(content = c(1, NA)),
+        col_types = cols(content = col_character()),
         comment='#'
-      ) %>% 
+        ) %>%
         filter(! grepl('^ *#', content)) %>%
         separate(
-          content, 
-          c('accno', 't0', 'profile', 't1', 'evalue', 'score', 'bias', 'f0', 'f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'rest'), 
-          '\\\s+',  extra='merge', convert = FALSE
+        content,
+        c('accno', 't0', 'profile', 't1', 'evalue', 'score', 'bias', 'f0', 'f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'rest'),
+        '\\\s+',  extra='merge', convert = FALSE
         ) %>%
         transmute(accno, profile, hmm_profile = t1, evalue = as.double(evalue), score = as.double(score))
-      if ( nrow(t) > 0 ) {
+    if ( nrow(t) > 0 ) {
         tlist[[i]] <- t
         i <- i + 1
-      }
+        }
     }
     if ( length(tlist) > 0  ) {
-      tblout <- bind_rows(tlist)
+        tblout <- bind_rows(tlist)
     } else {
-      write("No results found, exiting", stderr())
-      quit(save = 'no', status = 0)
+        write("No results found, exiting", stderr())
+        quit(save = 'no', status = 0)
     }
 
     tblout <- tblout %>%
-        group_by(accno) %>% 
+        group_by(accno) %>%
         arrange(desc(score), evalue, profile) %>%
         mutate(rank = row_number()) %>%
         rename(orf = accno) %>%
@@ -67,7 +67,7 @@ process HMMRANK {
 
     # write output
     write_tsv(tblout,'hmmrank.out')
-    
+
     writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")), paste0("    dplyr: ", packageVersion('dplyr')) ), "versions.yml")
     """
 }
