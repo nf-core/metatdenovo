@@ -131,8 +131,8 @@ include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS_CDS } from '../modules/nf-core/
 include { PRODIGAL                                   } from '../modules/nf-core/prodigal/main'
 include { MULTIQC                                    } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS                } from '../modules/nf-core/custom/dumpsoftwareversions/main'
-include { HMMER_HMMSEARCH as HMMSEARCH               } from '../modules/nf-core/modules/hmmer/hmmsearch/main.nf'
-include { SPADES                                     } from '../modules/nf-core/modules/spades/main'
+include { HMMER_HMMSEARCH as HMMSEARCH               } from '../modules/nf-core/hmmer/hmmsearch/main.nf'
+include { SPADES                                     } from '../modules/nf-core/spades/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
