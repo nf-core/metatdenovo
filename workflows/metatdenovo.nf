@@ -75,7 +75,6 @@ include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/inte
 include { HMMRANK                          } from '../modules/local/hmmrank.nf'
 include { UNPIGZ as UNPIGZ_FASTA_PROTEIN   } from '../modules/local/unpigz.nf'
 include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz.nf'
-include { FORMAT_TAX                       } from '../modules/local/format_tax.nf'
 include { COLLECT_FEATURECOUNTS            } from '../modules/local/collect_featurecounts.nf'
 include { COLLECT_FEATURECOUNTS_EUK        } from '../modules/local/collect_featurecounts_euk.nf'
 include { COLLECT_STATS                    } from '../modules/local/collect_stats.nf'
@@ -132,8 +131,8 @@ include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS_CDS } from '../modules/nf-core/
 include { PRODIGAL                                   } from '../modules/nf-core/prodigal/main'
 include { MULTIQC                                    } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS                } from '../modules/nf-core/custom/dumpsoftwareversions/main'
-include { HMMER_HMMSEARCH as HMMSEARCH               } from '../modules/nf-core/modules/hmmer/hmmsearch/main.nf'
-include { SPADES                                     } from '../modules/nf-core/modules/spades/main'
+include { HMMER_HMMSEARCH as HMMSEARCH               } from '../modules/nf-core/hmmer/hmmsearch/main.nf'
+include { SPADES                                     } from '../modules/nf-core/spades/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -373,14 +372,6 @@ workflow METATDENOVO {
 
     if( !params.skip_eukulele){
         SUB_EUKULELE(ch_eukulele)
-    }
-
-    //
-    // MODULE: FORMAT TAX. Format taxonomy as output from database
-    //
-
-    if( !params.skip_eukulele){
-        FORMAT_TAX(SUB_EUKULELE.out.taxonomy_estimation.map { it[1] } )
     }
 
     //

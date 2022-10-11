@@ -3,7 +3,6 @@
 //
 
 include { EUKULELE      } from '../../modules/local/eukulele/main'
-include { MV_DIR        } from '../../modules/local/mvdir'
 include { EUKULELE_DB   } from '../../modules/local/eukulele/download'
 include { FORMAT_TAX    } from '../../modules/local/format_tax'
 
@@ -15,8 +14,6 @@ workflow SUB_EUKULELE {
     main:
         ch_versions = Channel.empty()
 
-        MV_DIR(fastaprot)
-
         String directoryName = params.eukulele_dbpath
         File directory = new File(directoryName)
 
@@ -24,10 +21,10 @@ workflow SUB_EUKULELE {
             directory.mkdir()
             EUKULELE_DB( )
             if ( params.eukulele_db == 'mmetsp' ) {
-                EUKULELE(MV_DIR.out.contigs_dir, EUKULELE_DB.out.mmetsp_db)
+                EUKULELE(fastaprot, EUKULELE_DB.out.mmetsp_db)
                 FORMAT_TAX(EUKULELE.out.taxonomy_estimation.map { it[1] } )
             } else
-                EUKULELE(MV_DIR.out.contigs_dir, EUKULELE_DB.out.phylo_db)
+                EUKULELE(fastaprot, EUKULELE_DB.out.phylo_db)
                 FORMAT_TAX(EUKULELE.out.taxonomy_estimation.map { it[1] } )
         } else {
                 ch_database = Channel.fromPath(params.eukulele_dbpath)
