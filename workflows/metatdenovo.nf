@@ -354,7 +354,6 @@ workflow METATDENOVO {
     ch_fcs = ch_fcs.mix(
         ch_cds_counts).collect()
     
-    ch_fcs.view()
     //
     // MODULE: Collect statistics from mapping analysis
     //
