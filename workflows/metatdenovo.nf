@@ -78,6 +78,7 @@ include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz.nf'
 include { COLLECT_FEATURECOUNTS            } from '../modules/local/collect_featurecounts.nf'
 include { COLLECT_FEATURECOUNTS_EUK        } from '../modules/local/collect_featurecounts_euk.nf'
 include { COLLECT_STATS                    } from '../modules/local/collect_stats.nf'
+include { COLLECT_STATS_NOTRIM             } from '../modules/local/collect_stats_notrim.nf'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -352,19 +353,29 @@ workflow METATDENOVO {
     ch_fcs = Channel.empty()
     ch_fcs = ch_fcs.mix(
         ch_cds_counts).collect()
-
+    
     //
     // MODULE: Collect statistics from mapping analysis
     //
 
-    COLLECT_STATS (
-        FASTQC_TRIMGALORE.out.trim_log.map { meta, fastq -> meta.id }.collect(),
-        FASTQC_TRIMGALORE.out.trim_log.map { meta, fastq -> fastq[0] }.collect(),
-        BAM_SORT_SAMTOOLS.out.idxstats.collect()  { it[1] },
-        ch_fcs,
-        ch_bbduk_logs.collect()
-    )
-    ch_versions     = ch_versions.mix(COLLECT_STATS.out.versions)
+    if ( ! params.skip_trimming) {
+        COLLECT_STATS (
+            FASTQC_TRIMGALORE.out.trim_log.map { meta, fastq -> meta.id }.collect(),
+            FASTQC_TRIMGALORE.out.trim_log.map { meta, fastq -> fastq[0] }.collect(),
+            BAM_SORT_SAMTOOLS.out.idxstats.collect()  { it[1] },
+            ch_fcs,
+            ch_bbduk_logs.collect()
+        )
+        ch_versions     = ch_versions.mix(COLLECT_STATS.out.versions)
+    } else {
+        COLLECT_STATS_NOTRIM (
+            FASTQC_TRIMGALORE.out.fastqc_html.map { meta, fastq -> meta.id }.collect(),
+            BAM_SORT_SAMTOOLS.out.idxstats.collect()  { it[1] },
+            ch_fcs,
+            ch_bbduk_logs.collect()
+        )
+        ch_versions     = ch_versions.mix(COLLECT_STATS_NOTRIM.out.versions)
+    }
 
     //
     // SUBWORKFLOW: Eukulele
