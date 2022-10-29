@@ -25,7 +25,7 @@ process EUKULELE {
     """
     rc=0
     mkdir contigs
-    mv ${contigs_fasta} contigs
+    ln -s ${contigs_fasta} contigs
 
     EUKulele \\
         $args \\
