@@ -25,7 +25,7 @@ process EUKULELE {
     """
     rc=0
     mkdir contigs
-    ln -s ${contigs_fasta} contigs
+    cp ${contigs_fasta} ./contigs/
 
     EUKulele \\
         $args \\
