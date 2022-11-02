@@ -41,7 +41,7 @@ process EGGNOG_DOWNLOAD {
     """
 
     stub:
-    
+ 
     """
 
     mkdir eggnog
