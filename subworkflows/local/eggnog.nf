@@ -18,6 +18,7 @@ workflow EGGNOG {
         File test = new File(eggnogDB)
 
         if (! directory.exists()){
+            directory.mkdir()
             EGGNOG_DOWNLOAD()
             EGGNOG_MAPPER(faa, EGGNOG_DOWNLOAD.out.db)
         } else {
