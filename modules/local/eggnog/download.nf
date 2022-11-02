@@ -22,6 +22,7 @@ process EGGNOG_DOWNLOAD {
     def args = task.ext.args ?: ''
 
     """
+
     mkdir eggnog
 
     download_eggnog_data.py \\
@@ -30,6 +31,24 @@ process EGGNOG_DOWNLOAD {
         --data_dir ./eggnog/
 
     ln -s ./eggnog/* ./
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        eggnog: \$( echo \$(emapper.py --version 2>&1)| sed 's/.* emapper-//' )
+    END_VERSIONS
+
+
+    """
+
+    stub:
+    
+    """
+
+    mkdir eggnog
+    touch ./eggnog/eggnog.db
+    touch ./eggnog/eggnog.taxa.db
+    touch ./eggnog/eggnog.taxa.db.traverse.pkl
+    ln -s eggnog/* ./
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
