@@ -1,6 +1,7 @@
+﻿
 # nf-core/metatdenovo: Usage
 
-## :warning: Please read this documentation on the nf-core website: [https://nf-co.re/metatdenovo/usage](https://nf-co.re/metatdenovo/usage)
+## :warning: Please read this documentation on the nf-core website: [https://nf-co.re/metatdenovo/usage] (the link is not working) (https://nf-co.re/metatdenovo/usage)
 
 > _Documentation of pipeline parameters is generated automatically from the pipeline schema and can no longer be found in markdown files._
 
@@ -10,7 +11,7 @@
 
 ## Samplesheet input
 
-You will need to create a samplesheet with information about the samples you would like to analyse before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row as shown in the examples below.
+You will need to create a samplesheet with information about the samples you would like to analyse before running the pipeline. Use this parameter to specify its location. It must be a comma-separated file with 3 columns, and a header row as shown in the examples below
 
 ```console
 --input '[path to samplesheet file]'
@@ -44,20 +45,74 @@ TREATMENT_REP3,AEG588A6_S6_L003_R1_001.fastq.gz,
 TREATMENT_REP3,AEG588A6_S6_L004_R1_001.fastq.gz,
 ```
 
-| Column    | Description                                                                                                                                                                            |
-| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `sample`  | Custom sample name. This entry will be identical for multiple sequencing libraries/runs from the same sample. Spaces in sample names are automatically converted to underscores (`_`). |
-| `fastq_1` | Full path to FastQ file for Illumina short reads 1. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                             |
-| `fastq_2` | Full path to FastQ file for Illumina short reads 2. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                             |
+| Column         | Description                                                                                                                                                                            |
+|----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `sample`       | Custom sample name. This entry will be identical for multiple sequencing libraries/runs from the same sample. Spaces in sample names are automatically converted to underscores (`_`). |
+| `fastq_1`      | Full path to FastQ file for Illumina short reads 1. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                             |
+| `fastq_2`      | Full path to FastQ file for Illumina short reads 2. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                             |
 
 An [example samplesheet](../assets/samplesheet.csv) has been provided with the pipeline.
+
+## Assembler options
+
+By default, the pipeline uses Megahit (i.e. `--assembler  megahit`) to assemble the cleaned and trimmed FastQ reads to create the reference genome. Megahit is fast and it requires a not a lot of memory to run, typically is suggested to be used with prokaryotic samples. The pipeline allows you to choose another assembler RNAspades, (i.e. `--assembler rnaspades` ), that is usually suggested to use for eukaryotic samples.
+
+> N.B. you can use `Megahit` for eukaryotic samples too, we just suggest what is the best option according to our experience (literature?).
+
+## Orf caller options
+
+By default, the pipeline uses prodigal (i.e. `--orf_caller prodigal` ) to generate the genome feature file (.gff) and to generate gene structure from the assembly.
+
+Other orf caller options for running the pipeline are:
+
+- Prokka (`--orf_caller prokka`)
+
+- Transdecoder (`--orf_caller transdecoder`)
+
+> N.B. Prokka and prodigal are suggested to run with prokaryotes while transdecoder is specific for eukaryotes.
+
+## Taxonomical annotation options
+
+Metatdenovo uses `EUKulele` as main program for taxonomy annotation. EUKulele can run by using different reference datasets. The default dataset is PhyloDB (i.e. `--eukulele_db phylodb` ) which is suggested mainly for prokaryotes.
+
+Other databases options for running the pipeline are:
+
+- Mmetsp (i.e. `--eukulele_db mmetsp`)
+
+- GTDB (i.e. `--eukulele_db gtdb`) [not available yet]
+
+PhyloDB and GTDB are recommended for prokaryotic datasets while mmetsp for eukaryotes although PhyoDB can be also recognize eukaryotes and can be used for this purpose.
+
+If you already have these databases ready in your working directory,  you can redirect to the folder so the pipeline will not download the database
+(e.g. `--eukulele_dbpath your/path/database/` 
+> Please, check the EUKulele documentation for more information about the databases cited [HERE](https://eukulele.readthedocs.io/en/latest/#)
+
+## Functional annotation options
+
+By default, metatdenovo will not perform any functional annotation. In order to run it you will need to specify one of the options that we provide.
+
+This options are:
+
+- [Eggnog](https://github.com/eggnogdb/eggnog-mapper/wiki) (i.e. `--eggnog`)
+
+- [Hmmsearch](http://eddylab.org/software/hmmer/Userguide.pdf) (i.e. `--hmmsearch`)
+
+- [Rundbcan3](https://github.com/linnabrown/run_dbcan) (i.e. `--run_dbcan`)
+
+All the options can run in the same time (e.i. `extflow run main.nf  -profile test,docker --eggnog --hmmsearch --rundbcan`) but each program has it’s own option that you will need to read carefully before run the pipeline. You can find the different options in [parameters]() page and read about the programs from their own website.
+
+## Example pipeline command with some features
+
+`nextflow run nf-core/metatdenovo -profile docker --input samplesheet.csv --assembler rnaspades --orf_caller transdecoder --eggnog --run_dbcan`
+
+In thi example, we are running metatdenovo with `rnaspades`as assembler, `transdecoder`as ORF caller, `eggnog` and `run_dbcan`for functional annotation.
 
 ## Running the pipeline
 
 The typical command for running the pipeline is as follows:
 
 ```console
-nextflow run nf-core/metatdenovo --input samplesheet.csv --genome GRCh37 -profile docker
+nextflow run nf-core/metatdenovo --input samplesheet.csv -profile docker
 ```
 
 This will launch the pipeline with the `docker` configuration profile. See below for more information about profiles.
@@ -106,21 +161,21 @@ They are loaded in sequence, so later profiles can overwrite earlier profiles.
 
 If `-profile` is not specified, the pipeline will run locally and expect all software to be installed and available on the `PATH`. This is _not_ recommended.
 
--   `docker`
-    -   A generic configuration profile to be used with [Docker](https://docker.com/)
--   `singularity`
-    -   A generic configuration profile to be used with [Singularity](https://sylabs.io/docs/)
--   `podman`
-    -   A generic configuration profile to be used with [Podman](https://podman.io/)
--   `shifter`
-    -   A generic configuration profile to be used with [Shifter](https://nersc.gitlab.io/development/shifter/how-to-use/)
--   `charliecloud`
-    -   A generic configuration profile to be used with [Charliecloud](https://hpc.github.io/charliecloud/)
--   `conda`
-    -   A generic configuration profile to be used with [Conda](https://conda.io/docs/). Please only use Conda as a last resort i.e. when it's not possible to run the pipeline with Docker, Singularity, Podman, Shifter or Charliecloud.
--   `test`
-    -   A profile with a complete configuration for automated testing
-    -   Includes links to test data so needs no other parameters
+* `docker`
+    * A generic configuration profile to be used with [Docker](https://docker.com/)
+* `singularity`
+    * A generic configuration profile to be used with [Singularity](https://sylabs.io/docs/)
+* `podman`
+    * A generic configuration profile to be used with [Podman](https://podman.io/)
+* `shifter`
+    * A generic configuration profile to be used with [Shifter](https://nersc.gitlab.io/development/shifter/how-to-use/)
+* `charliecloud`
+    * A generic configuration profile to be used with [Charliecloud](https://hpc.github.io/charliecloud/)
+* `conda`
+    * A generic configuration profile to be used with [Conda](https://conda.io/docs/). Please only use Conda as a last resort i.e. when it's not possible to run the pipeline with Docker, Singularity, Podman, Shifter or Charliecloud.
+* `test`
+    * A profile with a complete configuration for automated testing
+    * Includes links to test data so needs no other parameters
 
 ### `-resume`
 
@@ -169,7 +224,7 @@ Work dir:
 Tip: you can replicate the issue by changing to the process work dir and entering the command `bash .command.run`
 ```
 
-To bypass this error you would need to find exactly which resources are set by the `STAR_ALIGN` process. The quickest way is to search for `process STAR_ALIGN` in the [nf-core/rnaseq Github repo](https://github.com/nf-core/rnaseq/search?q=process+STAR_ALIGN). We have standardised the structure of Nextflow DSL2 pipelines such that all module files will be present in the `modules/` directory and so based on the search results the file we want is `modules/nf-core/software/star/align/main.nf`. If you click on the link to that file you will notice that there is a `label` directive at the top of the module that is set to [`label process_high`](https://github.com/nf-core/rnaseq/blob/4c27ef5610c87db00c3c5a3eed10b1d161abf575/modules/nf-core/software/star/align/main.nf#L9). The [Nextflow `label`](https://www.nextflow.io/docs/latest/process.html#label) directive allows us to organise workflow processes in separate groups which can be referenced in a configuration file to select and configure subset of processes having similar computing requirements. The default values for the `process_high` label are set in the pipeline's [`base.config`](https://github.com/nf-core/rnaseq/blob/4c27ef5610c87db00c3c5a3eed10b1d161abf575/conf/base.config#L33-L37) which in this case is defined as 72GB. Providing you haven't set any other standard nf-core parameters to **cap** the [maximum resources](https://nf-co.re/usage/configuration#max-resources) used by the pipeline then we can try and bypass the `STAR_ALIGN` process failure by creating a custom config file that sets at least 72GB of memory, in this case increased to 100GB. The custom config below can then be provided to the pipeline via the [`-c`](#-c) parameter as highlighted in previous sections.
+To bypass this error you would need to find exactly which resources are set by the `STAR_ALIGN` process. The quickest way is to search for `process STAR_ALIGN` in the [nf-core/rnaseq Github repo](https://github.com/nf-core/rnaseq/search?q=process+STAR_ALIGN). We have standardised the structure of Nextflow DSL2 pipelines such that all module files will be present in the `modules/` directory and so based on the search results the file we want is `modules/nf-core/software/star/align/main.nf`. If you click on the link to that file you will notice that there is a `label` directive at the top of the module that is set to [`label process_high`](https://github.com/nf-core/rnaseq/blob/4c27ef5610c87db00c3c5a3eed10b1d161abf575/modules/nf-core/software/star/align/main.nf#L9). The [Nextflow `label`](https://www.nextflow.io/docs/latest/process.html#label) directive allows us to organise workflow processes in separate groups which can be referenced in a configuration file to select and configure subset of processes having similar computing requirements. The default values for the `process_high` label are set in the pipeline's [`base.config`](https://github.com/nf-core/rnaseq/blob/4c27ef5610c87db00c3c5a3eed10b1d161abf575/conf/base.config#L33-L37) which in this case is defined as 72GB. Providing you haven't set any other standard nf-core parameters to __cap__ the [maximum resources](https://nf-co.re/usage/configuration#max-resources) used by the pipeline then we can try and bypass the `STAR_ALIGN` process failure by creating a custom config file that sets at least 72GB of memory, in this case increased to 100GB. The custom config below can then be provided to the pipeline via the [`-c`](#-c) parameter as highlighted in previous sections.
 
 ```nextflow
 process {
@@ -181,6 +236,42 @@ process {
 
 > **NB:** We specify just the process name i.e. `STAR_ALIGN` in the config file and not the full task name string that is printed to screen in the error message or on the terminal whilst the pipeline is running i.e. `RNASEQ:ALIGN_STAR:STAR_ALIGN`. You may get a warning suggesting that the process selector isn't recognised but you can ignore that if the process name has been specified correctly. This is something that needs to be fixed upstream in core Nextflow.
 
+### Tool-specific options
+
+For the ultimate flexibility, we have implemented and are using Nextflow DSL2 modules in a way where it is possible for both developers and users to change tool-specific command-line arguments (e.g. providing an additional command-line argument to the `STAR_ALIGN` process) as well as publishing options (e.g. saving files produced by the `STAR_ALIGN` process that aren't saved by default by the pipeline). In the majority of instances, as a user you won't have to change the default options set by the pipeline developer(s), however, there may be edge cases where creating a simple custom config file can improve the behaviour of the pipeline if for example it is failing due to a weird error that requires setting a tool-specific parameter to deal with smaller / larger genomes.
+
+The command-line arguments passed to STAR in the `STAR_ALIGN` module are a combination of:
+
+* Mandatory arguments or those that need to be evaluated within the scope of the module, as supplied in the [`script`](https://github.com/nf-core/rnaseq/blob/4c27ef5610c87db00c3c5a3eed10b1d161abf575/modules/nf-core/software/star/align/main.nf#L49-L55) section of the module file.
+
+* An [`options.args`](https://github.com/nf-core/rnaseq/blob/4c27ef5610c87db00c3c5a3eed10b1d161abf575/modules/nf-core/software/star/align/main.nf#L56) string of non-mandatory parameters that is set to be empty by default in the module but can be overwritten when including the module in the sub-workflow / workflow context via the `addParams` Nextflow option.
+
+The nf-core/rnaseq pipeline has a sub-workflow (see [terminology](https://github.com/nf-core/modules#terminology)) specifically to align reads with STAR and to sort, index and generate some basic stats on the resulting BAM files using SAMtools. At the top of this file we import the `STAR_ALIGN` module via the Nextflow [`include`](https://github.com/nf-core/rnaseq/blob/4c27ef5610c87db00c3c5a3eed10b1d161abf575/subworkflows/nf-core/align_star.nf#L10) keyword and by default the options passed to the module via the `addParams` option are set as an empty Groovy map [here](https://github.com/nf-core/rnaseq/blob/4c27ef5610c87db00c3c5a3eed10b1d161abf575/subworkflows/nf-core/align_star.nf#L5); this in turn means `options.args` will be set to empty by default in the module file too. This is an intentional design choice and allows us to implement well-written sub-workflows composed of a chain of tools that by default run with the bare minimum parameter set for any given tool in order to make it much easier to share across pipelines and to provide the flexibility for users and developers to customise any non-mandatory arguments.
+
+When including the sub-workflow above in the main pipeline workflow we use the same `include` statement, however, we now have the ability to overwrite options for each of the tools in the sub-workflow including the [`align_options`](https://github.com/nf-core/rnaseq/blob/4c27ef5610c87db00c3c5a3eed10b1d161abf575/workflows/rnaseq.nf#L225) variable that will be used specifically to overwrite the optional arguments passed to the `STAR_ALIGN` module. In this case, the options to be provided to `STAR_ALIGN` have been assigned sensible defaults by the developer(s) in the pipeline's [`modules.config`](https://github.com/nf-core/rnaseq/blob/4c27ef5610c87db00c3c5a3eed10b1d161abf575/conf/modules.config#L70-L74) and can be accessed and customised in the [workflow context](https://github.com/nf-core/rnaseq/blob/4c27ef5610c87db00c3c5a3eed10b1d161abf575/workflows/rnaseq.nf#L201-L204) too before eventually passing them to the sub-workflow as a Groovy map called `star_align_options`. These options will then be propagated from `workflow -> sub-workflow -> module`.
+
+As mentioned at the beginning of this section it may also be necessary for users to overwrite the options passed to modules to be able to customise specific aspects of the way in which a particular tool is executed by the pipeline. Given that all of the default module options are stored in the pipeline's `modules.config` as a [`params` variable](https://github.com/nf-core/rnaseq/blob/4c27ef5610c87db00c3c5a3eed10b1d161abf575/conf/modules.config#L24-L25) it is also possible to overwrite any of these options via a custom config file.
+
+Say for example we want to append an additional, non-mandatory parameter (i.e. `--outFilterMismatchNmax 16`) to the arguments passed to the `STAR_ALIGN` module. Firstly, we need to copy across the default `args` specified in the [`modules.config`](https://github.com/nf-core/rnaseq/blob/4c27ef5610c87db00c3c5a3eed10b1d161abf575/conf/modules.config#L71) and create a custom config file that is a composite of the default `args` as well as the additional options you would like to provide. This is very important because Nextflow will overwrite the default value of `args` that you provide via the custom config.
+
+As you will see in the example below, we have:
+
+* appended `--outFilterMismatchNmax 16` to the default `args` used by the module.
+* changed the default `publish_dir` value to where the files will eventually be published in the main results directory.
+* appended `'bam':''` to the default value of `publish_files` so that the BAM files generated by the process will also be saved in the top-level results directory for the module. Note: `'out':'log'` means any file/directory ending in `out` will now be saved in a separate directory called `my_star_directory/log/`.
+
+```nextflow
+params {
+    modules {
+        'star_align' {
+            args          = "--quantMode TranscriptomeSAM --twopassMode Basic --outSAMtype BAM Unsorted --readFilesCommand zcat --runRNGseed 0 --outFilterMultimapNmax 20 --alignSJDBoverhangMin 1 --outSAMattributes NH HI AS NM MD --quantTranscriptomeBan Singleend --outFilterMismatchNmax 16"
+            publish_dir   = "my_star_directory"
+            publish_files = ['out':'log', 'tab':'log', 'bam':'']
+        }
+    }
+}
+```
+
 ### Updating containers
 
 The [Nextflow DSL2](https://www.nextflow.io/docs/latest/dsl2.html) implementation of this pipeline uses one container per process which makes it much easier to maintain and update software dependencies. If for some reason you need to use a different version of a particular tool with the pipeline then you just need to identify the `process` name and override the Nextflow `container` definition for that process using the `withName` declaration. For example, in the [nf-core/viralrecon](https://nf-co.re/viralrecon) pipeline a tool called [Pangolin](https://github.com/cov-lineages/pangolin) has been used during the COVID-19 pandemic to assign lineages to SARS-CoV-2 genome sequenced samples. Given that the lineage assignments change quite frequently it doesn't make sense to re-release the nf-core/viralrecon everytime a new version of Pangolin has been released. However, you can override the default container used by the pipeline by creating a custom config file and passing it as a command-line argument via `-c custom.config`.
@@ -189,7 +280,7 @@ The [Nextflow DSL2](https://www.nextflow.io/docs/latest/dsl2.html) implementatio
 2. Find the latest version of the Biocontainer available on [Quay.io](https://quay.io/repository/biocontainers/pangolin?tag=latest&tab=tags)
 3. Create the custom config accordingly:
 
-    - For Docker:
+    * For Docker:
 
         ```nextflow
         process {
@@ -199,7 +290,7 @@ The [Nextflow DSL2](https://www.nextflow.io/docs/latest/dsl2.html) implementatio
         }
         ```
 
-    - For Singularity:
+    * For Singularity:
 
         ```nextflow
         process {
@@ -209,7 +300,7 @@ The [Nextflow DSL2](https://www.nextflow.io/docs/latest/dsl2.html) implementatio
         }
         ```
 
-    - For Conda:
+    * For Conda:
 
         ```nextflow
         process {
@@ -246,3 +337,4 @@ We recommend adding the following line to your environment to limit this (typica
 ```console
 NXF_OPTS='-Xms1g -Xmx4g'
 ```
+

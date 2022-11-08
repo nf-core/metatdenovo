@@ -77,7 +77,7 @@ On release, automated continuous integration tests run the pipeline on a full-si
 
 ## Documentation
 
-The nf-core/metatdenovo pipeline comes with documentation about the pipeline [usage](https://nf-co.re/metatdenovo/usage), [parameters](https://nf-co.re/metatdenovo/parameters) and [output](https://nf-co.re/metatdenovo/output).
+The nf-core/metatdenovo pipeline comes with documentation about the pipeline [usage](https://github.com/LNUc-EEMiS/metatdenovo/blob/dev/docs/usage.md), [parameters](https://nf-co.re/metatdenovo/parameters) and [output](https://nf-co.re/metatdenovo/output).
 
 ## Credits
 
