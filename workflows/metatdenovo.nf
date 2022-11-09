@@ -381,8 +381,9 @@ workflow METATDENOVO {
     // SUBWORKFLOW: Eukulele
     //
 
-    if( !params.skip_eukulele){
+    if( params.eukulele ){
         SUB_EUKULELE(ch_eukulele)
+        ch_versions = ch_versions.mix(SUB_EUKULELE.out.versions)
     }
 
     //
