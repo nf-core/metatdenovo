@@ -19,7 +19,7 @@ process EGGNOG_TABLE {
     prefix   = task.ext.prefix ?: "${meta.id}"
 
     """
-    grep -v '^##' $eggnog |sed 's/^#//' | gzip -c > eggnogs.tsv.gz
+    grep -v '^##' $eggnog |sed 's/^#//' | sed 's/query/orf/' | gzip -c > eggnogs.tsv.gz
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
