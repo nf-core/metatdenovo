@@ -1,4 +1,4 @@
-process EUKULELE_DB {
+process EUKULELE_SDB {
     tag '$meta.id'
     label 'process_long'
 
@@ -14,11 +14,11 @@ process EUKULELE_DB {
     path("phylodb/")   , emit: phylo_db , optional: true
     path("mmetsp/")    , emit: mmetsp_db, optional: true
 
-    when:
-    task.ext.when == null || task.ext.when
-
     script:
     def args = task.ext.args ?: ''
+
+    //when:
+    //task.ext.when == null || task.ext.when
 
     """
     EUKulele \\

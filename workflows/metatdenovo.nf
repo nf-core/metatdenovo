@@ -109,8 +109,9 @@ include { TRANSDECODER } from '../subworkflows/local/transdecoder'
 // SUBWORKFLOW: Consisting of local modules
 //
 
-include { EGGNOG } from '../subworkflows/local/eggnog'
-include { SUB_EUKULELE } from '../subworkflows/local/eukulele'
+include { EGGNOG        } from '../subworkflows/local/eggnog'
+include { SUB_EUKULELE  } from '../subworkflows/local/eukulele'
+include { EUKULELE_SRUN } from '../subworkflows/local/eukulele_second_run'
 
 
 /*
@@ -384,6 +385,11 @@ workflow METATDENOVO {
     if( params.eukulele ){
         SUB_EUKULELE(ch_eukulele)
         ch_versions = ch_versions.mix(SUB_EUKULELE.out.versions)
+    }
+
+    if( params.eukulele_multirun){
+        EUKULELE_SRUN(ch_eukulele)
+        ch_versions = ch_versions.mix(EUKULELE_SRUN.out.versions)
     }
 
     //
