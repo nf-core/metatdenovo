@@ -247,15 +247,15 @@ workflow METATDENOVO {
     // SUBWORKFLOW: Run PROKKA on Megahit output, but split the fasta file in chunks of 10 MB, then concatenate and compress output.
     //
     if (params.orf_caller == ORF_CALLER_PROKKA) {
-        PROKKA_CAT(ch_assembly_contigs)
+        UNPIGZ_CONTIGS(ch_assembly_contigs)
+        PROKKA_CAT(UNPIGZ_CONTIGS.out.unzipped)
         ch_versions = ch_versions.mix(PROKKA_CAT.out.versions)
         ch_gff      = PROKKA_CAT.out.gff.map { it[1] }
         ch_hmm_aa   = PROKKA_CAT.out.faa
-        ch_aa       = PROKKA_CAT.out.faa.map { it[1] }
+        ch_aa       = PROKKA_CAT.out.faa
 
-        UNPIGZ_CONTIGS(ch_aa)
         MEGAHIT_INTERLEAVED.out.contigs.collect { [ [ id: 'all_samples' ]] }
-            .combine(UNPIGZ_CONTIGS.out.unzipped)
+            .combine(ch_aa)
             .set{ ch_eukulele }
     }
 
