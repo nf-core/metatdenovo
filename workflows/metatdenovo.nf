@@ -247,16 +247,11 @@ workflow METATDENOVO {
     // SUBWORKFLOW: Run PROKKA on Megahit output, but split the fasta file in chunks of 10 MB, then concatenate and compress output.
     //
     if (params.orf_caller == ORF_CALLER_PROKKA) {
-        UNPIGZ_CONTIGS(ch_assembly_contigs)
-        PROKKA_CAT(UNPIGZ_CONTIGS.out.unzipped)
+        PROKKA_CAT(ch_assembly_contigs)
         ch_versions = ch_versions.mix(PROKKA_CAT.out.versions)
         ch_gff      = PROKKA_CAT.out.gff.map { it[1] }
         ch_hmm_aa   = PROKKA_CAT.out.faa
-        ch_aa       = PROKKA_CAT.out.faa
-
-        MEGAHIT_INTERLEAVED.out.contigs.collect { [ [ id: 'all_samples' ]] }
-            .combine(ch_aa)
-            .set{ ch_eukulele }
+        ch_aa       = PROKKA_CAT.out.faa.map { it[1] }
     }
 
     //
@@ -307,6 +302,11 @@ workflow METATDENOVO {
     //
 
     if (params.eggnog) {
+        if ( params.orf_caller == ORF_CALLER_PROKKA ) {
+            UNPIGZ_CONTIGS(ch_aa)
+            EGGNOG(UNPIGZ_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] } )
+            ch_versions = ch_versions.mix(EGGNOG.out.versions)
+        } else
         EGGNOG(ch_aa)
         ch_versions = ch_versions.mix(EGGNOG.out.versions)
     }
@@ -382,6 +382,10 @@ workflow METATDENOVO {
     //
 
     if( !params.skip_eukulele){
+        if ( params.orf_caller == ORF_CALLER_PROKKA ) {
+            UNPIGZ_CONTIGS(ch_aa)
+            SUB_EUKULELE(UNPIGZ_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] } )
+        } else
         SUB_EUKULELE(ch_eukulele)
     }
 
