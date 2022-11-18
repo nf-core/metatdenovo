@@ -76,7 +76,7 @@ process COLLECT_STATS {
     for ( f in Sys.glob('*.bbduk.log') ) {
         s = str_remove(f, '.bbduk.log')
         t <- t %>% union(
-            read(cmd = sprintf("grep 'Result:' %s | sed 's/Result:[ \\t]*//; s/ reads.*//'", f), col.names = c('v')) %>%
+            fread(cmd = sprintf("grep 'Result:' %s | sed 's/Result:[ \\t]*//; s/ reads.*//'", f), col.names = c('v')) %>%
             as_tibble() %>%
             mutate(sample = s, m = 'n_non_contaminated')
         )
