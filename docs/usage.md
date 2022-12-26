@@ -55,9 +55,9 @@ An [example samplesheet](../assets/samplesheet.csv) has been provided with the p
 
 ## Assembler options
 
-By default, the pipeline uses Megahit (i.e. `--assembler  megahit`) to assemble the cleaned and trimmed FastQ reads to create the reference genome. Megahit is fast and memory-efficient, and is recommended for prokaryotic samples. The pipeline allows you to choose another assembler, RNAspades (i.e. `--assembler rnaspades` ), that is recommended for eukaryotic samples.
+By default, the pipeline uses Megahit (i.e. `--assembler  megahit`) to assemble the cleaned and trimmed FastQ reads to create the reference genome. Megahit is fast and it requires a not a lot of memory to run, typically is suggested to be used with prokaryotic samples. The pipeline allows you to choose another assembler RNAspades, (i.e. `--assembler rnaspades` ), that is usually suggested to use for eukaryotic samples.
 
-> N.B. you can use `Megahit` for eukaryotic samples or `RNAspades` for prokaryotes, these are just recommendations.
+> N.B. you can use `Megahit` for eukaryotic samples too, we just suggest what is the best option according to our experience (literature?).
 
 ## Orf caller options
 
@@ -69,7 +69,7 @@ Other orf caller options for running the pipeline are:
 
 - Transdecoder (`--orf_caller transdecoder`)
 
-> N.B. Prokka and prodigal are recommended for prokaryotic datasets while transdecoder is specific for eukaryotic datasets.
+> N.B. Prokka and prodigal are suggested to run with prokaryotes while transdecoder is specific for eukaryotes.
 
 ## Taxonomical annotation options
 
@@ -81,9 +81,9 @@ Other databases options for running the pipeline are:
 
 - GTDB (i.e. `--eukulele_db gtdb`) [not available yet]
 
-PhyloDB and GTDB are recommended for prokaryotic datasets while mmetsp is recommended for eukaryotic datasets, although PhyoDB can also annotate eukaryotes and can therefore be used for this purpose.
+PhyloDB and GTDB are recommended for prokaryotic datasets while mmetsp for eukaryotes although PhyoDB can be also recognize eukaryotes and can be used for this purpose.
 
-If you already have these databases available in your working environment,  you can redirect to the folder so the pipeline will not re-download the database of interest 
+If you already have these databases ready in your working directory,  you can redirect to the folder so the pipeline will not download the database
 (e.g. `--eukulele_dbpath your/path/database/` 
 > Please, check the EUKulele documentation for more information about the databases cited [HERE](https://eukulele.readthedocs.io/en/latest/#)
 
@@ -91,7 +91,7 @@ If you already have these databases available in your working environment,  you 
 
 By default, metatdenovo will not perform any functional annotation. In order to run it you will need to specify one of the options that we provide.
 
-These options are:
+This options are:
 
 - [Eggnog](https://github.com/eggnogdb/eggnog-mapper/wiki) (i.e. `--eggnog`)
 
@@ -99,13 +99,13 @@ These options are:
 
 - [Rundbcan3](https://github.com/linnabrown/run_dbcan) (i.e. `--run_dbcan`)
 
-All the options can run in parallell (i.e. `nextflow run lnuc-eemis/metatdenovo -profile test,docker --eggnog --hmmsearch --rundbcan`), but each program has it’s own options that you will need to read carefully before running the pipeline. You can find the different options in [parameters]() page and read about the programs on their own websites.
+All the options can run in the same time (e.i. `extflow run main.nf  -profile test,docker --eggnog --hmmsearch --rundbcan`) but each program has it’s own option that you will need to read carefully before run the pipeline. You can find the different options in [parameters]() page and read about the programs from their own website.
 
 ## Example pipeline command with some features
 
-`nextflow run nf-core/metatdenovo -profile docker --input samplesheet.csv --assembler rnaspades --orf_caller transdecoder --eggnog --run_dbcan`
+`nextflow run lnuc-eemis/metatdenovo -profile docker --input samplesheet.csv --assembler rnaspades --orf_caller transdecoder --eggnog --run_dbcan`
 
-In this example, we are running metatdenovo with `rnaspades` as assembler, `transdecoder` as ORF caller, `eggnog` and `run_dbcan` for functional annotation.
+In thi example, we are running metatdenovo with `rnaspades`as assembler, `transdecoder`as ORF caller, `eggnog` and `run_dbcan`for functional annotation.
 
 ## Running the pipeline
 
