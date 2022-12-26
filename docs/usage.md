@@ -83,7 +83,7 @@ Other databases options for running the pipeline are:
 
 PhyloDB and GTDB are recommended for prokaryotic datasets while mmetsp is recommended for eukaryotic datasets, although PhyoDB can also annotate eukaryotes and can therefore be used for this purpose.
 
-If you already have these databases ready in your working directory,  you can redirect to the folder so the pipeline will not download the database
+If you already have these databases available in your working environment,  you can redirect to the folder so the pipeline will not re-download the database of interest 
 (e.g. `--eukulele_dbpath your/path/database/` 
 > Please, check the EUKulele documentation for more information about the databases cited [HERE](https://eukulele.readthedocs.io/en/latest/#)
 
