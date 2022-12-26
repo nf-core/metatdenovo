@@ -74,6 +74,8 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved.nf'
 include { HMMRANK                          } from '../modules/local/hmmrank.nf'
 include { UNPIGZ as UNPIGZ_FASTA_PROTEIN   } from '../modules/local/unpigz.nf'
+include { UNPIGZ as UNPIGZ_EUKULELE        } from '../modules/local/unpigz.nf'
+include { UNPIGZ as UNPIGZ_EGGNOG          } from '../modules/local/unpigz.nf'
 include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz.nf'
 include { COLLECT_FEATURECOUNTS            } from '../modules/local/collect_featurecounts.nf'
 include { COLLECT_FEATURECOUNTS_EUK        } from '../modules/local/collect_featurecounts_euk.nf'
@@ -253,11 +255,6 @@ workflow METATDENOVO {
         ch_gff      = PROKKA_CAT.out.gff.map { it[1] }
         ch_hmm_aa   = PROKKA_CAT.out.faa
         ch_aa       = PROKKA_CAT.out.faa.map { it[1] }
-
-        UNPIGZ_CONTIGS(ch_aa)
-        MEGAHIT_INTERLEAVED.out.contigs.collect { [ [ id: 'all_samples' ]] }
-            .combine(UNPIGZ_CONTIGS.out.unzipped)
-            .set{ ch_eukulele }
     }
 
     //
@@ -308,6 +305,11 @@ workflow METATDENOVO {
     //
 
     if (params.eggnog) {
+        if ( params.orf_caller == ORF_CALLER_PROKKA ) {
+            UNPIGZ_EGGNOG(ch_aa)
+            EGGNOG(UNPIGZ_EGGNOG.out.unzipped.collect { [ [ id: 'all_samples' ], it ] } )
+            ch_versions = ch_versions.mix(EGGNOG.out.versions)
+        } else
         EGGNOG(ch_aa)
         ch_versions = ch_versions.mix(EGGNOG.out.versions)
     }
@@ -382,7 +384,12 @@ workflow METATDENOVO {
     // SUBWORKFLOW: Eukulele
     //
 
+
     if( params.eukulele ){
+        if ( params.orf_caller == ORF_CALLER_PROKKA ) {
+            UNPIGZ_EUKULELE(ch_aa)
+            SUB_EUKULELE(UNPIGZ_EUKULELE.out.unzipped.collect { [ [ id: 'all_samples' ], it ] } )
+        } else
         SUB_EUKULELE(ch_eukulele)
         ch_versions = ch_versions.mix(SUB_EUKULELE.out.versions)
     }
