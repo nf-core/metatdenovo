@@ -91,7 +91,7 @@ If you already have these databases available in your working environment,  you 
 
 By default, metatdenovo will not perform any functional annotation. In order to run it you will need to specify one of the options that we provide.
 
-This options are:
+These options are:
 
 - [Eggnog](https://github.com/eggnogdb/eggnog-mapper/wiki) (i.e. `--eggnog`)
 
