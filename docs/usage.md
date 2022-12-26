@@ -69,7 +69,7 @@ Other orf caller options for running the pipeline are:
 
 - Transdecoder (`--orf_caller transdecoder`)
 
-> N.B. Prokka and prodigal are suggested to run with prokaryotes while transdecoder is specific for eukaryotes.
+> N.B. Prokka and prodigal are recommended for prokaryotic datasets while transdecoder is specific for eukaryotic datasets.
 
 ## Taxonomical annotation options
 
