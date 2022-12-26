@@ -105,7 +105,7 @@ All the options can run in parallell (i.e. `nextflow run lnuc-eemis/metatdenovo 
 
 `nextflow run nf-core/metatdenovo -profile docker --input samplesheet.csv --assembler rnaspades --orf_caller transdecoder --eggnog --run_dbcan`
 
-In thi example, we are running metatdenovo with `rnaspades`as assembler, `transdecoder`as ORF caller, `eggnog` and `run_dbcan`for functional annotation.
+In this example, we are running metatdenovo with `rnaspades` as assembler, `transdecoder` as ORF caller, `eggnog` and `run_dbcan` for functional annotation.
 
 ## Running the pipeline
 
