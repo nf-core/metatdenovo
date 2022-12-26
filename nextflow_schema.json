@@ -10,7 +10,9 @@
             "type": "object",
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
-            "required": ["input"],
+            "required": [
+                "input"
+            ],
             "properties": {
                 "input": {
                     "type": "string",
@@ -42,129 +44,205 @@
                 }
             }
         },
-        "options": {
-            "title": "options",
+        "read_trimming_options": {
+            "title": "Read trimming options",
             "type": "object",
-            "fa_icon": "fas fa-dna",
+            "fa_icon": "fas fa-cut",
             "properties": {
                 "clip_r1": {
                     "type": "string",
-                    "description": "Instructs Trim Galore to remove bp from the 5' end of read 1 (or single-end reads)."
+                    "description": "Instructs Trim Galore to remove bp from the 5' end of read 1 (or single-end reads).",
+                    "fa_icon": "fas fa-cut"
                 },
                 "clip_r2": {
                     "type": "string",
-                    "description": "Instructs Trim Galore to remove bp from the 5' end of read 2 (paired-end reads only)."
+                    "description": "Instructs Trim Galore to remove bp from the 5' end of read 2 (paired-end reads only).",
+                    "fa_icon": "fas fa-cut"
                 },
                 "three_prime_clip_r1": {
                     "type": "string",
-                    "description": "Instructs Trim Galore to remove bp from the 3' end of read 1 AFTER adapter/quality trimming has been performed."
+                    "description": "Instructs Trim Galore to remove bp from the 3' end of read 1 AFTER adapter/quality trimming has been performed.",
+                    "fa_icon": "fas fa-cut"
                 },
                 "three_prime_clip_r2": {
                     "type": "string",
-                    "description": "Instructs Trim Galore to remove bp from the 3' end of read 2 AFTER adapter/quality trimming has been performed."
+                    "description": "Instructs Trim Galore to remove bp from the 3' end of read 2 AFTER adapter/quality trimming has been performed.",
+                    "fa_icon": "fas fa-cut"
                 },
                 "trim_nextseq": {
                     "type": "string",
                     "description": "Instructs Trim Galore to apply the --nextseq=X option, to trim based on quality after removing poly-G tails.",
-                    "help_text": "This enables the option Cutadapt `--nextseq-trim=3'CUTOFF` option via Trim Galore, which will set a quality cutoff (that is normally given with -q instead), but qualities of G bases are ignored. This trimming is in common for the NextSeq- and NovaSeq-platforms, where basecalls without any signal are called as high-quality G bases."
+                    "help_text": "This enables the option Cutadapt `--nextseq-trim=3'CUTOFF` option via Trim Galore, which will set a quality cutoff (that is normally given with -q instead), but qualities of G bases are ignored. This trimming is in common for the NextSeq- and NovaSeq-platforms, where basecalls without any signal are called as high-quality G bases.",
+                    "fa_icon": "fas fa-cut"
                 },
+                "skip_qc": {
+                    "type": "boolean",
+                    "description": "Skip all QC steps except for MultiQC.",
+                    "fa_icon": "fas fa-forward"
+                },
+                "skip_fastqc": {
+                    "type": "boolean",
+                    "description": "Skip FastQC.",
+                    "fa_icon": "fas fa-forward"
+                },
+                "skip_trimming": {
+                    "type": "boolean",
+                    "description": "Skip the adapter trimming step.",
+                    "help_text": "Use this if your input FastQ files have already been trimmed outside of the workflow or if you're very confident that there is no adapter contamination in your data.",
+                    "fa_icon": "fas fa-forward"
+                },
+                "save_trimmed": {
+                    "type": "boolean",
+                    "description": "Save the trimmed FastQ files in the results directory.",
+                    "help_text": "By default, trimmed FastQ files will not be saved to the results directory. Specify this flag (or set to true in your config file) to copy these files to the results directory when complete.",
+                    "fa_icon": "far fa-save"
+                }
+            },
+            "description": "Options to adjust read trimming criteria."
+        },
+        "digital_normalisation": {
+            "title": "digital normalisation",
+            "type": "object",
+            "description": "Add extra option in order to nomalize the reads",
+            "default": "",
+            "properties": {
                 "sequence_filter": {
                     "type": "string",
                     "description": "Fasta file with sequences to filter away before running assembly etc..",
                     "help_text": "Read sequences matching this file will be filtered out from samples with BBDuk before mapping. If no file is specified, BBDuk will not be run."
                 },
-                "save_trimmed": {
-                    "type": "boolean",
-                    "description": "Save the trimmed FastQ files in the results directory.",
-                    "help_text": "By default, trimmed FastQ files will not be saved to the results directory. Specify this flag (or set to true in your config file) to copy these files to the results directory when complete."
-                },
-                "skip_trimming": {
-                    "type": "boolean",
-                    "description": "Skip the adapter trimming step.",
-                    "help_text": "Use this if your input FastQ files have already been trimmed outside of the workflow or if you're very confident that there is no adapter contamination in your data."
-                },
-                "skip_qc": {
-                    "type": "boolean",
-                    "description": "Skip all QC steps except for MultiQC."
-                },
-                "skip_fastqc": {
-                    "type": "boolean",
-                    "description": "Skip FastQC."
-                },
                 "diginorm": {
                     "type": "boolean",
                     "description": "Perform digital normalization to reduce sequencing depth.",
-                    "help_text": "Digital normalization is performed following the example in https://khmer-protocols.readthedocs.io/en/latest/mrnaseq/2-diginorm.html.\\nThere are (hidden) parameters for the cutoff coverage and kmer length for `normalize-by-median.py`, set to defaults following the example above (cutoff: 20 and kmer length: 20)."
+                    "help_text": "Digital normalization is performed following the example in https://khmer-protocols.readthedocs.io/en/latest/mrnaseq/2-diginorm.html.\\nThere are (hidden) parameters for the cutoff coverage and kmer length for `normalize-by-median.py`, set to defaults following the example above (cutoff: 20 and kmer length: 20).",
+                    "fa_icon": "fas fa-calculator"
                 },
                 "diginorm_C": {
                     "type": "integer",
                     "default": 20,
                     "description": "Median coverage to keep a read, default 20.",
-                    "help_text": "This parameter is passed to `normalize-by-median.py` as the value to `-C` and to `filter-abund.py` as value to both `-C` and `-Z`"
+                    "help_text": "This parameter is passed to `normalize-by-median.py` as the value to `-C` and to `filter-abund.py` as value to both `-C` and `-Z`",
+                    "fa_icon": "fas fa-calculator"
                 },
                 "diginorm_k": {
                     "type": "integer",
                     "default": 20,
-                    "description": "Kmer length in first call of normalize-by-median.py, default 20."
-                },
+                    "description": "Kmer length in first call of normalize-by-median.py, default 20.",
+                    "fa_icon": "fas fa-calculator"
+                }
+            },
+            "fa_icon": "fas fa-square-root-alt"
+        },
+        "assembly_options": {
+            "title": "Assembly options",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
                 "assembler": {
                     "type": "string",
                     "default": "megahit",
-                    "description": "Specify which assembler you would like to run, possible alternatives: megahit, rnaspades. default: megahit"
+                    "description": "Specify which assembler you would like to run, possible alternatives: megahit, rnaspades. default: megahit",
+                    "fa_icon": "fas fa-object-ungroup"
                 },
                 "orf_caller": {
                     "type": "string",
                     "default": "prodigal",
-                    "description": "Specify which ORF caller you would like to run, possible alternatives: prodigal, prokka, transdecoder, default: prodigal."
+                    "description": "Specify which ORF caller you would like to run, possible alternatives: prodigal, prokka, transdecoder, default: prodigal.",
+                    "fa_icon": "fas fa-bullhorn"
                 },
                 "prodigal_trainingfile": {
                     "type": "string",
-                    "description": "Specify a training file for prodigal. By default prodigal will learn from the input sequences"
-                },
-                "eggnog": {
+                    "description": "Specify a training file for prodigal. By default prodigal will learn from the input sequences",
+                    "fa_icon": "fas fa-binoculars"
+                }
+            },
+            "fa_icon": "fas fa-puzzle-piece"
+        },
+        "taxonomical_annotation": {
+            "title": "taxonomical annotation",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "fa_icon": "fas fa-bacteria",
+            "properties": {
+                "eukulele": {
                     "type": "boolean",
-                    "description": "enable eggnog functional annotation"
+                    "description": "Activate eukulele module"
                 },
-                "eggnog_dbpath": {
-                    "type": "string",
-                    "default": "./",
-                    "description": "Specify eggnog database path"
-                },
-                "eukulele_db": {
-                    "type": "string",
-                    "default": "phylodb",
-                    "description": "Specify which database you would like to use with eukulele, possible alternatives: phylodb, mmetsp. default: phylodb"
-                },
-                "skip_eukulele": {
+                "eukulele_multirun": {
                     "type": "boolean",
-                    "description": "skip eukulele run"
+                    "description": "Activate a second run eukulele module",
+                    "fa_icon": "fas fa-code-branch"
                 },
                 "eukulele_dbpath": {
                     "type": "string",
                     "default": "./eukulele",
-                    "description": "Specify EUKulele database folder"
+                    "description": "Specify EUKulele database folder",
+                    "fa_icon": "fas fa-otter"
+                },
+                "eukulele_sdbpath": {
+                    "type": "string",
+                    "default": "./eukulele",
+                    "description": "Specify EUKulele database folder for the second run",
+                    "fa_icon": "fas fa-code-branch"
+                },
+                "eukulele_db": {
+                    "type": "string",
+                    "default": "phylodb",
+                    "description": "Specify which database you would like to use with eukulele, possible alternatives: phylodb, mmetsp. default: phylodb",
+                    "fa_icon": "fas fa-otter"
+                },
+                "eukulele_second_db": {
+                    "type": "string",
+                    "description": "Specify which database you would like to use with eukulele, possible alternatives: phylodb, mmetsp",
+                    "fa_icon": "fas fa-code-branch"
                 },
                 "eukulele_method": {
                     "type": "string",
                     "default": "mets",
-                    "description": "Specify which method to use for EUKulele"
+                    "description": "Specify which method to use for EUKulele",
+                    "fa_icon": "fas fa-otter"
+                }
+            }
+        },
+        "functional_annotation_option": {
+            "title": "functional annotation option",
+            "type": "object",
+            "description": "Different options to run functional annotation",
+            "default": "",
+            "properties": {
+                "eggnog": {
+                    "type": "boolean",
+                    "description": "enable eggnog functional annotation",
+                    "fa_icon": "fas fa-egg"
+                },
+                "eggnog_dbpath": {
+                    "type": "string",
+                    "default": "./",
+                    "description": "Specify eggnog database path",
+                    "fa_icon": "fas fa-egg"
                 },
                 "hmmsearch": {
                     "type": "boolean",
-                    "description": "Enable hmmsearch tool"
+                    "description": "Enable hmmsearch tool",
+                    "fa_icon": "fas fa-search"
                 },
                 "hmmfiles": {
                     "type": "string",
-                    "description": "list of hmm files to run"
+                    "description": "list of hmm files to run",
+                    "fa_icon": "fas fa-search"
                 },
                 "hmmdir": {
                     "type": "string",
-                    "description": "specify directory where the hmm files are"
+                    "description": "specify directory where the hmm files are",
+                    "fa_icon": "fas fa-search"
                 },
                 "hmmpattern": {
                     "type": "string",
                     "default": "*.hmm",
-                    "description": "specify which pattern hmm files end with"
+                    "description": "specify which pattern hmm files end with",
+                    "fa_icon": "fas fa-search"
                 }
             }
         },
@@ -333,7 +411,19 @@
             "$ref": "#/definitions/input_output_options"
         },
         {
-            "$ref": "#/definitions/options"
+            "$ref": "#/definitions/read_trimming_options"
+        },
+        {
+            "$ref": "#/definitions/digital_normalisation"
+        },
+        {
+            "$ref": "#/definitions/assembly_options"
+        },
+        {
+            "$ref": "#/definitions/taxonomical_annotation"
+        },
+        {
+            "$ref": "#/definitions/functional_annotation_option"
         },
         {
             "$ref": "#/definitions/institutional_config_options"
