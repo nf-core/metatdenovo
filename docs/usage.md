@@ -99,7 +99,7 @@ These options are:
 
 - [Rundbcan3](https://github.com/linnabrown/run_dbcan) (i.e. `--run_dbcan`)
 
-All the options can run in the same time (e.i. `extflow run main.nf  -profile test,docker --eggnog --hmmsearch --rundbcan`) but each program has it’s own option that you will need to read carefully before run the pipeline. You can find the different options in [parameters]() page and read about the programs from their own website.
+All the options can run in parallell (i.e. `nextflow run lnuc-eemis/metatdenovo -profile test,docker --eggnog --hmmsearch --rundbcan`), but each program has it’s own options that you will need to read carefully before running the pipeline. You can find the different options in [parameters]() page and read about the programs on their own websites.
 
 ## Example pipeline command with some features
 
