@@ -10,7 +10,9 @@
             "type": "object",
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
-            "required": ["input"],
+            "required": [
+                "input"
+            ],
             "properties": {
                 "input": {
                     "type": "string",
@@ -19,7 +21,7 @@
                     "pattern": "^\\S+\\.csv$",
                     "schema": "assets/schema_input.json",
                     "description": "Path to comma-separated file containing information about the samples in the experiment.",
-                    "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row. See [usage docs](https://nf-co.re/metatdenovo/usage#samplesheet-input).",
+                    "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row. See [usage docs](https://github.com/LNUc-EEMiS/metatdenovo).",
                     "fa_icon": "fas fa-file-csv"
                 },
                 "outdir": {
@@ -66,41 +68,121 @@
                 }
             }
         },
-        "reference_genome_options": {
-            "title": "Reference genome options",
+        "options": {
+            "title": "options",
             "type": "object",
             "fa_icon": "fas fa-dna",
-            "description": "Reference genome related files and options required for the workflow.",
             "properties": {
-                "genome": {
+                "clip_r1": {
                     "type": "string",
-                    "description": "Name of iGenomes reference.",
-                    "fa_icon": "fas fa-book",
-                    "help_text": "If using a reference genome configured in the pipeline using iGenomes, use this parameter to give the ID for the reference. This is then used to build the full paths for all required reference genome files e.g. `--genome GRCh38`. \n\nSee the [nf-core website docs](https://nf-co.re/usage/reference_genomes) for more details."
+                    "description": "Instructs Trim Galore to remove bp from the 5' end of read 1 (or single-end reads)."
                 },
-                "fasta": {
+                "clip_r2": {
                     "type": "string",
-                    "format": "file-path",
-                    "mimetype": "text/plain",
-                    "pattern": "^\\S+\\.fn?a(sta)?(\\.gz)?$",
-                    "description": "Path to FASTA genome file.",
-                    "help_text": "This parameter is *mandatory* if `--genome` is not specified. If you don't have a BWA index available this will be generated for you automatically. Combine with `--save_reference` to save BWA index for future runs.",
-                    "fa_icon": "far fa-file-code"
+                    "description": "Instructs Trim Galore to remove bp from the 5' end of read 2 (paired-end reads only)."
                 },
-                "igenomes_base": {
+                "three_prime_clip_r1": {
                     "type": "string",
-                    "format": "directory-path",
-                    "description": "Directory / URL base for iGenomes references.",
-                    "default": "s3://ngi-igenomes/igenomes",
-                    "fa_icon": "fas fa-cloud-download-alt",
-                    "hidden": true
+                    "description": "Instructs Trim Galore to remove bp from the 3' end of read 1 AFTER adapter/quality trimming has been performed."
                 },
-                "igenomes_ignore": {
+                "three_prime_clip_r2": {
+                    "type": "string",
+                    "description": "Instructs Trim Galore to remove bp from the 3' end of read 2 AFTER adapter/quality trimming has been performed."
+                },
+                "trim_nextseq": {
+                    "type": "string",
+                    "description": "Instructs Trim Galore to apply the --nextseq=X option, to trim based on quality after removing poly-G tails.",
+                    "help_text": "This enables the option Cutadapt `--nextseq-trim=3'CUTOFF` option via Trim Galore, which will set a quality cutoff (that is normally given with -q instead), but qualities of G bases are ignored. This trimming is in common for the NextSeq- and NovaSeq-platforms, where basecalls without any signal are called as high-quality G bases."
+                },
+                "sequence_filter": {
+                    "type": "string",
+                    "description": "Fasta file with sequences to filter away before running assembly etc..",
+                    "help_text": "Read sequences matching this file will be filtered out from samples with BBDuk before mapping. If no file is specified, BBDuk will not be run."
+                },
+                "save_trimmed": {
                     "type": "boolean",
-                    "description": "Do not load the iGenomes reference config.",
-                    "fa_icon": "fas fa-ban",
-                    "hidden": true,
-                    "help_text": "Do not load `igenomes.config` when running the pipeline. You may choose this option if you observe clashes between custom parameters and those supplied in `igenomes.config`."
+                    "description": "Save the trimmed FastQ files in the results directory.",
+                    "help_text": "By default, trimmed FastQ files will not be saved to the results directory. Specify this flag (or set to true in your config file) to copy these files to the results directory when complete."
+                },
+                "skip_trimming": {
+                    "type": "boolean",
+                    "description": "Skip the adapter trimming step.",
+                    "help_text": "Use this if your input FastQ files have already been trimmed outside of the workflow or if you're very confident that there is no adapter contamination in your data."
+                },
+                "skip_qc": {
+                    "type": "boolean",
+                    "description": "Skip all QC steps except for MultiQC."
+                },
+                "skip_fastqc": {
+                    "type": "boolean",
+                    "description": "Skip FastQC."
+                },
+                "diginorm": {
+                    "type": "boolean",
+                    "description": "Perform digital normalization to reduce sequencing depth.",
+                    "help_text": "Digital normalization is performed following the example in https://khmer-protocols.readthedocs.io/en/latest/mrnaseq/2-diginorm.html.\\nThere are (hidden) parameters for the cutoff coverage and kmer length for `normalize-by-median.py`, set to defaults following the example above (cutoff: 20 and kmer length: 20)."
+                },
+                "diginorm_C": {
+                    "type": "integer",
+                    "default": 20,
+                    "description": "Median coverage to keep a read, default 20.",
+                    "help_text": "This parameter is passed to `normalize-by-median.py` as the value to `-C` and to `filter-abund.py` as value to both `-C` and `-Z`"
+                },
+                "diginorm_k": {
+                    "type": "integer",
+                    "default": 20,
+                    "description": "Kmer length in first call of normalize-by-median.py, default 20."
+                },
+                "assembler": {
+                    "type": "string",
+                    "default": "megahit",
+                    "description": "Specify which assembler you would like to run, possible alternatives: megahit, rnaspades. default: megahit"
+                },
+                "orf_caller": {
+                    "type": "string",
+                    "default": "prodigal",
+                    "description": "Specify which ORF caller you would like to run, possible alternatives: prodigal, prokka, transdecoder, default: prodigal."
+                },
+                "prodigal_trainingfile": {
+                    "type": "string",
+                    "description": "Specify a training file for prodigal. By default prodigal will learn from the input sequences"
+                },
+                "eggnog": {
+                    "type": "boolean",
+                    "description": "enable eggnog functional annotation"
+                },
+                "eggnog_dbpath": {
+                    "type": "string",
+                    "default": "./",
+                    "description": "Specify eggnog database path"
+                },
+                "eukulele_db": {
+                    "type": "string",
+                    "default": "phylodb",
+                    "description": "Specify which database you would like to use with eukulele, possible alternatives: phylodb, mmetsp. default: phylodb"
+                },
+                "skip_eukulele": {
+                    "type": "boolean",
+                    "description": "skip eukulele run"
+                },
+                "eukulele_dbpath": {
+                    "type": "string",
+                    "default": "./eukulele",
+                    "description": "Specify EUKulele database folder"
+                },
+                "eukulele_method": {
+                    "type": "string",
+                    "default": "mets",
+                    "description": "Specify which method to use for EUKulele"
+                },
+                "hmmsearch": {
+                    "type": "boolean",
+                    "description": "Enable hmmsearch tool"
+                },
+                "hmmpattern": {
+                    "type": "string",
+                    "default": "*.hmm",
+                    "description": "specify which pattern hmm files end with"
                 }
             }
         },
@@ -124,12 +206,6 @@
                     "default": "https://raw.githubusercontent.com/nf-core/configs/master",
                     "hidden": true,
                     "help_text": "If you're running offline, Nextflow will not be able to fetch the institutional config files from the internet. If you don't need them, then this is not a problem. If you do need them, you should download the files from the repo and tell Nextflow where to find them with this parameter.",
-                    "fa_icon": "fas fa-users-cog"
-                },
-                "hostnames": {
-                    "type": "string",
-                    "description": "Institutional configs hostname.",
-                    "hidden": true,
                     "fa_icon": "fas fa-users-cog"
                 },
                 "config_profile_name": {
@@ -206,22 +282,6 @@
                     "fa_icon": "fas fa-question-circle",
                     "hidden": true
                 },
-                "publish_dir_mode": {
-                    "type": "string",
-                    "default": "copy",
-                    "description": "Method used to save pipeline results to output directory.",
-                    "help_text": "The Nextflow `publishDir` option specifies which intermediate files should be saved to the output directory. This option tells the pipeline what method should be used to move these files. See [Nextflow docs](https://www.nextflow.io/docs/latest/process.html#publishdir) for details.",
-                    "fa_icon": "fas fa-copy",
-                    "enum": [
-                        "symlink",
-                        "rellink",
-                        "link",
-                        "copy",
-                        "copyNoFollow",
-                        "move"
-                    ],
-                    "hidden": true
-                },
                 "email_on_fail": {
                     "type": "string",
                     "description": "Email address for completion summary, only when pipeline fails.",
@@ -282,13 +342,6 @@
                     "description": "Run this workflow with Conda. You can also use '-profile conda' instead of providing this parameter.",
                     "hidden": true,
                     "fa_icon": "fas fa-bacon"
-                },
-                "singularity_pull_docker_container": {
-                    "type": "boolean",
-                    "description": "Instead of directly downloading Singularity images for use with Singularity, force the workflow to pull and convert Docker containers instead.",
-                    "hidden": true,
-                    "fa_icon": "fas fa-toolbox",
-                    "help_text": "This may be useful for example if you are unable to directly pull Singularity containers to run the pipeline due to http/https proxy issues."
                 }
             }
         }
@@ -301,7 +354,7 @@
             "$ref": "#/definitions/pipeline_options"
         },
         {
-            "$ref": "#/definitions/reference_genome_options"
+            "$ref": "#/definitions/options"
         },
         {
             "$ref": "#/definitions/institutional_config_options"
