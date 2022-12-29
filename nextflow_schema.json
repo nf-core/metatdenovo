@@ -10,9 +10,7 @@
             "type": "object",
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
-            "required": [
-                "input"
-            ],
+            "required": ["input"],
             "properties": {
                 "input": {
                     "type": "string",
@@ -41,6 +39,30 @@
                     "type": "string",
                     "description": "MultiQC report title. Printed as page header, used for filename if not otherwise specified.",
                     "fa_icon": "fas fa-file-signature"
+                }
+            }
+        },
+        "pipeline_options": {
+            "title": "Pipeline options",
+            "type": "object",
+            "description": "Options for the pipeline",
+            "default": "",
+            "properties": {
+                "hmmdir": {
+                    "type": "string",
+                    "description": "Directory with hmm files which will be searched for among ORFs",
+                    "pattern": "^\\S+",
+                    "format": "directory-path",
+                    "fa_icon": "fas fa-folder-open"
+                },
+                "hmmfiles": {
+                    "type": "string",
+                    "description": "Comma-separated list of hmm files which will be searched for among ORFs",
+                    "pattern": "\\S+hmm(\\.gz)?",
+                    "format": "file-path",
+                    "mimetype": "text/plain",
+                    "fa_icon": "far fa-file-code",
+                    "help_text": "Files can be local or urls. Pfam profiles can be specified like `http://pfam.xfam.org/family/PF00848/hmm/`."
                 }
             }
         },
@@ -274,6 +296,9 @@
     "allOf": [
         {
             "$ref": "#/definitions/input_output_options"
+        },
+        {
+            "$ref": "#/definitions/pipeline_options"
         },
         {
             "$ref": "#/definitions/reference_genome_options"
