@@ -14,6 +14,7 @@ process MEGAHIT_INTERLEAVED {
 
     output:
     path("megahit_out/*.contigs.fa.gz")                            , emit: contigs
+    path("megahit_out/*.log")                                      , emit: log
     path("megahit_out/intermediate_contigs/k*.contigs.fa.gz")      , emit: k_contigs
     path("megahit_out/intermediate_contigs/k*.addi.fa.gz")         , emit: addi_contigs
     path("megahit_out/intermediate_contigs/k*.local.fa.gz")        , emit: local_contigs
