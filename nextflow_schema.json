@@ -57,14 +57,18 @@
                     "format": "directory-path",
                     "fa_icon": "fas fa-folder-open"
                 },
+                "hmmpattern": {
+                    "type": "string",
+                    "default": "*.hmm",
+                    "description": "specify which pattern hmm files end with"
+                },
                 "hmmfiles": {
                     "type": "string",
                     "description": "Comma-separated list of hmm files which will be searched for among ORFs",
                     "pattern": "\\S+hmm(\\.gz)?",
                     "format": "file-path",
                     "mimetype": "text/plain",
-                    "fa_icon": "far fa-file-code",
-                    "help_text": "Files can be local or urls. Pfam profiles can be specified like `http://pfam.xfam.org/family/PF00848/hmm/`."
+                    "fa_icon": "far fa-file-code"
                 }
             }
         },
@@ -174,15 +178,6 @@
                     "type": "string",
                     "default": "mets",
                     "description": "Specify which method to use for EUKulele"
-                },
-                "hmmsearch": {
-                    "type": "boolean",
-                    "description": "Enable hmmsearch tool"
-                },
-                "hmmpattern": {
-                    "type": "string",
-                    "default": "*.hmm",
-                    "description": "specify which pattern hmm files end with"
                 }
             }
         },

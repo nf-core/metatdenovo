@@ -39,19 +39,17 @@ if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input sample
 
 // If the user supplied hmm files, we will run hmmsearch and then rank the results.
 // Create a channel for hmm files.
-if ( params.hmmsearch ) {
-    if ( params.hmmdir ) {
-        Channel
-            .fromPath(params.hmmdir + params.hmmpattern)
-            .set { ch_hmmrs }
-    } else if ( params.hmmfiles ) {
-        Channel
-            .fromPath(params.hmmfiles)
-            .set { ch_hmmrs }
-    } else {
-        // Warn of missing params
-    }
+ch_hmmrs = Channel.empty()
+if ( params.hmmdir ) {
+    Channel
+        .fromPath(params.hmmdir + params.hmmpattern)
+        .set { ch_hmmrs }
+} else if ( params.hmmfiles ) {
+    Channel
+        .fromPath(params.hmmfiles)
+        .set { ch_hmmrs }
 }
+ch_hmmrs.view()
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
