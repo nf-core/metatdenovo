@@ -30,7 +30,7 @@ process HMMRANK {
     # Read all the tblout files
     tibble(fname = Sys.glob('*.tbl.gz')) %>%
         mutate(
-            fname_profile = basename(fname) %>% str_remove('.tbl.gz'),
+            profile = basename(fname) %>% str_remove('.tbl.gz'),
             d = purrr::map(
                 fname,
                 function(f) {
@@ -38,14 +38,15 @@ process HMMRANK {
                         filter(! grepl('^ *#', content)) %>%
                         separate(
                             content, 
-                            c('accno', 't0', 'profile', 't1', 'evalue', 'score', 'bias', 'f0', 'f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'rest'), 
+                            c('accno', 't0', 'profile_desc', 't1', 'evalue', 'score', 'bias', 'f0', 'f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'rest'), 
                             '\\\\s+',  extra='merge', convert = FALSE
                         ) %>%
-                        transmute(accno, profile, evalue = as.double(evalue), score = as.double(score))
+                        transmute(accno, profile_desc, evalue = as.double(evalue), score = as.double(score))
                 }
             )
         ) %>%
         unnest(d) %>%
+        select(-fname) %>%
         # Group and calculate a rank based on score and evalue; let ties be resolved by profile in alphabetical order
         group_by(accno) %>%
         arrange(desc(score), evalue, profile) %>%
