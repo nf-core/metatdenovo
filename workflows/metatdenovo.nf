@@ -213,7 +213,6 @@ workflow METATDENOVO {
         ch_spades = FASTQC_TRIMGALORE.out.reads.map { meta, fastq -> [ [ id: 'all_samples' ], fastq, [], [] ] }
         SPADES( ch_spades, [] )
         ch_assembly_contigs = SPADES.out.transcripts.map { it[1] }
-        ch_assembly_contigs.view()
         ch_versions = ch_versions.mix(SPADES.out.versions)
     } 
     if ( params.assembler == MEGAHIT ) {
@@ -275,10 +274,6 @@ workflow METATDENOVO {
         ch_eukulele     = PRODIGAL.out.amino_acid_fasta
         ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
     }
-
-    CUSTOM_DUMPSOFTWAREVERSIONS (
-        ch_versions.unique().collectFile(name: 'collated_versions.yml')
-    )
 
     //
     // SUBWORKFLOW: run TRANSDECODER on UNPIGZ output. Orf caller alternative for eukaryotes.
@@ -389,6 +384,10 @@ workflow METATDENOVO {
         } else
         SUB_EUKULELE(ch_eukulele)
     }
+
+    CUSTOM_DUMPSOFTWAREVERSIONS (
+        ch_versions.unique().collectFile(name: 'collated_versions.yml')
+    )
 
     //
     // MODULE: MultiQC
