@@ -76,14 +76,13 @@ Metatdenovo uses `EUKulele` as main program for taxonomy annotation. EUKulele ca
 
 Other databases options for running the pipeline are:
 
--   Mmetsp (i.e. `--eukulele_db mmetsp`)
+-   MMETSP (`--eukulele_db mmetsp`)
 
--   GTDB (i.e. `--eukulele_db gtdb`) [not available yet]
+-   GTDB (`--eukulele_db gtdb`) [under development]
 
-PhyloDB and GTDB are recommended for prokaryotic datasets while mmetsp for eukaryotes although PhyoDB can be also recognize eukaryotes and can be used for this purpose.
+PhyloDB and GTDB are recommended for prokaryotic datasets and MMETSP for eukaryotes, although PhyoDB can be also recognize eukaryotes and can be used for this purpose.
 
-If you already have these databases ready in your working directory, you can redirect to the folder so the pipeline will not download the database
-(e.g. `--eukulele_dbpath your/path/database/`
+If you already have these databases ready in your working directory, you can redirect to the folder so the pipeline will not download the database (e.g. `--eukulele_dbpath your/path/database/`
 
 > Please, check the EUKulele documentation for more information about the databases cited [HERE](https://eukulele.readthedocs.io/en/latest/#)
 
@@ -91,21 +90,22 @@ If you already have these databases ready in your working directory, you can red
 
 By default, metatdenovo will not perform any functional annotation. In order to run it you will need to specify one of the options that we provide.
 
-This options are:
+These options are:
 
--   [Eggnog](https://github.com/eggnogdb/eggnog-mapper/wiki) (i.e. `--eggnog`)
+-   [Eggnog](https://github.com/eggnogdb/eggnog-mapper/wiki) (`--eggnog`)
 
--   [Hmmsearch](http://eddylab.org/software/hmmer/Userguide.pdf) (i.e. `--hmmsearch`)
+-   [hmmsearch](http://eddylab.org/software/hmmer/Userguide.pdf) (`--hmmdir` or `--hmmfiles`)
 
--   [Rundbcan3](https://github.com/linnabrown/run_dbcan) (i.e. `--run_dbcan`)
+-   [Rundbcan3](https://github.com/linnabrown/run_dbcan) (`--run_dbcan`)
 
-All the options can run in the same time (e.i. `extflow run main.nf -profile test,docker --eggnog --hmmsearch --rundbcan`) but each program has it’s own option that you will need to read carefully before run the pipeline. You can find the different options in [parameters]() page and read about the programs from their own website.
+All the options can run in the same time (e.g. `nextflow run main.nf -profile test,docker --eggnog --hmmdir hmms/ --rundbcan`) but each program has its own options that you will need to read carefully before running the pipeline. 
+You can find the different options in [parameters]() page and read about the programs from their own website.
 
-## Example pipeline command with some features
+## Example pipeline command with some common features
 
 `nextflow run lnuc-eemis/metatdenovo -profile docker --input samplesheet.csv --assembler rnaspades --orf_caller transdecoder --eggnog --run_dbcan`
 
-In thi example, we are running metatdenovo with `rnaspades`as assembler, `transdecoder`as ORF caller, `eggnog` and `run_dbcan`for functional annotation.
+In this example, we are running metatdenovo with `rnaspades` as assembler, `transdecoder` as ORF caller, `eggnog` and `run_dbcan` for functional annotation.
 
 ## Running the pipeline
 
