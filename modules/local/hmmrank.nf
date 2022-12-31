@@ -53,6 +53,13 @@ process HMMRANK {
         ungroup() %>%
         write_tsv('hmmrank.out')
 
-    writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")), paste0("    dplyr: ", packageVersion('dplyr')) ), "versions.yml")
+    writeLines(
+        c(
+            "\\"${task.process}\\":", 
+            paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")), 
+            paste0("    tidyverse: ", packageVersion('tidyverse'))
+        ), 
+        "versions.yml"
+    )
     """
 }
