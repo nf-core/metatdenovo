@@ -8,11 +8,11 @@ process HMMRANK {
 
     input:
 
-    path hmmrout
+    path hmmtargsums
 
     output:
 
-    path "hmmrank.out" , emit: x
+    path "hmmrank.out" , emit: hmmrank
     path "versions.yml", emit: versions
 
     when:
@@ -28,45 +28,30 @@ process HMMRANK {
     library(stringr)
 
     # Read all the tblout files
-    files <- tibble(f = Sys.glob('*.tbl.gz'))
-    tlist <- list()
-    i <- 1
-    for ( tbloutfile in files ) {
-        p <- basename(tbloutfile)
-        t <- read_fwf(
-        tbloutfile, fwf_cols(content = c(1, NA)),
-        col_types = cols(content = col_character()),
-        comment='#'
+    tibble(fname = Sys.glob('*.tbl.gz')) %>%
+        mutate(
+            fname_profile = basename(fname) %>% str_remove('.tbl.gz'),
+            d = purrr::map(
+                fname,
+                function(f) {
+                    read_fwf(f, fwf_cols(content = c(1, NA)), col_types = cols(content = col_character()), comment='#') %>% 
+                        filter(! grepl('^ *#', content)) %>%
+                        separate(
+                            content, 
+                            c('accno', 't0', 'profile', 't1', 'evalue', 'score', 'bias', 'f0', 'f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'rest'), 
+                            '\\\\s+',  extra='merge', convert = FALSE
+                        ) %>%
+                        transmute(accno, profile, evalue = as.double(evalue), score = as.double(score))
+                }
+            )
         ) %>%
-        filter(! grepl('^ *#', content)) %>%
-        separate(
-        content,
-        c('accno', 't0', 'profile', 't1', 'evalue', 'score', 'bias', 'f0', 'f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'rest'),
-        '\\\s+',  extra='merge', convert = FALSE
-        ) %>%
-        transmute(accno, profile, hmm_profile = t1, evalue = as.double(evalue), score = as.double(score))
-    if ( nrow(t) > 0 ) {
-        tlist[[i]] <- t
-        i <- i + 1
-        }
-    }
-    if ( length(tlist) > 0  ) {
-        tblout <- bind_rows(tlist)
-    } else {
-        write("No results found, exiting", stderr())
-        quit(save = 'no', status = 0)
-    }
-
-    tblout <- tblout %>%
+        unnest(d) %>%
+        # Group and calculate a rank based on score and evalue; let ties be resolved by profile in alphabetical order
         group_by(accno) %>%
         arrange(desc(score), evalue, profile) %>%
         mutate(rank = row_number()) %>%
-        rename(orf = accno) %>%
         ungroup() %>%
-        filter(!is.na(orf)) %>% as_tibble()
-
-    # write output
-    write_tsv(tblout,'hmmrank.out')
+        write_tsv('hmmrank.out')
 
     writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")), paste0("    dplyr: ", packageVersion('dplyr')) ), "versions.yml")
     """
