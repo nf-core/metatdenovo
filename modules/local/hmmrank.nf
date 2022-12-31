@@ -12,8 +12,8 @@ process HMMRANK {
 
     output:
 
-    path "hmmrank.out" , emit: hmmrank
-    path "versions.yml", emit: versions
+    path "hmmrank.tsv.gz", emit: hmmrank
+    path "versions.yml"  , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -51,7 +51,7 @@ process HMMRANK {
         arrange(desc(score), evalue, profile) %>%
         mutate(rank = row_number()) %>%
         ungroup() %>%
-        write_tsv('hmmrank.out')
+        write_tsv('hmmrank.tsv.gz')
 
     writeLines(
         c(
