@@ -271,8 +271,6 @@ workflow METATDENOVO {
         ch_gff          = PRODIGAL.out.gene_annotations.map { it[1] }
         ch_hmm_aa       = PRODIGAL.out.amino_acid_fasta
         ch_aa           = PRODIGAL.out.amino_acid_fasta
-        ch_prodigal_fna = PRODIGAL.out.nucleotide_fasta
-        ch_eukulele     = PRODIGAL.out.amino_acid_fasta
         ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
     }
 
@@ -293,7 +291,6 @@ workflow METATDENOVO {
         ch_gff      = TRANSDECODER.out.gff.map { it[1] }
         ch_hmm_aa   = TRANSDECODER.out.pep
         ch_aa       = TRANSDECODER.out.pep //.map { [ [ it[0] ], it[1] ] }
-        ch_eukulele = TRANSDECODER.out.pep
         ch_versions = ch_versions.mix(TRANSDECODER.out.versions)
     }
 
@@ -381,7 +378,7 @@ workflow METATDENOVO {
             UNPIGZ_EUKULELE(ch_aa)
             SUB_EUKULELE(UNPIGZ_EUKULELE.out.unzipped.collect { [ [ id: 'all_samples' ], it ] } )
         } else
-        SUB_EUKULELE(ch_eukulele)
+        SUB_EUKULELE(ch_aa)
     }
 
     //
