@@ -34,11 +34,11 @@ process HMMRANK {
             d = purrr::map(
                 fname,
                 function(f) {
-                    read_fwf(f, fwf_cols(content = c(1, NA)), col_types = cols(content = col_character()), comment='#') %>% 
+                    read_fwf(f, fwf_cols(content = c(1, NA)), col_types = cols(content = col_character()), comment='#') %>%
                         filter(! grepl('^ *#', content)) %>%
                         separate(
-                            content, 
-                            c('accno', 't0', 'profile_desc', 't1', 'evalue', 'score', 'bias', 'f0', 'f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'rest'), 
+                            content,
+                            c('accno', 't0', 'profile_desc', 't1', 'evalue', 'score', 'bias', 'f0', 'f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'rest'),
                             '\\\\s+',  extra='merge', convert = FALSE
                         ) %>%
                         transmute(accno, profile_desc, evalue = as.double(evalue), score = as.double(score))
@@ -56,10 +56,10 @@ process HMMRANK {
 
     writeLines(
         c(
-            "\\"${task.process}\\":", 
-            paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")), 
+            "\\"${task.process}\\":",
+            paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")),
             paste0("    tidyverse: ", packageVersion('tidyverse'))
-        ), 
+        ),
         "versions.yml"
     )
     """
