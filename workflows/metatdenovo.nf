@@ -249,7 +249,7 @@ workflow METATDENOVO {
         PROKKA_CAT(ch_assembly_contigs)
         ch_versions = ch_versions.mix(PROKKA_CAT.out.versions)
         ch_gff      = PROKKA_CAT.out.gff.map { it[1] }
-        ch_aa       = PROKKA_CAT.out.faa.map { it[1] }
+        ch_aa       = PROKKA_CAT.out.faa
     }
 
     //
@@ -266,7 +266,6 @@ workflow METATDENOVO {
             'gff'
         )
         ch_gff          = PRODIGAL.out.gene_annotations.map { it[1] }
-        //ch_hmm_aa       = PRODIGAL.out.amino_acid_fasta
         ch_aa           = PRODIGAL.out.amino_acid_fasta
         ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
     }
@@ -275,15 +274,13 @@ workflow METATDENOVO {
     // SUBWORKFLOW: run TRANSDECODER on UNPIGZ output. Orf caller alternative for eukaryotes.
     //
 
-    ch_transdecoder_longorf = Channel.empty()
     if ( params.orf_caller == ORF_CALLER_TRANSDECODER ) {
         UNPIGZ_CONTIGS(ch_assembly_contigs)
         TRANSDECODER(
             UNPIGZ_CONTIGS.out.unzipped.collect { [ [ id: 'transdecoder' ], it ] }
         )
         ch_gff      = TRANSDECODER.out.gff.map { it[1] }
-        ch_hmm_aa   = TRANSDECODER.out.pep
-        ch_aa       = TRANSDECODER.out.pep //.map { [ [ it[0] ], it[1] ] }
+        ch_aa       = TRANSDECODER.out.pep
         ch_versions = ch_versions.mix(TRANSDECODER.out.versions)
     }
 
