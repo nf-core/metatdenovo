@@ -75,7 +75,6 @@ include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/inte
 include { HMMRANK                          } from '../modules/local/hmmrank.nf'
 include { UNPIGZ as UNPIGZ_FASTA_PROTEIN   } from '../modules/local/unpigz.nf'
 include { UNPIGZ as UNPIGZ_EUKULELE        } from '../modules/local/unpigz.nf'
-include { UNPIGZ as UNPIGZ_EGGNOG          } from '../modules/local/unpigz.nf'
 include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz.nf'
 include { COLLECT_FEATURECOUNTS            } from '../modules/local/collect_featurecounts.nf'
 include { COLLECT_FEATURECOUNTS_EUK        } from '../modules/local/collect_featurecounts_euk.nf'
@@ -253,7 +252,7 @@ workflow METATDENOVO {
         ch_versions = ch_versions.mix(PROKKA_CAT.out.versions)
         ch_gff      = PROKKA_CAT.out.gff.map { it[1] }
         ch_hmm_aa   = PROKKA_CAT.out.faa
-        ch_aa       = PROKKA_CAT.out.faa.map { it[1] }
+        ch_aa       = PROKKA_CAT.out.faa
     }
 
     //
@@ -261,19 +260,17 @@ workflow METATDENOVO {
     //
 
     ch_prodigal = Channel.empty()
-    if( params.orf_caller == ORF_CALLER_PRODIGAL ) {
+    if ( params.orf_caller == ORF_CALLER_PRODIGAL ) {
 
         UNPIGZ_CONTIGS(ch_assembly_contigs)
         ch_versions = ch_versions.mix(UNPIGZ_CONTIGS.out.versions)
         PRODIGAL(
-            UNPIGZ_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] },
+            UNPIGZ_CONTIGS.out.unzipped.collect { [ [ id: 'prodigal' ], it ] },
             'gff'
         )
         ch_gff          = PRODIGAL.out.gene_annotations.map { it[1] }
         ch_hmm_aa       = PRODIGAL.out.amino_acid_fasta
         ch_aa           = PRODIGAL.out.amino_acid_fasta
-        ch_prodigal_fna = PRODIGAL.out.nucleotide_fasta
-        ch_eukulele     = PRODIGAL.out.amino_acid_fasta
         ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
     }
 
@@ -286,16 +283,14 @@ workflow METATDENOVO {
     //
 
     ch_transdecoder_longorf = Channel.empty()
-    if( params.orf_caller == ORF_CALLER_TRANSDECODER ) {
+    if ( params.orf_caller == ORF_CALLER_TRANSDECODER ) {
         UNPIGZ_CONTIGS(ch_assembly_contigs)
         TRANSDECODER(
-            UNPIGZ_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] }
+            UNPIGZ_CONTIGS.out.unzipped.collect { [ [ id: 'transdecoder' ], it ] }
         )
         ch_gff      = TRANSDECODER.out.gff.map { it[1] }
         ch_hmm_aa   = TRANSDECODER.out.pep
-        ch_aa       = TRANSDECODER.out.pep
-        ch_gff      = TRANSDECODER.out.gff.map { it[1] }
-        ch_eukulele = TRANSDECODER.out.pep
+        ch_aa       = TRANSDECODER.out.pep //.map { [ [ it[0] ], it[1] ] }
         ch_versions = ch_versions.mix(TRANSDECODER.out.versions)
     }
 
@@ -304,11 +299,6 @@ workflow METATDENOVO {
     //
 
     if (params.eggnog) {
-        if ( params.orf_caller == ORF_CALLER_PROKKA ) {
-            UNPIGZ_EGGNOG(ch_aa)
-            EGGNOG(UNPIGZ_EGGNOG.out.unzipped.collect { [ [ id: 'all_samples' ], it ] } )
-            ch_versions = ch_versions.mix(EGGNOG.out.versions)
-        } else
         EGGNOG(ch_aa)
         ch_versions = ch_versions.mix(EGGNOG.out.versions)
     }
@@ -388,7 +378,7 @@ workflow METATDENOVO {
             UNPIGZ_EUKULELE(ch_aa)
             SUB_EUKULELE(UNPIGZ_EUKULELE.out.unzipped.collect { [ [ id: 'all_samples' ], it ] } )
         } else
-        SUB_EUKULELE(ch_eukulele)
+        SUB_EUKULELE(ch_aa)
     }
 
     //
