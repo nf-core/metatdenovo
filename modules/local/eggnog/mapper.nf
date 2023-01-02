@@ -1,5 +1,5 @@
 process EGGNOG_MAPPER {
-    tag '$meta.id'
+    tag "$meta.id"
     label 'process_medium'
 
     conda (params.enable_conda ? "bioconda::eggnog-mapper=2.1.6" : null)
@@ -26,14 +26,18 @@ process EGGNOG_MAPPER {
     script:
     def args = task.ext.args   ?: ''
     prefix   = task.ext.prefix ?: "${meta.id}"
+    input    = fasta =~ /\.gz$/ ? fasta.name.take(fasta.name.lastIndexOf('.')) : fasta
+    gunzip   = fasta =~ /\.gz$/ ? "gunzip -c ${fasta} > ${input}" : ""
 
     """
+    $gunzip
+
     emapper.py \\
         $args \\
         --cpu $task.cpus \\
         --data_dir $db \\
         --output $prefix \\
-        -i $fasta
+        -i $input
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

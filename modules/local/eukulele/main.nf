@@ -2,10 +2,10 @@ process EUKULELE {
     tag "$meta.id"
     label 'process_high'
 
-    conda (params.enable_conda ? "bioconda::eukulele=2.0.2-0" : null)
+    conda (params.enable_conda ? "bioconda::eukulele=2.0.3" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/eukulele:2.0.2--pyh723bec7_0' :
-        'quay.io/biocontainers/eukulele:2.0.2--pyh723bec7_0' }"
+        'https://depot.galaxyproject.org/singularity/eukulele:2.0.3--pyh723bec7_0' :
+        'quay.io/biocontainers/eukulele:2.0.3--pyh723bec7_0' }"
 
     input:
     tuple val(meta), path(contigs_fasta)
