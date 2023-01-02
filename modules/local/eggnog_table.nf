@@ -1,5 +1,5 @@
 process EGGNOG_TABLE {
-    tag '$meta.id'
+    tag "$meta.id"
     label 'process_low'
 
     conda (params.enable_conda ? "conda-forge::gzip=1.12" : null)
