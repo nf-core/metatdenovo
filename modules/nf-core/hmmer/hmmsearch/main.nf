@@ -2,7 +2,7 @@ process HMMER_HMMSEARCH {
     tag "$meta.id"
     label 'process_medium'
 
-    conda (params.enable_conda ? "bioconda::hmmer=3.3.2" : null)
+    conda "bioconda::hmmer=3.3.2"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/hmmer:3.3.2--h1b792b2_1' :
         'quay.io/biocontainers/hmmer:3.3.2--h1b792b2_1' }"
@@ -11,11 +11,11 @@ process HMMER_HMMSEARCH {
     tuple val(meta), path(hmmfile), path(seqdb), val(write_align), val(write_target), val(write_domain)
 
     output:
-    tuple val(meta), path('*.txt.gz')   , emit: output
+    tuple val(meta), path('*.txt.gz')    , emit: output
     tuple val(meta), path('*.sto.gz')   , emit: alignments    , optional: true
     tuple val(meta), path('*.tbl.gz')   , emit: target_summary, optional: true
     tuple val(meta), path('*.domtbl.gz'), emit: domain_summary, optional: true
-    path "versions.yml"                 , emit: versions
+    path "versions.yml"              , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
