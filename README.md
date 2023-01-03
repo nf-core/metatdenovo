@@ -22,7 +22,6 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 
 On release, automated continuous integration tests run the pipeline on a full-sized dataset on the AWS cloud infrastructure. This ensures that the pipeline runs on AWS, has sensible resource allocation defaults set to run on real-world datasets, and permits the persistent storage of results to benchmark between pipeline releases and other analysis sources.The results obtained from the full-sized test can be viewed on the [nf-core website](https://nf-co.re/metatdenovo/results).
 
-
 ## Pipeline summary
 
 ![nf-core/rnaseq metro map](docs/images/nf-core-metatdenovo_metro_map.png)
@@ -32,23 +31,20 @@ On release, automated continuous integration tests run the pipeline on a full-si
 3. Quality trimming and adapters removal for raw reads ( [`Trimm Galore!`](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/))
 4. Merge trimmed, pair-end reads ( [`Seqtk`](https://github.com/lh3/seqtk))
 5. Choice of de novo assembly:
-    1. [`RNAspade`](https://cab.spbu.ru/software/rnaspades/) suggested for Eukaryotes de novo assembly
-    2. [`Megahit`](https://github.com/voutcn/megahit) suggested for Prokaryotes de novo assembly
+   1. [`RNAspade`](https://cab.spbu.ru/software/rnaspades/) suggested for Eukaryotes de novo assembly
+   2. [`Megahit`](https://github.com/voutcn/megahit) suggested for Prokaryotes de novo assembly
 6. Choice of orf caller:
-    1. [`TransDecoder`](https://github.com/TransDecoder/TransDecoder) suggested for Eukaryotes
-    2. [`Prokka`](https://github.com/tseemann/prokka) suggested for Prokaryotes
-    3. [`Prodigal`](https://github.com/hyattpd/Prodigal) suggested for Prokaryotes
+   1. [`TransDecoder`](https://github.com/TransDecoder/TransDecoder) suggested for Eukaryotes
+   2. [`Prokka`](https://github.com/tseemann/prokka) suggested for Prokaryotes
+   3. [`Prodigal`](https://github.com/hyattpd/Prodigal) suggested for Prokaryotes
 7. Quantification of genes identified in assemblies:
-    1. generate index of assembly [`BBmap index`](https://sourceforge.net/projects/bbmap/)
-    2. Mapping cleaned reads to the assembly for quantification [`BBmap`](https://sourceforge.net/projects/bbmap/)
-    3. Get raw counts per each gene present in the assembly [`Featurecounts`](http://subread.sourceforge.net) -> TSV table with collected featurecounts output
+   1. generate index of assembly [`BBmap index`](https://sourceforge.net/projects/bbmap/)
+   2. Mapping cleaned reads to the assembly for quantification [`BBmap`](https://sourceforge.net/projects/bbmap/)
+   3. Get raw counts per each gene present in the assembly [`Featurecounts`](http://subread.sourceforge.net) -> TSV table with collected featurecounts output
 8. Taxonomical annotation:
-    1. [`EUKulele`](https://github.com/AlexanderLabWHOI/EUKulele) -> Reformat TSV output "Reformat_tax.R"
-9. Choice of functional annotation: 
-    1. [`Eggnog-mapper`](http://eggnog-mapper.embl.de) 
-    2. [`Run-DBcan`](https://github.com/linnabrown/run_dbcan) 
-    3. [`Hmmsearch`](https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch). Besides searching the ORFs, each ORF's hits will be ranked.
-10 Summary statistics table. Collect_stats.R
+   1. [`EUKulele`](https://github.com/AlexanderLabWHOI/EUKulele) -> Reformat TSV output "Reformat_tax.R"
+9. Choice of functional annotation: 1. [`Eggnog-mapper`](http://eggnog-mapper.embl.de) 2. [`Run-DBcan`](https://github.com/linnabrown/run_dbcan) 3. [`Hmmsearch`](https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch). Besides searching the ORFs, each ORF's hits will be ranked.
+   10 Summary statistics table. Collect_stats.R
 
 ## Quick Start
 
@@ -63,6 +59,7 @@ On release, automated continuous integration tests run the pipeline on a full-si
    ```
 
    Note that some form of configuration will be needed so that Nextflow knows how to fetch the required software. This is usually done in the form of a config profile (`YOURPROFILE` in the example command above). You can chain multiple config profiles in a comma-separated string.
+
    > - The pipeline comes with config profiles called `docker`, `singularity`, `podman`, `shifter`, `charliecloud` and `conda` which instruct the pipeline to use the named tool for software management. For example, `-profile test,docker`.
    > - Please check [nf-core/configs](https://github.com/nf-core/configs#documentation) to see if a custom config file to run nf-core pipelines already exists for your Institute. If so, you can simply use `-profile <institute>` in your command. This will enable either `docker` or `singularity` and set the appropriate execution settings for your local compute environment.
    > - If you are using `singularity`, please use the [`nf-core download`](https://nf-co.re/tools/#downloading-pipelines-for-offline-use) command to download images first, before running the pipeline. Setting the [`NXF_SINGULARITY_CACHEDIR` or `singularity.cacheDir`](https://www.nextflow.io/docs/latest/singularity.html?#singularity-docker-hub) Nextflow options enables you to store and re-use the images from a central location for future pipeline runs.

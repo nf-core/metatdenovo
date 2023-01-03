@@ -64,9 +64,9 @@ By default, the pipeline uses prodigal (i.e. `--orf_caller prodigal` ) to genera
 
 Other orf caller options for running the pipeline are:
 
--   Prokka (`--orf_caller prokka`)
+- Prokka (`--orf_caller prokka`)
 
--   Transdecoder (`--orf_caller transdecoder`)
+- Transdecoder (`--orf_caller transdecoder`)
 
 > N.B. Prokka and prodigal are suggested to run with prokaryotes while transdecoder is specific for eukaryotes.
 
@@ -76,9 +76,9 @@ Metatdenovo uses `EUKulele` as main program for taxonomy annotation. EUKulele ca
 
 Other databases options for running the pipeline are:
 
--   MMETSP (`--eukulele_db mmetsp`)
+- MMETSP (`--eukulele_db mmetsp`)
 
--   GTDB (`--eukulele_db gtdb`) [under development]
+- GTDB (`--eukulele_db gtdb`) [under development]
 
 PhyloDB and GTDB are recommended for prokaryotic datasets and MMETSP for eukaryotes, although PhyoDB can be also recognize eukaryotes and can be used for this purpose.
 
@@ -92,13 +92,13 @@ By default, metatdenovo will not perform any functional annotation. In order to 
 
 These options are:
 
--   [Eggnog](https://github.com/eggnogdb/eggnog-mapper/wiki) (`--eggnog`)
+- [Eggnog](https://github.com/eggnogdb/eggnog-mapper/wiki) (`--eggnog`)
 
--   [hmmsearch](http://eddylab.org/software/hmmer/Userguide.pdf) (`--hmmdir` or `--hmmfiles`)
+- [hmmsearch](http://eddylab.org/software/hmmer/Userguide.pdf) (`--hmmdir` or `--hmmfiles`)
 
--   [Rundbcan3](https://github.com/linnabrown/run_dbcan) (`--run_dbcan`)
+- [Rundbcan3](https://github.com/linnabrown/run_dbcan) (`--run_dbcan`)
 
-All the options can run in the same time (e.g. `nextflow run main.nf -profile test,docker --eggnog --hmmdir hmms/ --rundbcan`) but each program has its own options that you will need to read carefully before running the pipeline. 
+All the options can run in the same time (e.g. `nextflow run main.nf -profile test,docker --eggnog --hmmdir hmms/ --rundbcan`) but each program has its own options that you will need to read carefully before running the pipeline.
 You can find the different options in [parameters]() page and read about the programs from their own website.
 
 ## Example pipeline command with some common features
@@ -110,7 +110,6 @@ In this example, we are running metatdenovo with `rnaspades` as assembler, `tran
 ## Running the pipeline
 
 The typical command for running the pipeline is as follows:
-
 
 ```bash
 nextflow run nf-core/metatdenovo --input samplesheet.csv --outdir <OUTDIR> --genome GRCh37 -profile docker
@@ -252,9 +251,9 @@ For the ultimate flexibility, we have implemented and are using Nextflow DSL2 mo
 
 The command-line arguments passed to STAR in the `STAR_ALIGN` module are a combination of:
 
--   Mandatory arguments or those that need to be evaluated within the scope of the module, as supplied in the [`script`](https://github.com/nf-core/rnaseq/blob/4c27ef5610c87db00c3c5a3eed10b1d161abf575/modules/nf-core/software/star/align/main.nf#L49-L55) section of the module file.
+- Mandatory arguments or those that need to be evaluated within the scope of the module, as supplied in the [`script`](https://github.com/nf-core/rnaseq/blob/4c27ef5610c87db00c3c5a3eed10b1d161abf575/modules/nf-core/software/star/align/main.nf#L49-L55) section of the module file.
 
--   An [`options.args`](https://github.com/nf-core/rnaseq/blob/4c27ef5610c87db00c3c5a3eed10b1d161abf575/modules/nf-core/software/star/align/main.nf#L56) string of non-mandatory parameters that is set to be empty by default in the module but can be overwritten when including the module in the sub-workflow / workflow context via the `addParams` Nextflow option.
+- An [`options.args`](https://github.com/nf-core/rnaseq/blob/4c27ef5610c87db00c3c5a3eed10b1d161abf575/modules/nf-core/software/star/align/main.nf#L56) string of non-mandatory parameters that is set to be empty by default in the module but can be overwritten when including the module in the sub-workflow / workflow context via the `addParams` Nextflow option.
 
 The nf-core/rnaseq pipeline has a sub-workflow (see [terminology](https://github.com/nf-core/modules#terminology)) specifically to align reads with STAR and to sort, index and generate some basic stats on the resulting BAM files using SAMtools. At the top of this file we import the `STAR_ALIGN` module via the Nextflow [`include`](https://github.com/nf-core/rnaseq/blob/4c27ef5610c87db00c3c5a3eed10b1d161abf575/subworkflows/nf-core/align_star.nf#L10) keyword and by default the options passed to the module via the `addParams` option are set as an empty Groovy map [here](https://github.com/nf-core/rnaseq/blob/4c27ef5610c87db00c3c5a3eed10b1d161abf575/subworkflows/nf-core/align_star.nf#L5); this in turn means `options.args` will be set to empty by default in the module file too. This is an intentional design choice and allows us to implement well-written sub-workflows composed of a chain of tools that by default run with the bare minimum parameter set for any given tool in order to make it much easier to share across pipelines and to provide the flexibility for users and developers to customise any non-mandatory arguments.
 
@@ -266,9 +265,9 @@ Say for example we want to append an additional, non-mandatory parameter (i.e. `
 
 As you will see in the example below, we have:
 
--   appended `--outFilterMismatchNmax 16` to the default `args` used by the module.
--   changed the default `publish_dir` value to where the files will eventually be published in the main results directory.
--   appended `'bam':''` to the default value of `publish_files` so that the BAM files generated by the process will also be saved in the top-level results directory for the module. Note: `'out':'log'` means any file/directory ending in `out` will now be saved in a separate directory called `my_star_directory/log/`.
+- appended `--outFilterMismatchNmax 16` to the default `args` used by the module.
+- changed the default `publish_dir` value to where the files will eventually be published in the main results directory.
+- appended `'bam':''` to the default value of `publish_files` so that the BAM files generated by the process will also be saved in the top-level results directory for the module. Note: `'out':'log'` means any file/directory ending in `out` will now be saved in a separate directory called `my_star_directory/log/`.
 
 ```nextflow
 params {
