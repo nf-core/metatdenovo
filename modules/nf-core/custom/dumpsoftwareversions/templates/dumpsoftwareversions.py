@@ -44,6 +44,7 @@ def _make_versions_html(versions):
     html.append("</table>")
     return "\\n".join(html)
 
+
 versions_this_module = {}
 versions_this_module["${task.process}"] = {
     "python": platform.python_version(),
