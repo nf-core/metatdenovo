@@ -42,7 +42,7 @@
                     "fa_icon": "fas fa-file-signature"
                 },
                 "enable_conda": {
-                    "type": "string",
+                    "type": "boolean",
                     "description": "enable conda environment",
                     "fa_icon": "fas fa-file-signature"
                 }
