@@ -133,6 +133,7 @@ include { BAM_SORT_SAMTOOLS                          } from '../subworkflows/nf-
 include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS_CDS } from '../modules/nf-core/subread/featurecounts/main'
 include { PRODIGAL                                   } from '../modules/nf-core/prodigal/main'
 include { SPADES                                     } from '../modules/nf-core/spades/main'
+include { CAT_FASTQ 				     } from '../modules/nf-core/cat/fastq/main'
 include { FASTQC                                     } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                                    } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS                } from '../modules/nf-core/custom/dumpsoftwareversions/main'
@@ -156,13 +157,52 @@ workflow METATDENOVO {
     INPUT_CHECK (
         ch_input
     )
+    .reads
+    .map {
+        meta, fastq ->
+            new_id = meta.id - ~/_T\d+/
+            [ meta + [id: new_id], fastq ]
+    }
+    .groupTuple()
+    .branch {
+        meta, fastq ->
+            single  : fastq.size() == 1
+                return [ meta, fastq.flatten() ]
+            multiple: fastq.size() > 1
+                return [ meta, fastq.flatten() ]
+    }
+    .set { ch_fastq }
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
 
+    //
+    // MODULE: Concatenate FastQ files from same sample if required
+    //
+    CAT_FASTQ (
+        ch_fastq.multiple
+    )
+    .reads
+    .mix(ch_fastq.single)
+    .set { ch_cat_fastq }
+    ch_cat_fastq.view()
+
+    ch_versions = ch_versions.mix(CAT_FASTQ.out.versions.first().ifEmpty(null))
+
+    // Branch FastQ channels if 'auto' specified to infer strandedness
+    ch_cat_fastq
+        .branch {
+            meta, fastq ->
+                auto_strand : meta.strandedness == 'auto'
+                    return [ meta, fastq ]
+                known_strand: meta.strandedness != 'auto'
+                    return [ meta, fastq ]
+        }
+        .set { ch_strand_fastq }
     //
     // SUBWORKFLOW: Read QC and trim adapters
     //
     FASTQC_TRIMGALORE (
-        INPUT_CHECK.out.reads,
+        ch_cat_fastq,
+        //INPUT_CHECK.out.reads,
         params.skip_fastqc || params.skip_qc,
         params.skip_trimming
     )
@@ -203,9 +243,9 @@ workflow METATDENOVO {
 
     ch_pacbio = []
     ch_nanopore = []
-    ch_hmm = [] 
-    ch_spades = SEQTK_MERGEPE.out.reads.map { [ [ id: 'all_samples' ], it[1],  [], [] ] } 
-    
+    ch_hmm = []
+    ch_spades = SEQTK_MERGEPE.out.reads.map { [ [ id: 'all_samples' ], it[1],  [], [] ] }
+
 
     //
     // MODULE: Run Megahit or RNAspades on all interleaved fastq files
@@ -215,7 +255,7 @@ workflow METATDENOVO {
         SPADES( ch_spades, [] )
         ch_assembly_contigs = SPADES.out.transcripts.map { it[1] }
         ch_versions = ch_versions.mix(SPADES.out.versions)
-    } 
+    }
     if ( params.assembler == MEGAHIT ) {
     MEGAHIT_INTERLEAVED(
         ch_pe_reads_to_assembly.collect(),
@@ -337,7 +377,7 @@ workflow METATDENOVO {
     ch_fcs = Channel.empty()
     ch_fcs = ch_fcs.mix(
         ch_cds_counts).collect()
-    
+
     //
     // MODULE: Collect statistics from mapping analysis
     //
