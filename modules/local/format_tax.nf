@@ -36,7 +36,7 @@ process FORMAT_TAX {
 
     # create a table with taxonomy categories in each column
     tax <- list.files(pattern = "*.out") %>%
-                map_df(~read.table(.,  sep = "\t", header = TRUE))
+                map_df(~read.table(.,  sep = "\t", header = TRUE, fill = TRUE))
 
     tax <- tax[,-c(1,3,5,6,7,8)]
 

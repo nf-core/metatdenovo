@@ -39,18 +39,16 @@ if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input sample
 
 // If the user supplied hmm files, we will run hmmsearch and then rank the results.
 // Create a channel for hmm files.
-if ( params.hmmsearch ) {
-    if ( params.hmmdir ) {
-        Channel
-            .fromPath(params.hmmdir + params.hmmpattern)
-            .set { ch_hmmrs }
-    } else if ( params.hmmfiles ) {
-        Channel
-            .fromPath(params.hmmfiles)
-            .set { ch_hmmrs }
-    } else {
-        // Warn of missing params
-    }
+ch_hmmrs = Channel.empty()
+if ( params.hmmdir ) {
+    Channel
+        .fromPath(params.hmmdir + params.hmmpattern)
+        .set { ch_hmmrs }
+} else if ( params.hmmfiles ) {
+    Channel
+        .of( params.hmmfiles.split(',') )
+        .map { [ file(it) ] }
+        .set { ch_hmmrs }
 }
 
 /*
@@ -74,10 +72,8 @@ ch_multiqc_custom_methods_description = params.multiqc_methods_description ? fil
 // MODULE: local
 //
 include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved.nf'
-include { HMMRANK                          } from '../modules/local/hmmrank.nf'
 include { UNPIGZ as UNPIGZ_FASTA_PROTEIN   } from '../modules/local/unpigz.nf'
 include { UNPIGZ as UNPIGZ_EUKULELE        } from '../modules/local/unpigz.nf'
-include { UNPIGZ as UNPIGZ_EGGNOG          } from '../modules/local/unpigz.nf'
 include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz.nf'
 include { COLLECT_FEATURECOUNTS            } from '../modules/local/collect_featurecounts.nf'
 include { COLLECT_FEATURECOUNTS_EUK        } from '../modules/local/collect_featurecounts_euk.nf'
@@ -103,6 +99,7 @@ include { FASTQC_TRIMGALORE } from '../subworkflows/local/fastqc_trimgalore'
 include { DIGINORM } from '../subworkflows/local/diginorm'
 
 //
+// Is this really a good heading? I assume it's taken from the example above (INPUT_CHECK), but does one really need to know what's in the subworkflow? Or should we collect all subworkflows under the possible three headings: only nf-core, only local, mix?
 // SUBWORKFLOW: Consisting of nf-core/modules
 //
 
@@ -110,12 +107,14 @@ include { PROKKA_CAT   } from '../subworkflows/local/prokka_cat'
 include { TRANSDECODER } from '../subworkflows/local/transdecoder'
 
 //
+// Same here
 // SUBWORKFLOW: Consisting of local modules
 //
 
 include { EGGNOG } from '../subworkflows/local/eggnog'
 include { SUB_EUKULELE } from '../subworkflows/local/eukulele'
 
+include { HMMCLASSIFY } from '../subworkflows/local/hmmclassify'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -133,7 +132,6 @@ include { SEQTK_MERGEPE                              } from '../modules/nf-core/
 include { BAM_SORT_SAMTOOLS                          } from '../subworkflows/nf-core/bam_sort_samtools/main'
 include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS_CDS } from '../modules/nf-core/subread/featurecounts/main'
 include { PRODIGAL                                   } from '../modules/nf-core/prodigal/main'
-include { HMMER_HMMSEARCH as HMMSEARCH               } from '../modules/nf-core/hmmer/hmmsearch/main.nf'
 include { SPADES                                     } from '../modules/nf-core/spades/main'
 include { FASTQC                                     } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                                    } from '../modules/nf-core/multiqc/main'
@@ -216,7 +214,6 @@ workflow METATDENOVO {
         ch_spades = FASTQC_TRIMGALORE.out.reads.map { meta, fastq -> [ [ id: 'all_samples' ], fastq, [], [] ] }
         SPADES( ch_spades, [] )
         ch_assembly_contigs = SPADES.out.transcripts.map { it[1] }
-        ch_assembly_contigs.view()
         ch_versions = ch_versions.mix(SPADES.out.versions)
     } 
     if ( params.assembler == MEGAHIT ) {
@@ -254,8 +251,7 @@ workflow METATDENOVO {
         PROKKA_CAT(ch_assembly_contigs)
         ch_versions = ch_versions.mix(PROKKA_CAT.out.versions)
         ch_gff      = PROKKA_CAT.out.gff.map { it[1] }
-        ch_hmm_aa   = PROKKA_CAT.out.faa
-        ch_aa       = PROKKA_CAT.out.faa.map { it[1] }
+        ch_aa       = PROKKA_CAT.out.faa
     }
 
     //
@@ -263,41 +259,30 @@ workflow METATDENOVO {
     //
 
     ch_prodigal = Channel.empty()
-    if( params.orf_caller == ORF_CALLER_PRODIGAL ) {
+    if ( params.orf_caller == ORF_CALLER_PRODIGAL ) {
 
         UNPIGZ_CONTIGS(ch_assembly_contigs)
         ch_versions = ch_versions.mix(UNPIGZ_CONTIGS.out.versions)
         PRODIGAL(
-            UNPIGZ_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] },
+            UNPIGZ_CONTIGS.out.unzipped.collect { [ [ id: 'prodigal' ], it ] },
             'gff'
         )
         ch_gff          = PRODIGAL.out.gene_annotations.map { it[1] }
-        ch_hmm_aa       = PRODIGAL.out.amino_acid_fasta
         ch_aa           = PRODIGAL.out.amino_acid_fasta
-        ch_prodigal_fna = PRODIGAL.out.nucleotide_fasta
-        ch_eukulele     = PRODIGAL.out.amino_acid_fasta
         ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
     }
-
-    CUSTOM_DUMPSOFTWAREVERSIONS (
-        ch_versions.unique().collectFile(name: 'collated_versions.yml')
-    )
 
     //
     // SUBWORKFLOW: run TRANSDECODER on UNPIGZ output. Orf caller alternative for eukaryotes.
     //
 
-    ch_transdecoder_longorf = Channel.empty()
-    if( params.orf_caller == ORF_CALLER_TRANSDECODER ) {
+    if ( params.orf_caller == ORF_CALLER_TRANSDECODER ) {
         UNPIGZ_CONTIGS(ch_assembly_contigs)
         TRANSDECODER(
-            UNPIGZ_CONTIGS.out.unzipped.collect { [ [ id: 'all_samples' ], it ] }
+            UNPIGZ_CONTIGS.out.unzipped.collect { [ [ id: 'transdecoder' ], it ] }
         )
         ch_gff      = TRANSDECODER.out.gff.map { it[1] }
-        ch_hmm_aa   = TRANSDECODER.out.pep
         ch_aa       = TRANSDECODER.out.pep
-        ch_gff      = TRANSDECODER.out.gff.map { it[1] }
-        ch_eukulele = TRANSDECODER.out.pep
         ch_versions = ch_versions.mix(TRANSDECODER.out.versions)
     }
 
@@ -306,25 +291,20 @@ workflow METATDENOVO {
     //
 
     if (params.eggnog) {
-        if ( params.orf_caller == ORF_CALLER_PROKKA ) {
-            UNPIGZ_EGGNOG(ch_aa)
-            EGGNOG(UNPIGZ_EGGNOG.out.unzipped.collect { [ [ id: 'all_samples' ], it ] } )
-            ch_versions = ch_versions.mix(EGGNOG.out.versions)
-        } else
         EGGNOG(ch_aa)
         ch_versions = ch_versions.mix(EGGNOG.out.versions)
     }
 
     //
-    // MODULE: Hmmsearch on orf caller output
+    // SUBWORKFLOW: classify ORFs with a set of hmm files
     //
-    if( params.hmmsearch) {
-        ch_hmmstage = ch_hmmrs.combine(ch_hmm_aa.map { it[1] } )
-            .map { [ [id: it[0].baseName ], it[0], it[1], true, true, false ] }
-            .set { ch_hmmdir }
-        HMMSEARCH( ch_hmmdir )
-        HMMRANK( HMMSEARCH.out.target_summary.collect() { it[1] } )
-    }
+
+    ch_hmmrs
+        .combine(ch_aa)
+        .map { [ [id: it[0].baseName ], it[0], it[2] ] }
+        .set { ch_hmmclassify }
+    HMMCLASSIFY ( ch_hmmclassify )
+    ch_versions = ch_versions.mix(HMMCLASSIFY.out.versions)
 
     //
     // MODULE: FeatureCounts
@@ -390,8 +370,12 @@ workflow METATDENOVO {
             UNPIGZ_EUKULELE(ch_aa)
             SUB_EUKULELE(UNPIGZ_EUKULELE.out.unzipped.collect { [ [ id: 'all_samples' ], it ] } )
         } else
-        SUB_EUKULELE(ch_eukulele)
+        SUB_EUKULELE(ch_aa)
     }
+
+    CUSTOM_DUMPSOFTWAREVERSIONS (
+        ch_versions.unique().collectFile(name: 'collated_versions.yml')
+    )
 
     //
     // MODULE: MultiQC

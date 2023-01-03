@@ -44,8 +44,11 @@ On release, automated continuous integration tests run the pipeline on a full-si
     3. Get raw counts per each gene present in the assembly [`Featurecounts`](http://subread.sourceforge.net) -> TSV table with collected featurecounts output
 8. Taxonomical annotation:
     1. [`EUKulele`](https://github.com/AlexanderLabWHOI/EUKulele) -> Reformat TSV output "Reformat_tax.R"
-9. Choice of functional annotation: 1. [`Eggnog-mapper`](http://eggnog-mapper.embl.de) 2. [`Run-DBcan`](https://github.com/linnabrown/run_dbcan) 3. [`Hmmsearch`](https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch) -> Hmmrank.R it allows to sort the hmmprofiles based on rank.
-   10 Summary statistics table. Collect_stats.R
+9. Choice of functional annotation: 
+    1. [`Eggnog-mapper`](http://eggnog-mapper.embl.de) 
+    2. [`Run-DBcan`](https://github.com/linnabrown/run_dbcan) 
+    3. [`Hmmsearch`](https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch). Besides searching the ORFs, each ORF's hits will be ranked.
+10 Summary statistics table. Collect_stats.R
 
 ## Quick Start
 
@@ -75,7 +78,7 @@ On release, automated continuous integration tests run the pipeline on a full-si
 
 ## Documentation
 
-The nf-core/metatdenovo pipeline comes with documentation about the pipeline [usage](https://nf-co.re/metatdenovo/usage), [parameters](https://nf-co.re/metatdenovo/parameters) and [output](https://nf-co.re/metatdenovo/output).
+The nf-core/metatdenovo pipeline comes with documentation about the pipeline [usage](https://github.com/LNUc-EEMiS/metatdenovo/blob/dev/docs/usage.md), [parameters](https://nf-co.re/metatdenovo/parameters) and [output](https://nf-co.re/metatdenovo/output).
 
 ## Credits
 
