@@ -17,26 +17,22 @@ workflow SUB_EUKULELE {
 
         String directoryName = params.eukulele_dbpath
         File directory = new File(directoryName)
-        String eukuleleDB = params.eukulele_db
-        File test = new File(eukuleleDB)
 
-        if ( params.eukulele ) {
-            if(! directory.exists() ) {
-                directory.mkdir()
-                EUKULELE_DB( )
-                if ( eukulele_db == 'mmetsp' ) {
-                    EUKULELE(fastaprot, EUKULELE_DB.out.mmetsp_db)
-                    FORMAT_TAX(EUKULELE.out.taxonomy_estimation.map { it[1] } )
-                } else if ( eukulele_db == 'phylodb' ) {
-                    EUKULELE(fastaprot, EUKULELE_DB.out.phylo_db)
-                    FORMAT_TAX(EUKULELE.out.taxonomy_estimation.map { it[1] } )
-                }
-            } else {
-                    ch_database = Channel.fromPath(params.eukulele_dbpath)
-                    EUKULELE(fastaprot, ch_database)
-                    FORMAT_TAX(EUKULELE.out.taxonomy_estimation.map { it[1] } )
+        if(! directory.exists() ) {
+            directory.mkdir()
+            EUKULELE_DB( )
+            if ( eukulele_db == 'mmetsp' ) {
+                EUKULELE(fastaprot, EUKULELE_DB.out.mmetsp_db)
+                FORMAT_TAX(EUKULELE.out.taxonomy_estimation.map { it[1] } )
+            } else if ( eukulele_db == 'phylodb' ) {
+                EUKULELE(fastaprot, EUKULELE_DB.out.phylo_db)
+                FORMAT_TAX(EUKULELE.out.taxonomy_estimation.map { it[1] } )
             }
-        }
+        } else {
+                ch_database = Channel.fromPath(params.eukulele_dbpath)
+                EUKULELE(fastaprot, ch_database)
+                FORMAT_TAX(EUKULELE.out.taxonomy_estimation.map { it[1] } )
+            }
 
     emit:
         taxonomy_estimation = EUKULELE.out.taxonomy_estimation

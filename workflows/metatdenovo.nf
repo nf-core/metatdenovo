@@ -54,7 +54,7 @@ if ( params.hmmdir ) {
 ch_eukulele_db = Channel.empty()
 if ( params.eukulele_db) {
     Channel
-        .of ( params.eukulele_db.split(‘,’) )
+        .of ( params.eukulele_db.split(',') )
         .set { ch_eukulele_db }
 }
 
@@ -185,14 +185,14 @@ workflow METATDENOVO {
     ch_versions = ch_versions.mix(CAT_FASTQ.out.versions.first().ifEmpty(null))
 
     // Branch FastQ channels if 'auto' specified to infer strandedness
-    //ch_cat_fastq
-    //    .branch {
-    //        meta, fastq ->
-    //            auto_strand : meta.strandedness == 'auto'
-    //                return [ meta, fastq ]
-    //            known_strand: meta.strandedness != 'auto'
-    //                return [ meta, fastq ]
-    //    }
+    ch_cat_fastq
+        .branch {
+            meta, fastq ->
+                auto_strand : meta.strandedness == 'auto'
+                    return [ meta, fastq ]
+                known_strand: meta.strandedness != 'auto'
+                    return [ meta, fastq ]
+        }
         .set { ch_strand_fastq }
     //
     // SUBWORKFLOW: Read QC and trim adapters
@@ -425,7 +425,7 @@ workflow METATDENOVO {
             UNPIGZ_EUKULELE(ch_aa)
             SUB_EUKULELE(UNPIGZ_EUKULELE.out.unzipped.collect { [ [ id: 'all_samples' ], it ] }, ch_eukulele_db )
         } else
-        SUB_EUKULELE(ch_eukulele, ch_eukulele_db)
+        SUB_EUKULELE(ch_aa, ch_eukulele_db)
         ch_versions = ch_versions.mix(SUB_EUKULELE.out.versions)
     }
 

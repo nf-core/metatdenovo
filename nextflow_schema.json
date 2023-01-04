@@ -200,37 +200,17 @@
             "default": "",
             "fa_icon": "fas fa-bacteria",
             "properties": {
-                "eukulele": {
-                    "type": "boolean",
-                    "description": "Activate eukulele module"
-                },
-                "eukulele_multirun": {
-                    "type": "boolean",
-                    "description": "Activate a second run eukulele module",
-                    "fa_icon": "fas fa-code-branch"
-                },
                 "eukulele_dbpath": {
                     "type": "string",
                     "default": "./eukulele",
                     "description": "Specify EUKulele database folder",
                     "fa_icon": "fas fa-otter"
                 },
-                "eukulele_sdbpath": {
-                    "type": "string",
-                    "default": "./eukulele",
-                    "description": "Specify EUKulele database folder for the second run",
-                    "fa_icon": "fas fa-code-branch"
-                },
                 "eukulele_db": {
                     "type": "string",
                     "default": "phylodb",
                     "description": "Specify which database you would like to use with eukulele, possible alternatives: phylodb, mmetsp. default: phylodb",
                     "fa_icon": "fas fa-otter"
-                },
-                "eukulele_second_db": {
-                    "type": "string",
-                    "description": "Specify which database you would like to use with eukulele, possible alternatives: phylodb, mmetsp",
-                    "fa_icon": "fas fa-code-branch"
                 },
                 "eukulele_method": {
                     "type": "string",
