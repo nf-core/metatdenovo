@@ -133,7 +133,7 @@ include { BAM_SORT_SAMTOOLS                          } from '../subworkflows/nf-
 include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS_CDS } from '../modules/nf-core/subread/featurecounts/main'
 include { PRODIGAL                                   } from '../modules/nf-core/prodigal/main'
 include { SPADES                                     } from '../modules/nf-core/spades/main'
-include { CAT_FASTQ 				     } from '../modules/nf-core/cat/fastq/main'
+include { CAT_FASTQ 				                 } from '../modules/nf-core/cat/fastq/main'
 include { FASTQC                                     } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                                    } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS                } from '../modules/nf-core/custom/dumpsoftwareversions/main'
