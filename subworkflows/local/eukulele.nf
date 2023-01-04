@@ -10,6 +10,7 @@ workflow SUB_EUKULELE {
 
     take:
         fastaprot
+        eukulele_db
 
     main:
         ch_versions = Channel.empty()
@@ -23,12 +24,13 @@ workflow SUB_EUKULELE {
             if(! directory.exists() ) {
                 directory.mkdir()
                 EUKULELE_DB( )
-                if ( params.eukulele_db == 'mmetsp' ) {
+                if ( eukulele_db == 'mmetsp' ) {
                     EUKULELE(fastaprot, EUKULELE_DB.out.mmetsp_db)
                     FORMAT_TAX(EUKULELE.out.taxonomy_estimation.map { it[1] } )
-                } else
+                } else if ( eukulele_db == 'phylodb' ) {
                     EUKULELE(fastaprot, EUKULELE_DB.out.phylo_db)
                     FORMAT_TAX(EUKULELE.out.taxonomy_estimation.map { it[1] } )
+                }
             } else {
                     ch_database = Channel.fromPath(params.eukulele_dbpath)
                     EUKULELE(fastaprot, ch_database)

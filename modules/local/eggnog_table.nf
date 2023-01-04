@@ -1,5 +1,5 @@
 process EGGNOG_TABLE {
-    tag '$meta.id'
+    tag "$meta.id"
     label 'process_low'
 
     conda (params.enable_conda ? "conda-forge::gzip=1.12" : null)
@@ -13,6 +13,9 @@ process EGGNOG_TABLE {
     output:
     tuple val(meta), path("eggnogs.tsv.gz"), emit: eggtab
     path "versions.yml"                    , emit: versions
+
+    when:
+    task.ext.when == null || task.ext.when
 
     script:
     def args = task.ext.args   ?: ''
