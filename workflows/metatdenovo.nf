@@ -103,8 +103,8 @@ include { DIGINORM } from '../subworkflows/local/diginorm'
 // SUBWORKFLOW: Consisting of nf-core/modules
 //
 
-include { PROKKA_CAT   } from '../subworkflows/local/prokka_cat'
-include { TRANSDECODER } from '../subworkflows/local/transdecoder'
+include { PROKKA_SUBSETS } from '../subworkflows/local/prokka_subsets'
+include { TRANSDECODER   } from '../subworkflows/local/transdecoder'
 
 //
 // Same here
@@ -270,14 +270,15 @@ workflow METATDENOVO {
     ch_aa  = Channel.empty()
 
     //
-    // SUBWORKFLOW: Run PROKKA on Megahit output, but split the fasta file in chunks of 10 MB, then concatenate and compress output.
+    // SUBWORKFLOW: Run PROKKA_SUBSETS on Megahit output, but split the fasta file in chunks of 10 MB, then concatenate and compress output.
     //
     
-    if (params.orf_caller == ORF_CALLER_PROKKA) {
-        PROKKA_CAT(ch_assembly_contigs)
-        ch_versions = ch_versions.mix(PROKKA_CAT.out.versions)
-        ch_gff      = PROKKA_CAT.out.gff.map { it[1] }
-        ch_aa       = PROKKA_CAT.out.faa
+    if ( params.orf_caller == ORF_CALLER_PROKKA ) {
+        PROKKA_SUBSETS(ch_assembly_contigs)
+        ch_versions = ch_versions.mix(PROKKA_SUBSETS.out.versions)
+        // DL: When I think about it, I think it's better to leave the mapping to when the channel is used -- easier to understand, or?
+        ch_gff      = PROKKA_SUBSETS.out.gff.map { it[1] }
+        ch_aa       = PROKKA_SUBSETS.out.faa
     }
 
     //
@@ -359,6 +360,8 @@ workflow METATDENOVO {
     // MODULE: Collect featurecounts output counts in one table
     //
 
+    // DL: Why is there an if clause here? Shouldn't this be solved by setting up correctly named channels above?
+    // Moreover, it looks like Prokka and Prodigal are identical.
     if ( params.orf_caller == ORF_CALLER_PROKKA) {
         COLLECT_FEATURECOUNTS ( FEATURECOUNTS_CDS.out.counts.collect() { it[1] })
         ch_cds_counts = COLLECT_FEATURECOUNTS.out.counts
@@ -373,8 +376,7 @@ workflow METATDENOVO {
         ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTS_EUK.out.versions)
     }
     ch_fcs = Channel.empty()
-    ch_fcs = ch_fcs.mix(
-        ch_cds_counts).collect()
+    ch_fcs = ch_fcs.mix(ch_cds_counts).collect()
     
     //
     // MODULE: Collect statistics from mapping analysis
@@ -404,6 +406,7 @@ workflow METATDENOVO {
     //
 
     if( !params.skip_eukulele){
+        // DL: I think this should also be change so that the Eukulele module does the unzipping itself.
         if ( params.orf_caller == ORF_CALLER_PROKKA ) {
             UNPIGZ_EUKULELE(ch_aa)
             SUB_EUKULELE(UNPIGZ_EUKULELE.out.unzipped.collect { [ [ id: 'all_samples' ], it ] } )
