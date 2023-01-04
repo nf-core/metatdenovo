@@ -276,7 +276,7 @@ workflow METATDENOVO {
     if ( params.orf_caller == ORF_CALLER_PROKKA ) {
         PROKKA_SUBSETS(ch_assembly_contigs)
         ch_versions = ch_versions.mix(PROKKA_SUBSETS.out.versions)
-        // DL: When I think about it, I think it's better to leave the mapping to when the channel is used -- easier to understand, or?
+        // DL: Isn't it clearer to leave the mapping to when the channel is used?
         ch_gff      = PROKKA_SUBSETS.out.gff.map { it[1] }
         ch_aa       = PROKKA_SUBSETS.out.faa
     }
@@ -290,15 +290,7 @@ workflow METATDENOVO {
         UNPIGZ_CONTIGS(ch_assembly_contigs.map { it[1] })
         ch_versions = ch_versions.mix(UNPIGZ_CONTIGS.out.versions)
 
-        // Since the above doesn't have a meta and we'd like to keep the assembly name, combine the original channel with the unzipped output channel
-        ch_assembly_contigs
-            .combine(UNPIGZ_CONTIGS.out.unzipped)
-            .map { [ [ id: "${it[0].id}_prodigal" ], it[2] ] }
-            .set { ch_prodigal }
-        PRODIGAL(
-            ch_prodigal,
-            'gff'
-        )
+        PRODIGAL ( ch_assembly_contigs, 'gff' )
         ch_gff          = PRODIGAL.out.gene_annotations.map { it[1] }
         ch_aa           = PRODIGAL.out.amino_acid_fasta
         ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
@@ -313,12 +305,7 @@ workflow METATDENOVO {
         UNPIGZ_CONTIGS(ch_assembly_contigs.map { it[1] })
         ch_versions = ch_versions.mix(UNPIGZ_CONTIGS.out.versions)
 
-        // Since the above doesn't have a meta and we'd like to keep the assembly name, combine the original channel with the unzipped output channel
-        ch_assembly_contigs
-            .combine(UNPIGZ_CONTIGS.out.unzipped)
-            .map { [ [ id: "${it[0].id}_transdecoder" ], it[2] ] }
-            .set { ch_transdecoder }
-        TRANSDECODER ( ch_transdecoder )
+        TRANSDECODER ( ch_assembly_contigs )
 
         ch_gff      = TRANSDECODER.out.gff.map { it[1] }
         ch_aa       = TRANSDECODER.out.pep
