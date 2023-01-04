@@ -9,7 +9,7 @@ include { CAT_CAT as FNA_CAT   } from '../../modules/nf-core/cat/cat/main'
 
 workflow PROKKA_CAT {
     take:
-        contigs
+        contigs // channel: [ val(meta), file(contigs) ]
 
     main:
         ch_versions = Channel.empty()

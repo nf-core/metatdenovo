@@ -29,6 +29,13 @@
                     "description": "The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.",
                     "fa_icon": "fas fa-folder-open"
                 },
+                "assembly": {
+                    "type": "string",
+                    "format": "file-path",
+                    "mimetype": "text/plain",
+                    "description": "Path to a fasta file with a finished assembly. Assembly will be skipped by the pipeline.",
+                    "fa_icon": "far fa-file-code"
+                },
                 "email": {
                     "type": "string",
                     "description": "Email address for completion summary.",

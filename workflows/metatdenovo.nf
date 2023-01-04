@@ -182,54 +182,71 @@ workflow METATDENOVO {
     }
 
     //
-    // MODULE: Interleave sequences
+    // MODULE: Interleave sequences for assembly
     //
-    SEQTK_MERGEPE(ch_clean_reads)
-    ch_versions = ch_versions.mix(SEQTK_MERGEPE.out.versions)
+    ch_interleaved = Channel.empty()
+    if ( ! params.assembly ) {
+        SEQTK_MERGEPE(ch_clean_reads)
+        ch_interleaved = SEQTK_MERGEPE.out.reads
+        ch_versions = ch_versions.mix(SEQTK_MERGEPE.out.versions)
+    }
 
     //
     // SUBWORKFLOW: Perform digital normalization
     //
-    ch_reads_to_assembly = Channel.empty()
-    if ( params.diginorm ) {
-        DIGINORM(SEQTK_MERGEPE.out.reads.collect { meta, fastq -> fastq }, [], 'all_samples')
-        ch_versions = ch_versions.mix(DIGINORM.out.versions)
-        ch_pe_reads_to_assembly = DIGINORM.out.pairs
-        ch_se_reads_to_assembly = DIGINORM.out.singles
-    } else {
-        ch_pe_reads_to_assembly = SEQTK_MERGEPE.out.reads.map { meta, fastq -> fastq }
-        ch_se_reads_to_assembly = []
+    ch_pe_reads_to_assembly = Channel.empty()
+    ch_se_reads_to_assembly = Channel.empty()
+    if ( ! params.assembly ) {
+        if ( params.diginorm ) {
+            DIGINORM(ch_interleaved.collect { meta, fastq -> fastq }, [], 'all_samples')
+            ch_versions = ch_versions.mix(DIGINORM.out.versions)
+            ch_pe_reads_to_assembly = DIGINORM.out.pairs
+            ch_se_reads_to_assembly = DIGINORM.out.singles
+        } else {
+            ch_pe_reads_to_assembly = ch_interleaved.map { meta, fastq -> fastq }
+            ch_se_reads_to_assembly = []
+        }
     }
-
-    ch_pacbio = []
-    ch_nanopore = []
-    ch_hmm = [] 
-    ch_spades = SEQTK_MERGEPE.out.reads.map { [ [ id: 'all_samples' ], it[1],  [], [] ] } 
     
 
     //
     // MODULE: Run Megahit or RNAspades on all interleaved fastq files
     //
-    if ( params.assembler == RNASPADES ) {
-        ch_spades = FASTQC_TRIMGALORE.out.reads.map { meta, fastq -> [ [ id: 'all_samples' ], fastq, [], [] ] }
-        SPADES( ch_spades, [] )
+    if ( params.assembly ) {
+        /**
+        INPUT_CHECK.out.reads
+            .map { [ it[0], [ id: 'user_assembly' ], file(params.assembly) ] }
+            .set { ch_assembly_contigs }
+        Channel
+            .fromPath(params.assembly)
+            .map { [ [ id: 'user_assembly' ], it ] }
+            .set { ch_assembly_contigs }
+            **/
+        Channel
+            .value ( [ [ id: 'user_assembly' ], file(params.assembly) ] )
+            .set { ch_assembly_contigs }
+    } else if ( params.assembler == RNASPADES ) {
+        // This doesn't work as we want, as it gets called once for each pair, see issue: https://github.com/LNUc-EEMiS/metatdenovo/issues/78
+        ch_spades = FASTQC_TRIMGALORE.out.reads.map { meta, fastq -> [ [ id: 'spades' ], fastq, [], [] ] }
+        SPADES( ch_spades, [], [] )
         ch_assembly_contigs = SPADES.out.transcripts.map { it[1] }
         ch_versions = ch_versions.mix(SPADES.out.versions)
-    } 
-    if ( params.assembler == MEGAHIT ) {
-    MEGAHIT_INTERLEAVED(
-        ch_pe_reads_to_assembly.collect(),
-        ch_se_reads_to_assembly.collect(),
-        'all_samples'
-    )
-    ch_assembly_contigs = MEGAHIT_INTERLEAVED.out.contigs
-    ch_versions = ch_versions.mix(MEGAHIT_INTERLEAVED.out.versions)
+    } else if ( params.assembler == MEGAHIT ) {
+        MEGAHIT_INTERLEAVED(
+            ch_pe_reads_to_assembly.collect(),
+            ch_se_reads_to_assembly.collect(),
+            'megahit_assembly'
+        )
+        MEGAHIT_INTERLEAVED.out.contigs
+            .map { [ [ id: 'megahit' ], it ] }
+            .set { ch_assembly_contigs }
+        ch_versions = ch_versions.mix(MEGAHIT_INTERLEAVED.out.versions)
     }
 
     //
     // MODULE: Create a BBMap index
     //
-    BBMAP_INDEX(ch_assembly_contigs)
+    BBMAP_INDEX(ch_assembly_contigs.map { it[1] })
     ch_versions   = ch_versions.mix(BBMAP_INDEX.out.versions)
 
     //
@@ -238,6 +255,7 @@ workflow METATDENOVO {
     BBMAP_ALIGN ( ch_clean_reads, BBMAP_INDEX.out.index )
     ch_versions = ch_versions.mix(BBMAP_ALIGN.out.versions)
 
+
     //
     // SUBWORKFLOW: sort bam file
     //
@@ -245,8 +263,16 @@ workflow METATDENOVO {
     ch_versions = ch_versions.mix(BAM_SORT_SAMTOOLS.out.versions)
 
     //
+    // Call ORFs
+    //
+
+    ch_gff = Channel.empty()
+    ch_aa  = Channel.empty()
+
+    //
     // SUBWORKFLOW: Run PROKKA on Megahit output, but split the fasta file in chunks of 10 MB, then concatenate and compress output.
     //
+    
     if (params.orf_caller == ORF_CALLER_PROKKA) {
         PROKKA_CAT(ch_assembly_contigs)
         ch_versions = ch_versions.mix(PROKKA_CAT.out.versions)
@@ -258,13 +284,18 @@ workflow METATDENOVO {
     // MODULE: Call Prodigal
     //
 
-    ch_prodigal = Channel.empty()
     if ( params.orf_caller == ORF_CALLER_PRODIGAL ) {
 
-        UNPIGZ_CONTIGS(ch_assembly_contigs)
+        UNPIGZ_CONTIGS(ch_assembly_contigs.map { it[1] })
         ch_versions = ch_versions.mix(UNPIGZ_CONTIGS.out.versions)
+
+        // Since the above doesn't have a meta and we'd like to keep the assembly name, combine the original channel with the unzipped output channel
+        ch_assembly_contigs
+            .combine(UNPIGZ_CONTIGS.out.unzipped)
+            .map { [ [ id: "${it[0].id}_prodigal" ], it[2] ] }
+            .set { ch_prodigal }
         PRODIGAL(
-            UNPIGZ_CONTIGS.out.unzipped.collect { [ [ id: 'prodigal' ], it ] },
+            ch_prodigal,
             'gff'
         )
         ch_gff          = PRODIGAL.out.gene_annotations.map { it[1] }
@@ -277,10 +308,17 @@ workflow METATDENOVO {
     //
 
     if ( params.orf_caller == ORF_CALLER_TRANSDECODER ) {
-        UNPIGZ_CONTIGS(ch_assembly_contigs)
-        TRANSDECODER(
-            UNPIGZ_CONTIGS.out.unzipped.collect { [ [ id: 'transdecoder' ], it ] }
-        )
+
+        UNPIGZ_CONTIGS(ch_assembly_contigs.map { it[1] })
+        ch_versions = ch_versions.mix(UNPIGZ_CONTIGS.out.versions)
+
+        // Since the above doesn't have a meta and we'd like to keep the assembly name, combine the original channel with the unzipped output channel
+        ch_assembly_contigs
+            .combine(UNPIGZ_CONTIGS.out.unzipped)
+            .map { [ [ id: "${it[0].id}_transdecoder" ], it[2] ] }
+            .set { ch_transdecoder }
+        TRANSDECODER ( ch_transdecoder )
+
         ch_gff      = TRANSDECODER.out.gff.map { it[1] }
         ch_aa       = TRANSDECODER.out.pep
         ch_versions = ch_versions.mix(TRANSDECODER.out.versions)
