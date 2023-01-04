@@ -7,18 +7,23 @@ include { CAT_CAT as GFF_CAT   } from '../../modules/nf-core/cat/cat/main'
 include { CAT_CAT as FAA_CAT   } from '../../modules/nf-core/cat/cat/main'
 include { CAT_CAT as FNA_CAT   } from '../../modules/nf-core/cat/cat/main'
 
-workflow PROKKA_CAT {
+workflow PROKKA_SUBSETS {
     take:
-        contigs
+        contigs // channel: [ val(meta), file(contigs) ]
 
     main:
         ch_versions = Channel.empty()
 
-        PROKKA  (contigs.splitFasta(size: 10.MB, file: true).map { contigs -> [[id: contigs.getBaseName()], contigs] }, [], [] )
+        contigs
+            .splitFasta(size: 10.MB, file: true)
+            .set { ch_prokka }
+        PROKKA ( ch_prokka, [], [] )
         ch_versions = ch_versions.mix(PROKKA.out.versions)
-        GFF_CAT (PROKKA.out.gff.collect{it[1]}.map { [ [ id: 'prokka'], it ] })
-        FAA_CAT (PROKKA.out.faa.collect{it[1]}.map { [ [ id: 'prokka'], it ] })
-        FNA_CAT (PROKKA.out.fna.collect{it[1]}.map { [ [ id: 'prokka'], it ] })
+        GFF_CAT ( PROKKA.out.gff )
+        ch_versions = ch_versions.mix(GFF_CAT.out.versions)
+        FAA_CAT ( PROKKA.out.faa )
+        ch_versions = ch_versions.mix(FAA_CAT.out.versions)
+        FNA_CAT ( PROKKA.out.fna )
         ch_versions = ch_versions.mix(FNA_CAT.out.versions)
 
     emit:

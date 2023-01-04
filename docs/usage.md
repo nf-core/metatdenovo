@@ -54,7 +54,10 @@ An [example samplesheet](../assets/samplesheet.csv) has been provided with the p
 
 ## Assembler options
 
-By default, the pipeline uses Megahit (i.e. `--assembler megahit`) to assemble the cleaned and trimmed FastQ reads to create the reference genome. Megahit is fast and it requires a not a lot of memory to run, typically is suggested to be used with prokaryotic samples. The pipeline allows you to choose another assembler RNAspades, (i.e. `--assembler rnaspades` ), that is usually suggested to use for eukaryotic samples.
+By default, the pipeline uses Megahit (i.e. `--assembler megahit`) to assemble the cleaned and trimmed FastQ reads to create the reference genome.
+Megahit is fast and it requires a not a lot of memory to run, typically is suggested to be used with prokaryotic samples.
+The pipeline allows you to choose another assembler RNAspades, (i.e. `--assembler rnaspades` ), that is usually suggested to use for eukaryotic samples.
+You can also choose to input contigs from an assembly that you made outside the pipeline using the `--assembly file.fna` (where `file.fna` is the name of a fasta file with contigs) option.
 
 > N.B. you can use `Megahit` for eukaryotic samples too, we just suggest what is the best option according to our experience (literature?).
 

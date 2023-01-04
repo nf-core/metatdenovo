@@ -103,8 +103,8 @@ include { DIGINORM } from '../subworkflows/local/diginorm'
 // SUBWORKFLOW: Consisting of nf-core/modules
 //
 
-include { PROKKA_CAT   } from '../subworkflows/local/prokka_cat'
-include { TRANSDECODER } from '../subworkflows/local/transdecoder'
+include { PROKKA_SUBSETS } from '../subworkflows/local/prokka_subsets'
+include { TRANSDECODER   } from '../subworkflows/local/transdecoder'
 
 //
 // Same here
@@ -221,54 +221,61 @@ workflow METATDENOVO {
     }
 
     //
-    // MODULE: Interleave sequences
+    // MODULE: Interleave sequences for assembly
     //
-    SEQTK_MERGEPE(ch_clean_reads)
-    ch_versions = ch_versions.mix(SEQTK_MERGEPE.out.versions)
+    ch_interleaved = Channel.empty()
+    if ( ! params.assembly ) {
+        SEQTK_MERGEPE(ch_clean_reads)
+        ch_interleaved = SEQTK_MERGEPE.out.reads
+        ch_versions = ch_versions.mix(SEQTK_MERGEPE.out.versions)
+    }
 
     //
     // SUBWORKFLOW: Perform digital normalization
     //
-    ch_reads_to_assembly = Channel.empty()
-    if ( params.diginorm ) {
-        DIGINORM(SEQTK_MERGEPE.out.reads.collect { meta, fastq -> fastq }, [], 'all_samples')
-        ch_versions = ch_versions.mix(DIGINORM.out.versions)
-        ch_pe_reads_to_assembly = DIGINORM.out.pairs
-        ch_se_reads_to_assembly = DIGINORM.out.singles
-    } else {
-        ch_pe_reads_to_assembly = SEQTK_MERGEPE.out.reads.map { meta, fastq -> fastq }
-        ch_se_reads_to_assembly = []
+    ch_pe_reads_to_assembly = Channel.empty()
+    ch_se_reads_to_assembly = Channel.empty()
+    if ( ! params.assembly ) {
+        if ( params.diginorm ) {
+            DIGINORM(ch_interleaved.collect { meta, fastq -> fastq }, [], 'all_samples')
+            ch_versions = ch_versions.mix(DIGINORM.out.versions)
+            ch_pe_reads_to_assembly = DIGINORM.out.pairs
+            ch_se_reads_to_assembly = DIGINORM.out.singles
+        } else {
+            ch_pe_reads_to_assembly = ch_interleaved.map { meta, fastq -> fastq }
+            ch_se_reads_to_assembly = []
+        }
     }
-
-    ch_pacbio = []
-    ch_nanopore = []
-    ch_hmm = []
-    ch_spades = SEQTK_MERGEPE.out.reads.map { [ [ id: 'all_samples' ], it[1],  [], [] ] }
-
 
     //
     // MODULE: Run Megahit or RNAspades on all interleaved fastq files
     //
-    if ( params.assembler == RNASPADES ) {
-        ch_spades = FASTQC_TRIMGALORE.out.reads.map { meta, fastq -> [ [ id: 'all_samples' ], fastq, [], [] ] }
-        SPADES( ch_spades, [] )
+    if ( params.assembly ) {
+        Channel
+            .value ( [ [ id: 'user_assembly' ], file(params.assembly) ] )
+            .set { ch_assembly_contigs }
+    } else if ( params.assembler == RNASPADES ) {
+        // This doesn't work as we want, as it gets called once for each pair, see issue: https://github.com/LNUc-EEMiS/metatdenovo/issues/78
+        ch_spades = FASTQC_TRIMGALORE.out.reads.map { meta, fastq -> [ [ id: 'spades' ], fastq, [], [] ] }
+        SPADES( ch_spades, [], [] )
         ch_assembly_contigs = SPADES.out.transcripts.map { it[1] }
         ch_versions = ch_versions.mix(SPADES.out.versions)
-    }
-    if ( params.assembler == MEGAHIT ) {
-    MEGAHIT_INTERLEAVED(
-        ch_pe_reads_to_assembly.collect(),
-        ch_se_reads_to_assembly.collect(),
-        'all_samples'
-    )
-    ch_assembly_contigs = MEGAHIT_INTERLEAVED.out.contigs
-    ch_versions = ch_versions.mix(MEGAHIT_INTERLEAVED.out.versions)
+    } else if ( params.assembler == MEGAHIT ) {
+        MEGAHIT_INTERLEAVED(
+            ch_pe_reads_to_assembly.collect(),
+            ch_se_reads_to_assembly.collect(),
+            'megahit_assembly'
+        )
+        MEGAHIT_INTERLEAVED.out.contigs
+            .map { [ [ id: 'megahit' ], it ] }
+            .set { ch_assembly_contigs }
+        ch_versions = ch_versions.mix(MEGAHIT_INTERLEAVED.out.versions)
     }
 
     //
     // MODULE: Create a BBMap index
     //
-    BBMAP_INDEX(ch_assembly_contigs)
+    BBMAP_INDEX(ch_assembly_contigs.map { it[1] })
     ch_versions   = ch_versions.mix(BBMAP_INDEX.out.versions)
 
     //
@@ -277,6 +284,7 @@ workflow METATDENOVO {
     BBMAP_ALIGN ( ch_clean_reads, BBMAP_INDEX.out.index )
     ch_versions = ch_versions.mix(BBMAP_ALIGN.out.versions)
 
+
     //
     // SUBWORKFLOW: sort bam file
     //
@@ -284,28 +292,34 @@ workflow METATDENOVO {
     ch_versions = ch_versions.mix(BAM_SORT_SAMTOOLS.out.versions)
 
     //
-    // SUBWORKFLOW: Run PROKKA on Megahit output, but split the fasta file in chunks of 10 MB, then concatenate and compress output.
+    // Call ORFs
     //
-    if (params.orf_caller == ORF_CALLER_PROKKA) {
-        PROKKA_CAT(ch_assembly_contigs)
-        ch_versions = ch_versions.mix(PROKKA_CAT.out.versions)
-        ch_gff      = PROKKA_CAT.out.gff.map { it[1] }
-        ch_aa       = PROKKA_CAT.out.faa
+
+    ch_gff = Channel.empty()
+    ch_aa  = Channel.empty()
+
+    //
+    // SUBWORKFLOW: Run PROKKA_SUBSETS on Megahit output, but split the fasta file in chunks of 10 MB, then concatenate and compress output.
+    //
+    
+    if ( params.orf_caller == ORF_CALLER_PROKKA ) {
+        PROKKA_SUBSETS(ch_assembly_contigs)
+        ch_versions = ch_versions.mix(PROKKA_SUBSETS.out.versions)
+        // DL: Isn't it clearer to leave the mapping to when the channel is used?
+        ch_gff      = PROKKA_SUBSETS.out.gff.map { it[1] }
+        ch_aa       = PROKKA_SUBSETS.out.faa
     }
 
     //
     // MODULE: Call Prodigal
     //
 
-    ch_prodigal = Channel.empty()
     if ( params.orf_caller == ORF_CALLER_PRODIGAL ) {
 
-        UNPIGZ_CONTIGS(ch_assembly_contigs)
+        UNPIGZ_CONTIGS(ch_assembly_contigs.map { it[1] })
         ch_versions = ch_versions.mix(UNPIGZ_CONTIGS.out.versions)
-        PRODIGAL(
-            UNPIGZ_CONTIGS.out.unzipped.collect { [ [ id: 'prodigal' ], it ] },
-            'gff'
-        )
+
+        PRODIGAL ( ch_assembly_contigs, 'gff' )
         ch_gff          = PRODIGAL.out.gene_annotations.map { it[1] }
         ch_aa           = PRODIGAL.out.amino_acid_fasta
         ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
@@ -316,10 +330,12 @@ workflow METATDENOVO {
     //
 
     if ( params.orf_caller == ORF_CALLER_TRANSDECODER ) {
-        UNPIGZ_CONTIGS(ch_assembly_contigs)
-        TRANSDECODER(
-            UNPIGZ_CONTIGS.out.unzipped.collect { [ [ id: 'transdecoder' ], it ] }
-        )
+
+        UNPIGZ_CONTIGS(ch_assembly_contigs.map { it[1] })
+        ch_versions = ch_versions.mix(UNPIGZ_CONTIGS.out.versions)
+
+        TRANSDECODER ( ch_assembly_contigs )
+
         ch_gff      = TRANSDECODER.out.gff.map { it[1] }
         ch_aa       = TRANSDECODER.out.pep
         ch_versions = ch_versions.mix(TRANSDECODER.out.versions)
@@ -360,6 +376,8 @@ workflow METATDENOVO {
     // MODULE: Collect featurecounts output counts in one table
     //
 
+    // DL: Why is there an if clause here? Shouldn't this be solved by setting up correctly named channels above?
+    // Moreover, it looks like Prokka and Prodigal are identical.
     if ( params.orf_caller == ORF_CALLER_PROKKA) {
         COLLECT_FEATURECOUNTS ( FEATURECOUNTS_CDS.out.counts.collect() { it[1] })
         ch_cds_counts = COLLECT_FEATURECOUNTS.out.counts
@@ -374,8 +392,8 @@ workflow METATDENOVO {
         ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTS_EUK.out.versions)
     }
     ch_fcs = Channel.empty()
-    ch_fcs = ch_fcs.mix(
-        ch_cds_counts).collect()
+    ch_fcs = ch_fcs.mix(ch_cds_counts).collect()
+    
 
     //
     // MODULE: Collect statistics from mapping analysis
@@ -405,6 +423,7 @@ workflow METATDENOVO {
     //
 
     if( !params.skip_eukulele){
+        // DL: I think this should also be change so that the Eukulele module does the unzipping itself.
         if ( params.orf_caller == ORF_CALLER_PROKKA ) {
             UNPIGZ_EUKULELE(ch_aa)
             SUB_EUKULELE(UNPIGZ_EUKULELE.out.unzipped.collect { [ [ id: 'all_samples' ], it ] } )
