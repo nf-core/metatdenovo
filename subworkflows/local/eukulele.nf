@@ -17,22 +17,15 @@ workflow SUB_EUKULELE {
 
         String directoryName = params.eukulele_dbpath
         File directory = new File(directoryName)
-
         if(! directory.exists() ) {
             directory.mkdir()
-            EUKULELE_DB( )
-            if ( eukulele_db == 'mmetsp' ) {
-                EUKULELE(fastaprot, EUKULELE_DB.out.mmetsp_db)
-                FORMAT_TAX(EUKULELE.out.taxonomy_estimation.map { it[1] } )
-            } else if ( eukulele_db == 'phylodb' ) {
-                EUKULELE(fastaprot, EUKULELE_DB.out.phylo_db)
-                FORMAT_TAX(EUKULELE.out.taxonomy_estimation.map { it[1] } )
+            EUKULELE_DB(eukulele_db)
+            EUKULELE(fastaprot,EUKULELE_DB.out.db)
+            } else {
+                ch_dbpath = Channel.fromPath(params.eukulele_dbpath)
+                EUKULELE(fastaprot, ch_dbpath)
             }
-        } else {
-                ch_database = Channel.fromPath(params.eukulele_dbpath)
-                EUKULELE(fastaprot, ch_database)
-                FORMAT_TAX(EUKULELE.out.taxonomy_estimation.map { it[1] } )
-            }
+
 
     emit:
         taxonomy_estimation = EUKULELE.out.taxonomy_estimation

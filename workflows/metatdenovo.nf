@@ -58,6 +58,7 @@ if ( params.eukulele_db) {
         .set { ch_eukulele_db }
 }
 
+ch_eukulele_db.view()
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     CONFIG FILES

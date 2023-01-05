@@ -8,11 +8,11 @@ process EUKULELE_DB {
         'quay.io/biocontainers/eukulele:2.0.3--pyh723bec7_0' }"
 
     input:
+    val(db)
 
     output:
     path "versions.yml", emit: version
-    path("phylodb/")   , emit: phylo_db , optional: true
-    path("mmetsp/")    , emit: mmetsp_db, optional: true
+    path("*")          , emit: db , optional: true
 
     when:
     task.ext.when == null || task.ext.when
@@ -23,7 +23,8 @@ process EUKULELE_DB {
     """
     EUKulele \\
     download \\
-    $args
+    $args \\
+    --database $db
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
