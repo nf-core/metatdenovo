@@ -58,7 +58,6 @@ if ( params.eukulele_db) {
         .set { ch_eukulele_db }
 }
 
-ch_eukulele_db.view()
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     CONFIG FILES
@@ -132,7 +131,7 @@ include { BAM_SORT_SAMTOOLS                          } from '../subworkflows/nf-
 include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS_CDS } from '../modules/nf-core/subread/featurecounts/main'
 include { PRODIGAL                                   } from '../modules/nf-core/prodigal/main'
 include { SPADES                                     } from '../modules/nf-core/spades/main'
-include { CAT_FASTQ 		                     } from '../modules/nf-core/cat/fastq/main'
+include { CAT_FASTQ 		                         } from '../modules/nf-core/cat/fastq/main'
 include { FASTQC                                     } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                                    } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS                } from '../modules/nf-core/custom/dumpsoftwareversions/main'
@@ -299,7 +298,7 @@ workflow METATDENOVO {
     //
     // SUBWORKFLOW: Run PROKKA_SUBSETS on Megahit output, but split the fasta file in chunks of 10 MB, then concatenate and compress output.
     //
-    
+
     if ( params.orf_caller == ORF_CALLER_PROKKA ) {
         PROKKA_SUBSETS(ch_assembly_contigs)
         ch_versions = ch_versions.mix(PROKKA_SUBSETS.out.versions)
@@ -391,7 +390,7 @@ workflow METATDENOVO {
     }
     ch_fcs = Channel.empty()
     ch_fcs = ch_fcs.mix(ch_cds_counts).collect()
-    
+
 
     //
     // MODULE: Collect statistics from mapping analysis

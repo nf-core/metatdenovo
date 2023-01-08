@@ -35,7 +35,7 @@ workflow FASTQC_TRIMGALORE {
         trim_html   = TRIMGALORE.out.html
         trim_zip    = TRIMGALORE.out.zip
         trim_log    = TRIMGALORE.out.log
-        ch_versions = ch_versions.mix(FASTQC.out.versions.first())
+        ch_versions = ch_versions.mix(TRIMGALORE.out.versions.first())
     }
 
     emit:
