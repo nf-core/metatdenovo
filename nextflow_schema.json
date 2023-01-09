@@ -265,7 +265,7 @@
             "default": null
         },
         "diginorm": {
-            "type": "string",
+            "type": "boolean",
             "default": "false"
         },
         "diginorm_C": {
@@ -289,7 +289,7 @@
             "default": "megahit"
         },
         "eggnog": {
-            "type": "string",
+            "type": "boolean",
             "default": "false"
         },
         "eggnog_dbpath": {
@@ -301,7 +301,7 @@
             "default": null
         },
         "skip_eukulele": {
-            "type": "string",
+            "type": "boolean",
             "default": "false"
         },
         "eukulele_dbpath": {
@@ -333,19 +333,19 @@
             "default": null
         },
         "save_trimmed": {
-            "type": "string",
+            "type": "boolean",
             "default": "false"
         },
         "skip_trimming": {
-            "type": "string",
+            "type": "boolean",
             "default": "false"
         },
         "skip_qc": {
-            "type": "string",
+            "type": "boolea",
             "default": "false"
         },
         "skip_fastqc": {
-            "type": "string",
+            "type": "boolean",
             "default": "false"
         }
     }
