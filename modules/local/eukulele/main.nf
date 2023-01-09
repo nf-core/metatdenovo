@@ -25,7 +25,7 @@ process EUKULELE {
     gunzip   = fasta =~ /\.gz$/ ? "gunzip -c ${fasta} > ${input}" : ""
 
     """
-    
+
     $gunzip
 
     rc=0
