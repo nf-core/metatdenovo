@@ -8,29 +8,35 @@ process EUKULELE {
         'quay.io/biocontainers/eukulele:2.0.3--pyh723bec7_0' }"
 
     input:
-    tuple val(meta), path(contigs_fasta)
-    path(db)
+    tuple val(meta)  , path(fasta)
+    tuple path(eukdb), val(namedb)
 
     output:
-    tuple val(meta), path("${meta.id}/taxonomy_estimation/*.out")                  , emit: taxonomy_estimation
-    tuple val(meta), path("${meta.id}/taxonomy_counts/${meta.id}_all_*_counts.csv"), emit: taxonomy_counts
-    tuple val(meta), path("${meta.id}/mets_full/diamond/*")                        , emit: diamond
+    tuple val(meta), path("${meta.id}_${namedb}/taxonomy_estimation/*.out")                            , emit: taxonomy_estimation
+    tuple val(meta), path("${meta.id}_${namedb}/taxonomy_counts/${meta.id}_${namedb}_all_*_counts.csv"), emit: taxonomy_counts
+    tuple val(meta), path("${meta.id}_${namedb}/mets_full/diamond/*")                                  , emit: diamond
 
-    path "versions.yml"                                                            , emit: versions
+    path "versions.yml"                                                                                , emit: versions
 
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
+    input    = fasta =~ /\.gz$/ ? fasta.name.take(fasta.name.lastIndexOf('.')) : fasta
+    gunzip   = fasta =~ /\.gz$/ ? "gunzip -c ${fasta} > ${input}" : ""
 
     """
+    
+    $gunzip
+
     rc=0
     mkdir contigs
-    cp ${contigs_fasta} ./contigs/
+    cp $input ./contigs/
 
     EUKulele \\
         $args \\
-        --reference_dir $db \\
-        -o ${meta.id} \\
+        --database $namedb \\
+        --reference_dir $eukdb \\
+        -o ${meta.id}_$namedb \\
         --CPUs ${task.cpus} \\
         -s \\
         contigs || rc=\$?

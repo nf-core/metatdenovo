@@ -372,25 +372,15 @@ workflow METATDENOVO {
     //
     // MODULE: Collect featurecounts output counts in one table
     //
-
-    // DL: Why is there an if clause here? Shouldn't this be solved by setting up correctly named channels above?
-    // Moreover, it looks like Prokka and Prodigal are identical.
-    if ( params.orf_caller == ORF_CALLER_PROKKA) {
-        COLLECT_FEATURECOUNTS ( FEATURECOUNTS_CDS.out.counts.collect() { it[1] })
-        ch_cds_counts = COLLECT_FEATURECOUNTS.out.counts
-        ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
-    } else if ( params.orf_caller == ORF_CALLER_PRODIGAL) {
-        COLLECT_FEATURECOUNTS ( FEATURECOUNTS_CDS.out.counts.collect() { it[1] })
-        ch_cds_counts = COLLECT_FEATURECOUNTS.out.counts
-        ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
-    } else if ( params.orf_caller == ORF_CALLER_TRANSDECODER) {
-        COLLECT_FEATURECOUNTS_EUK ( FEATURECOUNTS_CDS.out.counts.collect() { it[1] })
-        ch_cds_counts = COLLECT_FEATURECOUNTS_EUK.out.counts
-        ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTS_EUK.out.versions)
-    }
+    
+    FEATURECOUNTS_CDS.out.counts.collect() { it[1] }
+        .combine(ch_eukulele_db)
+        .map { [ it[2] , it[1] ] }
+        .set { ch_collect_feature }
+    COLLECT_FEATURECOUNTS ( ch_collect_feature )
     ch_fcs = Channel.empty()
-    ch_fcs = ch_fcs.mix(ch_cds_counts).collect()
-
+    ch_fcs = COLLECT_FEATURECOUNTS.out.counts.collect()
+    ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
 
     //
     // MODULE: Collect statistics from mapping analysis
@@ -420,11 +410,6 @@ workflow METATDENOVO {
     //
 
     if( !params.skip_eukulele){
-        // DL: I think this should also be change so that the Eukulele module does the unzipping itself.
-        if ( params.orf_caller == ORF_CALLER_PROKKA ) {
-            UNPIGZ_EUKULELE(ch_aa)
-            SUB_EUKULELE(UNPIGZ_EUKULELE.out.unzipped.collect { [ [ id: 'all_samples' ], it ] }, ch_eukulele_db )
-        } else
         SUB_EUKULELE(ch_aa, ch_eukulele_db)
         ch_versions = ch_versions.mix(SUB_EUKULELE.out.versions)
     }

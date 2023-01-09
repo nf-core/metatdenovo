@@ -20,11 +20,20 @@ workflow SUB_EUKULELE {
         if(! directory.exists() ) {
             directory.mkdir()
             EUKULELE_DB(eukulele_db)
-            EUKULELE(fastaprot,EUKULELE_DB.out.db)
+            EUKULELE(fastaprot,EUKULELE_DB.out.db, eukulele_db)
             } else {
                 ch_dbpath = Channel.fromPath(params.eukulele_dbpath)
-                EUKULELE(fastaprot, ch_dbpath)
+                ch_dbpath
+                    .combine(eukulele_db)
+                    .set { ch_eukulele }
+                EUKULELE( fastaprot, ch_eukulele )
             }
+
+            EUKULELE.out.taxonomy_estimation
+                .combine(eukulele_db)
+                .map { [ it[2] , it[1] ] }
+                .set { ch_formtax }
+            FORMAT_TAX( ch_formtax )
 
 
     emit:

@@ -7,7 +7,7 @@ process COLLECT_FEATURECOUNTS {
         'quay.io/biocontainers/mulled-v2-508c9bc5e929a77a9708902b1deca248c0c84689:0bb5bee2557136d28549f41d3faa08485e967aa1-0' }"
 
     input:
-        path inputfiles
+    tuple val(meta), path(inputfiles)
 
     output:
         path "*.tsv.gz"    , emit: counts
@@ -53,7 +53,7 @@ process COLLECT_FEATURECOUNTS {
         ) %>%
         tidyr::unnest(d) %>%
         select(-f) %>%
-        write_tsv("counts.tsv.gz")
+        write_tsv("${meta}_counts.tsv.gz")
 
         writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")), paste0("    dplyr: ", packageVersion('dplyr')),
             paste0("    dtplyr: ", packageVersion('dtplyr')), paste0("    data.table: ", packageVersion('data.table')) ), "versions.yml")

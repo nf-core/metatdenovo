@@ -12,7 +12,7 @@ process EUKULELE_DB {
 
     output:
     path "versions.yml", emit: version
-    path("*")          , emit: db , optional: true
+    path("${db}")      , emit: db , optional: true
 
     when:
     task.ext.when == null || task.ext.when
