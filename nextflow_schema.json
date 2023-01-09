@@ -341,7 +341,7 @@
             "default": "false"
         },
         "skip_qc": {
-            "type": "boolea",
+            "type": "boolean",
             "default": "false"
         },
         "skip_fastqc": {
