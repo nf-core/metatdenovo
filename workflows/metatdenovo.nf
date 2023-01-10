@@ -23,11 +23,12 @@ EUKULELE_DB_PHYLODB     = 'phylodb'
 EUKULELE_DB_MMETSP      = 'mmetsp'
 EUKULELE_DB_EUKPROT     = 'eukprot'
 EUKULELE_DB_EUKZOO      = 'eukzoo'
+EUKULELE_DB_GTDB        = 'gtdb'
 
 def valid_params = [
-    orf_caller      : [ORF_CALLER_PRODIGAL, ORF_CALLER_PROKKA, ORF_CALLER_TRANSDECODER],
-    assembler       : [RNASPADES, MEGAHIT],
-    eukulele_db     : [EUKULELE_DB_PHYLODB, EUKULELE_DB_MMETSP, EUKULELE_DB_EUKPROT, EUKULELE_DB_EUKZOO]
+    orf_caller      : [ ORF_CALLER_PRODIGAL, ORF_CALLER_PROKKA, ORF_CALLER_TRANSDECODER ],
+    assembler       : [ RNASPADES, MEGAHIT ],
+    eukulele_db     : [ EUKULELE_DB_PHYLODB, EUKULELE_DB_MMETSP, EUKULELE_DB_EUKPROT, EUKULELE_DB_EUKZOO, EUKULELE_DB_GTDB ]
 ]
 
 // Check input path parameters to see if they exist
@@ -52,11 +53,15 @@ if ( params.hmmdir ) {
 }
 
 ch_eukulele_db = Channel.empty()
-if ( params.eukulele_db) {
-    Channel
-        .of ( params.eukulele_db.split(',') )
-        .set { ch_eukulele_db }
+if ( !params.skip_eukulele ) {
+    if ( params.eukulele_db) {
+        Channel
+            .of ( params.eukulele_db.split(',') )
+            .set { ch_eukulele_db }
+    } else {  exit 1, 'eukuelel database not specified!' 
+    }
 }
+
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
