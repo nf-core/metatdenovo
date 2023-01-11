@@ -387,7 +387,6 @@ workflow METATDENOVO {
 
     ch_fcs = Channel.empty()
     ch_fcs = COLLECT_FEATURECOUNTS.out.counts.collect()
-    ch_fcs.view()
     ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
 
     //
@@ -418,7 +417,11 @@ workflow METATDENOVO {
     //
 
     if( !params.skip_eukulele){
-        SUB_EUKULELE(ch_aa, ch_eukulele_db)
+        ch_eukulele_db
+            .combine(ch_aa)
+            .map{ [ [id:it[0] ], it[2] ] }
+            .set { ch_eukulele }
+        SUB_EUKULELE( ch_eukulele, ch_eukulele_db )
         ch_versions = ch_versions.mix(SUB_EUKULELE.out.versions)
     }
 

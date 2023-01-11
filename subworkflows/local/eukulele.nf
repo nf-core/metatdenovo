@@ -29,11 +29,7 @@ workflow SUB_EUKULELE {
                 EUKULELE( fastaprot, ch_eukulele )
             }
 
-            EUKULELE.out.taxonomy_estimation
-                .combine(eukulele_db)
-                .map { [ it[2] , it[1] ] }
-                .set { ch_formtax }
-            FORMAT_TAX( ch_formtax )
+            FORMAT_TAX( EUKULELE.out.taxonomy_estimation )
 
 
     emit:

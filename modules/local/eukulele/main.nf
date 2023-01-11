@@ -12,11 +12,11 @@ process EUKULELE {
     tuple path(eukdb), val(namedb)
 
     output:
-    tuple val(meta), path("${meta.id}_${namedb}/taxonomy_estimation/*.out")                            , emit: taxonomy_estimation
-    tuple val(meta), path("${meta.id}_${namedb}/taxonomy_counts/${meta.id}_${namedb}_all_*_counts.csv"), emit: taxonomy_counts
-    tuple val(meta), path("${meta.id}_${namedb}/mets_full/diamond/*")                                  , emit: diamond
+    tuple val(meta), path("${meta.id}/taxonomy_estimation/*.out")                            , emit: taxonomy_estimation
+    tuple val(meta), path("${meta.id}/taxonomy_counts/*_counts.csv")                         , emit: taxonomy_counts
+    tuple val(meta), path("${meta.id}/mets_full/diamond/*")                                  , emit: diamond
 
-    path "versions.yml"                                                                                , emit: versions
+    path "versions.yml"                                                                      , emit: versions
 
     script:
     def args = task.ext.args ?: ''
@@ -36,7 +36,7 @@ process EUKULELE {
         $args \\
         --database $namedb \\
         --reference_dir $eukdb \\
-        -o ${meta.id}_$namedb \\
+        -o ${meta.id} \\
         --CPUs ${task.cpus} \\
         -s \\
         contigs || rc=\$?
