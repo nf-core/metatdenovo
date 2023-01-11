@@ -378,13 +378,16 @@ workflow METATDENOVO {
     // MODULE: Collect featurecounts output counts in one table
     //
     
-    FEATURECOUNTS_CDS.out.counts.collect() { it[1] }
-        .combine(ch_eukulele_db)
-        .map { [ it[2] , it[1] ] }
+    FEATURECOUNTS_CDS.out.counts
+        .collect() { it[1] }
+        .map { [ 'all_samples', it ] }
         .set { ch_collect_feature }
+
     COLLECT_FEATURECOUNTS ( ch_collect_feature )
+
     ch_fcs = Channel.empty()
     ch_fcs = COLLECT_FEATURECOUNTS.out.counts.collect()
+    ch_fcs.view()
     ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
 
     //
