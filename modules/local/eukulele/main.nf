@@ -11,9 +11,9 @@ process EUKULELE {
     tuple val(meta), path(fasta), val(dbname), path(eukdb)
 
     output:
-    tuple val(meta), path("${meta.id}_*/taxonomy_estimation/*.out"), val($db)    , emit: taxonomy_estimation
-    tuple val(meta), path("${meta.id}_*/taxonomy_counts/*_counts.csv") , emit: taxonomy_counts
-    tuple val(meta), path("${meta.id}_*/mets_full/diamond/*")          , emit: diamond
+    tuple val(meta), path("${meta.id}_*/taxonomy_estimation/*.out"), val("${db}")    , emit: taxonomy_estimation
+    tuple val(meta), path("${meta.id}_*/taxonomy_counts/*_counts.csv")               , emit: taxonomy_counts
+    tuple val(meta), path("${meta.id}_*/mets_full/diamond/*")                        , emit: diamond
 
     path "versions.yml"                                                              , emit: versions
 
@@ -23,7 +23,7 @@ process EUKULELE {
     input    = fasta =~ /\.gz$/ ? fasta.name.take(fasta.name.lastIndexOf('.')) : fasta
     gunzip   = fasta =~ /\.gz$/ ? "gunzip -c ${fasta} > ${input}" : ""
     def database = dbname ? "--database ${dbname}" : ''
-    def db       = dbname ? "${dbname}" : 'default'
+    db       = dbname ? "${dbname}" : 'default'
     
     """
 
