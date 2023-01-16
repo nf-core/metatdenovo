@@ -54,12 +54,9 @@ if ( params.hmmdir ) {
 
 ch_eukulele_db = Channel.empty()
 if ( !params.skip_eukulele ) {
-    if ( params.eukulele_db) {
-        Channel
-            .of ( params.eukulele_db.split(',') )
-            .set { ch_eukulele_db }
-    } else {  exit 1, 'eukuelel database not specified!' 
-    }
+    Channel
+        .of ( params.eukulele_db.split(',') )
+        .set { ch_eukulele_db }
 }
 
 
@@ -136,7 +133,7 @@ include { BAM_SORT_SAMTOOLS                          } from '../subworkflows/nf-
 include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS_CDS } from '../modules/nf-core/subread/featurecounts/main'
 include { PRODIGAL                                   } from '../modules/nf-core/prodigal/main'
 include { SPADES                                     } from '../modules/nf-core/spades/main'
-include { CAT_FASTQ 		                         } from '../modules/nf-core/cat/fastq/main'
+include { CAT_FASTQ 		                     } from '../modules/nf-core/cat/fastq/main'
 include { FASTQC                                     } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                                    } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS                } from '../modules/nf-core/custom/dumpsoftwareversions/main'
@@ -380,7 +377,7 @@ workflow METATDENOVO {
     
     FEATURECOUNTS_CDS.out.counts
         .collect() { it[1] }
-        .map { [ 'all_samples', it ] }
+        .map { [ [ id:'all_samples'], it ] }
         .set { ch_collect_feature }
 
     COLLECT_FEATURECOUNTS ( ch_collect_feature )
@@ -417,11 +414,7 @@ workflow METATDENOVO {
     //
 
     if( !params.skip_eukulele){
-        ch_eukulele_db
-            .combine(ch_aa)
-            .map{ [ [id:it[0] ], it[2] ] }
-            .set { ch_eukulele }
-        SUB_EUKULELE( ch_eukulele, ch_eukulele_db )
+        SUB_EUKULELE( ch_aa, ch_eukulele_db )
         ch_versions = ch_versions.mix(SUB_EUKULELE.out.versions)
     }
 

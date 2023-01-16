@@ -23,10 +23,11 @@ workflow SUB_EUKULELE {
             EUKULELE(fastaprot,EUKULELE_DB.out.db, eukulele_db)
             } else {
                 ch_dbpath = Channel.fromPath(params.eukulele_dbpath)
-                ch_dbpath
+                fastaprot
                     .combine(eukulele_db)
+                    .combine(ch_dbpath)
                     .set { ch_eukulele }
-                EUKULELE( fastaprot, ch_eukulele )
+                EUKULELE( ch_eukulele )
             }
 
             FORMAT_TAX( EUKULELE.out.taxonomy_estimation )

@@ -1,4 +1,5 @@
 process COLLECT_FEATURECOUNTS {
+    tag "$meta.id"
     label 'process_high'
 
     conda (params.enable_conda ? "conda-forge::r-tidyverse=1.3.1 conda-forge::r-data.table=1.14.0 conda-forge::r-dtplyr=1.1.0" : null)
@@ -10,15 +11,15 @@ process COLLECT_FEATURECOUNTS {
     tuple val(meta), path(inputfiles)
 
     output:
-        path "*.tsv.gz"    , emit: counts
-        path "versions.yml", emit: versions
+    tuple val(meta), path("*.tsv.gz")   , emit: counts
+    path "versions.yml"                 , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
 
     script:
     def args     = task.ext.args ?: ''
-
+    def prefix = task.ext.prefix ?: "${meta.id}"
     """
     #!/usr/bin/env Rscript
 
@@ -53,7 +54,7 @@ process COLLECT_FEATURECOUNTS {
         ) %>%
         tidyr::unnest(d) %>%
         select(-f) %>%
-        write_tsv("${meta}_counts.tsv.gz")
+        write_tsv("${prefix}_counts.tsv.gz")
 
         writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")), paste0("    dplyr: ", packageVersion('dplyr')),
             paste0("    dtplyr: ", packageVersion('dtplyr')), paste0("    data.table: ", packageVersion('data.table')) ), "versions.yml")

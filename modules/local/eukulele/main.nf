@@ -8,8 +8,7 @@ process EUKULELE {
         'quay.io/biocontainers/eukulele:2.0.3--pyh723bec7_0' }"
 
     input:
-    tuple val(meta)  , path(fasta)
-    tuple path(eukdb), val(namedb)
+    tuple val(meta), path(fasta), val(dbname), path(eukdb)
 
     output:
     tuple val(meta), path("${meta.id}/taxonomy_estimation/*.out")                            , emit: taxonomy_estimation
@@ -34,7 +33,7 @@ process EUKULELE {
 
     EUKulele \\
         $args \\
-        --database $namedb \\
+        --database $dbname \\
         --reference_dir $eukdb \\
         -o ${meta.id} \\
         --CPUs ${task.cpus} \\

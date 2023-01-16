@@ -12,7 +12,7 @@ process EUKULELE_DB {
 
     output:
     path "versions.yml", emit: version
-    path("${db}")      , emit: db , optional: true
+    path("${db}")      , emit: db
 
     when:
     task.ext.when == null || task.ext.when
@@ -22,9 +22,9 @@ process EUKULELE_DB {
 
     """
     EUKulele \\
-    download \\
-    $args \\
-    --database $db
+        download \\
+        $args \\
+        --database $db
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
