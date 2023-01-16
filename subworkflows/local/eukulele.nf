@@ -29,8 +29,9 @@ workflow SUB_EUKULELE {
                     .set { ch_eukulele }
                 EUKULELE( ch_eukulele )
             }
+            EUKULELE.out.taxonomy_estimation.view()
 
-            FORMAT_TAX( EUKULELE.out.taxonomy_estimation )
+            FORMAT_TAX( EUKULELE.out.taxonomy_estimation.map { [ it[2], it[1] ] } )
 
     emit:
         taxonomy_estimation = EUKULELE.out.taxonomy_estimation
