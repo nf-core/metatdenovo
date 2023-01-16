@@ -11,18 +11,19 @@ process EUKULELE {
     tuple val(meta), path(fasta), val(dbname), path(eukdb)
 
     output:
-    tuple val(meta), path("${meta.id}/taxonomy_estimation/*.out")                            , emit: taxonomy_estimation
-    tuple val(meta), path("${meta.id}/taxonomy_counts/*_counts.csv")                         , emit: taxonomy_counts
-    tuple val(meta), path("${meta.id}/mets_full/diamond/*")                                  , emit: diamond
+    tuple val(database), path("${meta.id}_${database}/taxonomy_estimation/*.out")    , emit: taxonomy_estimation
+    tuple val(meta)    , path("${meta.id}_${database}/taxonomy_counts/*_counts.csv") , emit: taxonomy_counts
+    tuple val(meta)    , path("${meta.id}_${database}/mets_full/diamond/*")          , emit: diamond
 
-    path "versions.yml"                                                                      , emit: versions
+    path "versions.yml"                                                              , emit: versions
 
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
     input    = fasta =~ /\.gz$/ ? fasta.name.take(fasta.name.lastIndexOf('.')) : fasta
     gunzip   = fasta =~ /\.gz$/ ? "gunzip -c ${fasta} > ${input}" : ""
-
+    def database = dbname ? "${dbname}" : 'default'
+    
     """
 
     $gunzip
@@ -35,7 +36,7 @@ process EUKULELE {
         $args \\
         --database $dbname \\
         --reference_dir $eukdb \\
-        -o ${meta.id} \\
+        -o ${meta.id}_${database} \\
         --CPUs ${task.cpus} \\
         -s \\
         contigs || rc=\$?

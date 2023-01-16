@@ -32,7 +32,6 @@ workflow SUB_EUKULELE {
 
             FORMAT_TAX( EUKULELE.out.taxonomy_estimation )
 
-
     emit:
         taxonomy_estimation = EUKULELE.out.taxonomy_estimation
         taxonomy_counts     = EUKULELE.out.taxonomy_counts
