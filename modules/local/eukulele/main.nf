@@ -24,7 +24,7 @@ process EUKULELE {
     gunzip   = fasta =~ /\.gz$/ ? "gunzip -c ${fasta} > ${input}" : ""
     def database = dbname ? "--database ${dbname}" : ''
     db       = dbname ? "${dbname}" : 'default'
-    
+
     """
 
     $gunzip
