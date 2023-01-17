@@ -10,7 +10,7 @@ workflow SUB_EUKULELE {
 
     take:
         fastaprot
-        eukulele_db
+        //eukulele_db
 
     main:
         ch_versions = Channel.empty()
@@ -19,13 +19,16 @@ workflow SUB_EUKULELE {
         File directory = new File(directoryName)
         if(! directory.exists() ) {
             directory.mkdir()
-            EUKULELE_DB(eukulele_db)
-            EUKULELE(fastaprot,EUKULELE_DB.out.db, eukulele_db)
+            EUKULELE_DB( fastaprot.map { it[2] } )
+            
+            fastaprot
+                .combine( EUKULELE_DB.out.db )
+                .set { ch_eukulele }
+            EUKULELE( ch_eukulele )
             } else {
                 ch_dbpath = Channel.fromPath(params.eukulele_dbpath)
                 fastaprot
-                    .combine(eukulele_db)
-                    .combine(ch_dbpath)
+                    .combine( ch_dbpath )
                     .set { ch_eukulele }
                 EUKULELE( ch_eukulele )
             }

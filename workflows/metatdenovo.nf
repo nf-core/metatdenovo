@@ -54,9 +54,13 @@ if ( params.hmmdir ) {
 
 ch_eukulele_db = Channel.empty()
 if ( !params.skip_eukulele ) {
-    Channel
-        .of ( params.eukulele_db.split(',') )
-        .set { ch_eukulele_db }
+    if ( params.eukulele_db ) {
+        Channel
+            .of ( params.eukulele_db.split(',') )
+            .set { ch_eukulele_db }
+    } else {
+        ch_eukulele_db = []
+        }
 }
 
 
@@ -414,7 +418,15 @@ workflow METATDENOVO {
     //
 
     if( !params.skip_eukulele){
-        SUB_EUKULELE( ch_aa, ch_eukulele_db )
+        if ( !params.eukulele_db ) {
+            SUB_EUKULELE( ch_aa.map {[ [ id:'all_samples'], it[1], [] ] } )
+        } else {
+            ch_aa
+                .map {[ [ id:'all_samples'], it[1] ] }
+                .combine( ch_eukulele_db )
+                .set { ch_eukulele }
+            SUB_EUKULELE( ch_eukulele )
+        }
         ch_versions = ch_versions.mix(SUB_EUKULELE.out.versions)
     }
 
