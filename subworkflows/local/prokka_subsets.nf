@@ -15,15 +15,15 @@ workflow PROKKA_SUBSETS {
         ch_versions = Channel.empty()
 
         contigs
-            .splitFasta(size: 10.MB, file: true)
+            .splitFasta(size: 1.MB, file: true)
             .set { ch_prokka }
         PROKKA ( ch_prokka, [], [] )
         ch_versions = ch_versions.mix(PROKKA.out.versions)
-        GFF_CAT ( PROKKA.out.gff )
+        GFF_CAT ( PROKKA.out.gff.collect().map { [ [ id: 'prokka' ], it[1] ] } )
         ch_versions = ch_versions.mix(GFF_CAT.out.versions)
-        FAA_CAT ( PROKKA.out.faa )
+        FAA_CAT ( PROKKA.out.faa.collect().map { [ [ id: 'prokka' ], it[1] ] } )
         ch_versions = ch_versions.mix(FAA_CAT.out.versions)
-        FNA_CAT ( PROKKA.out.fna )
+        FNA_CAT ( PROKKA.out.fna.collect().map { [ [ id: 'prokka' ], it[1] ] } )
         ch_versions = ch_versions.mix(FNA_CAT.out.versions)
 
     emit:
