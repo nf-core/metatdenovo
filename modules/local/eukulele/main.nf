@@ -31,7 +31,7 @@ process EUKULELE {
 
     rc=0
     mkdir contigs
-    cp $input ./contigs/
+    mv $input ./contigs/
 
     EUKulele \\
         $args \\
