@@ -15,7 +15,7 @@ workflow PROKKA_SUBSETS {
         ch_versions = Channel.empty()
 
         contigs
-            .splitFasta(size: 1.MB, file: true)
+            .splitFasta(size: 10.MB, file: true)
             .set { ch_prokka }
         PROKKA ( ch_prokka, [], [] )
         ch_versions = ch_versions.mix(PROKKA.out.versions)
