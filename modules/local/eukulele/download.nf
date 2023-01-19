@@ -1,4 +1,4 @@
-process EUKULELE_DB {
+process EUKULELE_DOWNLOAD {
     tag '$meta.id'
     label 'process_long'
 
@@ -8,23 +8,30 @@ process EUKULELE_DB {
         'quay.io/biocontainers/eukulele:2.0.3--pyh723bec7_0' }"
 
     input:
+    path(directory)
     val(db)
 
     output:
-    path "versions.yml", emit: version
-    path("${db}")      , emit: db
+    path "versions.yml"       , emit: version
+    path("${directory}/${db}"), emit: db
 
     when:
+    // To run only when db is set, update ext.when in modules.config
     task.ext.when == null || task.ext.when
 
     script:
     def args = task.ext.args ?: ''
 
     """
+    pushd $directory
+
     EUKulele \\
         download \\
         $args \\
         --database $db
+
+    popd
+    touch $db
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

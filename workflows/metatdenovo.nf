@@ -323,6 +323,7 @@ workflow METATDENOVO {
         ch_versions = ch_versions.mix(UNPIGZ_CONTIGS.out.versions)
 
         PRODIGAL ( ch_assembly_contigs, 'gff' )
+        // DL: see comment before ch_gff for prokka
         ch_gff          = PRODIGAL.out.gene_annotations.map { it[1] }
         ch_aa           = PRODIGAL.out.amino_acid_fasta
         ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
@@ -339,6 +340,7 @@ workflow METATDENOVO {
 
         TRANSDECODER ( ch_assembly_contigs )
 
+        // DL: see comment before ch_gff for prokka
         ch_gff      = TRANSDECODER.out.gff.map { it[1] }
         ch_aa       = TRANSDECODER.out.pep
         ch_versions = ch_versions.mix(TRANSDECODER.out.versions)
@@ -418,12 +420,18 @@ workflow METATDENOVO {
     //
 
     if( !params.skip_eukulele){
+        ch_eukulele_dbpath = Channel.fromPath(params.eukulele_dbpath)
         if ( !params.eukulele_db ) {
-            SUB_EUKULELE( ch_aa.map {[ [ id:'all_samples'], it[1], [] ] } )
+            ch_aa
+                .map {[ [ id:"${it[0].id}.${params.orf_caller}"], it[1], [], [ "$params.eukulele_dbpath" ] ] }
+                .set { ch_eukulele }
+            SUB_EUKULELE( ch_eukulele )
         } else {
             ch_aa
-                .map {[ [ id:'all_samples'], it[1] ] }
+                //.map {[ [ id:"${it[0].id}.${params.orf_caller}" ], it[1], it[2], [ "$params.eukulele_dbpath" ] ] }
+                .map {[ [ id:"${it[0].id}.${params.orf_caller}" ], it[1] ] }
                 .combine( ch_eukulele_db )
+                .combine( ch_eukulele_dbpath )
                 .set { ch_eukulele }
             SUB_EUKULELE( ch_eukulele )
         }

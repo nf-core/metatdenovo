@@ -3,37 +3,29 @@
 //
 
 include { EUKULELE                          } from '../../modules/local/eukulele/main'
-include { EUKULELE_DB                       } from '../../modules/local/eukulele/download'
+include { EUKULELE_DOWNLOAD                 } from '../../modules/local/eukulele/download'
 include { FORMAT_TAX                        } from '../../modules/local/format_tax'
 
 workflow SUB_EUKULELE {
 
     take:
-        fastaprot
-        //eukulele_db
+        eukulele // Channel: val(meta), path(fasta), val(database), path(directory) 
 
     main:
         ch_versions = Channel.empty()
 
-        String directoryName = params.eukulele_dbpath
+        String directoryName = eukulele.map { it[3].toString() }
         File directory = new File(directoryName)
-        if(! directory.exists() ) {
-            directory.mkdir()
-            EUKULELE_DB( fastaprot.map { it[2] } )
-            
-            fastaprot
-                .combine( EUKULELE_DB.out.db )
-                .set { ch_eukulele }
-            EUKULELE( ch_eukulele )
-            } else {
-                ch_dbpath = Channel.fromPath(params.eukulele_dbpath)
-                fastaprot
-                    .combine( ch_dbpath )
-                    .set { ch_eukulele }
-                EUKULELE( ch_eukulele )
-            }
+        if ( ! directory.exists() ) { directory.mkdir() }
+        ch_directory = Channel.fromPath( directory )
+        EUKULELE_DOWNLOAD ( ch_directory, eukulele.map { it[2] } )
+        eukulele
+            .map { [ it[0], it[1], it[2] ] }
+            .combine(EUKULELE_DOWNLOAD.out.db)
+            .set { ch_eukulele }
+        EUKULELE( ch_eukulele )
 
-            FORMAT_TAX( EUKULELE.out.taxonomy_estimation.map { [ it[2], it[1] ] } )
+        FORMAT_TAX( EUKULELE.out.taxonomy_estimation.map { [ it[2], it[1] ] } )
 
     emit:
         taxonomy_estimation = EUKULELE.out.taxonomy_estimation
