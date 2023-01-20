@@ -16,7 +16,6 @@ process EUKULELE_DOWNLOAD {
     path("${directory}/${db}"), emit: db
 
     when:
-    // To run only when db is set, update ext.when in modules.config
     task.ext.when == null || task.ext.when
 
     script:

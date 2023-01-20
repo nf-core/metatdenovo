@@ -13,16 +13,12 @@ workflow SUB_EUKULELE {
 
     main:
         ch_versions = Channel.empty()
-
-        String directoryName = eukulele.map { it[3].toString() }
-        File directory = new File(directoryName)
-        if ( ! directory.exists() ) { directory.mkdir() }
-        ch_directory = Channel.fromPath( directory )
-        EUKULELE_DOWNLOAD ( ch_directory, eukulele.map { it[2] } )
+        EUKULELE_DOWNLOAD ( eukulele.map { it[3] }, eukulele.map { it[2] } )
         eukulele
             .map { [ it[0], it[1], it[2] ] }
-            .combine(EUKULELE_DOWNLOAD.out.db)
+            .combine( EUKULELE_DOWNLOAD.out.db )
             .set { ch_eukulele }
+        ch_eukulele.view()
         EUKULELE( ch_eukulele )
 
         FORMAT_TAX( EUKULELE.out.taxonomy_estimation.map { [ it[2], it[1] ] } )

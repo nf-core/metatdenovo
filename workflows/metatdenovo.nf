@@ -420,18 +420,21 @@ workflow METATDENOVO {
     //
 
     if( !params.skip_eukulele){
-        ch_eukulele_dbpath = Channel.fromPath(params.eukulele_dbpath)
+        String directoryName = params.eukulele_dbpath
+        File directory = new File(directoryName)
+        if ( ! directory.exists() ) { directory.mkdir() }
+        ch_directory = Channel.fromPath( directory )
         if ( !params.eukulele_db ) {
             ch_aa
-                .map {[ [ id:"${it[0].id}.${params.orf_caller}"], it[1], [], [ "$params.eukulele_dbpath" ] ] }
+                .map {[ [ id:"${it[0].id}.${params.orf_caller}"], it[1], [] ] }
+                .combine( ch_directory )
                 .set { ch_eukulele }
             SUB_EUKULELE( ch_eukulele )
         } else {
             ch_aa
-                //.map {[ [ id:"${it[0].id}.${params.orf_caller}" ], it[1], it[2], [ "$params.eukulele_dbpath" ] ] }
                 .map {[ [ id:"${it[0].id}.${params.orf_caller}" ], it[1] ] }
                 .combine( ch_eukulele_db )
-                .combine( ch_eukulele_dbpath )
+                .combine( ch_directory )
                 .set { ch_eukulele }
             SUB_EUKULELE( ch_eukulele )
         }
