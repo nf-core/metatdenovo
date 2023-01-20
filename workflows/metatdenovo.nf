@@ -79,6 +79,7 @@ include { COLLECT_FEATURECOUNTS            } from '../modules/local/collect_feat
 include { COLLECT_FEATURECOUNTS_EUK        } from '../modules/local/collect_featurecounts_euk.nf'
 include { COLLECT_STATS                    } from '../modules/local/collect_stats.nf'
 include { COLLECT_STATS_NOTRIM             } from '../modules/local/collect_stats_notrim.nf'
+include { FORMAT_PRODIGAL                  } from '../modules/local/format_prodigal.nf'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -111,10 +112,9 @@ include { TRANSDECODER   } from '../subworkflows/local/transdecoder'
 // SUBWORKFLOW: Consisting of local modules
 //
 
-include { EGGNOG } from '../subworkflows/local/eggnog'
-include { SUB_EUKULELE } from '../subworkflows/local/eukulele'
-
-include { HMMCLASSIFY } from '../subworkflows/local/hmmclassify'
+include { EGGNOG          } from '../subworkflows/local/eggnog'
+include { SUB_EUKULELE    } from '../subworkflows/local/eukulele'
+include { HMMCLASSIFY     } from '../subworkflows/local/hmmclassify'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -133,7 +133,7 @@ include { BAM_SORT_SAMTOOLS                          } from '../subworkflows/nf-
 include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS_CDS } from '../modules/nf-core/subread/featurecounts/main'
 include { PRODIGAL                                   } from '../modules/nf-core/prodigal/main'
 include { SPADES                                     } from '../modules/nf-core/spades/main'
-include { CAT_FASTQ 				                 } from '../modules/nf-core/cat/fastq/main'
+include { CAT_FASTQ 	          	             } from '../modules/nf-core/cat/fastq/main'
 include { FASTQC                                     } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                                    } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS                } from '../modules/nf-core/custom/dumpsoftwareversions/main'
@@ -320,9 +320,10 @@ workflow METATDENOVO {
         ch_versions = ch_versions.mix(UNPIGZ_CONTIGS.out.versions)
 
         PRODIGAL ( ch_assembly_contigs, 'gff' )
-        ch_gff          = PRODIGAL.out.gene_annotations.map { it[1] }
         ch_aa           = PRODIGAL.out.amino_acid_fasta
         ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
+        FORMAT_PRODIGAL ( PRODIGAL.out.gene_annotations )
+        ch_gff          = FORMAT_PRODIGAL.out.format_gff.map { it[1] }
     }
 
     //
