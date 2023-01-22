@@ -21,8 +21,8 @@ process FORMAT_PRODIGAL {
     def args = task.ext.args   ?: ''
     prefix   = task.ext.prefix ?: "${meta.id}"
 
-    """ 
-    
+    """
+ 
     sed -i 's/\\(\\(k[0-9]\\+_[0-9]\\+\\).*\\)ID=[0-9]\\+\\(_[0-9]\\+\\)/\\1ID=\\2\\3/g' $eggnog
     gzip $eggnog
 
