@@ -11,7 +11,7 @@ process FORMAT_PRODIGAL {
     tuple val(meta), path(eggnog)
 
     output:
-    tuple val(meta), path("$eggnog"), emit: format_gff
+    tuple val(meta), path("${eggnog}.gz"), emit: format_gff
     path "versions.yml"             , emit: versions
 
     when:
@@ -24,6 +24,7 @@ process FORMAT_PRODIGAL {
     """ 
     
     sed -i 's/\\(\\(k[0-9]\\+_[0-9]\\+\\).*\\)ID=[0-9]\\+\\(_[0-9]\\+\\)/\\1ID=\\2\\3/g' $eggnog
+    gzip $eggnog
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
