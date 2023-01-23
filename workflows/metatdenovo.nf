@@ -92,6 +92,7 @@ include { COLLECT_FEATURECOUNTS            } from '../modules/local/collect_feat
 include { COLLECT_FEATURECOUNTS_EUK        } from '../modules/local/collect_featurecounts_euk.nf'
 include { COLLECT_STATS                    } from '../modules/local/collect_stats.nf'
 include { COLLECT_STATS_NOTRIM             } from '../modules/local/collect_stats_notrim.nf'
+include { EUKULELE                         } from '../modules/local/eukulele/main'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -429,7 +430,8 @@ workflow METATDENOVO {
                 .map {[ [ id:"${it[0].id}.${params.orf_caller}"], it[1], [] ] }
                 .combine( ch_directory )
                 .set { ch_eukulele }
-            SUB_EUKULELE( ch_eukulele )
+            EUKULELE( ch_eukulele )
+            ch_versions = ch_versions.mix(EUKULELE.out.versions)
         } else {
             ch_aa
                 .map {[ [ id:"${it[0].id}.${params.orf_caller}" ], it[1] ] }
@@ -437,8 +439,8 @@ workflow METATDENOVO {
                 .combine( ch_directory )
                 .set { ch_eukulele }
             SUB_EUKULELE( ch_eukulele )
+            ch_versions = ch_versions.mix(SUB_EUKULELE.out.versions)
         }
-        ch_versions = ch_versions.mix(SUB_EUKULELE.out.versions)
     }
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
