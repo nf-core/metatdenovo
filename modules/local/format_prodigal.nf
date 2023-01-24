@@ -8,10 +8,10 @@ process FORMAT_PRODIGAL {
         'quay.io/biocontainers/gzip:1.11 ' }"
 
     input:
-    tuple val(meta), path(eggnog)
+    tuple val(meta), path (gff)
 
     output:
-    tuple val(meta), path("${eggnog}.gz"), emit: format_gff
+    tuple val(meta), path("${gff}.gz"), emit: format_gff
     path "versions.yml"             , emit: versions
 
     when:
@@ -22,9 +22,8 @@ process FORMAT_PRODIGAL {
     prefix   = task.ext.prefix ?: "${meta.id}"
 
     """
-
-    sed -i 's/\\(\\(k[0-9]\\+_[0-9]\\+\\).*\\)ID=[0-9]\\+\\(_[0-9]\\+\\)/\\1ID=\\2\\3/g' $eggnog
-    gzip $eggnog
+    sed -i 's/\\(\\(k[0-9]\\+_[0-9]\\+\\).*\\)ID=[0-9]\\+\\(_[0-9]\\+\\)/\\1ID=\\2\\3/g' $gff
+    gzip $gff
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
