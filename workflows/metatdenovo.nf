@@ -85,7 +85,6 @@ ch_multiqc_custom_methods_description = params.multiqc_methods_description ? fil
 // MODULE: local
 //
 include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved.nf'
-include { UNPIGZ as UNPIGZ_FASTA_PROTEIN   } from '../modules/local/unpigz.nf'
 include { UNPIGZ as UNPIGZ_EUKULELE        } from '../modules/local/unpigz.nf'
 include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz.nf'
 include { COLLECT_FEATURECOUNTS            } from '../modules/local/collect_featurecounts.nf'
@@ -100,26 +99,17 @@ include { COLLECT_STATS_NOTRIM             } from '../modules/local/collect_stat
 include { INPUT_CHECK } from '../subworkflows/local/input_check'
 
 //
-// SUBWORKFLOW: Adapted from rnaseq!
+// SUBWORKFLOW: Consisting of local modules
 //
-
+include { EGGNOG            } from '../subworkflows/local/eggnog'
+include { SUB_EUKULELE      } from '../subworkflows/local/eukulele'
+include { SUB_EUKULELE_NODB } from '../subworkflows/local/eukulele_nodb'
+include { HMMCLASSIFY       } from '../subworkflows/local/hmmclassify'
+include { PROKKA_SUBSETS    } from '../subworkflows/local/prokka_subsets'
+include { TRANSDECODER      } from '../subworkflows/local/transdecoder'
+include { DIGINORM          } from '../subworkflows/local/diginorm'
 include { FASTQC_TRIMGALORE } from '../subworkflows/local/fastqc_trimgalore'
-
-//
-// SUBWORKFLOW: Perform digital normalization
-//
-
-include { DIGINORM } from '../subworkflows/local/diginorm'
-//
-// SUBWORKFLOW
-//
-
-include { PROKKA_SUBSETS     } from '../subworkflows/local/prokka_subsets'
-include { TRANSDECODER       } from '../subworkflows/local/transdecoder'
-include { EGGNOG             } from '../subworkflows/local/eggnog'
-include { SUB_EUKULELE       } from '../subworkflows/local/eukulele'
-include { SUB_EUKULELE_NODB  } from '../subworkflows/local/eukulele_nodb'
-include { HMMCLASSIFY        } from '../subworkflows/local/hmmclassify'
+include { PRODIGAL          } from '../subworkflows/local/prodigal'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -134,14 +124,13 @@ include { BBMAP_BBDUK                                } from '../modules/nf-core/
 include { BBMAP_INDEX                                } from '../modules/nf-core/bbmap/index/main'
 include { BBMAP_ALIGN                                } from '../modules/nf-core/bbmap/align/main'
 include { SEQTK_MERGEPE                              } from '../modules/nf-core/seqtk/mergepe/main'
-include { BAM_SORT_SAMTOOLS                          } from '../subworkflows/nf-core/bam_sort_samtools/main'
 include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS_CDS } from '../modules/nf-core/subread/featurecounts/main'
-include { PRODIGAL                                   } from '../modules/nf-core/prodigal/main'
 include { SPADES                                     } from '../modules/nf-core/spades/main'
-include { CAT_FASTQ 		                     } from '../modules/nf-core/cat/fastq/main'
+include { CAT_FASTQ 	          	             } from '../modules/nf-core/cat/fastq/main'
 include { FASTQC                                     } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                                    } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS                } from '../modules/nf-core/custom/dumpsoftwareversions/main'
+include { BAM_SORT_SAMTOOLS                          } from '../subworkflows/nf-core/bam_sort_samtools/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -319,14 +308,9 @@ workflow METATDENOVO {
     //
 
     if ( params.orf_caller == ORF_CALLER_PRODIGAL ) {
-
-        UNPIGZ_CONTIGS(ch_assembly_contigs.map { it[1] })
-        ch_versions = ch_versions.mix(UNPIGZ_CONTIGS.out.versions)
-
-        PRODIGAL ( ch_assembly_contigs, 'gff' )
-        // DL: see comment before ch_gff for prokka
-        ch_gff          = PRODIGAL.out.gene_annotations.map { it[1] }
-        ch_aa           = PRODIGAL.out.amino_acid_fasta
+        PRODIGAL( ch_assembly_contigs )
+        ch_aa           = PRODIGAL.out.faa
+        ch_gff          = PRODIGAL.out.gff
         ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
     }
 
