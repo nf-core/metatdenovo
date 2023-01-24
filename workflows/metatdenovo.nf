@@ -63,6 +63,14 @@ if ( !params.skip_eukulele ) {
         }
 }
 
+if(params.cat_db){
+    ch_cat_db_file = Channel
+        .value(file( "${params.cat_db}" ))
+} else {
+    ch_cat_db_file = Channel.empty()
+}
+
+
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -88,14 +96,16 @@ include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/inte
 include { UNPIGZ as UNPIGZ_EUKULELE        } from '../modules/local/unpigz.nf'
 include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz.nf'
 include { COLLECT_FEATURECOUNTS            } from '../modules/local/collect_featurecounts.nf'
-include { COLLECT_FEATURECOUNTS_EUK        } from '../modules/local/collect_featurecounts_euk.nf'
 include { COLLECT_STATS                    } from '../modules/local/collect_stats.nf'
 include { COLLECT_STATS_NOTRIM             } from '../modules/local/collect_stats_notrim.nf'
+include { CAT_DB                           } from '../modules/local/cat/cat_db'
+include { CAT_DB_GENERATE                  } from '../modules/local/cat/cat_db_generate'
+include { CAT                              } from '../modules/local/cat/cat'
+include { CAT_SUMMARY                      } from "../modules/local/cat/cat_summary"
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
-
 include { INPUT_CHECK } from '../subworkflows/local/input_check'
 
 //
@@ -399,6 +409,27 @@ workflow METATDENOVO {
         )
         ch_versions     = ch_versions.mix(COLLECT_STATS_NOTRIM.out.versions)
     }
+
+    //
+    // CAT: Bin Annotation Tool (BAT) are pipelines for the taxonomic classification of long DNA sequences and metagenome assembled genomes (MAGs/bins)
+    //
+    ch_cat_db = Channel.empty()
+    if (params.cat_db){
+        CAT_DB ( ch_cat_db_file )
+        ch_cat_db = CAT_DB.out.db
+    } else if (params.cat_db_generate){
+        CAT_DB_GENERATE ()
+        ch_cat_db = CAT_DB_GENERATE.out.db
+    }
+    CAT (
+        ch_aa,
+        ch_cat_db
+    )
+    CAT_SUMMARY(
+        CAT.out.tax_classification.collect()
+    )
+    ch_versions = ch_versions.mix(CAT.out.versions.first())
+    ch_versions = ch_versions.mix(CAT_SUMMARY.out.versions.first())
 
     //
     // SUBWORKFLOW: Eukulele

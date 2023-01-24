@@ -18,7 +18,6 @@ workflow SUB_EUKULELE {
             .map { [ it[0], it[1], it[2] ] }
             .combine( EUKULELE_DOWNLOAD.out.db )
             .set { ch_eukulele }
-        ch_eukulele.view()
         EUKULELE( ch_eukulele )
 
         FORMAT_TAX( EUKULELE.out.taxonomy_estimation.map { [ it[2], it[1] ] } )
