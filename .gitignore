@@ -8,4 +8,3 @@ testing*
 *.pyc
 .*.sw?
 .screenrc
-ncbi_taxonomy.tsv.gz

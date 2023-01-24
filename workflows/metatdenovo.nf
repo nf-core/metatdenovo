@@ -440,20 +440,15 @@ workflow METATDENOVO {
         File directory = new File(directoryName)
         if ( ! directory.exists() ) { directory.mkdir() }
         ch_directory = Channel.fromPath( directory )
-        if ( !params.eukulele_db ) {
-            ch_aa
-                .map {[ [ id:"${it[0].id}.${params.orf_caller}"], it[1], [] ] }
-                .combine( ch_directory )
-                .set { ch_eukulele }
-            SUB_EUKULELE_NODB( ch_eukulele )
-            ch_versions = ch_versions.mix(SUB_EUKULELE_NODB.out.versions)
-        } else {
-            ch_aa
-                .map {[ [ id:"${it[0].id}.${params.orf_caller}" ], it[1] ] }
-                .combine( ch_eukulele_db )
-                .combine( ch_directory )
-                .set { ch_eukulele }
+        ch_aa
+            .map {[ [ id:"${it[0].id}.${params.orf_caller}" ], it[1] ] }
+            .combine( ch_eukulele_db )
+            .combine( ch_directory )
+            .set { ch_eukulele }
+        if ( params.eukulele_download_database ) {
             SUB_EUKULELE( ch_eukulele )
+        } else {
+            SUB_EUKULELE_NODB( ch_eukulele )
             ch_versions = ch_versions.mix(SUB_EUKULELE.out.versions)
         }
     }
