@@ -23,11 +23,12 @@ EUKULELE_DB_PHYLODB     = 'phylodb'
 EUKULELE_DB_MMETSP      = 'mmetsp'
 EUKULELE_DB_EUKPROT     = 'eukprot'
 EUKULELE_DB_EUKZOO      = 'eukzoo'
+EUKULELE_DB_GTDB        = 'gtdb'
 
 def valid_params = [
-    orf_caller      : [ORF_CALLER_PRODIGAL, ORF_CALLER_PROKKA, ORF_CALLER_TRANSDECODER],
-    assembler       : [RNASPADES, MEGAHIT],
-    eukulele_db     : [EUKULELE_DB_PHYLODB, EUKULELE_DB_MMETSP, EUKULELE_DB_EUKPROT, EUKULELE_DB_EUKZOO]
+    orf_caller      : [ ORF_CALLER_PRODIGAL, ORF_CALLER_PROKKA, ORF_CALLER_TRANSDECODER ],
+    assembler       : [ RNASPADES, MEGAHIT ],
+    eukulele_db     : [ EUKULELE_DB_PHYLODB, EUKULELE_DB_MMETSP, EUKULELE_DB_EUKPROT, EUKULELE_DB_EUKZOO, EUKULELE_DB_GTDB ]
 ]
 
 // Check input path parameters to see if they exist
@@ -50,6 +51,18 @@ if ( params.hmmdir ) {
         .map { [ file(it) ] }
         .set { ch_hmmrs }
 }
+
+ch_eukulele_db = Channel.empty()
+if ( !params.skip_eukulele ) {
+    if ( params.eukulele_db ) {
+        Channel
+            .of ( params.eukulele_db.split(',') )
+            .set { ch_eukulele_db }
+    } else {
+        ch_eukulele_db = []
+        }
+}
+
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -88,9 +101,9 @@ include { INPUT_CHECK } from '../subworkflows/local/input_check'
 //
 // SUBWORKFLOW: Consisting of local modules
 //
-
 include { EGGNOG            } from '../subworkflows/local/eggnog'
 include { SUB_EUKULELE      } from '../subworkflows/local/eukulele'
+include { SUB_EUKULELE_NODB } from '../subworkflows/local/eukulele_nodb'
 include { HMMCLASSIFY       } from '../subworkflows/local/hmmclassify'
 include { PROKKA_SUBSETS    } from '../subworkflows/local/prokka_subsets'
 include { TRANSDECODER      } from '../subworkflows/local/transdecoder'
@@ -182,7 +195,6 @@ workflow METATDENOVO {
     //
     FASTQC_TRIMGALORE (
         ch_cat_fastq,
-        //INPUT_CHECK.out.reads,
         params.skip_fastqc || params.skip_qc,
         params.skip_trimming
     )
@@ -282,7 +294,7 @@ workflow METATDENOVO {
     //
     // SUBWORKFLOW: Run PROKKA_SUBSETS on Megahit output, but split the fasta file in chunks of 10 MB, then concatenate and compress output.
     //
-    
+
     if ( params.orf_caller == ORF_CALLER_PROKKA ) {
         PROKKA_SUBSETS(ch_assembly_contigs)
         ch_versions = ch_versions.mix(PROKKA_SUBSETS.out.versions)
@@ -296,7 +308,6 @@ workflow METATDENOVO {
     //
 
     if ( params.orf_caller == ORF_CALLER_PRODIGAL ) {
-
         PRODIGAL( ch_assembly_contigs )
         ch_aa           = PRODIGAL.out.faa
         ch_gff          = PRODIGAL.out.gff
@@ -314,6 +325,7 @@ workflow METATDENOVO {
 
         TRANSDECODER ( ch_assembly_contigs )
 
+        // DL: see comment before ch_gff for prokka
         ch_gff      = TRANSDECODER.out.gff.map { it[1] }
         ch_aa       = TRANSDECODER.out.pep
         ch_versions = ch_versions.mix(TRANSDECODER.out.versions)
@@ -353,25 +365,17 @@ workflow METATDENOVO {
     //
     // MODULE: Collect featurecounts output counts in one table
     //
-
-    // DL: Why is there an if clause here? Shouldn't this be solved by setting up correctly named channels above?
-    // Moreover, it looks like Prokka and Prodigal are identical.
-    if ( params.orf_caller == ORF_CALLER_PROKKA) {
-        COLLECT_FEATURECOUNTS ( FEATURECOUNTS_CDS.out.counts.collect() { it[1] })
-        ch_cds_counts = COLLECT_FEATURECOUNTS.out.counts
-        ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
-    } else if ( params.orf_caller == ORF_CALLER_PRODIGAL) {
-        COLLECT_FEATURECOUNTS ( FEATURECOUNTS_CDS.out.counts.collect() { it[1] })
-        ch_cds_counts = COLLECT_FEATURECOUNTS.out.counts
-        ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
-    } else if ( params.orf_caller == ORF_CALLER_TRANSDECODER) {
-        COLLECT_FEATURECOUNTS_EUK ( FEATURECOUNTS_CDS.out.counts.collect() { it[1] })
-        ch_cds_counts = COLLECT_FEATURECOUNTS_EUK.out.counts
-        ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTS_EUK.out.versions)
-    }
-    ch_fcs = Channel.empty()
-    ch_fcs = ch_fcs.mix(ch_cds_counts).collect()
     
+    FEATURECOUNTS_CDS.out.counts
+        .collect() { it[1] }
+        .map { [ [ id:'all_samples'], it ] }
+        .set { ch_collect_feature }
+
+    COLLECT_FEATURECOUNTS ( ch_collect_feature )
+
+    ch_fcs = Channel.empty()
+    ch_fcs = COLLECT_FEATURECOUNTS.out.counts.collect()
+    ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
 
     //
     // MODULE: Collect statistics from mapping analysis
@@ -401,12 +405,26 @@ workflow METATDENOVO {
     //
 
     if( !params.skip_eukulele){
-        // DL: I think this should also be change so that the Eukulele module does the unzipping itself.
-        if ( params.orf_caller == ORF_CALLER_PROKKA ) {
-            UNPIGZ_EUKULELE(ch_aa)
-            SUB_EUKULELE(UNPIGZ_EUKULELE.out.unzipped.collect { [ [ id: 'all_samples' ], it ] } )
-        } else
-        SUB_EUKULELE(ch_aa)
+        String directoryName = params.eukulele_dbpath
+        File directory = new File(directoryName)
+        if ( ! directory.exists() ) { directory.mkdir() }
+        ch_directory = Channel.fromPath( directory )
+        if ( !params.eukulele_db ) {
+            ch_aa
+                .map {[ [ id:"${it[0].id}.${params.orf_caller}"], it[1], [] ] }
+                .combine( ch_directory )
+                .set { ch_eukulele }
+            SUB_EUKULELE_NODB( ch_eukulele )
+            ch_versions = ch_versions.mix(SUB_EUKULELE_NODB.out.versions)
+        } else {
+            ch_aa
+                .map {[ [ id:"${it[0].id}.${params.orf_caller}" ], it[1] ] }
+                .combine( ch_eukulele_db )
+                .combine( ch_directory )
+                .set { ch_eukulele }
+            SUB_EUKULELE( ch_eukulele )
+            ch_versions = ch_versions.mix(SUB_EUKULELE.out.versions)
+        }
     }
 
     CUSTOM_DUMPSOFTWAREVERSIONS (

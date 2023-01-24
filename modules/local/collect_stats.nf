@@ -1,4 +1,5 @@
 process COLLECT_STATS {
+    tag "$meta.id"
     label 'process_low'
 
     conda (params.enable_conda ? "conda-forge::r-tidyverse=1.3.1 conda-forge::r-data.table=1.14.0 conda-forge::r-dtplyr=1.1.0" : null)
@@ -11,17 +12,19 @@ process COLLECT_STATS {
     val  samples
     path trimlogs
     path idxstats
-    path fcs
+    tuple val(meta), path(fcs)
     path bbduks
 
     output:
-    path "overall_stats.tsv", emit: overall_stats
+    path "${meta.id}_overall_stats.tsv", emit: overall_stats
     path "versions.yml"     , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
 
     script:
+    def args = task.ext.args ?: ''
+    def prefix = task.ext.prefix ?: "${meta.id}"
 
     """
     #!/usr/bin/env Rscript
@@ -64,7 +67,7 @@ process COLLECT_STATS {
         pivot_longer(2:ncol(.), names_to = 'm', values_to = 'v') %>%
         union(
             # Total observation after featureCounts
-            tibble(file = Sys.glob('counts*.tsv.gz')) %>%
+            tibble(file = Sys.glob('*_counts.tsv.gz')) %>%
             mutate(d = map(file, function(f) fread(cmd = sprintf("gunzip -c %s", f), sep = '\\t'))) %>%
             as_tibble() %>%
             unnest(d) %>%
@@ -87,7 +90,7 @@ process COLLECT_STATS {
         mutate(m = parse_factor(m, levels = TYPE_ORDER, ordered = TRUE)) %>%
         arrange(sample, m) %>%
         pivot_wider(names_from = m, values_from = v) %>%
-        write_tsv('overall_stats.tsv')
+        write_tsv('${prefix}_overall_stats.tsv')
 
         writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")), paste0("    dplyr: ", packageVersion('dplyr')),
             paste0("    dtplyr: ", packageVersion('dtplyr')), paste0("    data.table: ", packageVersion('data.table')), paste0("    readr: ", packageVersion('readr')),

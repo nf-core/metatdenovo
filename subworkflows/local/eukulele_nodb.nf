@@ -3,24 +3,16 @@
 //
 
 include { EUKULELE                          } from '../../modules/local/eukulele/main'
-include { EUKULELE_DOWNLOAD                 } from '../../modules/local/eukulele/download'
 include { FORMAT_TAX                        } from '../../modules/local/format_tax'
 
-workflow SUB_EUKULELE {
+workflow SUB_EUKULELE_NODB {
 
     take:
         eukulele // Channel: val(meta), path(fasta), val(database), path(directory) 
 
     main:
         ch_versions = Channel.empty()
-        EUKULELE_DOWNLOAD ( eukulele.map { it[3] }, eukulele.map { it[2] } )
-        eukulele
-            .map { [ it[0], it[1], it[2] ] }
-            .combine( EUKULELE_DOWNLOAD.out.db )
-            .set { ch_eukulele }
-        ch_eukulele.view()
-        EUKULELE( ch_eukulele )
-
+        EUKULELE( eukulele )
         FORMAT_TAX( EUKULELE.out.taxonomy_estimation.map { [ it[2], it[1] ] } )
 
     emit:

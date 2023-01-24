@@ -1,4 +1,3 @@
-
 process FORMAT_TAX {
     label 'process_low'
 
@@ -8,11 +7,11 @@ process FORMAT_TAX {
         'quay.io/biocontainers/mulled-v2-508c9bc5e929a77a9708902b1deca248c0c84689:0bb5bee2557136d28549f41d3faa08485e967aa1-0' }"
 
     input:
-    path taxtable
+    tuple val(meta), path(taxtable)
 
     output:
-    path "taxonomy_classification.tsv", emit: tax
-    path "versions.yml"               , emit: versions
+    path "*_taxonomy_classification.tsv", emit: tax
+    path "versions.yml"                 , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -27,7 +26,6 @@ process FORMAT_TAX {
     library(readr)
     library(dtplyr)
     library(dplyr)
-    library(readr)
     library(purrr)
     library(tidyr)
     library(stringr)
@@ -54,9 +52,8 @@ process FORMAT_TAX {
                 Species = ifelse(is.na(Species) | Species == '', sprintf("%s uncl.", str_remove(Genus, ' unclassified')),  Species)
             ) %>%
             na.omit() %>%
-            write_tsv('taxonomy_classification.tsv')
+            write_tsv("${meta}_taxonomy_classification.tsv")
 
     writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")),paste0("    dplyr: ", packageVersion("dplyr")) ), "versions.yml")
     """
 }
-
