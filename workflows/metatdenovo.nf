@@ -296,7 +296,7 @@ workflow METATDENOVO {
     //
 
     if ( params.orf_caller == ORF_CALLER_PROKKA ) {
-        PROKKA_SUBSETS(ch_assembly_contigs)
+        PROKKA_SUBSETS(ch_assembly_contigs.map { it[1] })
         ch_versions = ch_versions.mix(PROKKA_SUBSETS.out.versions)
         // DL: Isn't it clearer to leave the mapping to when the channel is used?
         ch_gff      = PROKKA_SUBSETS.out.gff.map { it[1] }
