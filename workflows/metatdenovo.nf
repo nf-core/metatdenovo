@@ -421,8 +421,13 @@ workflow METATDENOVO {
         CAT_DB_GENERATE ()
         ch_cat_db = CAT_DB_GENERATE.out.db
     }
+    UNPIGZ_CONTIGS( ch_assembly_contigs.map { it[1] })
+    ch_assembly_contigs
+        .map { it[0] }
+        .combine( UNPIGZ_CONTIGS.out.unzipped )
+        .set { ch_cat }
     CAT (
-        ch_aa,
+        ch_cat,
         ch_cat_db
     )
     CAT_SUMMARY(
