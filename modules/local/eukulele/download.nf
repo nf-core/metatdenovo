@@ -8,12 +8,11 @@ process EUKULELE_DOWNLOAD {
         'quay.io/biocontainers/eukulele:2.0.3--pyh723bec7_0' }"
 
     input:
-    path(directory)
-    val(db)
+    tuple val(db), path(directory)
 
     output:
-    path "versions.yml"       , emit: version
-    path("${directory}/${db}"), emit: db
+    path "versions.yml"                           , emit: version
+    tuple val("${db}"), path("${directory}/${db}"), emit: db
 
     when:
     task.ext.when == null || task.ext.when

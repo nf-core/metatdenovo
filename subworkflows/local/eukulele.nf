@@ -13,12 +13,11 @@ workflow SUB_EUKULELE {
 
     main:
         ch_versions = Channel.empty()
-        EUKULELE_DOWNLOAD ( eukulele.map { it[3] }, eukulele.map { it[2] } )
+        EUKULELE_DOWNLOAD ( eukulele.map { [ it[2], it[3] ] } )
         eukulele
-            .map { [ it[0], it[1], it[2] ] }
-            .combine( EUKULELE_DOWNLOAD.out.db )
+            .map { [ it[0], it[1] ] }
+            .merge ( EUKULELE_DOWNLOAD.out.db )
             .set { ch_eukulele }
-        ch_eukulele.view()
         EUKULELE( ch_eukulele )
 
         FORMAT_TAX( EUKULELE.out.taxonomy_estimation.map { [ it[2], it[1] ] } )
