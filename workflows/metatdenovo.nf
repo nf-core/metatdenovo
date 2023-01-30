@@ -130,6 +130,10 @@ include { CAT_FASTQ 	          	             } from '../modules/nf-core/cat/fast
 include { FASTQC                                     } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                                    } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS                } from '../modules/nf-core/custom/dumpsoftwareversions/main'
+
+//
+// SUBWORKFLOWS: Installed directly from nf-core/modules
+//
 include { BAM_SORT_SAMTOOLS                          } from '../subworkflows/nf-core/bam_sort_samtools/main'
 
 /*
@@ -181,6 +185,7 @@ workflow METATDENOVO {
     ch_versions = ch_versions.mix(CAT_FASTQ.out.versions.first().ifEmpty(null))
 
     // Branch FastQ channels if 'auto' specified to infer strandedness
+    // DL & DDL: We're not using this channel -- delete or deal with the channel?
     ch_cat_fastq
         .branch {
             meta, fastq ->
@@ -205,22 +210,23 @@ workflow METATDENOVO {
     //
     if ( params.sequence_filter ) {
         BBMAP_BBDUK ( FASTQC_TRIMGALORE.out.reads, params.sequence_filter )
-        ch_clean_reads  = BBMAP_BBDUK.out.reads
-        ch_bbduk_logs = BBMAP_BBDUK.out.log.map { it[1] }
-        ch_versions   = ch_versions.mix(BBMAP_BBDUK.out.versions)
+        ch_clean_reads = BBMAP_BBDUK.out.reads
+        ch_bbduk_logs  = BBMAP_BBDUK.out.log.map { it[1] }
+        ch_versions    = ch_versions.mix(BBMAP_BBDUK.out.versions)
     } else {
-        ch_clean_reads  = FASTQC_TRIMGALORE.out.reads
-        ch_bbduk_logs = []
+        ch_clean_reads = FASTQC_TRIMGALORE.out.reads
+        ch_bbduk_logs  = []
     }
 
     //
     // MODULE: Interleave sequences for assembly
     //
+    // DL & DDL: We can probably not deal with single end input
     ch_interleaved = Channel.empty()
     if ( ! params.assembly ) {
         SEQTK_MERGEPE(ch_clean_reads)
         ch_interleaved = SEQTK_MERGEPE.out.reads
-        ch_versions = ch_versions.mix(SEQTK_MERGEPE.out.versions)
+        ch_versions    = ch_versions.mix(SEQTK_MERGEPE.out.versions)
     }
 
     //
@@ -248,7 +254,7 @@ workflow METATDENOVO {
             .value ( [ [ id: 'user_assembly' ], file(params.assembly) ] )
             .set { ch_assembly_contigs }
     } else if ( params.assembler == RNASPADES ) {
-        // This doesn't work as we want, as it gets called once for each pair, see issue: https://github.com/LNUc-EEMiS/metatdenovo/issues/78
+        // DL: This doesn't work as we want, as it gets called once for each pair, see issue: https://github.com/LNUc-EEMiS/metatdenovo/issues/78
         ch_spades = FASTQC_TRIMGALORE.out.reads.map { meta, fastq -> [ [ id: 'spades' ], fastq, [], [] ] }
         SPADES( ch_spades, [], [] )
         ch_assembly_contigs = SPADES.out.transcripts.map { it[1] }
@@ -277,7 +283,6 @@ workflow METATDENOVO {
     BBMAP_ALIGN ( ch_clean_reads, BBMAP_INDEX.out.index )
     ch_versions = ch_versions.mix(BBMAP_ALIGN.out.versions)
 
-
     //
     // SUBWORKFLOW: sort bam file
     //
@@ -298,8 +303,7 @@ workflow METATDENOVO {
     if ( params.orf_caller == ORF_CALLER_PROKKA ) {
         PROKKA_SUBSETS(ch_assembly_contigs.map { it[1] })
         ch_versions = ch_versions.mix(PROKKA_SUBSETS.out.versions)
-        // DL: Isn't it clearer to leave the mapping to when the channel is used?
-        ch_gff      = PROKKA_SUBSETS.out.gff.map { it[1] }
+        ch_gff      = PROKKA_SUBSETS.out.gff
         ch_aa       = PROKKA_SUBSETS.out.faa
     }
 
@@ -309,8 +313,8 @@ workflow METATDENOVO {
 
     if ( params.orf_caller == ORF_CALLER_PRODIGAL ) {
         PRODIGAL( ch_assembly_contigs )
-        ch_aa           = PRODIGAL.out.faa
         ch_gff          = PRODIGAL.out.gff
+        ch_aa           = PRODIGAL.out.faa
         ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
     }
 
@@ -325,8 +329,7 @@ workflow METATDENOVO {
 
         TRANSDECODER ( ch_assembly_contigs )
 
-        // DL: see comment before ch_gff for prokka
-        ch_gff      = TRANSDECODER.out.gff.map { it[1] }
+        ch_gff      = TRANSDECODER.out.gff
         ch_aa       = TRANSDECODER.out.pep
         ch_versions = ch_versions.mix(TRANSDECODER.out.versions)
     }
@@ -356,7 +359,7 @@ workflow METATDENOVO {
     //
 
     BAM_SORT_SAMTOOLS.out.bam
-        .combine(ch_gff)
+        .combine(ch_gff.map { it[1] })
         .set { ch_featurecounts }
 
     FEATURECOUNTS_CDS ( ch_featurecounts)

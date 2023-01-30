@@ -19,7 +19,7 @@ workflow PRODIGAL {
 
     emit:
         faa     = PRODIGAL_MODULE.out.amino_acid_fasta
-        gff     = FORMAT_PRODIGAL.out.format_gff.map { it[1] }
+        gff     = FORMAT_PRODIGAL.out.format_gff
         versions = ch_versions
 
 }
