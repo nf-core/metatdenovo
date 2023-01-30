@@ -376,7 +376,6 @@ workflow METATDENOVO {
 
     COLLECT_FEATURECOUNTS ( ch_collect_feature )
 
-    ch_fcs = Channel.empty()
     ch_fcs = COLLECT_FEATURECOUNTS.out.counts.collect()
     ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
 
@@ -384,6 +383,7 @@ workflow METATDENOVO {
     // MODULE: Collect statistics from mapping analysis
     //
 
+    // DL & DDL: Fix so only one module called with one tuple
     if ( ! params.skip_trimming) {
         COLLECT_STATS (
             FASTQC_TRIMGALORE.out.trim_log.map { meta, fastq -> meta.id }.collect(),
