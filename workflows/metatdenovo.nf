@@ -88,7 +88,6 @@ include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/inte
 include { UNPIGZ as UNPIGZ_EUKULELE        } from '../modules/local/unpigz.nf'
 include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz.nf'
 include { COLLECT_FEATURECOUNTS            } from '../modules/local/collect_featurecounts.nf'
-include { COLLECT_FEATURECOUNTS_EUK        } from '../modules/local/collect_featurecounts_euk.nf'
 include { COLLECT_STATS                    } from '../modules/local/collect_stats.nf'
 include { COLLECT_STATS_NOTRIM             } from '../modules/local/collect_stats_notrim.nf'
 
