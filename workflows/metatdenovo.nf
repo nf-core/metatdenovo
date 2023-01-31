@@ -301,7 +301,7 @@ workflow METATDENOVO {
     //
 
     if ( params.orf_caller == ORF_CALLER_PROKKA ) {
-        PROKKA_SUBSETS(ch_assembly_contigs.map { it[1] })
+        PROKKA_SUBSETS(ch_assembly_contigs)
         ch_versions = ch_versions.mix(PROKKA_SUBSETS.out.versions)
         ch_gff      = PROKKA_SUBSETS.out.gff
         ch_aa       = PROKKA_SUBSETS.out.faa
