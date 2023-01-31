@@ -89,7 +89,6 @@ include { UNPIGZ as UNPIGZ_EUKULELE        } from '../modules/local/unpigz.nf'
 include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz.nf'
 include { COLLECT_FEATURECOUNTS            } from '../modules/local/collect_featurecounts.nf'
 include { COLLECT_STATS                    } from '../modules/local/collect_stats.nf'
-include { COLLECT_STATS_NOTRIM             } from '../modules/local/collect_stats_notrim.nf'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -192,12 +191,25 @@ workflow METATDENOVO {
     //
     // SUBWORKFLOW: Read QC and trim adapters
     //
+
     FASTQC_TRIMGALORE (
         ch_cat_fastq,
         params.skip_fastqc || params.skip_qc,
         params.skip_trimming
     )
     ch_versions = ch_versions.mix(FASTQC_TRIMGALORE.out.versions)
+
+    ch_collect_stats = ch_cat_fastq.collect { it[0].id }.map { [ [ id:"${params.assembler}.${params.orf_caller}" ], it ] }
+    if ( params.skip_trimming ) {
+        ch_collect_stats
+            .map { [ it[0], it[1], [] ] }
+            .set { ch_collect_stats }
+    } else {
+        ch_collect_stats
+            .combine(FASTQC_TRIMGALORE.out.trim_log.collect { it[1][0] }.map { [ it ] })
+            .set { ch_collect_stats }
+    }
+    ch_collect_stats.view()
 
     //
     // MODULE: Run BBDuk to clean out whatever sequences the user supplied via params.sequence_filter
@@ -380,24 +392,17 @@ workflow METATDENOVO {
     // MODULE: Collect statistics from mapping analysis
     //
 
-    if ( ! params.skip_trimming) {
-        COLLECT_STATS (
-            FASTQC_TRIMGALORE.out.trim_log.map { meta, fastq -> meta.id }.collect(),
-            FASTQC_TRIMGALORE.out.trim_log.map { meta, fastq -> fastq[0] }.collect(),
-            BAM_SORT_SAMTOOLS.out.idxstats.collect()  { it[1] },
-            ch_fcs,
-            ch_bbduk_logs.collect()
-        )
-        ch_versions     = ch_versions.mix(COLLECT_STATS.out.versions)
-    } else {
-        COLLECT_STATS_NOTRIM (
-            FASTQC_TRIMGALORE.out.fastqc_html.map { meta, fastq -> meta.id }.collect(),
-            BAM_SORT_SAMTOOLS.out.idxstats.collect()  { it[1] },
-            ch_fcs,
-            ch_bbduk_logs.collect()
-        )
-        ch_versions     = ch_versions.mix(COLLECT_STATS_NOTRIM.out.versions)
-    }
+    COLLECT_STATS(ch_collect_stats)
+    /**
+    COLLECT_STATS (
+        FASTQC_TRIMGALORE.out.trim_log.map { meta, fastq -> meta.id }.collect(),
+        FASTQC_TRIMGALORE.out.trim_log.map { meta, fastq -> fastq[0] }.collect(),
+        BAM_SORT_SAMTOOLS.out.idxstats.collect()  { it[1] },
+        ch_fcs,
+        ch_bbduk_logs.collect()
+    )
+    **/
+    ch_versions     = ch_versions.mix(COLLECT_STATS.out.versions)
 
     //
     // SUBWORKFLOW: Eukulele
