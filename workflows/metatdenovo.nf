@@ -338,7 +338,7 @@ workflow METATDENOVO {
     // SUBWORKFLOW: run eggnog_mapper on the ORF-called amino acid sequences
     //
 
-    if (params.eggnog) {
+    if ( ! params.skip_eggnog ) {
         EGGNOG(ch_aa)
         ch_versions = ch_versions.mix(EGGNOG.out.versions)
     }
