@@ -251,8 +251,8 @@ workflow METATDENOVO {
     } else if ( params.assembler == RNASPADES ) {
         // 1. Write a yaml file for Spades
         WRITESPADESYAML (
-            ch_pe_reads_to_assembly.collect(), 
-            ch_se_reads_to_assembly.collect().ifEmpty( [] )
+            ch_pe_reads_to_assembly.collect().ifEmpty([]),
+            ch_se_reads_to_assembly.collect().ifEmpty([])
         )
         // 2. Call the module with a channel with all fastq files plus the yaml
         Channel.empty()
