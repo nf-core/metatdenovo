@@ -237,7 +237,7 @@ workflow METATDENOVO {
             ch_se_reads_to_assembly = DIGINORM.out.singles
         } else {
             ch_pe_reads_to_assembly = ch_interleaved.map { meta, fastq -> fastq }
-            ch_se_reads_to_assembly = []
+            ch_se_reads_to_assembly = Channel.empty()
         }
     }
 
@@ -249,14 +249,15 @@ workflow METATDENOVO {
             .value ( [ [ id: 'user_assembly' ], file(params.assembly) ] )
             .set { ch_assembly_contigs }
     } else if ( params.assembler == RNASPADES ) {
-        // This doesn't work as we want, as it gets called once for each pair, see issue: https://github.com/LNUc-EEMiS/metatdenovo/issues/78
         // 1. Write a yaml file for Spades
         WRITESPADESYAML (
             ch_pe_reads_to_assembly.collect(), 
-            ch_se_reads_to_assembly.collect() 
+            ch_se_reads_to_assembly.collect().ifEmpty( [] )
         )
         // 2. Call the module with a channel with all fastq files plus the yaml
-        ch_pe_reads_to_assembly
+        Channel.empty()
+            .mix(ch_pe_reads_to_assembly)
+            .mix(ch_se_reads_to_assembly)
             .collect()
             .map { [ [ id:'rnaspades' ], it, [], [] ] }
             .set { ch_spades }

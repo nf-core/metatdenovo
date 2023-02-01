@@ -8,31 +8,25 @@ process WRITESPADESYAML {
         'quay.io/biocontainers/pigz:2.3.4' }"
 
     input:
-    //tuple val(meta), path(pe), path(se)
     path(pe)
     path(se)
 
     output:
-    //tuple val(meta), path("*.yaml"), emit: yaml
     path("*.yaml")     , emit: yaml
-    path "versions.yml"            , emit: versions
+    path "versions.yml", emit: versions
 
     when:
     task.ext.when == null || task.ext.when
 
     script:
     def args = task.ext.args ?: ''
-    //def pe_split = pe.join('",\n            "')
-    def pe_split = pe.join('", "')
+    def read_list = []
+    if ( pe ) read_list.add('{ orientation: "fr", type: "paired-end", interlaced reads: [ "' + pe.join('", "') + '" ] }')
+    if ( se ) read_list.add('{ type: "single", single reads: [ "' + se.join('", "') + '" ] }')
+    def reads = read_list.join(", ")
     """
     cat <<-YAML > spades.yaml
-    [
-      {
-        orientation: "fr",
-            type: "paired-end",
-            interlaced reads: [ "${pe_split}" ]
-      }
-    ]
+    [ $reads ]
     YAML
 
     cat <<-END_VERSIONS > versions.yml
