@@ -63,6 +63,14 @@ if ( !params.skip_eukulele ) {
         }
 }
 
+if(params.cat_db){
+    ch_cat_db_file = Channel
+        .value(file( "${params.cat_db}" ))
+} else {
+    ch_cat_db_file = Channel.empty()
+}
+
+
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -93,7 +101,6 @@ include { COLLECT_STATS                    } from '../modules/local/collect_stat
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
-
 include { INPUT_CHECK } from '../subworkflows/local/input_check'
 
 //
@@ -405,6 +412,32 @@ workflow METATDENOVO {
     ch_versions     = ch_versions.mix(COLLECT_STATS.out.versions)
 
     //
+    // CAT: Bin Annotation Tool (BAT) are pipelines for the taxonomic classification of long DNA sequences and metagenome assembled genomes (MAGs/bins)
+    //
+    ch_cat_db = Channel.empty()
+    if (params.cat_db){
+        CAT_DB ( ch_cat_db_file )
+        ch_cat_db = CAT_DB.out.db
+    } else if (params.cat_db_generate){
+        CAT_DB_GENERATE ()
+        ch_cat_db = CAT_DB_GENERATE.out.db
+    }
+    UNPIGZ_CONTIGS( ch_assembly_contigs.map { it[1] })
+    ch_assembly_contigs
+        .map { it[0] }
+        .combine( UNPIGZ_CONTIGS.out.unzipped )
+        .set { ch_cat }
+    CAT (
+        ch_cat,
+        ch_cat_db
+    )
+    CAT_SUMMARY(
+        CAT.out.tax_classification.collect()
+    )
+    ch_versions = ch_versions.mix(CAT.out.versions.first())
+    ch_versions = ch_versions.mix(CAT_SUMMARY.out.versions.first())
+
+    //
     // SUBWORKFLOW: Eukulele
     //
 
@@ -413,20 +446,15 @@ workflow METATDENOVO {
         File directory = new File(directoryName)
         if ( ! directory.exists() ) { directory.mkdir() }
         ch_directory = Channel.fromPath( directory )
-        if ( !params.eukulele_db ) {
-            ch_aa
-                .map {[ [ id:"${it[0].id}.${params.orf_caller}"], it[1], [] ] }
-                .combine( ch_directory )
-                .set { ch_eukulele }
-            SUB_EUKULELE_NODB( ch_eukulele )
-            ch_versions = ch_versions.mix(SUB_EUKULELE_NODB.out.versions)
-        } else {
-            ch_aa
-                .map {[ [ id:"${it[0].id}.${params.orf_caller}" ], it[1] ] }
-                .combine( ch_eukulele_db )
-                .combine( ch_directory )
-                .set { ch_eukulele }
+        ch_aa
+            .map {[ [ id:"${it[0].id}.${params.orf_caller}" ], it[1] ] }
+            .combine( ch_eukulele_db )
+            .combine( ch_directory )
+            .set { ch_eukulele }
+        if ( params.eukulele_download_database ) {
             SUB_EUKULELE( ch_eukulele )
+        } else {
+            SUB_EUKULELE_NODB( ch_eukulele )
             ch_versions = ch_versions.mix(SUB_EUKULELE.out.versions)
         }
     }
