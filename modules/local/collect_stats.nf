@@ -9,11 +9,14 @@ process COLLECT_STATS {
 
     input:
 
+    tuple val(meta), val(samples), path(trimlogs)
+    /**
     val  samples
     path trimlogs
     path idxstats
     tuple val(meta), path(fcs)
     path bbduks
+    **/
 
     output:
     path "${meta.id}_overall_stats.tsv", emit: overall_stats
@@ -25,6 +28,23 @@ process COLLECT_STATS {
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
+
+    if ( trimlogs ) {
+        read_trimlogs = """%>%
+        mutate(
+            d = map(
+                sample,
+                function(s) {
+                    fread(cmd = sprintf("grep 'Reads written (passing filters)' %s*trimming_report.txt | sed 's/.*: *//' | sed 's/ .*//' | sed 's/,//g'", s)) %>%
+                        as_tibble()
+                }
+            )
+        ) %>%
+        unnest(d)
+        """
+    } else {
+        read_trimlogs = ""
+    }
 
     """
     #!/usr/bin/env Rscript
@@ -40,56 +60,44 @@ process COLLECT_STATS {
     TYPE_ORDER = c('n_trimmed', 'n_non_contaminated', 'idxs_n_mapped', 'idxs_n_unmapped', 'n_feature_count')
 
     # Collect stats for each sample, create a table in long format that can be appended to
-    t <- tibble(sample = c("${samples.join('", "')}")) %>%
-        mutate(
-            # N. after trimming
-            t = map(
-                sample,
-                function(s) {
-                    fread(
-                        cmd = sprintf("grep 'Reads written (passing filters)' %s*trimming_report.txt | sed 's/.*: *//' | sed 's/ .*//' | sed 's/,//g'", s),
-                        sep = ',',
-                        col.names = c('n_trimmed')
-                    )
-                }
-            ),
-            i = map(
-                sample,
-                function(s) {
-                    fread(cmd = sprintf("grep -v '^*' %s*idxstats", s), sep = '\\t', col.names = c('chr', 'length', 'idxs_n_mapped', 'idxs_n_unmapped')) %>%
-                    lazy_dt() %>%
-                    summarise(idxs_n_mapped = sum(idxs_n_mapped), idxs_n_unmapped = sum(idxs_n_unmapped)) %>%
-                    as_tibble()
-                }
-            )
-        ) %>%
-        unnest(c(t, i)) %>%
-        pivot_longer(2:ncol(.), names_to = 'm', values_to = 'v') %>%
-        union(
-            # Total observation after featureCounts
-            tibble(file = Sys.glob('*_counts.tsv.gz')) %>%
-            mutate(d = map(file, function(f) fread(cmd = sprintf("gunzip -c %s", f), sep = '\\t'))) %>%
-            as_tibble() %>%
-            unnest(d) %>%
-            group_by(sample) %>% summarise(n_feature_count = sum(count), .groups = 'drop') %>%
-            pivot_longer(2:ncol(.), names_to = 'm', values_to = 'v')
-        )
-
-    # Add in stats from BBDuk, if present
-    for ( f in Sys.glob('*.bbduk.log') ) {
-        s = str_remove(f, '.bbduk.log')
-        t <- t %>% union(
-            fread(cmd = sprintf("grep 'Result:' %s | sed 's/Result:[ \\t]*//; s/ reads.*//'", f), col.names = c('v')) %>%
-            as_tibble() %>%
-            mutate(sample = s, m = 'n_non_contaminated')
-        )
-    }
-
-    # Write the table in wide format
+    t <- tibble(sample = c("${samples.join('", "')}")) ${read_trimlogs}
+###            i = map(
+###                sample,
+###                function(s) {
+###                    fread(cmd = sprintf("grep -v '^*' %s*idxstats", s), sep = '\\t', col.names = c('chr', 'length', 'idxs_n_mapped', 'idxs_n_unmapped')) %>%
+###                    lazy_dt() %>%
+###                    summarise(idxs_n_mapped = sum(idxs_n_mapped), idxs_n_unmapped = sum(idxs_n_unmapped)) %>%
+###                    as_tibble()
+###                }
+###            )
+###        ) %>%
+###        unnest(c(t, i)) %>%
+###        pivot_longer(2:ncol(.), names_to = 'm', values_to = 'v') %>%
+###        union(
+###            # Total observation after featureCounts
+###            tibble(file = Sys.glob('*_counts.tsv.gz')) %>%
+###            mutate(d = map(file, function(f) fread(cmd = sprintf("gunzip -c %s", f), sep = '\\t'))) %>%
+###            as_tibble() %>%
+###            unnest(d) %>%
+###            group_by(sample) %>% summarise(n_feature_count = sum(count), .groups = 'drop') %>%
+###            pivot_longer(2:ncol(.), names_to = 'm', values_to = 'v')
+###        )
+###
+###    # Add in stats from BBDuk, if present
+###    for ( f in Sys.glob('*.bbduk.log') ) {
+###        s = str_remove(f, '.bbduk.log')
+###        t <- t %>% union(
+###            fread(cmd = sprintf("grep 'Result:' %s | sed 's/Result:[ \\t]*//; s/ reads.*//'", f), col.names = c('v')) %>%
+###            as_tibble() %>%
+###            mutate(sample = s, m = 'n_non_contaminated')
+###        )
+###    }
+###
+###    # Write the table in wide format
     t %>%
-        mutate(m = parse_factor(m, levels = TYPE_ORDER, ordered = TRUE)) %>%
-        arrange(sample, m) %>%
-        pivot_wider(names_from = m, values_from = v) %>%
+###        mutate(m = parse_factor(m, levels = TYPE_ORDER, ordered = TRUE)) %>%
+###        arrange(sample, m) %>%
+###        pivot_wider(names_from = m, values_from = v) %>%
         write_tsv('${prefix}_overall_stats.tsv')
 
         writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")), paste0("    dplyr: ", packageVersion('dplyr')),
