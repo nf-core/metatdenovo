@@ -35,6 +35,7 @@ process COLLECT_STATS {
         ) %>%
         unnest(d) %>%
         rename(n_trimmed = V1) %>%
+        mutate(n_trimmed = n_trimmed*2) %>%
         """
     } else {
         read_trimlogs = "%>%"
