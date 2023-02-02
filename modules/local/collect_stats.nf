@@ -67,16 +67,17 @@ process COLLECT_STATS {
                 }
             )
         ) %>%
-        unnest(i) 
-##            union(
-##            # Total observation after featureCounts
-##                tibble(file = Sys.glob('*_counts.tsv.gz')) %>%
-##                mutate(d = map(file, function(f) fread(cmd = sprintf("gunzip -c %s", f), sep = '\\t'))) %>%
-##                as_tibble() %>%
-##                unnest(d) %>%
-##                group_by(sample) %>% summarise(n_feature_count = sum(count), .groups = 'drop') %>%
-##                pivot_longer(2:ncol(.), names_to = 'm', values_to = 'v')
-##            )
+        unnest(i) %>%
+            pivot_longer(2:ncol(.), names_to = 'm', values_to = 'v') %>%
+            union(
+            # Total observation after featureCounts
+                tibble(file = Sys.glob('*_counts.tsv.gz')) %>%
+                mutate(d = map(file, function(f) fread(cmd = sprintf("gunzip -c %s", f), sep = '\\t'))) %>%
+                as_tibble() %>%
+                unnest(d) %>%
+                group_by(sample) %>% summarise(n_feature_count = sum(count), .groups = 'drop') %>%
+                pivot_longer(2:ncol(.), names_to = 'm', values_to = 'v')
+            )
 
     # Add in stats from BBDuk, if present
     for ( f in Sys.glob('*.bbduk.log') ) {
@@ -90,9 +91,9 @@ process COLLECT_STATS {
 
     # Write the table in wide format
     t %>%
-###        mutate(m = parse_factor(m, levels = TYPE_ORDER, ordered = TRUE)) %>%
-###        arrange(sample, m) %>%
-###        pivot_wider(names_from = m, values_from = v) %>%
+        mutate(m = parse_factor(m, levels = TYPE_ORDER, ordered = TRUE)) %>%
+        arrange(sample, m) %>%
+        pivot_wider(names_from = m, values_from = v) %>%
         write_tsv('${prefix}_overall_stats.tsv')
 
         writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")), paste0("    dplyr: ", packageVersion('dplyr')),
