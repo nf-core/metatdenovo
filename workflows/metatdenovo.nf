@@ -216,7 +216,6 @@ workflow METATDENOVO {
             .combine(FASTQC_TRIMGALORE.out.trim_log.collect { it[1][0] }.map { [ it ] })
             .set { ch_collect_stats }
     }
-    ch_collect_stats.view()
 
     //
     // MODULE: Run BBDuk to clean out whatever sequences the user supplied via params.sequence_filter
@@ -377,6 +376,10 @@ workflow METATDENOVO {
         .combine(ch_gff)
         .set { ch_featurecounts }
 
+    ch_collect_stats
+        .combine(BAM_SORT_SAMTOOLS.out.idxstats.collect { it[1]}.map { [ it ] })
+        .set { ch_collect_stats }
+    
     FEATURECOUNTS_CDS ( ch_featurecounts)
     ch_versions       = ch_versions.mix(FEATURECOUNTS_CDS.out.versions)
 
@@ -395,6 +398,11 @@ workflow METATDENOVO {
     ch_fcs = COLLECT_FEATURECOUNTS.out.counts.collect()
     ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
 
+    ch_collect_stats
+        .combine(COLLECT_FEATURECOUNTS.out.counts.collect { it[1]}.map { [ it ] })
+        .set { ch_collect_stats }
+    ch_collect_stats
+
     //
     // MODULE: Collect statistics from mapping analysis
     //
@@ -410,32 +418,6 @@ workflow METATDENOVO {
     )
     **/
     ch_versions     = ch_versions.mix(COLLECT_STATS.out.versions)
-
-    //
-    // CAT: Bin Annotation Tool (BAT) are pipelines for the taxonomic classification of long DNA sequences and metagenome assembled genomes (MAGs/bins)
-    //
-    ch_cat_db = Channel.empty()
-    if (params.cat_db){
-        CAT_DB ( ch_cat_db_file )
-        ch_cat_db = CAT_DB.out.db
-    } else if (params.cat_db_generate){
-        CAT_DB_GENERATE ()
-        ch_cat_db = CAT_DB_GENERATE.out.db
-    }
-    UNPIGZ_CONTIGS( ch_assembly_contigs.map { it[1] })
-    ch_assembly_contigs
-        .map { it[0] }
-        .combine( UNPIGZ_CONTIGS.out.unzipped )
-        .set { ch_cat }
-    CAT (
-        ch_cat,
-        ch_cat_db
-    )
-    CAT_SUMMARY(
-        CAT.out.tax_classification.collect()
-    )
-    ch_versions = ch_versions.mix(CAT.out.versions.first())
-    ch_versions = ch_versions.mix(CAT_SUMMARY.out.versions.first())
 
     //
     // SUBWORKFLOW: Eukulele

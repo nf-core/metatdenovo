@@ -9,14 +9,7 @@ process COLLECT_STATS {
 
     input:
 
-    tuple val(meta), val(samples), path(trimlogs)
-    /**
-    val  samples
-    path trimlogs
-    path idxstats
-    tuple val(meta), path(fcs)
-    path bbduks
-    **/
+    tuple val(meta), val(samples), path(trimlogs), path(idxstats), path(fcs)
 
     output:
     path "${meta.id}_overall_stats.tsv", emit: overall_stats
@@ -40,10 +33,11 @@ process COLLECT_STATS {
                 }
             )
         ) %>%
-        unnest(d)
+        unnest(d) %>%
+        rename(n_trimmed = V1) %>%
         """
     } else {
-        read_trimlogs = ""
+        read_trimlogs = "%>%"
     }
 
     """
@@ -60,40 +54,41 @@ process COLLECT_STATS {
     TYPE_ORDER = c('n_trimmed', 'n_non_contaminated', 'idxs_n_mapped', 'idxs_n_unmapped', 'n_feature_count')
 
     # Collect stats for each sample, create a table in long format that can be appended to
-    t <- tibble(sample = c("${samples.join('", "')}")) ${read_trimlogs}
-###            i = map(
-###                sample,
-###                function(s) {
-###                    fread(cmd = sprintf("grep -v '^*' %s*idxstats", s), sep = '\\t', col.names = c('chr', 'length', 'idxs_n_mapped', 'idxs_n_unmapped')) %>%
-###                    lazy_dt() %>%
-###                    summarise(idxs_n_mapped = sum(idxs_n_mapped), idxs_n_unmapped = sum(idxs_n_unmapped)) %>%
-###                    as_tibble()
-###                }
-###            )
-###        ) %>%
-###        unnest(c(t, i)) %>%
-###        pivot_longer(2:ncol(.), names_to = 'm', values_to = 'v') %>%
-###        union(
-###            # Total observation after featureCounts
-###            tibble(file = Sys.glob('*_counts.tsv.gz')) %>%
-###            mutate(d = map(file, function(f) fread(cmd = sprintf("gunzip -c %s", f), sep = '\\t'))) %>%
-###            as_tibble() %>%
-###            unnest(d) %>%
-###            group_by(sample) %>% summarise(n_feature_count = sum(count), .groups = 'drop') %>%
-###            pivot_longer(2:ncol(.), names_to = 'm', values_to = 'v')
-###        )
-###
-###    # Add in stats from BBDuk, if present
-###    for ( f in Sys.glob('*.bbduk.log') ) {
-###        s = str_remove(f, '.bbduk.log')
-###        t <- t %>% union(
-###            fread(cmd = sprintf("grep 'Result:' %s | sed 's/Result:[ \\t]*//; s/ reads.*//'", f), col.names = c('v')) %>%
-###            as_tibble() %>%
-###            mutate(sample = s, m = 'n_non_contaminated')
-###        )
-###    }
-###
-###    # Write the table in wide format
+    t <- tibble(sample = c("${samples.join('", "')}")) ${read_trimlogs} 
+    # add samtools idxstats output
+        mutate(     
+            i = map(
+                sample,
+                function(s) {
+                    fread(cmd = sprintf("grep -v '^*' %s*idxstats", s), sep = '\\t', col.names = c('chr', 'length', 'idxs_n_mapped', 'idxs_n_unmapped')) %>%
+                    lazy_dt() %>%
+                    summarise(idxs_n_mapped = sum(idxs_n_mapped), idxs_n_unmapped = sum(idxs_n_unmapped)) %>%
+                    as_tibble()
+                }
+            )
+        ) %>%
+        unnest(i) 
+##            union(
+##            # Total observation after featureCounts
+##                tibble(file = Sys.glob('*_counts.tsv.gz')) %>%
+##                mutate(d = map(file, function(f) fread(cmd = sprintf("gunzip -c %s", f), sep = '\\t'))) %>%
+##                as_tibble() %>%
+##                unnest(d) %>%
+##                group_by(sample) %>% summarise(n_feature_count = sum(count), .groups = 'drop') %>%
+##                pivot_longer(2:ncol(.), names_to = 'm', values_to = 'v')
+##            )
+
+    # Add in stats from BBDuk, if present
+    for ( f in Sys.glob('*.bbduk.log') ) {
+        s = str_remove(f, '.bbduk.log')
+        t <- t %>% union(
+            fread(cmd = sprintf("grep 'Result:' %s | sed 's/Result:[ \\t]*//; s/ reads.*//'", f), col.names = c('v')) %>%
+            as_tibble() %>%
+            mutate(sample = s, m = 'n_non_contaminated')
+        )
+    }
+
+    # Write the table in wide format
     t %>%
 ###        mutate(m = parse_factor(m, levels = TYPE_ORDER, ordered = TRUE)) %>%
 ###        arrange(sample, m) %>%
