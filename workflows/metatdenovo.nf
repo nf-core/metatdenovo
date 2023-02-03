@@ -63,7 +63,6 @@ if ( !params.skip_eukulele ) {
         }
 }
 
-
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     CONFIG FILES
@@ -88,14 +87,11 @@ include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/inte
 include { UNPIGZ as UNPIGZ_EUKULELE        } from '../modules/local/unpigz.nf'
 include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz.nf'
 include { COLLECT_FEATURECOUNTS            } from '../modules/local/collect_featurecounts.nf'
-include { COLLECT_FEATURECOUNTS_EUK        } from '../modules/local/collect_featurecounts_euk.nf'
 include { COLLECT_STATS                    } from '../modules/local/collect_stats.nf'
-include { COLLECT_STATS_NOTRIM             } from '../modules/local/collect_stats_notrim.nf'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
-
 include { INPUT_CHECK } from '../subworkflows/local/input_check'
 
 //
@@ -193,6 +189,7 @@ workflow METATDENOVO {
     //
     // SUBWORKFLOW: Read QC and trim adapters
     //
+
     FASTQC_TRIMGALORE (
         ch_cat_fastq,
         params.skip_fastqc || params.skip_qc,
@@ -200,18 +197,38 @@ workflow METATDENOVO {
     )
     ch_versions = ch_versions.mix(FASTQC_TRIMGALORE.out.versions)
 
+    ch_collect_stats = ch_cat_fastq.collect { it[0].id }.map { [ [ id:"${params.assembler}.${params.orf_caller}" ], it ] }
+    if ( params.skip_trimming ) {
+        ch_collect_stats
+            .map { [ it[0], it[1], [] ] }
+            .set { ch_collect_stats }
+    } else {
+        ch_collect_stats
+            .combine(FASTQC_TRIMGALORE.out.trim_log.collect { it[1][0] }.map { [ it ] })
+            .set { ch_collect_stats }
+    }
+
     //
     // MODULE: Run BBDuk to clean out whatever sequences the user supplied via params.sequence_filter
     //
     if ( params.sequence_filter ) {
         BBMAP_BBDUK ( FASTQC_TRIMGALORE.out.reads, params.sequence_filter )
         ch_clean_reads  = BBMAP_BBDUK.out.reads
-        ch_bbduk_logs = BBMAP_BBDUK.out.log.map { it[1] }
+        ch_bbduk_logs = BBMAP_BBDUK.out.log.collect { it[1] }.map { [ it ] }
         ch_versions   = ch_versions.mix(BBMAP_BBDUK.out.versions)
+        ch_collect_stats
+            .combine(ch_bbduk_logs)
+            .set {ch_collect_stats}
     } else {
         ch_clean_reads  = FASTQC_TRIMGALORE.out.reads
-        ch_bbduk_logs = []
+        ch_bbduk_logs = Channel.empty() 
+        ch_collect_stats
+            .map { [ it[0], it[1], it[2], [] ] }
+            .set { ch_collect_stats }
     }
+    ch_collect_stats
+        .combine(ch_bbduk_logs.ifEmpty([]))
+        .set {ch_collect_stats}
 
     //
     // MODULE: Interleave sequences for assembly
@@ -359,6 +376,10 @@ workflow METATDENOVO {
         .combine(ch_gff)
         .set { ch_featurecounts }
 
+    ch_collect_stats
+        .combine(BAM_SORT_SAMTOOLS.out.idxstats.collect { it[1]}.map { [ it ] })
+        .set { ch_collect_stats }
+    
     FEATURECOUNTS_CDS ( ch_featurecounts)
     ch_versions       = ch_versions.mix(FEATURECOUNTS_CDS.out.versions)
 
@@ -376,29 +397,17 @@ workflow METATDENOVO {
     ch_fcs = Channel.empty()
     ch_fcs = COLLECT_FEATURECOUNTS.out.counts.collect()
     ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
+    
+    ch_collect_stats
+        .combine(COLLECT_FEATURECOUNTS.out.counts.collect { it[1]}.map { [ it ] })
+        .set { ch_collect_stats }
 
     //
     // MODULE: Collect statistics from mapping analysis
     //
 
-    if ( ! params.skip_trimming) {
-        COLLECT_STATS (
-            FASTQC_TRIMGALORE.out.trim_log.map { meta, fastq -> meta.id }.collect(),
-            FASTQC_TRIMGALORE.out.trim_log.map { meta, fastq -> fastq[0] }.collect(),
-            BAM_SORT_SAMTOOLS.out.idxstats.collect()  { it[1] },
-            ch_fcs,
-            ch_bbduk_logs.collect()
-        )
-        ch_versions     = ch_versions.mix(COLLECT_STATS.out.versions)
-    } else {
-        COLLECT_STATS_NOTRIM (
-            FASTQC_TRIMGALORE.out.fastqc_html.map { meta, fastq -> meta.id }.collect(),
-            BAM_SORT_SAMTOOLS.out.idxstats.collect()  { it[1] },
-            ch_fcs,
-            ch_bbduk_logs.collect()
-        )
-        ch_versions     = ch_versions.mix(COLLECT_STATS_NOTRIM.out.versions)
-    }
+    COLLECT_STATS(ch_collect_stats)
+    //ch_versions     = ch_versions.mix(COLLECT_STATS.out.versions)
 
     //
     // SUBWORKFLOW: Eukulele
@@ -409,20 +418,15 @@ workflow METATDENOVO {
         File directory = new File(directoryName)
         if ( ! directory.exists() ) { directory.mkdir() }
         ch_directory = Channel.fromPath( directory )
-        if ( !params.eukulele_db ) {
-            ch_aa
-                .map {[ [ id:"${it[0].id}.${params.orf_caller}"], it[1], [] ] }
-                .combine( ch_directory )
-                .set { ch_eukulele }
-            SUB_EUKULELE_NODB( ch_eukulele )
-            ch_versions = ch_versions.mix(SUB_EUKULELE_NODB.out.versions)
-        } else {
-            ch_aa
-                .map {[ [ id:"${it[0].id}.${params.orf_caller}" ], it[1] ] }
-                .combine( ch_eukulele_db )
-                .combine( ch_directory )
-                .set { ch_eukulele }
+        ch_aa
+            .map {[ [ id:"${it[0].id}.${params.orf_caller}" ], it[1] ] }
+            .combine( ch_eukulele_db )
+            .combine( ch_directory )
+            .set { ch_eukulele }
+        if ( params.eukulele_download_database ) {
             SUB_EUKULELE( ch_eukulele )
+        } else {
+            SUB_EUKULELE_NODB( ch_eukulele )
             ch_versions = ch_versions.mix(SUB_EUKULELE.out.versions)
         }
     }

@@ -9,11 +9,7 @@ process COLLECT_STATS {
 
     input:
 
-    val  samples
-    path trimlogs
-    path idxstats
-    tuple val(meta), path(fcs)
-    path bbduks
+    tuple val(meta), val(samples), path(trimlogs), path(bblogs), path(idxstats), path(fcs)
 
     output:
     path "${meta.id}_overall_stats.tsv", emit: overall_stats
@@ -25,6 +21,25 @@ process COLLECT_STATS {
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
+
+    if ( trimlogs ) {
+        read_trimlogs = """%>%
+        mutate(
+            d = map(
+                sample,
+                function(s) {
+                    fread(cmd = sprintf("grep 'Reads written (passing filters)' %s*trimming_report.txt | sed 's/.*: *//' | sed 's/ .*//' | sed 's/,//g'", s)) %>%
+                        as_tibble()
+                }
+            )
+        ) %>%
+        unnest(d) %>%
+        rename(n_trimmed = V1) %>%
+        mutate(n_trimmed = n_trimmed*2) %>%
+        """
+    } else {
+        read_trimlogs = "%>%"
+    }
 
     """
     #!/usr/bin/env Rscript
@@ -40,19 +55,9 @@ process COLLECT_STATS {
     TYPE_ORDER = c('n_trimmed', 'n_non_contaminated', 'idxs_n_mapped', 'idxs_n_unmapped', 'n_feature_count')
 
     # Collect stats for each sample, create a table in long format that can be appended to
-    t <- tibble(sample = c("${samples.join('", "')}")) %>%
+    t <- tibble(sample = c("${samples.join('", "')}")) ${read_trimlogs}
+    # add samtools idxstats output
         mutate(
-            # N. after trimming
-            t = map(
-                sample,
-                function(s) {
-                    fread(
-                        cmd = sprintf("grep 'Reads written (passing filters)' %s*trimming_report.txt | sed 's/.*: *//' | sed 's/ .*//' | sed 's/,//g'", s),
-                        sep = ',',
-                        col.names = c('n_trimmed')
-                    )
-                }
-            ),
             i = map(
                 sample,
                 function(s) {
@@ -63,17 +68,17 @@ process COLLECT_STATS {
                 }
             )
         ) %>%
-        unnest(c(t, i)) %>%
-        pivot_longer(2:ncol(.), names_to = 'm', values_to = 'v') %>%
-        union(
+        unnest(i) %>%
+            pivot_longer(2:ncol(.), names_to = 'm', values_to = 'v') %>%
+            union(
             # Total observation after featureCounts
-            tibble(file = Sys.glob('*_counts.tsv.gz')) %>%
-            mutate(d = map(file, function(f) fread(cmd = sprintf("gunzip -c %s", f), sep = '\\t'))) %>%
-            as_tibble() %>%
-            unnest(d) %>%
-            group_by(sample) %>% summarise(n_feature_count = sum(count), .groups = 'drop') %>%
-            pivot_longer(2:ncol(.), names_to = 'm', values_to = 'v')
-        )
+                tibble(file = Sys.glob('*_counts.tsv.gz')) %>%
+                mutate(d = map(file, function(f) fread(cmd = sprintf("gunzip -c %s", f), sep = '\\t'))) %>%
+                as_tibble() %>%
+                unnest(d) %>%
+                group_by(sample) %>% summarise(n_feature_count = sum(count), .groups = 'drop') %>%
+                pivot_longer(2:ncol(.), names_to = 'm', values_to = 'v')
+            )
 
     # Add in stats from BBDuk, if present
     for ( f in Sys.glob('*.bbduk.log') ) {
