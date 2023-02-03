@@ -57,10 +57,13 @@ if ( !params.skip_eukulele ) {
     if ( params.eukulele_db ) {
         Channel
             .of ( params.eukulele_db.split(',') )
+            .map { [ it, file(params.eukulele_dbpath) ] }
             .set { ch_eukulele_db }
     } else {
-        ch_eukulele_db = []
-        }
+        Channel.fromPath(params.eukulele_dbpath)
+            .map { [ [], it ] }
+            .set { ch_eukulele_db }
+    }
 }
 
 /*
@@ -414,21 +417,14 @@ workflow METATDENOVO {
     //
 
     if( !params.skip_eukulele){
-        String directoryName = params.eukulele_dbpath
-        File directory = new File(directoryName)
+        File directory = new File(params.eukulele_dbpath)
         if ( ! directory.exists() ) { directory.mkdir() }
         ch_directory = Channel.fromPath( directory )
-        ch_aa
-            .map {[ [ id:"${it[0].id}.${params.orf_caller}" ], it[1] ] }
-            .combine( ch_eukulele_db )
-            .combine( ch_directory )
-            .set { ch_eukulele }
-        if ( params.eukulele_download_database ) {
+            ch_aa
+                .map {[ [ id:"${it[0].id}.${params.orf_caller}" ], it[1] ] }
+                .combine( ch_eukulele_db )
+                .set { ch_eukulele }
             SUB_EUKULELE( ch_eukulele )
-        } else {
-            SUB_EUKULELE_NODB( ch_eukulele )
-            ch_versions = ch_versions.mix(SUB_EUKULELE.out.versions)
-        }
     }
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
