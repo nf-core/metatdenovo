@@ -183,10 +183,6 @@
                     "type": "string",
                     "default": "mets",
                     "description": "Specify which method to use for EUKulele"
-                },
-                "eukulele_download_database": {
-                    "type": "string",
-                    "default": null
                 }
             }
         },

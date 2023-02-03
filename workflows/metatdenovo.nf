@@ -417,8 +417,7 @@ workflow METATDENOVO {
     //
 
     if( !params.skip_eukulele){
-        String directoryName = params.eukulele_dbpath
-        File directory = new File(directoryName)
+        File directory = new File(params.eukulele_dbpath)
         if ( ! directory.exists() ) { directory.mkdir() }
         ch_directory = Channel.fromPath( directory )
             ch_aa
@@ -426,10 +425,7 @@ workflow METATDENOVO {
                 .combine( ch_eukulele_db )
                 .set { ch_eukulele }
             SUB_EUKULELE( ch_eukulele )
-        } else {
-            SUB_EUKULELE_NODB( ch_eukulele )
-            ch_versions = ch_versions.mix(SUB_EUKULELE.out.versions)
-        }
+    }
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')

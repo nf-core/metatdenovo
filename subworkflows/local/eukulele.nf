@@ -14,16 +14,19 @@ workflow SUB_EUKULELE {
     main:
         ch_versions = Channel.empty()
         EUKULELE_DOWNLOAD ( eukulele.filter{ it[2] }.map { [ it[2], it[3] ] } )
-        eukulele
-            .map { [ it[0], it[1] ] }
-            .join ( EUKULELE_DOWNLOAD.out.db )
-            .join(eukulele.filter{ ! it[2] }.map { [ [], it[3] ] } )
+        ch_download = EUKULELE_DOWNLOAD.out.db
+        Channel.empty()
+            .mix ( EUKULELE_DOWNLOAD.out.db )
+            .mix(eukulele.filter{ ! it[2] }.map { [ [], it[3] ] } )
+            .merge( eukulele.map{ [ it[0], it[1] ] } )
+            .map { [ it[2], it[3], it[0], it[1] ] } 
             .set { ch_eukulele }
         EUKULELE( ch_eukulele )
 
         FORMAT_TAX( EUKULELE.out.taxonomy_estimation.map { [ it[2], it[1] ] } )
 
     emit:
+        eukulele = ch_eukulele
         taxonomy_estimation = EUKULELE.out.taxonomy_estimation
         taxonomy_counts     = EUKULELE.out.taxonomy_counts
         diamond             = EUKULELE.out.diamond
