@@ -63,15 +63,6 @@ if ( !params.skip_eukulele ) {
         }
 }
 
-if(params.cat_db){
-    ch_cat_db_file = Channel
-        .value(file( "${params.cat_db}" ))
-} else {
-    ch_cat_db_file = Channel.empty()
-}
-
-
-
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     CONFIG FILES
@@ -223,12 +214,21 @@ workflow METATDENOVO {
     if ( params.sequence_filter ) {
         BBMAP_BBDUK ( FASTQC_TRIMGALORE.out.reads, params.sequence_filter )
         ch_clean_reads  = BBMAP_BBDUK.out.reads
-        ch_bbduk_logs = BBMAP_BBDUK.out.log.map { it[1] }
+        ch_bbduk_logs = BBMAP_BBDUK.out.log.collect { it[1] }.map { [ it ] }
         ch_versions   = ch_versions.mix(BBMAP_BBDUK.out.versions)
+        ch_collect_stats
+            .combine(ch_bbduk_logs)
+            .set {ch_collect_stats}
     } else {
         ch_clean_reads  = FASTQC_TRIMGALORE.out.reads
-        ch_bbduk_logs = []
+        ch_bbduk_logs = Channel.empty() 
+        ch_collect_stats
+            .map { [ it[0], it[1], it[2], [] ] }
+            .set { ch_collect_stats }
     }
+    ch_collect_stats
+        .combine(ch_bbduk_logs.ifEmpty([]))
+        .set {ch_collect_stats}
 
     //
     // MODULE: Interleave sequences for assembly
@@ -397,27 +397,17 @@ workflow METATDENOVO {
     ch_fcs = Channel.empty()
     ch_fcs = COLLECT_FEATURECOUNTS.out.counts.collect()
     ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
-
+    
     ch_collect_stats
         .combine(COLLECT_FEATURECOUNTS.out.counts.collect { it[1]}.map { [ it ] })
         .set { ch_collect_stats }
-    ch_collect_stats
 
     //
     // MODULE: Collect statistics from mapping analysis
     //
 
     COLLECT_STATS(ch_collect_stats)
-    /**
-    COLLECT_STATS (
-        FASTQC_TRIMGALORE.out.trim_log.map { meta, fastq -> meta.id }.collect(),
-        FASTQC_TRIMGALORE.out.trim_log.map { meta, fastq -> fastq[0] }.collect(),
-        BAM_SORT_SAMTOOLS.out.idxstats.collect()  { it[1] },
-        ch_fcs,
-        ch_bbduk_logs.collect()
-    )
-    **/
-    ch_versions     = ch_versions.mix(COLLECT_STATS.out.versions)
+    //ch_versions     = ch_versions.mix(COLLECT_STATS.out.versions)
 
     //
     // SUBWORKFLOW: Eukulele

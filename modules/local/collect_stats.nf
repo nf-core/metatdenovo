@@ -9,7 +9,7 @@ process COLLECT_STATS {
 
     input:
 
-    tuple val(meta), val(samples), path(trimlogs), path(idxstats), path(fcs)
+    tuple val(meta), val(samples), path(trimlogs), path(bblogs), path(idxstats), path(fcs)
 
     output:
     path "${meta.id}_overall_stats.tsv", emit: overall_stats
@@ -55,9 +55,9 @@ process COLLECT_STATS {
     TYPE_ORDER = c('n_trimmed', 'n_non_contaminated', 'idxs_n_mapped', 'idxs_n_unmapped', 'n_feature_count')
 
     # Collect stats for each sample, create a table in long format that can be appended to
-    t <- tibble(sample = c("${samples.join('", "')}")) ${read_trimlogs} 
+    t <- tibble(sample = c("${samples.join('", "')}")) ${read_trimlogs}
     # add samtools idxstats output
-        mutate(     
+        mutate(
             i = map(
                 sample,
                 function(s) {
