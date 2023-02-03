@@ -26,7 +26,6 @@ workflow SUB_EUKULELE {
         FORMAT_TAX( EUKULELE.out.taxonomy_estimation.map { [ it[2], it[1] ] } )
 
     emit:
-        eukulele = ch_eukulele
         taxonomy_estimation = EUKULELE.out.taxonomy_estimation
         taxonomy_counts     = EUKULELE.out.taxonomy_counts
         diamond             = EUKULELE.out.diamond
