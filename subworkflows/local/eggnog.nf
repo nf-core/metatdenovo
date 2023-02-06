@@ -40,6 +40,7 @@ workflow EGGNOG {
 
     emit:
         hits     = EGGNOG_MAPPER.out.hits
+        eggtab   = EGGNOG_TABLE.out.eggtab
         versions = ch_versions
 
 }

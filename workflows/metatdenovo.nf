@@ -91,6 +91,7 @@ include { UNPIGZ as UNPIGZ_EUKULELE        } from '../modules/local/unpigz.nf'
 include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz.nf'
 include { COLLECT_FEATURECOUNTS            } from '../modules/local/collect_featurecounts.nf'
 include { COLLECT_STATS                    } from '../modules/local/collect_stats.nf'
+include { SUM_EGGNOG                       } from '../modules/local/sum_eggnog.nf'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -224,7 +225,7 @@ workflow METATDENOVO {
             .set {ch_collect_stats}
     } else {
         ch_clean_reads  = FASTQC_TRIMGALORE.out.reads
-        ch_bbduk_logs = Channel.empty() 
+        ch_bbduk_logs = Channel.empty()
         ch_collect_stats
             .map { [ it[0], it[1], it[2], [] ] }
             .set { ch_collect_stats }
@@ -352,15 +353,6 @@ workflow METATDENOVO {
     }
 
     //
-    // SUBWORKFLOW: run eggnog_mapper on the ORF-called amino acid sequences
-    //
-
-    if (params.eggnog) {
-        EGGNOG(ch_aa)
-        ch_versions = ch_versions.mix(EGGNOG.out.versions)
-    }
-
-    //
     // SUBWORKFLOW: classify ORFs with a set of hmm files
     //
 
@@ -382,35 +374,41 @@ workflow METATDENOVO {
     ch_collect_stats
         .combine(BAM_SORT_SAMTOOLS.out.idxstats.collect { it[1]}.map { [ it ] })
         .set { ch_collect_stats }
-    
+
     FEATURECOUNTS_CDS ( ch_featurecounts)
     ch_versions       = ch_versions.mix(FEATURECOUNTS_CDS.out.versions)
 
     //
     // MODULE: Collect featurecounts output counts in one table
     //
-    
+
     FEATURECOUNTS_CDS.out.counts
         .collect() { it[1] }
         .map { [ [ id:'all_samples'], it ] }
         .set { ch_collect_feature }
 
     COLLECT_FEATURECOUNTS ( ch_collect_feature )
-
-    ch_fcs = Channel.empty()
-    ch_fcs = COLLECT_FEATURECOUNTS.out.counts.collect()
     ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
-    
+    ch_fcs = COLLECT_FEATURECOUNTS.out.counts.collect { it[1]}.map { [ it ] }
     ch_collect_stats
-        .combine(COLLECT_FEATURECOUNTS.out.counts.collect { it[1]}.map { [ it ] })
+        .combine(ch_fcs)
         .set { ch_collect_stats }
 
+    //
+    // SUBWORKFLOW: run eggnog_mapper on the ORF-called amino acid sequences
+    //
+
+    if (params.eggnog) {
+        EGGNOG(ch_aa)
+        ch_versions = ch_versions.mix(EGGNOG.out.versions)
+        SUM_EGGNOG(EGGNOG.out.eggtab.map, ch_fcs)
+    }
     //
     // MODULE: Collect statistics from mapping analysis
     //
 
     COLLECT_STATS(ch_collect_stats)
-    //ch_versions     = ch_versions.mix(COLLECT_STATS.out.versions)
+    ch_versions     = ch_versions.mix(COLLECT_STATS.out.versions)
 
     //
     // SUBWORKFLOW: Eukulele
