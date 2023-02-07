@@ -167,7 +167,7 @@
                 },
                 "eukulele_db": {
                     "type": "string",
-                    "description": "This option allows to download a specific database (or set of database when separated by comma) whether the latter is not present inside the database directory. Possible alternatives: phylodb, mmetsp, marmmetsp, eukprot. NB: you can't use this option with a custom database as eukulele will not recognize the name and it will start to download phylodb by default. If you want to use a custom database, please skip this option and go directly with eukulele_dbpath"
+                    "description": "This option allows to use a specific database (or set of databases when separated by commas) with Eukulele. Databases will be downloaded if not already present inside the database directory (see `--eukulele_dbpath`). Possible alternatives: phylodb, mmetsp, marmmetsp, eukprot. NB: you can't use this option with a custom database as eukulele will not recognize the name and it will start to download phylodb by default. If you want to use a custom database, please skip this option and specify only `--eukulele_dbpath`."
                 },
                 "skip_eukulele": {
                     "type": "boolean",
