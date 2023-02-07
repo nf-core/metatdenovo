@@ -16,7 +16,7 @@ process CAT {
     path("raw/*.predicted_proteins.faa.gz"), emit: faa
     path("raw/*.predicted_proteins.gff.gz"), emit: gff
     path("raw/*.log")                      , emit: log
-    path("raw/*.bin2classification.txt.gz"), emit: tax_classification_taxids
+    path("raw/*.contig2classification.txt.gz"), emit: tax_classification_taxids
     path "versions.yml"                    , emit: versions
 
     script:
