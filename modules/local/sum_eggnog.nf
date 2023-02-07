@@ -39,7 +39,7 @@ process SUM_EGGNOG {
     # call the tables into variables
     eggnog <- read.delim("eggnogs.tsv.gz",  sep = "\t", header = TRUE, fill = TRUE) %>%
         as_tibble()
- 
+
     counts <- list.files(pattern = "*_counts.tsv.gz") %>%
             map_df(~read.table(.,  sep = "\t", header = TRUE, fill = TRUE)) %>%
             as_tibble()
