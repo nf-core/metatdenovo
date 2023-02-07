@@ -86,6 +86,7 @@ ch_multiqc_custom_methods_description = params.multiqc_methods_description ? fil
 //
 // MODULE: local
 //
+include { WRITESPADESYAML                  } from '../modules/local/writespadesyaml.nf'
 include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved.nf'
 include { UNPIGZ as UNPIGZ_EUKULELE        } from '../modules/local/unpigz.nf'
 include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz.nf'
@@ -256,7 +257,7 @@ workflow METATDENOVO {
             ch_se_reads_to_assembly = DIGINORM.out.singles
         } else {
             ch_pe_reads_to_assembly = ch_interleaved.map { meta, fastq -> fastq }
-            ch_se_reads_to_assembly = []
+            ch_se_reads_to_assembly = Channel.empty()
         }
     }
 
@@ -268,10 +269,24 @@ workflow METATDENOVO {
             .value ( [ [ id: 'user_assembly' ], file(params.assembly) ] )
             .set { ch_assembly_contigs }
     } else if ( params.assembler == RNASPADES ) {
-        // This doesn't work as we want, as it gets called once for each pair, see issue: https://github.com/LNUc-EEMiS/metatdenovo/issues/78
-        ch_spades = FASTQC_TRIMGALORE.out.reads.map { meta, fastq -> [ [ id: 'spades' ], fastq, [], [] ] }
-        SPADES( ch_spades, [], [] )
-        ch_assembly_contigs = SPADES.out.transcripts.map { it[1] }
+        // 1. Write a yaml file for Spades
+        WRITESPADESYAML (
+            ch_pe_reads_to_assembly.collect().ifEmpty([]),
+            ch_se_reads_to_assembly.collect().ifEmpty([])
+        )
+        // 2. Call the module with a channel with all fastq files plus the yaml
+        Channel.empty()
+            .mix(ch_pe_reads_to_assembly)
+            .mix(ch_se_reads_to_assembly)
+            .collect()
+            .map { [ [ id:'rnaspades' ], it, [], [] ] }
+            .set { ch_spades }
+        SPADES (
+            ch_spades,
+            WRITESPADESYAML.out.yaml,
+            []
+        )
+        ch_assembly_contigs = SPADES.out.transcripts
         ch_versions = ch_versions.mix(SPADES.out.versions)
     } else if ( params.assembler == MEGAHIT ) {
         MEGAHIT_INTERLEAVED(
