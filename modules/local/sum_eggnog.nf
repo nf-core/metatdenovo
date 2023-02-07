@@ -44,16 +44,17 @@ process SUM_EGGNOG {
             map_df(~read.table(.,  sep = "\t", header = TRUE, fill = TRUE)) %>%
             as_tibble()
 
-    #counts[,c(1,7)] %>%
-        #right_join(eggnog[,1], by = 'orf') %>%
-        #drop_na() %>%
-        #group_by(sample) %>%
-        #count(orf) %>%
-        #summarise( value = sum(n)) %>%
-        #as_tibble() %>%
-        #add_column(database = "eggnog", field = "n_orfs") %>%
-        #relocate(value, .after = last_col()) %>%
-        write_tsv(counts, 'eggnog_summary.tsv')
+    counts[,c(1,7)] %>%
+        right_join(eggnog[,1], by = 'orf') %>%
+        drop_na() %>%
+        as_tibble() %>%
+        group_by(sample) %>%
+        count(orf) %>%
+        summarise( value = sum(n)) %>%
+        as_tibble() %>%
+        add_column(database = "eggnog", field = "n_orfs") %>%
+        relocate(value, .after = last_col()) %>%
+        write_tsv('eggnog_summary.tsv')
 
     writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")), paste0("    dplyr: ", packageVersion('dplyr')),
         paste0("    dtplyr: ", packageVersion('dtplyr')), paste0("    data.table: ", packageVersion('data.table')), paste0("    readr: ", packageVersion('readr')),
