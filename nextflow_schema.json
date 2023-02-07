@@ -183,7 +183,7 @@
                 "eukulele_method": {
                     "type": "string",
                     "default": "mets",
-                    "description": "Specify which method to use for EUKulele (metatranscriptomic or metagenomic). default: metatranscriptomics (mets)"
+                    "description": "Specify which method to use for EUKulele. the alternatives are: mets (metatranscriptomics) or  mags (Metagenome Assembled Genomes). default: metatranscriptomics (mets)"
                 }
             }
         },
