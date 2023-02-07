@@ -86,6 +86,7 @@ ch_multiqc_custom_methods_description = params.multiqc_methods_description ? fil
 //
 // MODULE: local
 //
+include { WRITESPADESYAML                  } from '../modules/local/writespadesyaml.nf'
 include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved.nf'
 include { UNPIGZ as UNPIGZ_EUKULELE        } from '../modules/local/unpigz.nf'
 include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz.nf'
@@ -130,6 +131,10 @@ include { CAT_FASTQ 	          	             } from '../modules/nf-core/cat/fast
 include { FASTQC                                     } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                                    } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS                } from '../modules/nf-core/custom/dumpsoftwareversions/main'
+
+//
+// SUBWORKFLOWS: Installed directly from nf-core/modules
+//
 include { BAM_SORT_SAMTOOLS                          } from '../subworkflows/nf-core/bam_sort_samtools/main'
 
 /*
@@ -181,6 +186,7 @@ workflow METATDENOVO {
     ch_versions = ch_versions.mix(CAT_FASTQ.out.versions.first().ifEmpty(null))
 
     // Branch FastQ channels if 'auto' specified to infer strandedness
+    // DL & DDL: We're not using this channel -- delete or deal with the channel?
     ch_cat_fastq
         .branch {
             meta, fastq ->
@@ -237,11 +243,12 @@ workflow METATDENOVO {
     //
     // MODULE: Interleave sequences for assembly
     //
+    // DL & DDL: We can probably not deal with single end input
     ch_interleaved = Channel.empty()
     if ( ! params.assembly ) {
         SEQTK_MERGEPE(ch_clean_reads)
         ch_interleaved = SEQTK_MERGEPE.out.reads
-        ch_versions = ch_versions.mix(SEQTK_MERGEPE.out.versions)
+        ch_versions    = ch_versions.mix(SEQTK_MERGEPE.out.versions)
     }
 
     //
@@ -257,7 +264,7 @@ workflow METATDENOVO {
             ch_se_reads_to_assembly = DIGINORM.out.singles
         } else {
             ch_pe_reads_to_assembly = ch_interleaved.map { meta, fastq -> fastq }
-            ch_se_reads_to_assembly = []
+            ch_se_reads_to_assembly = Channel.empty()
         }
     }
 
@@ -269,10 +276,25 @@ workflow METATDENOVO {
             .value ( [ [ id: 'user_assembly' ], file(params.assembly) ] )
             .set { ch_assembly_contigs }
     } else if ( params.assembler == RNASPADES ) {
-        // This doesn't work as we want, as it gets called once for each pair, see issue: https://github.com/LNUc-EEMiS/metatdenovo/issues/78
-        ch_spades = FASTQC_TRIMGALORE.out.reads.map { meta, fastq -> [ [ id: 'spades' ], fastq, [], [] ] }
-        SPADES( ch_spades, [], [] )
-        ch_assembly_contigs = SPADES.out.transcripts.map { it[1] }
+        // 1. Write a yaml file for Spades
+        WRITESPADESYAML (
+            ch_pe_reads_to_assembly.collect().ifEmpty([]),
+            ch_se_reads_to_assembly.collect().ifEmpty([])
+        )
+        // 2. Call the module with a channel with all fastq files plus the yaml
+        Channel.empty()
+            .mix(ch_pe_reads_to_assembly)
+            .mix(ch_se_reads_to_assembly)
+            .collect()
+            .map { [ [ id:'rnaspades' ], it, [], [] ] }
+            .set { ch_spades }
+        SPADES (
+            ch_spades,
+            WRITESPADESYAML.out.yaml,
+            []
+        )
+        ch_assembly_contigs = SPADES.out.transcripts
+
         ch_versions = ch_versions.mix(SPADES.out.versions)
     } else if ( params.assembler == MEGAHIT ) {
         MEGAHIT_INTERLEAVED(
@@ -298,7 +320,6 @@ workflow METATDENOVO {
     BBMAP_ALIGN ( ch_clean_reads, BBMAP_INDEX.out.index )
     ch_versions = ch_versions.mix(BBMAP_ALIGN.out.versions)
 
-
     //
     // SUBWORKFLOW: sort bam file
     //
@@ -317,10 +338,9 @@ workflow METATDENOVO {
     //
 
     if ( params.orf_caller == ORF_CALLER_PROKKA ) {
-        PROKKA_SUBSETS(ch_assembly_contigs.map { it[1] })
+        PROKKA_SUBSETS(ch_assembly_contigs)
         ch_versions = ch_versions.mix(PROKKA_SUBSETS.out.versions)
-        // DL: Isn't it clearer to leave the mapping to when the channel is used?
-        ch_gff      = PROKKA_SUBSETS.out.gff.map { it[1] }
+        ch_gff      = PROKKA_SUBSETS.out.gff
         ch_aa       = PROKKA_SUBSETS.out.faa
     }
 
@@ -330,8 +350,8 @@ workflow METATDENOVO {
 
     if ( params.orf_caller == ORF_CALLER_PRODIGAL ) {
         PRODIGAL( ch_assembly_contigs )
-        ch_aa           = PRODIGAL.out.faa
         ch_gff          = PRODIGAL.out.gff
+        ch_aa           = PRODIGAL.out.faa
         ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
     }
 
@@ -346,8 +366,7 @@ workflow METATDENOVO {
 
         TRANSDECODER ( ch_assembly_contigs )
 
-        // DL: see comment before ch_gff for prokka
-        ch_gff      = TRANSDECODER.out.gff.map { it[1] }
+        ch_gff      = TRANSDECODER.out.gff
         ch_aa       = TRANSDECODER.out.pep
         ch_versions = ch_versions.mix(TRANSDECODER.out.versions)
     }
@@ -368,7 +387,7 @@ workflow METATDENOVO {
     //
 
     BAM_SORT_SAMTOOLS.out.bam
-        .combine(ch_gff)
+        .combine(ch_gff.map { it[1] })
         .set { ch_featurecounts }
 
     ch_collect_stats

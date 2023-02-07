@@ -9,18 +9,30 @@ include { CAT_CAT as FNA_CAT   } from '../../modules/nf-core/cat/cat/main'
 
 workflow PROKKA_SUBSETS {
     take:
-        contigs // channel:  file(contigs)
+        contigs // channel:  tuple val(meta), file(contigs)
 
     main:
         ch_versions = Channel.empty()
 
-        PROKKA ( contigs.splitFasta(size: 10.MB, file: true).map { contigs -> [ [ id: contigs.getBaseName() ], contigs] }, [], []  )
+        PROKKA ( contigs.map{ it[1] }.splitFasta(size: 10.MB, file: true).map { contigs -> [ [ id: contigs.getBaseName() ], contigs] }, [], []  )
         ch_versions = ch_versions.mix(PROKKA.out.versions)
-        GFF_CAT ( PROKKA.out.gff.collect{it[1]}.map { [ [ id: 'prokka'], it ] } )
+
+        contigs.map{ [ id:"${it[0].id}.prokka" ] }
+            .combine(PROKKA.out.gff.collect { it[1] }.map { [ it ] })
+            .set { ch_gff }
+        GFF_CAT ( ch_gff )
         ch_versions = ch_versions.mix(GFF_CAT.out.versions)
-        FAA_CAT ( PROKKA.out.faa.collect{it[1]}.map { [ [ id: 'prokka'], it ] } )
+
+        contigs.map{ [ id:"${it[0].id}.prokka" ] }
+            .combine(PROKKA.out.faa.collect { it[1] }.map { [ it ] })
+            .set { ch_faa }
+        FAA_CAT ( ch_faa )
         ch_versions = ch_versions.mix(FAA_CAT.out.versions)
-        FNA_CAT ( PROKKA.out.fna.collect{it[1]}.map { [ [ id: 'prokka'], it ] } )
+
+        contigs.map{ [ id:"${it[0].id}.prokka" ] }
+            .combine(PROKKA.out.fna.collect { it[1] }.map { [ it ] })
+            .set { ch_fna }
+        FNA_CAT ( ch_fna )
         ch_versions = ch_versions.mix(FNA_CAT.out.versions)
 
     emit:

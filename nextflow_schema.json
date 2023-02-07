@@ -156,14 +156,15 @@
                     "type": "string",
                     "description": "Specify a training file for prodigal. By default prodigal will learn from the input sequences"
                 },
-                "eggnog": {
+                "skip_eggnog": {
                     "type": "boolean",
-                    "description": "enable eggnog functional annotation"
+                    "default": false,
+                    "description": "Skip EGGNOG functional annotation"
                 },
                 "eggnog_dbpath": {
                     "type": "string",
-                    "default": "./",
-                    "description": "Specify eggnog database path"
+                    "default": "./eggnog",
+                    "description": "Specify EGGNOG database path"
                 },
                 "eukulele_db": {
                     "type": "string",
