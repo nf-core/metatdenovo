@@ -167,8 +167,7 @@
                 },
                 "eukulele_db": {
                     "type": "string",
-                    "default": "phylodb",
-                    "description": "Specify which database you would like to use with eukulele, possible alternatives: phylodb, mmetsp. default: phylodb"
+                    "description": "This option allows to download a specific database (or set of database when separated by comma) whether the latter is not present inside the database directory. Possible alternatives: phylodb, mmetsp, marmmetsp, eukprot. NB: you can't use this option with a custom database as eukulele will not recognize the name and it will start to download phylodb by default. If you want to use a custom database, please skip this option and go directly with eukulele_dbpath"
                 },
                 "skip_eukulele": {
                     "type": "boolean",
@@ -177,12 +176,12 @@
                 "eukulele_dbpath": {
                     "type": "string",
                     "default": "./eukulele",
-                    "description": "Specify EUKulele database folder"
+                    "description": "Specify EUKulele database folder (useful for custom database)"
                 },
                 "eukulele_method": {
                     "type": "string",
                     "default": "mets",
-                    "description": "Specify which method to use for EUKulele"
+                    "description": "Specify which method to use for EUKulele (metatranscriptomic or metagenomic). default: metatranscriptomics (mets)"
                 }
             }
         },
