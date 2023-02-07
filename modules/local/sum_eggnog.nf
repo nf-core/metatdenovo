@@ -14,8 +14,8 @@ process SUM_EGGNOG {
 
     output:
 
-    path "${meta.id}_eggnog_stats.tsv", emit: overall_stats
-    path "versions.yml"               , emit: versions
+    path "eggnog_summary.tsv" , emit: eggnog_summary
+    path "versions.yml"       , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -27,30 +27,33 @@ process SUM_EGGNOG {
     """
     #!/usr/bin/env Rscript
 
-library(data.table)
-library(dtplyr)
-library(dplyr)
-library(readr)
-library(tidyr)
-library(stringr)
-library(tidyverse)
+    library(data.table)
+    library(dtplyr)
+    library(dplyr)
+    library(readr)
+    library(tidyr)
+    library(stringr)
+    library(tidyverse)
 
     TYPE_ORDER = c('sample', 'database', 'field', 'value')
     # call the tables into variables
-    eggnog <- fread("eggnogs.tsv.gz")
+    eggnog <- read.delim("eggnogs.tsv.gz",  sep = "\t", header = TRUE, fill = TRUE) %>%
+        as_tibble()
+ 
     counts <- list.files(pattern = "*_counts.tsv.gz") %>%
-            map_df(~fread(.))
+            map_df(~read.table(.,  sep = "\t", header = TRUE, fill = TRUE)) %>%
+            as_tibble()
 
-    counts[,c(1,6)] %>%
-        right_join(eggnog[,1], by = 'orf') %>%
-        drop_na() %>%
-        group_by(sample) %>%
-        count(orf) %>%
-        summarise( value = sum(n)) %>%
-        as_tibble() %>%
-        add_column(database = "eggnog", field = "n_orfs") %>%
-        relocate(value, .after = last_col()) %>%
-        write_tsv('eggnog_summary.tsv')
+    #counts[,c(1,7)] %>%
+        #right_join(eggnog[,1], by = 'orf') %>%
+        #drop_na() %>%
+        #group_by(sample) %>%
+        #count(orf) %>%
+        #summarise( value = sum(n)) %>%
+        #as_tibble() %>%
+        #add_column(database = "eggnog", field = "n_orfs") %>%
+        #relocate(value, .after = last_col()) %>%
+        write_tsv(counts, 'eggnog_summary.tsv')
 
     writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")), paste0("    dplyr: ", packageVersion('dplyr')),
         paste0("    dtplyr: ", packageVersion('dtplyr')), paste0("    data.table: ", packageVersion('data.table')), paste0("    readr: ", packageVersion('readr')),

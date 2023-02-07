@@ -401,7 +401,7 @@ workflow METATDENOVO {
     if (params.eggnog) {
         EGGNOG(ch_aa)
         ch_versions = ch_versions.mix(EGGNOG.out.versions)
-        SUM_EGGNOG(EGGNOG.out.eggtab.map, ch_fcs)
+        SUM_EGGNOG(EGGNOG.out.eggtab, COLLECT_FEATURECOUNTS.out.counts.map { it[1]} )
     }
     //
     // MODULE: Collect statistics from mapping analysis
