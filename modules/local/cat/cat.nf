@@ -27,7 +27,7 @@ process CAT {
     CAT add_names -i "${meta.id}.contig2classification.txt" -o "${meta.id}.contig2classification.names.txt" -t taxonomy/ ${official_taxonomy}
 
     mkdir raw
-    mv *.predicted_proteins.faa *.predicted_proteins.gff *.log *.bin2classification.txt raw/
+    mv *.ORF2LCA.txt *.predicted_proteins.faa *.predicted_proteins.gff *.log *.bin2classification.txt raw/
     gzip \
         "raw/${meta.id}.concatenated.predicted_proteins.faa" \
         "raw/${meta.id}.concatenated.predicted_proteins.gff" \
