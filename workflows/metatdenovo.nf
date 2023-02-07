@@ -66,6 +66,14 @@ if ( !params.skip_eukulele ) {
     }
 }
 
+if(params.cat_db){
+    ch_cat_db_file = Channel
+        .value(file( "${params.cat_db}" ))
+} else {
+    ch_cat_db_file = Channel.empty()
+}
+
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     CONFIG FILES
@@ -87,10 +95,13 @@ ch_multiqc_custom_methods_description = params.multiqc_methods_description ? fil
 // MODULE: local
 //
 include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved.nf'
-include { UNPIGZ as UNPIGZ_EUKULELE        } from '../modules/local/unpigz.nf'
 include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz.nf'
 include { COLLECT_FEATURECOUNTS            } from '../modules/local/collect_featurecounts.nf'
 include { COLLECT_STATS                    } from '../modules/local/collect_stats.nf'
+include { CAT_DB                           } from '../modules/local/cat/cat_db'
+include { CAT_DB_GENERATE                  } from '../modules/local/cat/cat_db_generate'
+include { CAT                              } from '../modules/local/cat/cat'
+include { CAT_SUMMARY                      } from "../modules/local/cat/cat_summary"
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -102,7 +113,6 @@ include { INPUT_CHECK } from '../subworkflows/local/input_check'
 //
 include { EGGNOG            } from '../subworkflows/local/eggnog'
 include { SUB_EUKULELE      } from '../subworkflows/local/eukulele'
-include { SUB_EUKULELE_NODB } from '../subworkflows/local/eukulele_nodb'
 include { HMMCLASSIFY       } from '../subworkflows/local/hmmclassify'
 include { PROKKA_SUBSETS    } from '../subworkflows/local/prokka_subsets'
 include { TRANSDECODER      } from '../subworkflows/local/transdecoder'
@@ -335,14 +345,10 @@ workflow METATDENOVO {
     }
 
     //
-    // SUBWORKFLOW: run TRANSDECODER on UNPIGZ output. Orf caller alternative for eukaryotes.
+    // SUBWORKFLOW: run TRANSDECODER. Orf caller alternative for eukaryotes.
     //
 
     if ( params.orf_caller == ORF_CALLER_TRANSDECODER ) {
-
-        UNPIGZ_CONTIGS(ch_assembly_contigs.map { it[1] })
-        ch_versions = ch_versions.mix(UNPIGZ_CONTIGS.out.versions)
-
         TRANSDECODER ( ch_assembly_contigs )
 
         // DL: see comment before ch_gff for prokka
@@ -411,6 +417,29 @@ workflow METATDENOVO {
 
     COLLECT_STATS(ch_collect_stats)
     //ch_versions     = ch_versions.mix(COLLECT_STATS.out.versions)
+
+    //
+    // CAT: Bin Annotation Tool (BAT) are pipelines for the taxonomic classification of long DNA sequences and metagenome assembled genomes (MAGs/bins)
+    //
+ 
+    ch_cat_db = Channel.empty()
+    if (params.cat_db){
+        CAT_DB ( ch_cat_db_file )
+        ch_cat_db = CAT_DB.out.db
+    } else if (params.cat_db_generate){
+        CAT_DB_GENERATE ()
+        ch_cat_db = CAT_DB_GENERATE.out.db
+    }
+    UNPIGZ_CONTIGS(ch_assembly_contigs)
+    CAT (
+        UNPIGZ_CONTIGS.out.unzipped,
+        ch_cat_db
+    )
+    CAT_SUMMARY(
+        CAT.out.tax_classification.collect()
+    )
+    ch_versions = ch_versions.mix(CAT.out.versions)
+    ch_versions = ch_versions.mix(CAT_SUMMARY.out.versions)
 
     //
     // SUBWORKFLOW: Eukulele

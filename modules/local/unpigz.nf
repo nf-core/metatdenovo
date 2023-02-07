@@ -8,11 +8,11 @@ process UNPIGZ {
         'quay.io/biocontainers/pigz:2.3.4' }"
 
     input:
-    path file
+    tuple val(meta), path(file)
 
     output:
-    path "$gunzip",      emit: unzipped
-    path "versions.yml", emit: versions
+    tuple val(meta), path("$gunzip") , emit: unzipped
+    path "versions.yml"              , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
