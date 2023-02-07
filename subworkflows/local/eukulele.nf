@@ -13,10 +13,13 @@ workflow SUB_EUKULELE {
 
     main:
         ch_versions = Channel.empty()
-        EUKULELE_DOWNLOAD ( eukulele.map { [ it[2], it[3] ] } )
-        eukulele
-            .map { [ it[0], it[1] ] }
-            .merge ( EUKULELE_DOWNLOAD.out.db )
+        EUKULELE_DOWNLOAD ( eukulele.filter{ it[2] }.map { [ it[2], it[3] ] } )
+        ch_download = EUKULELE_DOWNLOAD.out.db
+        Channel.empty()
+            .mix ( EUKULELE_DOWNLOAD.out.db )
+            .mix(eukulele.filter{ ! it[2] }.map { [ [], it[3] ] } )
+            .merge( eukulele.map{ [ it[0], it[1] ] } )
+            .map { [ it[2], it[3], it[0], it[1] ] } 
             .set { ch_eukulele }
         EUKULELE( ch_eukulele )
 
