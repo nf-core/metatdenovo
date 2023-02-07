@@ -130,6 +130,10 @@ include { CAT_FASTQ 	          	             } from '../modules/nf-core/cat/fast
 include { FASTQC                                     } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                                    } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS                } from '../modules/nf-core/custom/dumpsoftwareversions/main'
+
+//
+// SUBWORKFLOWS: Installed directly from nf-core/modules
+//
 include { BAM_SORT_SAMTOOLS                          } from '../subworkflows/nf-core/bam_sort_samtools/main'
 
 /*
@@ -181,6 +185,7 @@ workflow METATDENOVO {
     ch_versions = ch_versions.mix(CAT_FASTQ.out.versions.first().ifEmpty(null))
 
     // Branch FastQ channels if 'auto' specified to infer strandedness
+    // DL & DDL: We're not using this channel -- delete or deal with the channel?
     ch_cat_fastq
         .branch {
             meta, fastq ->
@@ -237,11 +242,12 @@ workflow METATDENOVO {
     //
     // MODULE: Interleave sequences for assembly
     //
+    // DL & DDL: We can probably not deal with single end input
     ch_interleaved = Channel.empty()
     if ( ! params.assembly ) {
         SEQTK_MERGEPE(ch_clean_reads)
         ch_interleaved = SEQTK_MERGEPE.out.reads
-        ch_versions = ch_versions.mix(SEQTK_MERGEPE.out.versions)
+        ch_versions    = ch_versions.mix(SEQTK_MERGEPE.out.versions)
     }
 
     //
@@ -287,6 +293,7 @@ workflow METATDENOVO {
             []
         )
         ch_assembly_contigs = SPADES.out.transcripts
+
         ch_versions = ch_versions.mix(SPADES.out.versions)
     } else if ( params.assembler == MEGAHIT ) {
         MEGAHIT_INTERLEAVED(
@@ -312,7 +319,6 @@ workflow METATDENOVO {
     BBMAP_ALIGN ( ch_clean_reads, BBMAP_INDEX.out.index )
     ch_versions = ch_versions.mix(BBMAP_ALIGN.out.versions)
 
-
     //
     // SUBWORKFLOW: sort bam file
     //
@@ -331,10 +337,9 @@ workflow METATDENOVO {
     //
 
     if ( params.orf_caller == ORF_CALLER_PROKKA ) {
-        PROKKA_SUBSETS(ch_assembly_contigs.map { it[1] })
+        PROKKA_SUBSETS(ch_assembly_contigs)
         ch_versions = ch_versions.mix(PROKKA_SUBSETS.out.versions)
-        // DL: Isn't it clearer to leave the mapping to when the channel is used?
-        ch_gff      = PROKKA_SUBSETS.out.gff.map { it[1] }
+        ch_gff      = PROKKA_SUBSETS.out.gff
         ch_aa       = PROKKA_SUBSETS.out.faa
     }
 
@@ -344,8 +349,8 @@ workflow METATDENOVO {
 
     if ( params.orf_caller == ORF_CALLER_PRODIGAL ) {
         PRODIGAL( ch_assembly_contigs )
-        ch_aa           = PRODIGAL.out.faa
         ch_gff          = PRODIGAL.out.gff
+        ch_aa           = PRODIGAL.out.faa
         ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
     }
 
@@ -360,8 +365,7 @@ workflow METATDENOVO {
 
         TRANSDECODER ( ch_assembly_contigs )
 
-        // DL: see comment before ch_gff for prokka
-        ch_gff      = TRANSDECODER.out.gff.map { it[1] }
+        ch_gff      = TRANSDECODER.out.gff
         ch_aa       = TRANSDECODER.out.pep
         ch_versions = ch_versions.mix(TRANSDECODER.out.versions)
     }
@@ -370,7 +374,7 @@ workflow METATDENOVO {
     // SUBWORKFLOW: run eggnog_mapper on the ORF-called amino acid sequences
     //
 
-    if (params.eggnog) {
+    if ( ! params.skip_eggnog ) {
         EGGNOG(ch_aa)
         ch_versions = ch_versions.mix(EGGNOG.out.versions)
     }
@@ -391,7 +395,7 @@ workflow METATDENOVO {
     //
 
     BAM_SORT_SAMTOOLS.out.bam
-        .combine(ch_gff)
+        .combine(ch_gff.map { it[1] })
         .set { ch_featurecounts }
 
     ch_collect_stats
@@ -412,7 +416,6 @@ workflow METATDENOVO {
 
     COLLECT_FEATURECOUNTS ( ch_collect_feature )
 
-    ch_fcs = Channel.empty()
     ch_fcs = COLLECT_FEATURECOUNTS.out.counts.collect()
     ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
     
@@ -425,7 +428,7 @@ workflow METATDENOVO {
     //
 
     COLLECT_STATS(ch_collect_stats)
-    //ch_versions     = ch_versions.mix(COLLECT_STATS.out.versions)
+    ch_versions     = ch_versions.mix(COLLECT_STATS.out.versions)
 
     //
     // SUBWORKFLOW: Eukulele
