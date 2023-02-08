@@ -12,7 +12,7 @@ process FORMAT_PRODIGAL {
 
     output:
     tuple val(meta), path("${gff}.gz"), emit: format_gff
-    path "versions.yml"             , emit: versions
+    path "versions.yml"               , emit: versions
 
     when:
     task.ext.when == null || task.ext.when

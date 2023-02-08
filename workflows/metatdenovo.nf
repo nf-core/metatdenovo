@@ -90,6 +90,7 @@ include { WRITESPADESYAML                  } from '../modules/local/writespadesy
 include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved.nf'
 include { COLLECT_FEATURECOUNTS            } from '../modules/local/collect_featurecounts.nf'
 include { COLLECT_STATS                    } from '../modules/local/collect_stats.nf'
+include { FORMATSPADES                     } from '../modules/local/formatspades.nf'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -290,9 +291,10 @@ workflow METATDENOVO {
             WRITESPADESYAML.out.yaml,
             []
         )
-        ch_assembly_contigs = SPADES.out.transcripts
-
+        ch_assembly = SPADES.out.transcripts
         ch_versions = ch_versions.mix(SPADES.out.versions)
+        FORMATSPADES( ch_assembly )
+        ch_assembly_contigs = FORMATSPADES.out.assembly
     } else if ( params.assembler == MEGAHIT ) {
         MEGAHIT_INTERLEAVED(
             ch_pe_reads_to_assembly.collect().ifEmpty([]),
