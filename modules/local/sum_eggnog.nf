@@ -37,21 +37,17 @@ process SUM_EGGNOG {
 
     TYPE_ORDER = c('sample', 'database', 'field', 'value')
     # call the tables into variables
-    eggnog <- read.delim("eggnogs.tsv.gz",  sep = "\t", header = TRUE, fill = TRUE) %>%
+    eggnog <- read.tsv("eggnogs.tsv.gz",  sep = "\t", header = TRUE, fill = TRUE) %>%
         as_tibble()
 
-    counts <- list.files(pattern = "*_counts.tsv.gz") %>%
-            map_df(~read.table(.,  sep = "\t", header = TRUE, fill = TRUE)) %>%
+    counts <- read_tsv("*_counts.tsv.gz", show_col_types = FALSE) %>%
             as_tibble()
 
-    counts[,c(1,7)] %>%
-        right_join(eggnog[,1], by = 'orf') %>%
-        drop_na() %>%
-        as_tibble() %>%
+    counts %>% select(1, 7) %>%
+        right_join(eggnog, by = 'orf') %>%
         group_by(sample) %>%
         count(orf) %>%
-        summarise( value = sum(n)) %>%
-        as_tibble() %>%
+        summarise( value = sum(n), groups = 'drop') %>%
         add_column(database = "eggnog", field = "n_orfs") %>%
         relocate(value, .after = last_col()) %>%
         write_tsv('eggnog_summary.tsv')
