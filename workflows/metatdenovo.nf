@@ -92,7 +92,6 @@ include { UNPIGZ as UNPIGZ_EUKULELE        } from '../modules/local/unpigz.nf'
 include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz.nf'
 include { COLLECT_FEATURECOUNTS            } from '../modules/local/collect_featurecounts.nf'
 include { COLLECT_STATS                    } from '../modules/local/collect_stats.nf'
-include { SUM_EGGNOG                       } from '../modules/local/sum_eggnog.nf'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -407,8 +406,9 @@ workflow METATDENOVO {
         .set { ch_collect_feature }
 
     COLLECT_FEATURECOUNTS ( ch_collect_feature )
-    ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
-    ch_fcs = COLLECT_FEATURECOUNTS.out.counts.collect { it[1]}.map { [ it ] }
+    ch_versions           = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
+    ch_fcs                = COLLECT_FEATURECOUNTS.out.counts.collect { it[1]}.map { [ it ] }
+    ch_fcs_eggnog         = COLLECT_FEATURECOUNTS.out.counts.map { it[1]}
     ch_collect_stats
         .combine(ch_fcs)
         .set { ch_collect_stats }
@@ -418,9 +418,8 @@ workflow METATDENOVO {
     //
 
     if (params.eggnog) {
-        EGGNOG(ch_aa)
+        EGGNOG(ch_aa, ch_fcs_eggnog )
         ch_versions = ch_versions.mix(EGGNOG.out.versions)
-        SUM_EGGNOG(EGGNOG.out.eggtab, COLLECT_FEATURECOUNTS.out.counts.map { it[1]} )
     }
     //
     // MODULE: Collect statistics from mapping analysis

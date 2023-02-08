@@ -37,10 +37,11 @@ process SUM_EGGNOG {
 
     TYPE_ORDER = c('sample', 'database', 'field', 'value')
     # call the tables into variables
-    eggnog <- read.tsv("eggnogs.tsv.gz",  sep = "\t", header = TRUE, fill = TRUE) %>%
+    eggnog <- read_tsv("eggnogs.tsv.gz", show_col_types = FALSE ) %>%
         as_tibble()
 
-    counts <- read_tsv("*_counts.tsv.gz", show_col_types = FALSE) %>%
+    counts <- list.files(pattern = "*_counts.tsv.gz") %>%
+        map_df(~read_tsv(.,  show_col_types  = TRUE)) %>%
             as_tibble()
 
     counts %>% select(1, 7) %>%
