@@ -88,8 +88,6 @@ ch_multiqc_custom_methods_description = params.multiqc_methods_description ? fil
 //
 include { WRITESPADESYAML                  } from '../modules/local/writespadesyaml.nf'
 include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved.nf'
-include { UNPIGZ as UNPIGZ_EUKULELE        } from '../modules/local/unpigz.nf'
-include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz.nf'
 include { COLLECT_FEATURECOUNTS            } from '../modules/local/collect_featurecounts.nf'
 include { COLLECT_STATS                    } from '../modules/local/collect_stats.nf'
 
@@ -333,7 +331,7 @@ workflow METATDENOVO {
     ch_aa  = Channel.empty()
 
     //
-    // SUBWORKFLOW: Run PROKKA_SUBSETS on Megahit output, but split the fasta file in chunks of 10 MB, then concatenate and compress output.
+    // SUBWORKFLOW: Run PROKKA_SUBSETS on assmebly output, but split the fasta file in chunks of 10 MB, then concatenate and compress output.
     //
 
     if ( params.orf_caller == ORF_CALLER_PROKKA ) {
@@ -344,7 +342,7 @@ workflow METATDENOVO {
     }
 
     //
-    // MODULE: Call Prodigal
+    // MODULE: Run PRODIGAL on assembly output.
     //
 
     if ( params.orf_caller == ORF_CALLER_PRODIGAL ) {
@@ -355,13 +353,10 @@ workflow METATDENOVO {
     }
 
     //
-    // SUBWORKFLOW: run TRANSDECODER on UNPIGZ output. Orf caller alternative for eukaryotes.
+    // SUBWORKFLOW: run TRANSDECODER on assembly output. Orf caller alternative for eukaryotes.
     //
 
     if ( params.orf_caller == ORF_CALLER_TRANSDECODER ) {
-
-        UNPIGZ_CONTIGS(ch_assembly_contigs.map { it[1] })
-        ch_versions = ch_versions.mix(UNPIGZ_CONTIGS.out.versions)
 
         TRANSDECODER ( ch_assembly_contigs )
 
