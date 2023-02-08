@@ -2,8 +2,8 @@ process CAT_DB_GENERATE {
 
     conda "bioconda::cat=4.6 bioconda::diamond=2.0.6"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/mulled-v2-75e2a26f10cbf3629edf2d1600db3fed5ebe6e04:eae321284604f7dabbdf121e3070bda907b91266-0' :
-        'quay.io/biocontainers/mulled-v2-75e2a26f10cbf3629edf2d1600db3fed5ebe6e04:eae321284604f7dabbdf121e3070bda907b91266-0' }"
+        'https://depot.galaxyproject.org/singularity/cat:5.2.3--hdfd78af_1' :
+        'quay.io/biocontainers/cat:5.2.3--hdfd78af_1' }"
 
     output:
     tuple env(DB_NAME), path("database/*"), path("taxonomy/*"), emit: db
