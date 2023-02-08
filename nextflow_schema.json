@@ -178,7 +178,7 @@
                     "type": "string",
                     "default": "./eukulele",
                     "description": "EUKulele database folder.",
-                    "help_text": "If used with a named database (`--eukulele_db`) it will be searched for in the directory you specify here and downloaded if not present; if not, a custom database (see EUKulele documentation) will be assumed to be present."
+                    "help_text": "If this parameter is set, EUKulele will look for a database to use in this folder. If --eukulele_db also is set, the specified database will be searched for in this directory and if it is not present it will be downloaded. If a custom database (see EUKulele documentation) should be used, EUKulele will assume that it is present in this folder - N.B. only works with one custom database (if using a custom database, point to a directory that only contains that database)."
                 },
                 "eukulele_method": {
                     "type": "string",
