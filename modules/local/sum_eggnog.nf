@@ -40,7 +40,7 @@ process SUM_EGGNOG {
 
     counts <- list.files(pattern = "*_counts.tsv.gz") %>%
         map_df(~read_tsv(.,  show_col_types  = TRUE)) %>%
-            as_tibble()
+        as_tibble()
 
     counts %>% select(1, 7) %>%
         right_join(eggnog, by = 'orf') %>%
