@@ -222,8 +222,9 @@ workflow METATDENOVO {
     if ( params.sequence_filter ) {
         BBMAP_BBDUK ( FASTQC_TRIMGALORE.out.reads, params.sequence_filter )
         ch_clean_reads  = BBMAP_BBDUK.out.reads
-        ch_bbduk_logs = BBMAP_BBDUK.out.log.collect { it[1] }.map { [ it ] }
+        ch_bbduk_logs = BBMAP_BBDUK.out.log.collect { it[1] }.map { [ it[1] ] }
         ch_versions   = ch_versions.mix(BBMAP_BBDUK.out.versions)
+        ch_bbduk_logs.view()
         ch_collect_stats
             .combine(ch_bbduk_logs)
             .set {ch_collect_stats}
@@ -234,9 +235,6 @@ workflow METATDENOVO {
             .map { [ it[0], it[1], it[2], [] ] }
             .set { ch_collect_stats }
     }
-    ch_collect_stats
-        .combine(ch_bbduk_logs.ifEmpty([]))
-        .set {ch_collect_stats}
 
     //
     // MODULE: Interleave sequences for assembly
