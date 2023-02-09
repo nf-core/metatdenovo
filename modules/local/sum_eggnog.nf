@@ -27,8 +27,6 @@ process SUM_EGGNOG {
     """
     #!/usr/bin/env Rscript
 
-    library(data.table)
-    library(dtplyr)
     library(dplyr)
     library(readr)
     library(tidyr)
