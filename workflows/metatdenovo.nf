@@ -401,10 +401,10 @@ workflow METATDENOVO {
 
     COLLECT_FEATURECOUNTS ( ch_collect_feature )
     ch_versions           = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
-    ch_fcs                = COLLECT_FEATURECOUNTS.out.counts.collect { it[1]}.map { [ it ] }
-    ch_fcs_eggnog         = COLLECT_FEATURECOUNTS.out.counts.map { it[1]}
+    ch_fcs_for_stats      = COLLECT_FEATURECOUNTS.out.counts.collect { it[1]}.map { [ it ] }
+    ch_fcs_for_summary    = COLLECT_FEATURECOUNTS.out.counts.map { it[1]}
     ch_collect_stats
-        .combine(ch_fcs)
+        .combine(ch_fcs_for_stats)
         .set { ch_collect_stats }
 
     //
@@ -412,7 +412,7 @@ workflow METATDENOVO {
     //
 
     if ( ! params.skip_eggnog ) {
-        EGGNOG(ch_aa, ch_fcs_eggnog )
+        EGGNOG(ch_aa, ch_fcs_for_summary )
         ch_versions = ch_versions.mix(EGGNOG.out.versions)
     }
 
@@ -435,7 +435,7 @@ workflow METATDENOVO {
                 .map {[ [ id:"${it[0].id}.${params.orf_caller}" ], it[1] ] }
                 .combine( ch_eukulele_db )
                 .set { ch_eukulele }
-            SUB_EUKULELE( ch_eukulele )
+            SUB_EUKULELE( ch_eukulele, ch_fcs_for_summary )
     }
 
     CUSTOM_DUMPSOFTWAREVERSIONS (

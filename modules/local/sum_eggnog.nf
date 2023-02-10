@@ -45,8 +45,9 @@ process SUM_EGGNOG {
     counts %>% select(1, 7) %>%
         right_join(eggnog, by = 'orf') %>%
         group_by(sample) %>%
+        drop_na() %>%
         count(orf) %>%
-        summarise( value = sum(n), groups = 'drop') %>%
+        summarise( value = sum(n), .groups = 'drop') %>%
         add_column(database = "eggnog", field = "n_orfs") %>%
         relocate(value, .after = last_col()) %>%
         write_tsv('eggnog_summary.tsv')

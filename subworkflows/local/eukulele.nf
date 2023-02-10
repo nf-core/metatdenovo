@@ -5,11 +5,13 @@
 include { EUKULELE                          } from '../../modules/local/eukulele/main'
 include { EUKULELE_DOWNLOAD                 } from '../../modules/local/eukulele/download'
 include { FORMAT_TAX                        } from '../../modules/local/format_tax'
+include { SUM_TAXONOMY                      } from '../../modules/local/sum_taxonomy'
 
 workflow SUB_EUKULELE {
 
     take:
         eukulele // Channel: val(meta), path(fasta), val(database), path(directory) 
+        collect_fcs
 
     main:
         ch_versions = Channel.empty()
@@ -23,7 +25,8 @@ workflow SUB_EUKULELE {
             .set { ch_eukulele }
         EUKULELE( ch_eukulele )
 
-        FORMAT_TAX( EUKULELE.out.taxonomy_estimation.map { [ it[2], it[1] ] } )
+        FORMAT_TAX( EUKULELE.out.taxonomy_estimation.map { [ [id: it[2]], it[1] ] } )
+        SUM_TAXONOMY( FORMAT_TAX.out.tax, collect_fcs )
 
     emit:
         taxonomy_estimation = EUKULELE.out.taxonomy_estimation

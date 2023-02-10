@@ -1,4 +1,5 @@
 process FORMAT_TAX {
+    tag "$meta.id"
     label 'process_low'
 
     conda (params.enable_conda ? "conda-forge::r-tidyverse=1.3.1 conda-forge::r-data.table=1.14.0 conda-forge::r-dtplyr=1.1.0" : null)
@@ -10,14 +11,15 @@ process FORMAT_TAX {
     tuple val(meta), path(taxtable)
 
     output:
-    path "*_taxonomy_classification.tsv", emit: tax
-    path "versions.yml"                 , emit: versions
+    tuple val(meta), path("*_taxonomy_classification.tsv"), emit: tax
+    path "versions.yml"                                   , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
 
     script:
     def args = task.ext.args ?: ''
+    def prefix = task.ext.prefix ?: "${meta.id}"
 
     """
     #!/usr/bin/env Rscript
@@ -52,7 +54,7 @@ process FORMAT_TAX {
                 Species = ifelse(is.na(Species) | Species == '', sprintf("%s uncl.", str_remove(Genus, ' unclassified')),  Species)
             ) %>%
             na.omit() %>%
-            write_tsv("${meta}_taxonomy_classification.tsv")
+            write_tsv("${prefix}_taxonomy_classification.tsv")
 
     writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")),paste0("    dplyr: ", packageVersion("dplyr")) ), "versions.yml")
     """
