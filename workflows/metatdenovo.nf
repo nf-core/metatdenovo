@@ -234,9 +234,6 @@ workflow METATDENOVO {
             .map { [ it[0], it[1], it[2], [] ] }
             .set { ch_collect_stats }
     }
-    ch_collect_stats
-        .combine(ch_bbduk_logs.ifEmpty([]))
-        .set {ch_collect_stats}
 
     //
     // MODULE: Interleave sequences for assembly
@@ -414,10 +411,11 @@ workflow METATDENOVO {
     // SUBWORKFLOW: run eggnog_mapper on the ORF-called amino acid sequences
     //
 
-    if (params.eggnog) {
+    if ( ! params.skip_eggnog ) {
         EGGNOG(ch_aa, ch_fcs_eggnog )
         ch_versions = ch_versions.mix(EGGNOG.out.versions)
     }
+
     //
     // MODULE: Collect statistics from mapping analysis
     //
