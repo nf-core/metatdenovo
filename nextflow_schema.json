@@ -156,19 +156,20 @@
                     "type": "string",
                     "description": "Specify a training file for prodigal. By default prodigal will learn from the input sequences"
                 },
-                "eggnog": {
+                "skip_eggnog": {
                     "type": "boolean",
-                    "description": "enable eggnog functional annotation"
+                    "default": false,
+                    "description": "Skip EGGNOG functional annotation"
                 },
                 "eggnog_dbpath": {
                     "type": "string",
-                    "default": "./",
-                    "description": "Specify eggnog database path"
+                    "default": "./eggnog",
+                    "description": "Specify EGGNOG database path"
                 },
                 "eukulele_db": {
                     "type": "string",
-                    "default": "phylodb",
-                    "description": "Specify which database you would like to use with eukulele, possible alternatives: phylodb, mmetsp. default: phylodb"
+                    "description": "EUKulele database.",
+                    "help_text": "This option allows the user to specify which database (or set of databases, separated by comma) to use with EUKulele. Databases that are provided with EUKulele will be downloaded if not already present inside the database directory (see --eukulele_dbpath). Possible alternatives: phylodb, mmetsp, marmmetsp, eukprot. NB: you can't use this option with a custom database as eukulele will not recognize the name and it will start to download phylodb by default. If you want to use a custom database, please skip this option and specify only --eukulele_dbpath."
                 },
                 "skip_eukulele": {
                     "type": "boolean",
@@ -177,12 +178,13 @@
                 "eukulele_dbpath": {
                     "type": "string",
                     "default": "./eukulele",
-                    "description": "Specify EUKulele database folder"
+                    "description": "EUKulele database folder.",
+                    "help_text": "If this parameter is set, EUKulele will look for a database to use in this folder. If --eukulele_db also is set, the specified database will be searched for in this directory and if it is not present it will be downloaded. If a custom database (see EUKulele documentation) should be used, EUKulele will assume that it is present in this folder - N.B. only works with one custom database (if using a custom database, point to a directory that only contains that database)."
                 },
                 "eukulele_method": {
                     "type": "string",
                     "default": "mets",
-                    "description": "Specify which method to use for EUKulele"
+                    "description": "Specify which method to use for EUKulele. the alternatives are: mets (metatranscriptomics) or  mags (Metagenome Assembled Genomes). default: mets"
                 }
             }
         },

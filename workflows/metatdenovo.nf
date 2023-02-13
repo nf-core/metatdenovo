@@ -94,14 +94,16 @@ ch_multiqc_custom_methods_description = params.multiqc_methods_description ? fil
 //
 // MODULE: local
 //
+include { WRITESPADESYAML                  } from '../modules/local/writespadesyaml.nf'
 include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved.nf'
-include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz.nf'
 include { COLLECT_FEATURECOUNTS            } from '../modules/local/collect_featurecounts.nf'
 include { COLLECT_STATS                    } from '../modules/local/collect_stats.nf'
 include { CAT_DB                           } from '../modules/local/cat/cat_db'
 include { CAT_DB_GENERATE                  } from '../modules/local/cat/cat_db_generate'
 include { CAT                              } from '../modules/local/cat/cat'
 include { CAT_SUMMARY                      } from "../modules/local/cat/cat_summary"
+include { FORMATSPADES                     } from '../modules/local/formatspades.nf'
+include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz.nf'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -139,6 +141,10 @@ include { CAT_FASTQ 	          	             } from '../modules/nf-core/cat/fast
 include { FASTQC                                     } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                                    } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS                } from '../modules/nf-core/custom/dumpsoftwareversions/main'
+
+//
+// SUBWORKFLOWS: Installed directly from nf-core/modules
+//
 include { BAM_SORT_SAMTOOLS                          } from '../subworkflows/nf-core/bam_sort_samtools/main'
 
 /*
@@ -190,6 +196,7 @@ workflow METATDENOVO {
     ch_versions = ch_versions.mix(CAT_FASTQ.out.versions.first().ifEmpty(null))
 
     // Branch FastQ channels if 'auto' specified to infer strandedness
+    // DL & DDL: We're not using this channel -- delete or deal with the channel?
     ch_cat_fastq
         .branch {
             meta, fastq ->
@@ -234,23 +241,21 @@ workflow METATDENOVO {
             .set {ch_collect_stats}
     } else {
         ch_clean_reads  = FASTQC_TRIMGALORE.out.reads
-        ch_bbduk_logs = Channel.empty() 
+        ch_bbduk_logs = Channel.empty()
         ch_collect_stats
             .map { [ it[0], it[1], it[2], [] ] }
             .set { ch_collect_stats }
     }
-    ch_collect_stats
-        .combine(ch_bbduk_logs.ifEmpty([]))
-        .set {ch_collect_stats}
 
     //
     // MODULE: Interleave sequences for assembly
     //
+    // DL & DDL: We can probably not deal with single end input
     ch_interleaved = Channel.empty()
     if ( ! params.assembly ) {
         SEQTK_MERGEPE(ch_clean_reads)
         ch_interleaved = SEQTK_MERGEPE.out.reads
-        ch_versions = ch_versions.mix(SEQTK_MERGEPE.out.versions)
+        ch_versions    = ch_versions.mix(SEQTK_MERGEPE.out.versions)
     }
 
     //
@@ -266,7 +271,7 @@ workflow METATDENOVO {
             ch_se_reads_to_assembly = DIGINORM.out.singles
         } else {
             ch_pe_reads_to_assembly = ch_interleaved.map { meta, fastq -> fastq }
-            ch_se_reads_to_assembly = []
+            ch_se_reads_to_assembly = Channel.empty()
         }
     }
 
@@ -278,15 +283,31 @@ workflow METATDENOVO {
             .value ( [ [ id: 'user_assembly' ], file(params.assembly) ] )
             .set { ch_assembly_contigs }
     } else if ( params.assembler == RNASPADES ) {
-        // This doesn't work as we want, as it gets called once for each pair, see issue: https://github.com/LNUc-EEMiS/metatdenovo/issues/78
-        ch_spades = FASTQC_TRIMGALORE.out.reads.map { meta, fastq -> [ [ id: 'spades' ], fastq, [], [] ] }
-        SPADES( ch_spades, [], [] )
-        ch_assembly_contigs = SPADES.out.transcripts.map { it[1] }
+        // 1. Write a yaml file for Spades
+        WRITESPADESYAML (
+            ch_pe_reads_to_assembly.collect().ifEmpty([]),
+            ch_se_reads_to_assembly.collect().ifEmpty([])
+        )
+        // 2. Call the module with a channel with all fastq files plus the yaml
+        Channel.empty()
+            .mix(ch_pe_reads_to_assembly)
+            .mix(ch_se_reads_to_assembly)
+            .collect()
+            .map { [ [ id:'rnaspades' ], it, [], [] ] }
+            .set { ch_spades }
+        SPADES (
+            ch_spades,
+            WRITESPADESYAML.out.yaml,
+            []
+        )
+        ch_assembly = SPADES.out.transcripts
         ch_versions = ch_versions.mix(SPADES.out.versions)
+        FORMATSPADES( ch_assembly )
+        ch_assembly_contigs = FORMATSPADES.out.assembly
     } else if ( params.assembler == MEGAHIT ) {
         MEGAHIT_INTERLEAVED(
-            ch_pe_reads_to_assembly.collect(),
-            ch_se_reads_to_assembly.collect(),
+            ch_pe_reads_to_assembly.collect().ifEmpty([]),
+            ch_se_reads_to_assembly.collect().ifEmpty([]),
             'megahit_assembly'
         )
         MEGAHIT_INTERLEAVED.out.contigs
@@ -307,7 +328,6 @@ workflow METATDENOVO {
     BBMAP_ALIGN ( ch_clean_reads, BBMAP_INDEX.out.index )
     ch_versions = ch_versions.mix(BBMAP_ALIGN.out.versions)
 
-
     //
     // SUBWORKFLOW: sort bam file
     //
@@ -322,25 +342,24 @@ workflow METATDENOVO {
     ch_aa  = Channel.empty()
 
     //
-    // SUBWORKFLOW: Run PROKKA_SUBSETS on Megahit output, but split the fasta file in chunks of 10 MB, then concatenate and compress output.
+    // SUBWORKFLOW: Run PROKKA_SUBSETS on assmebly output, but split the fasta file in chunks of 10 MB, then concatenate and compress output.
     //
 
     if ( params.orf_caller == ORF_CALLER_PROKKA ) {
-        PROKKA_SUBSETS(ch_assembly_contigs.map { it[1] })
+        PROKKA_SUBSETS(ch_assembly_contigs)
         ch_versions = ch_versions.mix(PROKKA_SUBSETS.out.versions)
-        // DL: Isn't it clearer to leave the mapping to when the channel is used?
-        ch_gff      = PROKKA_SUBSETS.out.gff.map { it[1] }
+        ch_gff      = PROKKA_SUBSETS.out.gff
         ch_aa       = PROKKA_SUBSETS.out.faa
     }
 
     //
-    // MODULE: Call Prodigal
+    // MODULE: Run PRODIGAL on assembly output.
     //
 
     if ( params.orf_caller == ORF_CALLER_PRODIGAL ) {
         PRODIGAL( ch_assembly_contigs )
-        ch_aa           = PRODIGAL.out.faa
         ch_gff          = PRODIGAL.out.gff
+        ch_aa           = PRODIGAL.out.faa
         ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
     }
 
@@ -350,20 +369,9 @@ workflow METATDENOVO {
 
     if ( params.orf_caller == ORF_CALLER_TRANSDECODER ) {
         TRANSDECODER ( ch_assembly_contigs )
-
-        // DL: see comment before ch_gff for prokka
-        ch_gff      = TRANSDECODER.out.gff.map { it[1] }
+        ch_gff      = TRANSDECODER.out.gff
         ch_aa       = TRANSDECODER.out.pep
         ch_versions = ch_versions.mix(TRANSDECODER.out.versions)
-    }
-
-    //
-    // SUBWORKFLOW: run eggnog_mapper on the ORF-called amino acid sequences
-    //
-
-    if (params.eggnog) {
-        EGGNOG(ch_aa)
-        ch_versions = ch_versions.mix(EGGNOG.out.versions)
     }
 
     //
@@ -382,41 +390,48 @@ workflow METATDENOVO {
     //
 
     BAM_SORT_SAMTOOLS.out.bam
-        .combine(ch_gff)
+        .combine(ch_gff.map { it[1] })
         .set { ch_featurecounts }
 
     ch_collect_stats
         .combine(BAM_SORT_SAMTOOLS.out.idxstats.collect { it[1]}.map { [ it ] })
         .set { ch_collect_stats }
-    
+
     FEATURECOUNTS_CDS ( ch_featurecounts)
     ch_versions       = ch_versions.mix(FEATURECOUNTS_CDS.out.versions)
 
     //
     // MODULE: Collect featurecounts output counts in one table
     //
-    
+
     FEATURECOUNTS_CDS.out.counts
         .collect() { it[1] }
         .map { [ [ id:'all_samples'], it ] }
         .set { ch_collect_feature }
 
     COLLECT_FEATURECOUNTS ( ch_collect_feature )
-
-    ch_fcs = Channel.empty()
-    ch_fcs = COLLECT_FEATURECOUNTS.out.counts.collect()
-    ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
-    
+    ch_versions           = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
+    ch_fcs_for_stats      = COLLECT_FEATURECOUNTS.out.counts.collect { it[1]}.map { [ it ] }
+    ch_fcs_for_summary    = COLLECT_FEATURECOUNTS.out.counts.map { it[1]}
     ch_collect_stats
-        .combine(COLLECT_FEATURECOUNTS.out.counts.collect { it[1]}.map { [ it ] })
+        .combine(ch_fcs_for_stats)
         .set { ch_collect_stats }
+
+    //
+    // SUBWORKFLOW: run eggnog_mapper on the ORF-called amino acid sequences
+    //
+
+    if ( ! params.skip_eggnog ) {
+        EGGNOG(ch_aa, ch_fcs_for_summary )
+        ch_versions = ch_versions.mix(EGGNOG.out.versions)
+    }
 
     //
     // MODULE: Collect statistics from mapping analysis
     //
 
     COLLECT_STATS(ch_collect_stats)
-    //ch_versions     = ch_versions.mix(COLLECT_STATS.out.versions)
+    ch_versions     = ch_versions.mix(COLLECT_STATS.out.versions)
 
     //
     // CAT: Bin Annotation Tool (BAT) are pipelines for the taxonomic classification of long DNA sequences and metagenome assembled genomes (MAGs/bins)
@@ -453,7 +468,7 @@ workflow METATDENOVO {
                 .map {[ [ id:"${it[0].id}.${params.orf_caller}" ], it[1] ] }
                 .combine( ch_eukulele_db )
                 .set { ch_eukulele }
-            SUB_EUKULELE( ch_eukulele )
+            SUB_EUKULELE( ch_eukulele, ch_fcs_for_summary )
     }
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
