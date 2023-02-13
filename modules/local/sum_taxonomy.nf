@@ -14,8 +14,8 @@ process SUM_TAXONOMY {
 
     output:
 
-    path "*_summary.tsv" , emit: taxonomy_summary
-    path "versions.yml"          , emit: versions
+    tuple val(meta), path("*_summary.tsv") , emit: taxonomy_summary
+    path "versions.yml"                    , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -31,15 +31,14 @@ process SUM_TAXONOMY {
     library(readr)
     library(tidyr)
     library(stringr)
+    library(tidyverse)
 
     TYPE_ORDER = c('sample', 'database', 'field', 'value')
     # call the tables into variables
-    taxonomy <- read_tsv("${prefix}_taxonomy_classification.tsv", show_col_types = FALSE ) %>%
-        as_tibble()
+    taxonomy <- read_tsv("${prefix}_taxonomy_classification.tsv", show_col_types = FALSE )
 
     counts <- list.files(pattern = "*_counts.tsv.gz") %>%
-        map_df(~read_tsv(.,  show_col_types  = TRUE)) %>%
-        as_tibble()
+        map_df(~read_tsv(.,  show_col_types  = TRUE))
 
     counts %>% select(1, 7) %>%
         right_join(taxonomy, by = 'orf') %>%
