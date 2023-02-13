@@ -1,4 +1,4 @@
-process SUM_EGGNOG {
+process SUM_TAXONOMY {
     tag "$meta.id"
     label 'process_low'
 
@@ -9,13 +9,13 @@ process SUM_EGGNOG {
 
     input:
 
-    tuple val(meta), path(eggnog)
+    tuple val(meta), path(taxonomy)
     path(fcs)
 
     output:
 
-    path "eggnog_summary.tsv" , emit: eggnog_summary
-    path "versions.yml"       , emit: versions
+    path "*_summary.tsv" , emit: taxonomy_summary
+    path "versions.yml"          , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -31,11 +31,10 @@ process SUM_EGGNOG {
     library(readr)
     library(tidyr)
     library(stringr)
-    library(tidyverse)
 
     TYPE_ORDER = c('sample', 'database', 'field', 'value')
     # call the tables into variables
-    eggnog <- read_tsv("eggnogs.tsv.gz", show_col_types = FALSE ) %>%
+    taxonomy <- read_tsv("${prefix}_taxonomy_classification.tsv", show_col_types = FALSE ) %>%
         as_tibble()
 
     counts <- list.files(pattern = "*_counts.tsv.gz") %>%
@@ -43,14 +42,14 @@ process SUM_EGGNOG {
         as_tibble()
 
     counts %>% select(1, 7) %>%
-        right_join(eggnog, by = 'orf') %>%
+        right_join(taxonomy, by = 'orf') %>%
         group_by(sample) %>%
         drop_na() %>%
         count(orf) %>%
         summarise( value = sum(n), .groups = 'drop') %>%
-        add_column(database = "eggnog", field = "n_orfs") %>%
+        add_column(database = "${prefix}", field = "n_orfs") %>%
         relocate(value, .after = last_col()) %>%
-        write_tsv('eggnog_summary.tsv')
+        write_tsv('${prefix}_summary.tsv')
 
     writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")), paste0("    dplyr: ", packageVersion('dplyr')),
         paste0("    dtplyr: ", packageVersion('dtplyr')), paste0("    data.table: ", packageVersion('data.table')), paste0("    readr: ", packageVersion('readr')),
