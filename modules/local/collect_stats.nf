@@ -48,7 +48,7 @@ process COLLECT_STATS {
         """
     } else {
         read_mergetab = """
-        mergetab <- data.frame(sample = character(), database = character(),field = character(),  value = numeric(), stringsAsFactors = FALSE)
+        mergetab <- data.frame(sample = character(), stringsAsFactors = FALSE)
         """
     }
 

@@ -419,7 +419,6 @@ workflow METATDENOVO {
         ch_aa
             .map { [ it[0], [] ] }
             .set { ch_merge_tables }
-    ch_merge_tables.view()
     }
 
     //
