@@ -44,7 +44,7 @@ process COLLECT_STATS {
         read_mergetab = """
 
         mergetab <- list.files(pattern = "*_merged_table.tsv" ) %>%
-            map_df(~read_tsv(.,  show_col_types  = TRUE))
+            map_df(~read_tsv(.,  show_col_types  = FALSE))
         """
     } else {
         read_mergetab = """
