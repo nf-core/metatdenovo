@@ -109,7 +109,7 @@ process COLLECT_STATS {
         mutate(m = parse_factor(m, levels = TYPE_ORDER, ordered = TRUE)) %>%
         arrange(sample, m) %>%
         pivot_wider(names_from = m, values_from = v) %>%
-        left_join(mergetab, by = 'NN') %>%
+        left_join(mergetab, by = 'sample') %>%
         write_tsv('${prefix}_overall_stats.tsv')
 
         writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")), paste0("    dplyr: ", packageVersion('dplyr')),
