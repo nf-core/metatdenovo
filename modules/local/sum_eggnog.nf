@@ -14,7 +14,7 @@ process SUM_EGGNOG {
 
     output:
 
-    tuple val(meta), path("eggnog_summary.tsv") , emit: eggnog_summary
+    tuple val(meta), path("${meta.id}.eggnog_summary.tsv") , emit: eggnog_summary
     path "versions.yml"                         , emit: versions
 
     when:
