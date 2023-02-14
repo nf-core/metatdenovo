@@ -29,6 +29,7 @@ workflow SUB_EUKULELE {
         SUM_TAXONOMY( FORMAT_TAX.out.tax, collect_fcs )
 
     emit:
+        taxonomy_summary    = SUM_TAXONOMY.out.taxonomy_summary
         taxonomy_estimation = EUKULELE.out.taxonomy_estimation
         taxonomy_counts     = EUKULELE.out.taxonomy_counts
         diamond             = EUKULELE.out.diamond

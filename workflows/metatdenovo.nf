@@ -91,6 +91,7 @@ include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/inte
 include { COLLECT_FEATURECOUNTS            } from '../modules/local/collect_featurecounts.nf'
 include { COLLECT_STATS                    } from '../modules/local/collect_stats.nf'
 include { FORMATSPADES                     } from '../modules/local/formatspades.nf'
+include { MERGE_TABLES                     } from '../modules/local/merge_summary_tables.nf'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -102,7 +103,6 @@ include { INPUT_CHECK } from '../subworkflows/local/input_check'
 //
 include { EGGNOG            } from '../subworkflows/local/eggnog'
 include { SUB_EUKULELE      } from '../subworkflows/local/eukulele'
-include { SUB_EUKULELE_NODB } from '../subworkflows/local/eukulele_nodb'
 include { HMMCLASSIFY       } from '../subworkflows/local/hmmclassify'
 include { PROKKA_SUBSETS    } from '../subworkflows/local/prokka_subsets'
 include { TRANSDECODER      } from '../subworkflows/local/transdecoder'
@@ -414,14 +414,12 @@ workflow METATDENOVO {
     if ( ! params.skip_eggnog ) {
         EGGNOG(ch_aa, ch_fcs_for_summary )
         ch_versions = ch_versions.mix(EGGNOG.out.versions)
+        ch_merge_tables = EGGNOG.out.sumtable
+    } else {
+        ch_aa
+            .map { [ it[0], [] ] }
+            .set { ch_merge_tables }
     }
-
-    //
-    // MODULE: Collect statistics from mapping analysis
-    //
-
-    COLLECT_STATS(ch_collect_stats)
-    ch_versions     = ch_versions.mix(COLLECT_STATS.out.versions)
 
     //
     // SUBWORKFLOW: Eukulele
@@ -436,7 +434,33 @@ workflow METATDENOVO {
                 .combine( ch_eukulele_db )
                 .set { ch_eukulele }
             SUB_EUKULELE( ch_eukulele, ch_fcs_for_summary )
+            ch_taxonomy_summary = SUB_EUKULELE.out.taxonomy_summary.collect().map { it[1] }
+            ch_merge_tables
+                .combine( ch_taxonomy_summary )
+                .set { ch_merge_tables }
+    } else {
+        ch_merge_tables
+            .map { [ it[0], it[1], [] ] }
+            .set { ch_merge_tables }
     }
+
+    //
+    // MODULE: Collect statistics from mapping analysis
+    //
+    
+    if( !params.skip_eggnog  || !params.skip_eukulele ) {
+        MERGE_TABLES ( ch_merge_tables )
+        ch_collect_stats
+            .combine(MERGE_TABLES.out.merged_table.collect{ it[1]}.map { [ it ] })
+            .set { ch_collect_stats }
+    } else {
+        ch_collect_stats
+            .map { [ it[0], it[1], it[2], it[3], it[4], it[5], [] ] }
+            .set { ch_collect_stats }
+    }
+
+    COLLECT_STATS(ch_collect_stats)
+    ch_versions     = ch_versions.mix(COLLECT_STATS.out.versions)
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
