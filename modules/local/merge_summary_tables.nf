@@ -25,8 +25,6 @@ process MERGE_TABLES {
     """
     #!/usr/bin/env Rscript
 
-    library(data.table)
-    library(dtplyr)
     library(dplyr)
     library(readr)
     library(purrr)
