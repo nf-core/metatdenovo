@@ -4,7 +4,7 @@ process CAT {
     conda "bioconda::cat=4.6 bioconda::diamond=2.0.6"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/cat:5.2.3--hdfd78af_1' :
-        'my_image:latest' }"
+        'quay.io/biocontainers/cat:5.2.3--hdfd78af_1' }"
 
     input:
     tuple val(meta), path(assembly)
@@ -27,13 +27,14 @@ process CAT {
     CAT add_names -i "${meta.id}.contig2classification.txt" -o "${meta.id}.contig2classification.names.txt" -t taxonomy/ ${official_taxonomy}
 
     mkdir raw
-    mv *.ORF2LCA.txt *.predicted_proteins.faa *.predicted_proteins.gff *.log *.bin2classification.txt raw/
+    mv *.ORF2LCA.txt *.predicted_proteins.faa *.predicted_proteins.gff *.log *.contig2classification.txt raw/
     gzip \
-        "raw/${meta.id}.concatenated.predicted_proteins.faa" \
-        "raw/${meta.id}.concatenated.predicted_proteins.gff" \
-        "raw/${meta.id}.bin2classification.txt" \
+        "raw/${meta.id}.predicted_proteins.faa" \
+        "raw/${meta.id}.predicted_proteins.gff" \
+        "raw/${meta.id}.contig2classification.txt" \
         "${meta.id}.ORF2LCA.names.txt" \
-        "${meta.id}.bin2classification.names.txt"
+        "raw/${meta.id}.ORF2LCA.txt" \
+        "${meta.id}.contig2classification.names.txt"
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

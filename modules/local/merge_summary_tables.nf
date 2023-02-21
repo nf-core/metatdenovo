@@ -1,4 +1,4 @@
-process SUM_EGGNOG {
+process MERGE_TABLES {
     tag "$meta.id"
     label 'process_low'
 
@@ -9,13 +9,11 @@ process SUM_EGGNOG {
 
     input:
 
-    tuple val(meta), path(eggnog)
-    path(fcs)
+    tuple val(meta), path(eggtab), path(taxtab)
 
     output:
-
-    tuple val(meta), path("${meta.id}.eggnog_summary.tsv") , emit: eggnog_summary
-    path "versions.yml"                         , emit: versions
+    tuple val(meta), path("${meta.id}_merged_table.tsv") , emit: merged_table
+    path "versions.yml"                                  , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -29,25 +27,15 @@ process SUM_EGGNOG {
 
     library(dplyr)
     library(readr)
+    library(purrr)
     library(tidyr)
     library(stringr)
-    library(tidyverse)
 
-    # call the tables into variables
-    eggnog <- read_tsv("eggnogs.tsv.gz", show_col_types = FALSE )
-
-    counts <- list.files(pattern = "*_counts.tsv.gz") %>%
-        map_df(~read_tsv(.,  show_col_types  = FALSE))
-
-    counts %>% select(1, 7) %>%
-        right_join(eggnog, by = 'orf') %>%
-        group_by(sample) %>%
-        drop_na() %>%
-        count(orf) %>%
-        summarise( value = sum(n), .groups = 'drop') %>%
-        add_column(database = "eggnog", field = "n_orfs") %>%
-        relocate(value, .after = last_col()) %>%
-        write_tsv('eggnog_summary.tsv')
+    summary <- data.frame(sample = character(), database = character(),field = character(),  value = numeric(), stringsAsFactors = FALSE) %>%
+        union(list.files(pattern = "*.tsv") %>%
+        map_df(~read_tsv(.,  show_col_types  = TRUE))) %>%
+        pivot_wider(names_from = c(database,field), values_from = value) %>%
+        write_tsv('${prefix}_merged_table.tsv')
 
     writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")), paste0("    dplyr: ", packageVersion('dplyr')),
         paste0("    dtplyr: ", packageVersion('dtplyr')), paste0("    data.table: ", packageVersion('data.table')), paste0("    readr: ", packageVersion('readr')),

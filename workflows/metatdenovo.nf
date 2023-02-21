@@ -104,6 +104,7 @@ include { CAT                              } from '../modules/local/cat/cat'
 include { CAT_SUMMARY                      } from "../modules/local/cat/cat_summary"
 include { FORMATSPADES                     } from '../modules/local/formatspades.nf'
 include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz.nf'
+include { MERGE_TABLES                     } from '../modules/local/merge_summary_tables.nf'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -424,14 +425,12 @@ workflow METATDENOVO {
     if ( ! params.skip_eggnog ) {
         EGGNOG(ch_aa, ch_fcs_for_summary )
         ch_versions = ch_versions.mix(EGGNOG.out.versions)
+        ch_merge_tables = EGGNOG.out.sumtable
+    } else {
+        ch_aa
+            .map { [ it[0], [] ] }
+            .set { ch_merge_tables }
     }
-
-    //
-    // MODULE: Collect statistics from mapping analysis
-    //
-
-    COLLECT_STATS(ch_collect_stats)
-    ch_versions     = ch_versions.mix(COLLECT_STATS.out.versions)
 
     //
     // CAT: Bin Annotation Tool (BAT) are pipelines for the taxonomic classification of long DNA sequences and metagenome assembled genomes (MAGs/bins)
@@ -445,9 +444,10 @@ workflow METATDENOVO {
         CAT_DB_GENERATE ()
         ch_cat_db = CAT_DB_GENERATE.out.db
     }
-    UNPIGZ_CONTIGS(ch_assembly_contigs)
+    //UNPIGZ_CONTIGS(ch_assembly_contigs)
     CAT (
-        UNPIGZ_CONTIGS.out.unzipped,
+        //UNPIGZ_CONTIGS.out.unzipped,
+        ch_assembly_contigs,
         ch_cat_db
     )
     CAT_SUMMARY(
@@ -469,7 +469,33 @@ workflow METATDENOVO {
                 .combine( ch_eukulele_db )
                 .set { ch_eukulele }
             SUB_EUKULELE( ch_eukulele, ch_fcs_for_summary )
+            ch_taxonomy_summary = SUB_EUKULELE.out.taxonomy_summary.collect().map { it[1] }
+            ch_merge_tables
+                .combine( ch_taxonomy_summary )
+                .set { ch_merge_tables }
+    } else {
+        ch_merge_tables
+            .map { [ it[0], it[1], [] ] }
+            .set { ch_merge_tables }
     }
+
+    //
+    // MODULE: Collect statistics from mapping analysis
+    //
+    
+    if( !params.skip_eggnog  || !params.skip_eukulele ) {
+        MERGE_TABLES ( ch_merge_tables )
+        ch_collect_stats
+            .combine(MERGE_TABLES.out.merged_table.collect{ it[1]}.map { [ it ] })
+            .set { ch_collect_stats }
+    } else {
+        ch_collect_stats
+            .map { [ it[0], it[1], it[2], it[3], it[4], it[5], [] ] }
+            .set { ch_collect_stats }
+    }
+
+    //COLLECT_STATS(ch_collect_stats)
+    //ch_versions     = ch_versions.mix(COLLECT_STATS.out.versions)
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')

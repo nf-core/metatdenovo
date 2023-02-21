@@ -8,8 +8,7 @@ process COLLECT_STATS {
         'quay.io/biocontainers/mulled-v2-508c9bc5e929a77a9708902b1deca248c0c84689:0bb5bee2557136d28549f41d3faa08485e967aa1-0' } "
 
     input:
-
-    tuple val(meta), val(samples), path(trimlogs), path(bblogs), path(idxstats), path(fcs)
+    tuple val(meta), val(samples), path(trimlogs), path(bblogs), path(idxstats), path(fcs), path(mergetab)
 
     output:
     path "${meta.id}_overall_stats.tsv", emit: overall_stats
@@ -39,6 +38,18 @@ process COLLECT_STATS {
         """
     } else {
         read_trimlogs = "%>%"
+    }
+
+    if (mergetab) {
+        read_mergetab = """
+
+        mergetab <- list.files(pattern = "*_merged_table.tsv" ) %>%
+            map_df(~read_tsv(.,  show_col_types  = FALSE))
+        """
+    } else {
+        read_mergetab = """
+        mergetab <- data.frame(sample = character(), stringsAsFactors = FALSE)
+        """
     }
 
     """
@@ -90,17 +101,20 @@ process COLLECT_STATS {
         )
     }
 
+    # Add in stats from taxonomy and function
+    ${read_mergetab}
+
     # Write the table in wide format
     t %>%
         mutate(m = parse_factor(m, levels = TYPE_ORDER, ordered = TRUE)) %>%
         arrange(sample, m) %>%
         pivot_wider(names_from = m, values_from = v) %>%
+        left_join(mergetab, by = 'sample') %>%
         write_tsv('${prefix}_overall_stats.tsv')
 
         writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")), paste0("    dplyr: ", packageVersion('dplyr')),
             paste0("    dtplyr: ", packageVersion('dtplyr')), paste0("    data.table: ", packageVersion('data.table')), paste0("    readr: ", packageVersion('readr')),
             paste0("    purrr: ", packageVersion('purrr')), paste0("    tidyr: ", packageVersion('tidyr')), paste0("    stringr: ", packageVersion('stringr')) ),
             "versions.yml")
-
     """
 }

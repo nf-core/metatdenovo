@@ -17,7 +17,7 @@ process CAT_SUMMARY {
     def prefix = task.ext.prefix ?: "cat_summary"
     """
     # use find as sometimes these are empty and need to fail gracefully
-    find -L -type f -name "*bin2classification.names.txt.gz" -exec sh -c 'for f do gunzip -c \$f > \${f%.*}; done' find-sh {} +
+    find -L -type f -name "*contig2classification.names.txt.gz" -exec sh -c 'for f do gunzip -c \$f > \${f%.*}; done' find-sh {} +
 
     bioawk '(NR == 1) || (FNR > 1)' *.txt > ${prefix}.tsv
 
