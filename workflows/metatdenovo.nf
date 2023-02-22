@@ -437,24 +437,25 @@ workflow METATDENOVO {
     //
  
     ch_cat_db = Channel.empty()
-    if (params.cat_db){
-        CAT_DB ( ch_cat_db_file )
-        ch_cat_db = CAT_DB.out.db
-    } else if (params.cat_db_generate){
-        CAT_DB_GENERATE ()
-        ch_cat_db = CAT_DB_GENERATE.out.db
+    if (params.cat) {
+        if (params.cat_db){
+            CAT_DB ( ch_cat_db_file )
+            ch_cat_db = CAT_DB.out.db
+        } else if (params.cat_db_generate){
+            CAT_DB_GENERATE ()
+            ch_cat_db = CAT_DB_GENERATE.out.db
+        }
+        UNPIGZ_CONTIGS(ch_assembly_contigs)
+        CAT_CONTIGS (
+            UNPIGZ_CONTIGS.out.unzipped,
+            ch_cat_db
+        )
+        CAT_SUMMARY(
+            CAT_CONTIGS.out.tax_classification.collect()
+        )
+        ch_versions = ch_versions.mix(CAT_CONTIGS.out.versions)
+        ch_versions = ch_versions.mix(CAT_SUMMARY.out.versions)
     }
-    UNPIGZ_CONTIGS(ch_assembly_contigs)
-    CAT_CONTIGS (
-        UNPIGZ_CONTIGS.out.unzipped,
-        ch_cat_db
-    )
-    CAT_SUMMARY(
-        CAT_CONTIGS.out.tax_classification.collect()
-    )
-    ch_versions = ch_versions.mix(CAT_CONTIGS.out.versions)
-    ch_versions = ch_versions.mix(CAT_SUMMARY.out.versions)
-
     //
     // SUBWORKFLOW: Eukulele
     //
