@@ -444,10 +444,9 @@ workflow METATDENOVO {
         CAT_DB_GENERATE ()
         ch_cat_db = CAT_DB_GENERATE.out.db
     }
-    //UNPIGZ_CONTIGS(ch_assembly_contigs)
+    UNPIGZ_CONTIGS(ch_assembly_contigs)
     CAT (
-        //UNPIGZ_CONTIGS.out.unzipped,
-        ch_assembly_contigs,
+        UNPIGZ_CONTIGS.out.unzipped,
         ch_cat_db
     )
     CAT_SUMMARY(
@@ -494,8 +493,8 @@ workflow METATDENOVO {
             .set { ch_collect_stats }
     }
 
-    //COLLECT_STATS(ch_collect_stats)
-    //ch_versions     = ch_versions.mix(COLLECT_STATS.out.versions)
+    COLLECT_STATS(ch_collect_stats)
+    ch_versions     = ch_versions.mix(COLLECT_STATS.out.versions)
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')

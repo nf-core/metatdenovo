@@ -1,5 +1,6 @@
 process CAT {
     tag "${meta.id}-${db_name}"
+    label 'process_high'
 
     conda "bioconda::cat=4.6 bioconda::diamond=2.0.6"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
@@ -22,7 +23,7 @@ process CAT {
     script:
     def official_taxonomy = params.cat_official_taxonomy ? "--only_official" : ""
     """
-    CAT contigs -c "$assembly" -d database/ -t taxonomy/ -n 4 -o "${meta.id}"
+    CAT contigs -c "$assembly" -d database/ -t taxonomy/ -n 4 -o "${meta.id}" --top 11 --I_know_what_Im_doing
     CAT add_names -i "${meta.id}.ORF2LCA.txt" -o "${meta.id}.ORF2LCA.names.txt" -t taxonomy/ ${official_taxonomy}
     CAT add_names -i "${meta.id}.contig2classification.txt" -o "${meta.id}.contig2classification.names.txt" -t taxonomy/ ${official_taxonomy}
 
