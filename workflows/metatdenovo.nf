@@ -100,7 +100,7 @@ include { COLLECT_FEATURECOUNTS            } from '../modules/local/collect_feat
 include { COLLECT_STATS                    } from '../modules/local/collect_stats.nf'
 include { CAT_DB                           } from '../modules/local/cat/cat_db'
 include { CAT_DB_GENERATE                  } from '../modules/local/cat/cat_db_generate'
-include { CAT                              } from '../modules/local/cat/cat'
+include { CAT_CONTIGS                      } from '../modules/local/cat/cat_contigs'
 include { CAT_SUMMARY                      } from "../modules/local/cat/cat_summary"
 include { FORMATSPADES                     } from '../modules/local/formatspades.nf'
 include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz.nf'
@@ -445,14 +445,14 @@ workflow METATDENOVO {
         ch_cat_db = CAT_DB_GENERATE.out.db
     }
     UNPIGZ_CONTIGS(ch_assembly_contigs)
-    CAT (
+    CAT_CONTIGS (
         UNPIGZ_CONTIGS.out.unzipped,
         ch_cat_db
     )
     CAT_SUMMARY(
-        CAT.out.tax_classification.collect()
+        CAT_CONTIGS.out.tax_classification.collect()
     )
-    ch_versions = ch_versions.mix(CAT.out.versions)
+    ch_versions = ch_versions.mix(CAT_CONTIGS.out.versions)
     ch_versions = ch_versions.mix(CAT_SUMMARY.out.versions)
 
     //
