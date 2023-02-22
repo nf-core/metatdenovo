@@ -66,6 +66,14 @@ if ( !params.skip_eukulele ) {
     }
 }
 
+if(params.cat_db){
+    ch_cat_db_file = Channel
+        .value(file( "${params.cat_db}" ))
+} else {
+    ch_cat_db_file = Channel.empty()
+}
+
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     CONFIG FILES
@@ -90,7 +98,12 @@ include { WRITESPADESYAML                  } from '../modules/local/writespadesy
 include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved.nf'
 include { COLLECT_FEATURECOUNTS            } from '../modules/local/collect_featurecounts.nf'
 include { COLLECT_STATS                    } from '../modules/local/collect_stats.nf'
+include { CAT_DB                           } from '../modules/local/cat/cat_db'
+include { CAT_DB_GENERATE                  } from '../modules/local/cat/cat_db_generate'
+include { CAT_CONTIGS                      } from '../modules/local/cat/cat_contigs'
+include { CAT_SUMMARY                      } from "../modules/local/cat/cat_summary"
 include { FORMATSPADES                     } from '../modules/local/formatspades.nf'
+include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz.nf'
 include { MERGE_TABLES                     } from '../modules/local/merge_summary_tables.nf'
 
 //
@@ -352,13 +365,11 @@ workflow METATDENOVO {
     }
 
     //
-    // SUBWORKFLOW: run TRANSDECODER on assembly output. Orf caller alternative for eukaryotes.
+    // SUBWORKFLOW: run TRANSDECODER. Orf caller alternative for eukaryotes.
     //
 
     if ( params.orf_caller == ORF_CALLER_TRANSDECODER ) {
-
         TRANSDECODER ( ch_assembly_contigs )
-
         ch_gff      = TRANSDECODER.out.gff
         ch_aa       = TRANSDECODER.out.pep
         ch_versions = ch_versions.mix(TRANSDECODER.out.versions)
@@ -421,6 +432,30 @@ workflow METATDENOVO {
             .set { ch_merge_tables }
     }
 
+    //
+    // CAT: Bin Annotation Tool (BAT) are pipelines for the taxonomic classification of long DNA sequences and metagenome assembled genomes (MAGs/bins)
+    //
+ 
+    ch_cat_db = Channel.empty()
+    if (params.cat) {
+        if (params.cat_db){
+            CAT_DB ( ch_cat_db_file )
+            ch_cat_db = CAT_DB.out.db
+        } else if (params.cat_db_generate){
+            CAT_DB_GENERATE ()
+            ch_cat_db = CAT_DB_GENERATE.out.db
+        }
+        UNPIGZ_CONTIGS(ch_assembly_contigs)
+        CAT_CONTIGS (
+            UNPIGZ_CONTIGS.out.unzipped,
+            ch_cat_db
+        )
+        CAT_SUMMARY(
+            CAT_CONTIGS.out.tax_classification.collect()
+        )
+        ch_versions = ch_versions.mix(CAT_CONTIGS.out.versions)
+        ch_versions = ch_versions.mix(CAT_SUMMARY.out.versions)
+    }
     //
     // SUBWORKFLOW: Eukulele
     //
