@@ -158,7 +158,6 @@
                 },
                 "skip_eggnog": {
                     "type": "boolean",
-                    "default": false,
                     "description": "Skip EGGNOG functional annotation"
                 },
                 "eggnog_dbpath": {
@@ -185,6 +184,24 @@
                     "type": "string",
                     "default": "mets",
                     "description": "Specify which method to use for EUKulele. the alternatives are: mets (metatranscriptomics) or  mags (Metagenome Assembled Genomes). default: mets"
+                },
+                "cat_db": {
+                    "type": "string",
+                    "default": null,
+                    "help_text": "This parameter is mutual exclusive with \u00b4cat_db_generate\u00b4. You need to provide a version of CAT database that has the same DIAMOND version of the module (DIAMOND 2.0.8) otherwise you might encounter issues of incompatibility and the module will fail. We recommend to always use the database provided by CAT website: https://tbb.bio.uu.nl/bastiaan/CAT_prepare/"
+                },
+                "cat_db_generate": {
+                    "type": "boolean",
+                    "description": "It will run a CAT command that will download the database",
+                    "help_text": "This parameter is mutual exclusive with `cat_db`. when activated, `cat_db_generate` will run a module in order to download and prepare a CAT database. "
+                },
+                "cat_official_taxonomy": {
+                    "type": "boolean",
+                    "description": "Use it if you want assign official taxonomy"
+                },
+                "save_cat_db": {
+                    "type": "boolean",
+                    "description": "Use it if you want save the database"
                 }
             }
         },
