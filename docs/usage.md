@@ -85,13 +85,18 @@ PhyloDB and GTDB are recommended for prokaryotic datasets and MMETSP for eukaryo
 
 If you already have these databases ready in your working directory, you can redirect to the folder so the pipeline will not download the database (e.g. `--eukulele_dbpath your/path/database/`
 
-> Please, check the EUKulele documentation for more information about the databases cited [HERE](https://eukulele.readthedocs.io/en/latest/#)
+> Please, check the `EUKulele` documentation for more information about the databases cited [HERE](https://eukulele.readthedocs.io/en/latest/#)
+
+Another alternative to `EUKulele` is `CAT` program. `CAT` works by taking as input the assembly fasta file. As `CAT` is a pipeline itself, it uses `Prodigal` to call the orf, `DIAMOND` for the allignment to a reference database.
+The database can be generate with the option `--cat_db_generate` or you can provide a `CAT_Prepare` database that you can download from `CAT` [website](). check the also the [options]() documentation to learn how to configure `CAT`properly. 
+
+> Please, check the `CAT` documentation for more information about the database cited [HERE]()
 
 ## Functional annotation options
 
-By default, metatdenovo will not perform any functional annotation. In order to run it you will need to specify one of the options that we provide.
+By default, metatdenovo will perform a functional annotation with `eggnog` program. In order to run the other programs, you will need to specify them as additional options.
 
-These options are:
+These options are (including the default):
 
 - [Eggnog](https://github.com/eggnogdb/eggnog-mapper/wiki) (`--eggnog`)
 
