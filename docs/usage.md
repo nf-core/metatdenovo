@@ -89,7 +89,7 @@ If you already have these databases ready in your working directory, you can red
 
 Another alternative to `EUKulele` is `CAT` program. `CAT` works by taking as input the assembly fasta file. 
 
-As `CAT` is a pipeline itself, it uses `Prodigal` to call the orf, `DIAMOND` for the allignment to a reference database.
+As `CAT` is a pipeline itself, it uses `Prodigal` to call the orfs, `DIAMOND` for the allignment to a reference database.
 
 The database can be generate with the option `--cat_db_generate` or you can provide a `CAT_Prepare` database that you can download from `CAT` [website](https://tbb.bio.uu.nl/bastiaan/CAT_prepare/). 
 Check the also the [options]() documentation to learn how to configure `CAT`properly. 
