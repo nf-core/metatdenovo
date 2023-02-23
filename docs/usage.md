@@ -73,7 +73,7 @@ Other orf caller options for running the pipeline are:
 
 ## Taxonomical annotation options
 
-Metatdenovo uses `EUKulele` as main program for taxonomy annotation. EUKulele can run by using different reference datasets. The default dataset is PhyloDB (i.e. `--eukulele_db phylodb` ) which is suggested mainly for prokaryotes.
+Metatdenovo uses `EUKulele` as main program for taxonomy annotation. `EUKulele` can run by using different reference datasets. The default dataset is PhyloDB (i.e. `--eukulele_db phylodb` ) which is suggested mainly for prokaryotes.
 
 Other databases options for running the pipeline are:
 
@@ -83,14 +83,18 @@ Other databases options for running the pipeline are:
 
 PhyloDB and GTDB are recommended for prokaryotic datasets and MMETSP for eukaryotes, although PhyoDB can be also recognize eukaryotes and can be used for this purpose.
 
-If you already have these databases ready in your working directory, you can redirect to the folder so the pipeline will not download the database (e.g. `--eukulele_dbpath your/path/database/`
+If you already have these databases ready in your working directory, you can redirect to the folder so the pipeline will not download the database (e.g. `--eukulele_dbpath your/path/database/`). N.B. When you are using a custom database, you don't have to use `--eukulele_db` option. The pipeline will provide a `default` name for the database to avoid that `EUKulele` will try to download a new database.
 
 > Please, check the `EUKulele` documentation for more information about the databases cited [HERE](https://eukulele.readthedocs.io/en/latest/#)
 
-Another alternative to `EUKulele` is `CAT` program. `CAT` works by taking as input the assembly fasta file. As `CAT` is a pipeline itself, it uses `Prodigal` to call the orf, `DIAMOND` for the allignment to a reference database.
-The database can be generate with the option `--cat_db_generate` or you can provide a `CAT_Prepare` database that you can download from `CAT` [website](). check the also the [options]() documentation to learn how to configure `CAT`properly. 
+Another alternative to `EUKulele` is `CAT` program. `CAT` works by taking as input the assembly fasta file. 
 
-> Please, check the `CAT` documentation for more information about the database cited [HERE]()
+As `CAT` is a pipeline itself, it uses `Prodigal` to call the orf, `DIAMOND` for the allignment to a reference database.
+
+The database can be generate with the option `--cat_db_generate` or you can provide a `CAT_Prepare` database that you can download from `CAT` [website](https://tbb.bio.uu.nl/bastiaan/CAT_prepare/). 
+Check the also the [options]() documentation to learn how to configure `CAT`properly. 
+
+> Please, check the `CAT` documentation for more information about the database cited [HERE](https://github.com/dutilh/CAT)
 
 ## Functional annotation options
 
