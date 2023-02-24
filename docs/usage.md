@@ -73,7 +73,7 @@ Other orf caller options for running the pipeline are:
 
 ## Taxonomical annotation options
 
-Metatdenovo uses `EUKulele` as main program for taxonomy annotation. EUKulele can run by using different reference datasets. The default dataset is PhyloDB (i.e. `--eukulele_db phylodb` ) which is suggested mainly for prokaryotes.
+Metatdenovo uses `EUKulele` as the main program for taxonomy annotation. `EUKulele` can be run with different reference datasets. The default dataset is PhyloDB (i.e. `--eukulele_db phylodb` ) which works for mixed communities of prokaryotes and eukaryotes.
 
 Other databases options for running the pipeline are:
 
@@ -83,13 +83,22 @@ Other databases options for running the pipeline are:
 
 PhyloDB and GTDB are recommended for prokaryotic datasets and MMETSP for eukaryotes, although PhyoDB can be also recognize eukaryotes and can be used for this purpose.
 
-If you already have these databases ready in your working directory, you can redirect to the folder so the pipeline will not download the database (e.g. `--eukulele_dbpath your/path/database/`
+If you already have these databases ready in your working directory, you can point to the folder so the pipeline will not download the database (e.g. `--eukulele_dbpath your/path/database/`). N.B. When you are using a custom database, don't specify the `--eukulele_db` option. The pipeline will provide a default name for the database to avoid that EUKulele will try to download a new database.
 
-> Please, check the EUKulele documentation for more information about the databases cited [HERE](https://eukulele.readthedocs.io/en/latest/#)
+> Please, check the [EUKulele documentation](https://eukulele.readthedocs.io/en/latest/#) for more information about the databases.
+
+An alternative to EUKulele is the CAT program. In contrast to EUKulele that annotates open reading frames (ORFs), CAT annotates the contigs from the assembly.
+
+CAT is uses Prodigal to call ORFs and DIAMOND for the alignment to a reference database. Subsequently, DIAMOND hits for individual ORFs are translated by CAT into contig annotations.
+
+The database can be generated with the option `--cat_db_generate` or you can provide a prepared database that you downloaded from [CAT website](https://tbb.bio.uu.nl/bastiaan/CAT_prepare/).
+Check the also the [options]() documentation to learn how to configure CATproperly.
+
+> Please, check the `CAT` documentation for more information about the database cited [HERE](https://github.com/dutilh/CAT)
 
 ## Functional annotation options
 
-By default, metatdenovo will not perform any functional annotation. In order to run it you will need to specify one of the options that we provide.
+By default, the metatdenovo pipeline will perform a functional annotation with the [eggNOG-mapper](http://eggnog-mapper.embl.de/) program. In order to run the other programs, you will need to specify them as additional options.
 
 These options are:
 
@@ -101,6 +110,8 @@ These options are:
 
 All the options can run in the same time (e.g. `nextflow run main.nf -profile test,docker --eggnog --hmmdir hmms/ --rundbcan`) but each program has its own options that you will need to read carefully before running the pipeline.
 You can find the different options in [parameters]() page and read about the programs from their own website.
+
+If you don't want run eggNOG-mapper, you will need to add the flag `--skip_eggnog`, otherwise metatdenovo will run the program automatically.
 
 ## Example pipeline command with some common features
 
