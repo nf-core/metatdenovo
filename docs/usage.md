@@ -73,7 +73,7 @@ Other orf caller options for running the pipeline are:
 
 ## Taxonomical annotation options
 
-Metatdenovo uses `EUKulele` as main program for taxonomy annotation. `EUKulele` can run by using different reference datasets. The default dataset is PhyloDB (i.e. `--eukulele_db phylodb` ) which is suggested mainly for prokaryotes.
+Metatdenovo uses `EUKulele` as the main program for taxonomy annotation. `EUKulele` can be run with different reference datasets. The default dataset is PhyloDB (i.e. `--eukulele_db phylodb` ) which works for mixed communities of prokaryotes and eukaryotes.
 
 Other databases options for running the pipeline are:
 
