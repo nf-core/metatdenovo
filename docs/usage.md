@@ -100,7 +100,7 @@ Check the also the [options]() documentation to learn how to configure CATproper
 
 By default, the metatdenovo pipeline will perform a functional annotation with the [eggNOG-mapper](http://eggnog-mapper.embl.de/) program. In order to run the other programs, you will need to specify them as additional options.
 
-These options are (including the default):
+These options are:
 
 - [Eggnog](https://github.com/eggnogdb/eggnog-mapper/wiki) (`--eggnog`)
 
@@ -110,6 +110,8 @@ These options are (including the default):
 
 All the options can run in the same time (e.g. `nextflow run main.nf -profile test,docker --eggnog --hmmdir hmms/ --rundbcan`) but each program has its own options that you will need to read carefully before running the pipeline.
 You can find the different options in [parameters]() page and read about the programs from their own website.
+
+If you don't want run eggNOG-mapper, you will need to add the flag `--skip_eggnog`, otherwise metatdenovo will run the program automatically.
 
 ## Example pipeline command with some common features
 
