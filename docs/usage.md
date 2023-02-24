@@ -98,7 +98,7 @@ Check the also the [options]() documentation to learn how to configure CATproper
 
 ## Functional annotation options
 
-By default, metatdenovo will perform a functional annotation with `eggnog` program. In order to run the other programs, you will need to specify them as additional options.
+By default, the metatdenovo pipeline will perform a functional annotation with the [eggNOG-mapper](http://eggnog-mapper.embl.de/) program. In order to run the other programs, you will need to specify them as additional options.
 
 These options are (including the default):
 
