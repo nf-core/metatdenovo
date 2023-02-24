@@ -91,7 +91,7 @@ An alternative to EUKulele is the CAT program. In contrast to EUKulele that anno
 
 CAT is uses Prodigal to call ORFs and DIAMOND for the alignment to a reference database. Subsequently, DIAMOND hits for individual ORFs are translated by CAT into contig annotations.
 
-The database can be generate with the option `--cat_db_generate` or you can provide a `CAT_Prepare` database that you can download from `CAT` [website](https://tbb.bio.uu.nl/bastiaan/CAT_prepare/). 
+The database can be generated with the option `--cat_db_generate` or you can provide a prepared database that you downloaded from [CAT website](https://tbb.bio.uu.nl/bastiaan/CAT_prepare/). 
 Check the also the [options]() documentation to learn how to configure `CAT`properly. 
 
 > Please, check the `CAT` documentation for more information about the database cited [HERE](https://github.com/dutilh/CAT)
