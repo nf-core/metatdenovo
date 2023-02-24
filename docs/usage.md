@@ -85,7 +85,7 @@ PhyloDB and GTDB are recommended for prokaryotic datasets and MMETSP for eukaryo
 
 If you already have these databases ready in your working directory, you can point to the folder so the pipeline will not download the database (e.g. `--eukulele_dbpath your/path/database/`). N.B. When you are using a custom database, don't specify the `--eukulele_db` option. The pipeline will provide a default name for the database to avoid that EUKulele will try to download a new database.
 
-> Please, check the `EUKulele` documentation for more information about the databases cited [HERE](https://eukulele.readthedocs.io/en/latest/#)
+> Please, check the [EUKulele documentation](https://eukulele.readthedocs.io/en/latest/#) for more information about the databases.
 
 Another alternative to `EUKulele` is `CAT` program. `CAT` works by taking as input the assembly fasta file. 
 
