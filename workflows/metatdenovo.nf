@@ -517,10 +517,10 @@ workflow METATDENOVO {
     ch_multiqc_files = ch_multiqc_files.mix(BAM_SORT_SAMTOOLS.out.idxstats.collect{it[1]}.ifEmpty([]))
     //ch_multiqc_files = prokka
     //ch_multiqc_files = featurecounts
-    //ch_multiqc_files = bbmap
-    //if (params.sequence_filter) {
-    //    ch_multiqc_files =
-    //}
+    ch_multiqc_files = ch_multiqc_files.mix(BBMAP_ALIGN.out.log.collect{it[1]}.ifEmpty([]))
+    ch_multiqc_files = ch_multiqc_files.mix(BBMAP_BBDUK.out.log.collect{it[1]}.ifEmpty([]))
+    ch_multiqc_files.view()
+    
 
     MULTIQC (
         ch_multiqc_files.collect(),
