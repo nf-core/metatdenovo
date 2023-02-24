@@ -87,7 +87,7 @@ If you already have these databases ready in your working directory, you can poi
 
 > Please, check the [EUKulele documentation](https://eukulele.readthedocs.io/en/latest/#) for more information about the databases.
 
-Another alternative to `EUKulele` is `CAT` program. `CAT` works by taking as input the assembly fasta file. 
+An alternative to EUKulele is the CAT program. In contrast to EUKulele that annotates open reading frames (ORFs), CAT annotates the contigs from the assembly. 
 
 As `CAT` is a pipeline itself, it uses `Prodigal` to call the orfs, `DIAMOND` for the allignment to a reference database.
 
