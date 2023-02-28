@@ -31,7 +31,7 @@ process SUM_TAXONOMY {
     library(readr)
     library(tidyr)
     library(stringr)
-    library(purrr)
+    library(tidyverse)
 
     TYPE_ORDER = c('sample', 'database', 'field', 'value')
     # call the tables into variables
