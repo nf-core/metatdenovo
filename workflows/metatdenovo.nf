@@ -519,9 +519,7 @@ workflow METATDENOVO {
     ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
     ch_multiqc_files = ch_multiqc_files.mix(FASTQC_TRIMGALORE.out.trim_zip.collect{it[1]}.ifEmpty([]))
     ch_multiqc_files = ch_multiqc_files.mix(BAM_SORT_SAMTOOLS.out.idxstats.collect{it[1]}.ifEmpty([]))
-    ch_multiqc_files = 
     ch_multiqc_files = ch_multiqc_files.mix(FEATURECOUNTS_CDS.out.summary.collect{it[1]}.ifEmpty([]))
-    ch_multiqc_files = ch_multiqc_files.mix(BBMAP_ALIGN.out.log.collect{it[1]}.ifEmpty([]))
     
 
     MULTIQC (
