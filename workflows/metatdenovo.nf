@@ -38,6 +38,9 @@ for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true
 // Check mandatory parameters
 if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input samplesheet not specified!' }
 
+// set an empty multiqc channel
+ch_multiqc_files = Channel.empty()
+
 // If the user supplied hmm files, we will run hmmsearch and then rank the results.
 // Create a channel for hmm files.
 ch_hmmrs = Channel.empty()
@@ -240,6 +243,7 @@ workflow METATDENOVO {
         ch_collect_stats
             .combine(ch_bbduk_logs)
             .set {ch_collect_stats}
+        ch_multiqc_files = ch_multiqc_files.mix(BBMAP_BBDUK.out.log.collect{it[1]}.ifEmpty([]))
     } else {
         ch_clean_reads  = FASTQC_TRIMGALORE.out.reads
         ch_bbduk_logs = Channel.empty()
@@ -348,9 +352,10 @@ workflow METATDENOVO {
 
     if ( params.orf_caller == ORF_CALLER_PROKKA ) {
         PROKKA_SUBSETS(ch_assembly_contigs)
-        ch_versions = ch_versions.mix(PROKKA_SUBSETS.out.versions)
-        ch_gff      = PROKKA_SUBSETS.out.gff
-        ch_aa       = PROKKA_SUBSETS.out.faa
+        ch_versions      = ch_versions.mix(PROKKA_SUBSETS.out.versions)
+        ch_gff           = PROKKA_SUBSETS.out.gff
+        ch_aa            = PROKKA_SUBSETS.out.faa
+        ch_multiqc_files = ch_multiqc_files.mix(PROKKA_SUBSETS.out.prokka_log.collect{it[1]}.ifEmpty([]))
     }
 
     //
@@ -511,9 +516,11 @@ workflow METATDENOVO {
     methods_description    = WorkflowMetatdenovo.methodsDescriptionText(workflow, ch_multiqc_custom_methods_description)
     ch_methods_description = Channel.value(methods_description)
 
-    ch_multiqc_files = Channel.empty()
     ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
     ch_multiqc_files = ch_multiqc_files.mix(FASTQC_TRIMGALORE.out.trim_zip.collect{it[1]}.ifEmpty([]))
+    ch_multiqc_files = ch_multiqc_files.mix(BAM_SORT_SAMTOOLS.out.idxstats.collect{it[1]}.ifEmpty([]))
+    ch_multiqc_files = ch_multiqc_files.mix(FEATURECOUNTS_CDS.out.summary.collect{it[1]}.ifEmpty([]))
+    
 
     MULTIQC (
         ch_multiqc_files.collect(),
