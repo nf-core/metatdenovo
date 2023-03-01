@@ -27,11 +27,7 @@ process SUM_TAXONOMY {
     """
     #!/usr/bin/env Rscript
 
-    library(dplyr)
-    library(readr)
-    library(tidyr)
-    library(stringr)
-    library(purrr)
+    library(tidyverse)
 
     TYPE_ORDER = c('sample', 'database', 'field', 'value')
     # call the tables into variables
@@ -50,9 +46,7 @@ process SUM_TAXONOMY {
         relocate(value, .after = last_col()) %>%
         write_tsv('${prefix}_summary.tsv')
 
-    writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")), paste0("    dplyr: ", packageVersion('dplyr')),
-        paste0("    dtplyr: ", packageVersion('dtplyr')), paste0("    data.table: ", packageVersion('data.table')), paste0("    readr: ", packageVersion('readr')),
-        paste0("    purrr: ", packageVersion('purrr')), paste0("    tidyr: ", packageVersion('tidyr')), paste0("    stringr: ", packageVersion('stringr')) ),
+    writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")), paste0("    tidyverse: ", packageVersion('tidyverse'))),
         "versions.yml")
     """
 }
