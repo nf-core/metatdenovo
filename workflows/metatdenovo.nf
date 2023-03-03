@@ -474,7 +474,8 @@ workflow METATDENOVO {
                 .combine( ch_eukulele_db )
                 .set { ch_eukulele }
             SUB_EUKULELE( ch_eukulele, ch_fcs_for_summary )
-            ch_taxonomy_summary = SUB_EUKULELE.out.taxonomy_summary.collect().map { it[1] }
+            ch_taxonomy_summary = SUB_EUKULELE.out.taxonomy_summary.collect{ it[1]}.map { [ it ] }.view()
+            SUB_EUKULELE.out.taxonomy_summary.collect{ it[1]}.map { [ it ] }
             ch_merge_tables
                 .combine( ch_taxonomy_summary )
                 .set { ch_merge_tables }
