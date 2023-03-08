@@ -11,8 +11,8 @@ process FORMAT_PRODIGAL {
     tuple val(meta), path (gff)
 
     output:
-    tuple val(meta), path("${gff}.gz"), emit: format_gff
-    path "versions.yml"               , emit: versions
+    tuple val(meta), path("${prefix}_format.gff.gz"), emit: format_gff
+    path "versions.yml"                             , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -22,8 +22,9 @@ process FORMAT_PRODIGAL {
     prefix   = task.ext.prefix ?: "${meta.id}"
 
     """
-    sed -i 's/\\(\\(k[0-9]\\+_[0-9]\\+\\).*\\)ID=[0-9]\\+\\(_[0-9]\\+\\)/\\1ID=\\2\\3/g' $gff
-    gzip $gff
+    sed 's/\\(\\(k[0-9]\\+_[0-9]\\+\\).*\\)ID=[0-9]\\+\\(_[0-9]\\+\\)/\\1ID=\\2\\3/g' $gff > ${prefix}_format.gff
+    sed -i 's/\\(\\(NODE_[0-9]\\+\\).*\\)ID=[0-9]\\+\\(_[0-9]\\+\\)/\\1ID=\\2\\3/g' ${prefix}_format.gff
+    gzip ${prefix}_format.gff
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

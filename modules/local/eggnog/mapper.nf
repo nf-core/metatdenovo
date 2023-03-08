@@ -2,10 +2,10 @@ process EGGNOG_MAPPER {
     tag "$meta.id"
     label 'process_medium'
 
-    conda (params.enable_conda ? "bioconda::eggnog-mapper=2.1.6" : null)
+    conda (params.enable_conda ? "bioconda::eggnog-mapper=2.1.9" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/eggnog-mapper:2.1.6--pyhdfd78af_0':
-        'quay.io/biocontainers/eggnog-mapper:2.1.6--pyhdfd78af_0' }"
+        'https://depot.galaxyproject.org/singularity/eggnog-mapper:2.1.9--pyhdfd78af_0':
+        'quay.io/biocontainers/eggnog-mapper:2.1.9--pyhdfd78af_0' }"
 
     input:
     tuple val(meta), path(fasta)
@@ -41,7 +41,7 @@ process EGGNOG_MAPPER {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        eggnog: \$( echo \$(emapper.py --version 2>&1)| sed 's/.* emapper-//')
+        eggnog: \$( echo \$(emapper.py --version 2>&1)| sed 's/.* emapper-//' | sed 's/\\/ Expected eggNOG DB version: 5.0.2 \\/ Installed eggNOG DB version: unknown \\/ Diamond version found: diamond version 2.1.4 \\/ MMseqs2 version found: 13.45111//g' )
     END_VERSIONS
     """
 
@@ -53,7 +53,7 @@ process EGGNOG_MAPPER {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        eggnog: \$( echo \$(emapper.py --version 2>&1)| sed 's/.* emapper-//')
+        eggnog: \$( echo \$(emapper.py --version 2>&1)| sed 's/.* emapper-//' | sed 's/\\/ Expected eggNOG DB version: 5.0.2 \\/ Installed eggNOG DB version: unknown \\/ Diamond version found: diamond version 2.1.4 \\/ MMseqs2 version found: 13.45111//g' )
     END_VERSIONS
     """
 }
