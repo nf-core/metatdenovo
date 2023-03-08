@@ -39,7 +39,7 @@ workflow EGGNOG {
             }
         }
 
-        ch_versions = ch_versions.mix(EGGNOG_MAPPER.out.versions)
+        //ch_versions = ch_versions.mix(EGGNOG_MAPPER.out.versions)
         ch_versions = ch_versions.mix(EGGNOG_TABLE.out.versions)
         ch_versions = ch_versions.mix(SUM_EGGNOG.out.versions)
 
