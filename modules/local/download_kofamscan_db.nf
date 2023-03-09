@@ -28,7 +28,7 @@ process DOWNLOAD_KODB {
     
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        wget: \$(echo \$(wget --version 2>&1) | sed 's/^.*GNU Wget//' )
+        wget: 1.18
     END_VERSIONS
     """
 }
