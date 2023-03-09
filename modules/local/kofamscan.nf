@@ -9,12 +9,12 @@ process KOFAMSCAN {
 
     input:
     tuple val(meta), path(fastaprot)
-    tuple val(meta), path(ko_list), path(famscan)
+    tuple val(kodb), path(ko_list), path(famscan)
 
     output:
-    tuple val(meta), path("*.tsv")   , emit: kout
-    tuple val(meta), path(tmp_test/*), emit: tmpfile
-    path "versions.yml"              , emit: versions
+    tuple val(meta), path("kofamscan_output.tsv"), emit: kout
+    tuple val(meta), path("tmp_kofamscan/*")     , emit: tmpfile
+    path "versions.yml"                          , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -28,9 +28,9 @@ process KOFAMSCAN {
         --profile $famscan \\
         --ko-list $ko_list \\
         --format detail-tsv \\
-        --tmp-dir tmp_test \\
+        --tmp-dir tmp_kofamscan \\
         $fastaprot \\
-        -o test.tsv
+        -o kofamscan_output.tsv
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
