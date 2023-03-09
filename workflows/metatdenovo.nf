@@ -448,12 +448,30 @@ workflow METATDENOVO {
             .set { ch_merge_tables }
     }
 
-    if ( ! params.skip_kofamscan ){
-        ch_aa
-            .map {[ [ id:"${it[0].id}.${params.orf_caller}" ], it[1] ] }
-            .set { ch_kofamscan }
-        KOFAMSCAN( ch_kofamscan, ch_ko_db )
-    }
+
+    if( !params.skip_kofamscan ) {
+        File ko_profiles = new File(params.ko_profiles)
+        File Ko_list     = new File(params.ko_list)
+        if ( ! ko_profiles.exists() ) { directory.mkdir() }
+        if ( ! ko_list.exists() ) { directory.mkdir() }
+        ch_ko_profiles  = Channel.fromPath( ko_profiles )
+        ch_ko_list      = Channel.fromPath( ko_list )
+            ch_ko_db = ch_ko_list
+                .map { [ [id: 'ko_database'], it ] }
+                .combine(ch_ko_profiles)
+            ch_aa
+                .map {[ [ id:"${it[0].id}.${params.orf_caller}" ], it[1] ] }
+                .combine( ch_ko_db  )
+                .set { ch_kofamscan }
+            KOFAMSCAN( ch_kofamscan )
+    }}
+    
+    //if ( ! params.skip_kofamscan ){
+    //    ch_aa
+    //        .map {[ [ id:"${it[0].id}.${params.orf_caller}" ], it[1] ] }
+    //        .set { ch_kofamscan }
+    //    KOFAMSCAN( ch_kofamscan, ch_ko_db )
+    //}
     
     //
     // CAT: Bin Annotation Tool (BAT) are pipelines for the taxonomic classification of long DNA sequences and metagenome assembled genomes (MAGs/bins)

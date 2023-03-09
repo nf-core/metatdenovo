@@ -25,7 +25,7 @@ process DOWNLOAD_KODB {
     """
     wget https://www.genome.jp/ftp/db/kofam/ko_list.gz | gunzip
     wget https://www.genome.jp/ftp/db/kofam/profiles.tar.gz | gunzip | tar -xf -
- 
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         wget: 1.18
