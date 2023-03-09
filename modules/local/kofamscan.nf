@@ -9,8 +9,7 @@ process KOFAMSCAN {
 
     input:
     tuple val(meta), path(fastaprot)
-    path(ko_list)
-    path(famscan)
+    tuple val(meta), path(ko_list), path(famscan)
 
     output:
     tuple val(meta), path("*.tsv")   , emit: kout

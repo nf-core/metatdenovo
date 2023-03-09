@@ -76,6 +76,17 @@ if(params.cat_db){
     ch_cat_db_file = Channel.empty()
 }
 
+if(params.kofam_db) {
+    ch_ko_list = Channel.fromPath(params.ko_list)
+    ch_ko_profiles = Channel.fromPath(params.ko_profiles)
+    ch_ko_db = ch_ko_list
+        .map { [ [id: 'ko_database], it ] }
+        .combine(ch_ko_profiles)
+        .set { ch_ko_db }
+} else {
+    ch_ko_list     = Chanel.empty()
+    ch_ko_profiles = Channel.empty()
+}
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -108,6 +119,7 @@ include { CAT_SUMMARY                      } from "../modules/local/cat/cat_summ
 include { FORMATSPADES                     } from '../modules/local/formatspades.nf'
 include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz.nf'
 include { MERGE_TABLES                     } from '../modules/local/merge_summary_tables.nf'
+include { KOFAMSCAN                        } from '../modules/local/kofamscan.nf'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
