@@ -1,5 +1,5 @@
 process DOWNLOAD_KODB {
-    tag "downlaod_KO_databases"
+    tag "KO data"
     label 'process_medium'
 
     conda "bioconda::gnu-wget=1.18"
