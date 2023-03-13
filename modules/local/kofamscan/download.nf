@@ -1,4 +1,4 @@
-process DOWNLOAD_KOFMASCAN_DB {
+process KOFAMSCAN_DOWNLOAD {
     tag "downlaod_KO_databases"
     label 'process_medium'
 
