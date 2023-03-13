@@ -212,10 +212,6 @@
                     "type": "boolean",
                     "description": "skip kofamscan run"
                 },
-                "kofam_db": {
-                    "type": "boolean",
-                    "description": "enabled only when you have both databases ko_list and Ko_profiles"
-                },
                 "ko_list": {
                     "type": "string",
                     "default": null
