@@ -2,7 +2,7 @@
 // Run KOFAMSCAN on protein fasta from orf_caller output
 //
 
-include { KOFAMSCAN as EXEC_ANNOTATION      } from '../../modules/local/kofamscan/main'
+include { KOFAMSCAN_SCAN      } from '../../modules/local/kofamscan/scan'
 include { DOWNLOAD_KOFMASCAN_DB as DOWNLOAD } from '../../modules/local/kofamscan/download'
 
 workflow KOFAMSCAN {
