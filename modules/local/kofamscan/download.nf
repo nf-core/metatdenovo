@@ -1,5 +1,5 @@
 process KOFAMSCAN_DOWNLOAD {
-    tag "downlaod_KO_databases"
+    tag "KEGG data"
     label 'process_medium'
 
     conda "bioconda::gnu-wget=1.18"
