@@ -13,7 +13,6 @@ process KOFAMSCAN_SCAN {
 
     output:
     tuple val(meta), path("kofamscan_output.tsv.gz"), emit: kout
-    tuple val(meta), path("tmp_kofamscan/*")     , emit: tmpfile
     path "versions.yml"                          , emit: versions
 
     when:
