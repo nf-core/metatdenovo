@@ -21,7 +21,7 @@ process DOWNLOAD_KOFMASCAN_DB {
     def args = task.ext.args ?: ''
 
     """
-    wget https://www.genome.jp/ftp/db/kofam/ko_list.gz 
+    wget https://www.genome.jp/ftp/db/kofam/ko_list.gz
     wget https://www.genome.jp/ftp/db/kofam/profiles.tar.gz
     gunzip ko_list.gz
     gunzip profiles.tar.gz
