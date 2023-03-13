@@ -23,11 +23,11 @@ workflow KOFAMSCAN {
             ch_ko_db = ch_ko_list
                 .map { [ [id: 'ko_database'], it ] }
                 .combine( ch_ko_profiles)
-            EXEC_ANNOTATION( kofamscan, ch_ko_db )
-            ch_versions = ch_versions.mix(EXEC_ANNOTATION.out.versions)
+            KOFAMSCAN_SCAN( kofamscan, ch_ko_db )
+            ch_versions = ch_versions.mix(KOFAMSCAN_SCAN.out.versions)
         } else {
-            EXEC_ANNOTATION( kofamscan, databases )
-            ch_versions = ch_versions.mix(EXEC_ANNOTATION.out.versions)
+            KOFAMSCAN_SCAN( kofamscan, databases )
+            ch_versions = ch_versions.mix(KOFAMSCAN_SCAN.out.versions)
         }
 
     emit:
