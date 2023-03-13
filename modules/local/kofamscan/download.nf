@@ -23,9 +23,7 @@ process KOFAMSCAN_DOWNLOAD {
     """
     wget https://www.genome.jp/ftp/db/kofam/ko_list.gz
     wget https://www.genome.jp/ftp/db/kofam/profiles.tar.gz
-    gunzip ko_list.gz
-    gunzip profiles.tar.gz
-    tar -xf profiles.tar
+    tar -xfz profiles.tar
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
