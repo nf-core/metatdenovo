@@ -214,11 +214,13 @@
                 },
                 "ko_list": {
                     "type": "string",
-                    "default": null
+                    "default": null,
+                    "description": "path to a file with a full list of KO terms. This database can be downloaded at https://www.genome.jp/ftp/db/kofam/ko_list.gz"
                 },
                 "ko_profiles": {
                     "type": "string",
-                    "default": null
+                    "default": null,
+                    "description": "path to a folder that contains hmm profiles. The database can be downloaded at https://www.genome.jp/ftp/db/kofam/profiles.tar.gz"
                 }
             }
         },
