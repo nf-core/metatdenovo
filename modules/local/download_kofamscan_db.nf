@@ -10,10 +10,9 @@ process DOWNLOAD_KODB {
     input:
 
     output:
-    tuple val(meta), path("kodb/*")        , emit: kodb
-    tuple val(meta), path("kodb/profiles/*), emit: tmpfile
-    tuple val(meta), path("kodb/ko_list")  , emit: tmpfile
-    path "versions.yml"                    , emit: versions
+    tuple val(meta), path("profiles/*"), emit: profiles
+    tuple val(meta), path("ko_list/*") , emit: ko_list
+    path "versions.yml"                , emit: versions
 
     when:
     task.ext.when == null || task.ext.when

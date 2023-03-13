@@ -107,18 +107,19 @@ ch_multiqc_custom_methods_description = params.multiqc_methods_description ? fil
 //
 // MODULE: local
 //
-include { WRITESPADESYAML                  } from '../modules/local/writespadesyaml.nf'
-include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved.nf'
-include { COLLECT_FEATURECOUNTS            } from '../modules/local/collect_featurecounts.nf'
-include { COLLECT_STATS                    } from '../modules/local/collect_stats.nf'
+include { WRITESPADESYAML                  } from '../modules/local/writespadesyaml'
+include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved'
+include { COLLECT_FEATURECOUNTS            } from '../modules/local/collect_featurecounts'
+include { COLLECT_STATS                    } from '../modules/local/collect_stats'
 include { CAT_DB                           } from '../modules/local/cat/cat_db'
 include { CAT_DB_GENERATE                  } from '../modules/local/cat/cat_db_generate'
 include { CAT_CONTIGS                      } from '../modules/local/cat/cat_contigs'
 include { CAT_SUMMARY                      } from "../modules/local/cat/cat_summary"
-include { FORMATSPADES                     } from '../modules/local/formatspades.nf'
-include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz.nf'
-include { MERGE_TABLES                     } from '../modules/local/merge_summary_tables.nf'
-include { KOFAMSCAN                        } from '../modules/local/kofamscan.nf'
+include { FORMATSPADES                     } from '../modules/local/formatspades'
+include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz'
+include { MERGE_TABLES                     } from '../modules/local/merge_summary_tables'
+include { KOFAMSCAN                        } from '../modules/local/kofamscan'
+include { DOWNLOAD_KODB                    } from '../modules/local/download_kofamscan_db'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -450,28 +451,21 @@ workflow METATDENOVO {
 
 
     if( !params.skip_kofamscan ) {
-        File ko_profiles = new File(params.ko_profiles)
-        File Ko_list     = new File(params.ko_list)
-        if ( ! ko_profiles.exists() ) { directory.mkdir() }
-        if ( ! ko_list.exists() ) { directory.mkdir() }
-        ch_ko_profiles  = Channel.fromPath( ko_profiles )
-        ch_ko_list      = Channel.fromPath( ko_list )
+        if( !params.ko_db ) {
+            DOWNLOAD_KODB( )
+            ch_ko_profiles = DOWNLOAD_KODB.out.profiles
+            ch_ko_list     = DOWNLOAD_KODB.out.ko_list
+            versions       = DOWNLOAD_KODB.out.versions
             ch_ko_db = ch_ko_list
                 .map { [ [id: 'ko_database'], it ] }
-                .combine(ch_ko_profiles)
-            ch_aa
-                .map {[ [ id:"${it[0].id}.${params.orf_caller}" ], it[1] ] }
-                .combine( ch_ko_db  )
-                .set { ch_kofamscan }
-            KOFAMSCAN( ch_kofamscan )
-    }}
+                .combine( ch_ko_profiles)
+        }
+        ch_aa
+            .map {[ [ id:"${it[0].id}.${params.orf_caller}" ], it[1] ] }
+            .set { ch_kofamscan }
+        KOFAMSCAN( ch_kofamscan, ch_ko_db )
+    }
     
-    //if ( ! params.skip_kofamscan ){
-    //    ch_aa
-    //        .map {[ [ id:"${it[0].id}.${params.orf_caller}" ], it[1] ] }
-    //        .set { ch_kofamscan }
-    //    KOFAMSCAN( ch_kofamscan, ch_ko_db )
-    //}
     
     //
     // CAT: Bin Annotation Tool (BAT) are pipelines for the taxonomic classification of long DNA sequences and metagenome assembled genomes (MAGs/bins)

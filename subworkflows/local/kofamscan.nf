@@ -5,7 +5,7 @@
 include { KOFAMSCAN     } from '../../modules/local/eukulele/kofamscan'
 include { DOWNLOAD_KODB } from '../../modules/local/eukulele/download_kofamscan_db'
 
-workflow SUB_EUKULELE {
+workflow SUB_KOFAMSCAN {
 
     take:
         kofamscan // Channel: val(meta), path(fasta), val(database), path(ko_list), path(koprofiles)
@@ -22,13 +22,7 @@ workflow SUB_EUKULELE {
             .set { ch_eukulele }
         EUKULELE( ch_eukulele )
 
-        FORMAT_TAX( EUKULELE.out.taxonomy_estimation.map { [ [id: it[2]], it[1] ] } )
-        SUM_TAXONOMY( FORMAT_TAX.out.tax, collect_fcs )
-
     emit:
         taxonomy_summary    = SUM_TAXONOMY.out.taxonomy_summary
-        taxonomy_estimation = EUKULELE.out.taxonomy_estimation
-        taxonomy_counts     = EUKULELE.out.taxonomy_counts
-        diamond             = EUKULELE.out.diamond
         versions            = EUKULELE.out.versions
 }
