@@ -9,7 +9,7 @@ workflow KOFAMSCAN {
 
     take:
         kofamscan // Channel: val(meta), path(fasta)
-        databases // Channel: val(meta), path(ko_list), path(koprofiles)
+        databases // Channel: path(ko_list), path(koprofiles)
         check_db  // Channel: path(ko_list)
 
     main:
