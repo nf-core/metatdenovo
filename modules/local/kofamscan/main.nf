@@ -1,4 +1,4 @@
-process KOFAMSCAN {
+process KOFAMSCAN_SCAN {
     tag "$meta.id"
     label 'process_medium'
 
