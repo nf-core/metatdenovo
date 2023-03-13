@@ -32,6 +32,7 @@ process KOFAMSCAN {
         $fastaprot \\
         -o kofamscan_output.tsv
 
+    gzip kofamscan_output.tsv
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         kofamscan: \$(echo \$(exec_annotation --version 2>&1) | sed 's/^.*exec_annotation//' )
