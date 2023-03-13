@@ -31,6 +31,6 @@ workflow KOFAMSCAN {
         }
 
     emit:
-        kofam_table_out = EXEC_ANNOTATION.out.kout
+        kofam_table_out = KOFAMSCAN_SCAN.out.kout
         versions        = ch_versions 
 }
