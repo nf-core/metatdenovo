@@ -10,8 +10,8 @@ process KOFAMSCAN_DOWNLOAD {
     input:
 
     output:
-    tuple val(meta), path("profiles/*"), emit: profiles
-    tuple val(meta), path("ko_list/*") , emit: ko_list
+    path("profiles/*"), emit: profiles
+    path("ko_list/*") , emit: ko_list
     path "versions.yml"                , emit: versions
 
     when:
