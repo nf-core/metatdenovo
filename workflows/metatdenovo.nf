@@ -451,7 +451,7 @@ workflow METATDENOVO {
 
 
     if( !params.skip_kofamscan ) {
-        if( !params.ko_db ) {
+        if( !params.kofam_db ) {
             DOWNLOAD_KODB( )
             ch_ko_profiles = DOWNLOAD_KODB.out.profiles
             ch_ko_list     = DOWNLOAD_KODB.out.ko_list

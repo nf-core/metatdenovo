@@ -1,5 +1,5 @@
 process DOWNLOAD_KODB {
-    tag "$meta.id"
+    tag "downlaod_KO_databases"
     label 'process_medium'
 
     conda "bioconda::gnu-wget=1.18"
@@ -19,11 +19,13 @@ process DOWNLOAD_KODB {
 
     script:
     def args = task.ext.args ?: ''
-    def prefix = task.ext.prefix ?: "${meta.id}"
 
     """
-    wget https://www.genome.jp/ftp/db/kofam/ko_list.gz | gunzip
-    wget https://www.genome.jp/ftp/db/kofam/profiles.tar.gz | gunzip | tar -xf -
+    wget https://www.genome.jp/ftp/db/kofam/ko_list.gz 
+    wget https://www.genome.jp/ftp/db/kofam/profiles.tar.gz
+    gunzip ko_list.gz
+    gunzip profiles.tar.gz
+    tar -xf profiles.tar
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
