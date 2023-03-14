@@ -26,7 +26,7 @@ workflow KOFAMSCAN {
             KOFAMSCAN_SCAN( kofamscan, ch_ko_db )
             ch_versions = ch_versions.mix(KOFAMSCAN_SCAN.out.versions)
         } else {
-            KOFAMSCAN_SCAN( kofamscan, databases )
+            KOFAMSCAN_SCAN( kofamscan, ch_ko_list, ch_ko_profiles )
             ch_versions = ch_versions.mix(KOFAMSCAN_SCAN.out.versions)
         }
 
