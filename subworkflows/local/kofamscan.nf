@@ -3,7 +3,7 @@
 //
 
 include { KOFAMSCAN_SCAN      } from '../../modules/local/kofamscan/scan'
-include { DOWNLOAD_KOFMASCAN_DB as DOWNLOAD } from '../../modules/local/kofamscan/download'
+include { KOFMASCAN_DOWNLOAD } from '../../modules/local/kofamscan/download'
 
 workflow KOFAMSCAN {
 
