@@ -12,8 +12,6 @@ process KOFAMSCAN_DOWNLOAD {
     path(koprofiles_dir)
 
     output:
-    path("profiles/*"), emit: profiles
-    path("ko_list/*") , emit: ko_list
     path "versions.yml"                , emit: versions
 
     when:
