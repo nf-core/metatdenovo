@@ -9,8 +9,8 @@ workflow KOFAMSCAN {
 
     take:
         kofamscan // Channel: val(meta), path(fasta)
-        databases // Channel: path(ko_list), path(koprofiles)
-        check_db  // Channel: path(ko_list)
+        path(ko_list_file)
+        path(koprofiles_dir)
 
     main:
         ch_versions = Channel.empty()
