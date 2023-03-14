@@ -25,7 +25,7 @@ process KOFAMSCAN_SCAN {
 
     """
     exec_annotation \\
-        --profile $famscan \\
+        --profile $koprofiles \\
         --ko-list $ko_list \\
         --format detail-tsv \\
         --tmp-dir tmp_kofamscan \\
