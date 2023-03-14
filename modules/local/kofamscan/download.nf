@@ -21,8 +21,8 @@ process KOFAMSCAN_DOWNLOAD {
     def args = task.ext.args ?: ''
 
     """
-    wget https://www.genome.jp/ftp/db/kofam/ko_list.gz
-    wget https://www.genome.jp/ftp/db/kofam/profiles.tar.gz
+    wget -o $ko_list_file https://www.genome.jp/ftp/db/kofam/ko_list.gz
+    wget -P $koprofiles_dir https://www.genome.jp/ftp/db/kofam/profiles.tar.gz
     tar -xfz profiles.tar
 
     cat <<-END_VERSIONS > versions.yml
