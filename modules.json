@@ -15,6 +15,11 @@
                         "git_sha": "c8e35eb2055c099720a75538d1b8adb3fb5a464c",
                         "installed_by": ["modules"]
                     },
+                    "bbmap/bbnorm": {
+                        "branch": "master",
+                        "git_sha": "10b8f5ecf46b4c83040d74f2e1816c7cca0454b4",
+                        "installed_by": ["modules"]
+                    },
                     "bbmap/index": {
                         "branch": "master",
                         "git_sha": "c8e35eb2055c099720a75538d1b8adb3fb5a464c",

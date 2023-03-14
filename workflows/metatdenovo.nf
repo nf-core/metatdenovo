@@ -138,6 +138,7 @@ include { PRODIGAL          } from '../subworkflows/local/prodigal'
 include { BBMAP_BBDUK                                } from '../modules/nf-core/bbmap/bbduk/main'
 include { BBMAP_INDEX                                } from '../modules/nf-core/bbmap/index/main'
 include { BBMAP_ALIGN                                } from '../modules/nf-core/bbmap/align/main'
+include { BBMAP_BBNORM                               } from '../modules/nf-core/bbmap/bbnorm/main'
 include { SEQTK_MERGEPE                              } from '../modules/nf-core/seqtk/mergepe/main'
 include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS_CDS } from '../modules/nf-core/subread/featurecounts/main'
 include { SPADES                                     } from '../modules/nf-core/spades/main'
@@ -268,6 +269,9 @@ workflow METATDENOVO {
     //
     ch_pe_reads_to_assembly = Channel.empty()
     ch_se_reads_to_assembly = Channel.empty()
+    ch_interleaved.collect { meta, fastq -> fastq }.map {[ [id:'all_samples', single_end:true], it ] }.view()
+    //BBMAP_BBNORM(ch_interleaved.collect { meta, fastq -> fastq }.map {[ [id:'all_samples', single_end:true], it ] } )
+
     if ( ! params.assembly ) {
         if ( params.diginorm ) {
             DIGINORM(ch_interleaved.collect { meta, fastq -> fastq }, [], 'all_samples')
