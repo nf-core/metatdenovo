@@ -14,7 +14,7 @@ process KOFAMSCAN_SCAN {
 
     output:
     tuple val(meta), path("kofamscan_output.tsv.gz"), emit: kout
-    path "versions.yml"                          , emit: versions
+    path "versions.yml"                             , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -28,11 +28,11 @@ process KOFAMSCAN_SCAN {
         --profile $koprofiles \\
         --ko-list $ko_list \\
         --format detail-tsv \\
-        --tmp-dir tmp_kofamscan \\
         $fastaprot \\
         -o kofamscan_output.tsv
 
     gzip kofamscan_output.tsv
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         kofamscan: \$(echo \$(exec_annotation --version 2>&1) | sed 's/^.*exec_annotation//' )

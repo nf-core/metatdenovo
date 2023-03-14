@@ -76,19 +76,6 @@ if(params.cat_db){
     ch_cat_db_file = Channel.empty()
 }
 
-if( ! params.skip_kofamscan ) {
-    if ( params.kofam_dir ) {
-        ch_ko_list = Channel.fromPath(sprintf("%s/%s", params.kofam_dir, "NAME_OF_KO_LIST")
-        ch_koprofiles = Channel.fromPath(sprintf("%s/%s", params.kofam_dir, "NAME_OF_KOPROFILES")
-    } else {
-        ch_ko_list = Channel.fromPath(params.ko_list)
-        ch_ko_profiles = Channel.fromPath(params.ko_profiles)
-    }
-    ch_ko_db = ch_ko_list
-        .map { [ [id: 'ko_database'], it ] }
-        .combine(ch_ko_profiles)
-} 
-
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     CONFIG FILES
@@ -455,13 +442,15 @@ workflow METATDENOVO {
     // SUBWORKFLOW: run kofamscan on the ORF-called amino acid sequences
     //
     if( !params.skip_kofamscan ) {
-        File check_db = new File( params.ko_list )
+        //ch_ko_list = Channel.fromPath(sprintf("%s/%s", params.kofam_dir, "ko_list")
+        //ch_koprofiles = Channel.fromPath(sprintf("%s/%s", params.kofam_dir, "profiles")
+        ch_ko_list    = Channel.fromPath(params.ko_list)
+        ch_ko_profiles = Channel.fromPath(params.ko_profiles)
         ch_aa
             .map {[ [ id:"${it[0].id}.${params.orf_caller}" ], it[1] ] }
             .set { ch_kofamscan }
-        KOFAMSCAN( ch_kofamscan, ch_ko_db, check_db )
+        KOFAMSCAN( ch_kofamscan, ch_ko_list, ch_ko_profiles )
         ch_versions = ch_versions.mix(KOFAMSCAN.out.versions)
-
     }
     
     
