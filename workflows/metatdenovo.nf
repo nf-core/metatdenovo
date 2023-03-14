@@ -442,9 +442,7 @@ workflow METATDENOVO {
     // SUBWORKFLOW: run kofamscan on the ORF-called amino acid sequences
     //
     if( !params.skip_kofamscan ) {
-        //ch_ko_list = Channel.fromPath(sprintf("%s/%s", params.kofam_dir, "ko_list")
-        //ch_koprofiles = Channel.fromPath(sprintf("%s/%s", params.kofam_dir, "profiles")
-        ch_ko_list    = Channel.fromPath(params.ko_list)
+        ch_ko_list     = Channel.fromPath(params.ko_list)
         ch_ko_profiles = Channel.fromPath(params.ko_profiles)
         ch_aa
             .map {[ [ id:"${it[0].id}.${params.orf_caller}" ], it[1] ] }

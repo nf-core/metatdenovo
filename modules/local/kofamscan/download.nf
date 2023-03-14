@@ -12,7 +12,9 @@ process KOFAMSCAN_DOWNLOAD {
     path(koprofiles_dir)
 
     output:
-    path "versions.yml"                , emit: versions
+    path("ko_list")    , emit: ko_list
+    path("profiles/*") , emit: ko_profiles
+    path "versions.yml", emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -21,8 +23,10 @@ process KOFAMSCAN_DOWNLOAD {
     def args = task.ext.args ?: ''
 
     """
-    wget -o $ko_list_file https://www.genome.jp/ftp/db/kofam/ko_list.gz
+    wget -O $ko_list_file https://www.genome.jp/ftp/db/kofam/ko_list.gz
     wget -P $koprofiles_dir https://www.genome.jp/ftp/db/kofam/profiles.tar.gz
+    
+    gunzip profiles.tar.gz
     tar -xfz profiles.tar
 
     cat <<-END_VERSIONS > versions.yml
