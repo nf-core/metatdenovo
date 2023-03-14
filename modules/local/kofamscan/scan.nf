@@ -9,9 +9,8 @@ process KOFAMSCAN_SCAN {
 
     input:
     tuple val(meta), path(fastaprot)
-    val(kodb)
     path(ko_list)
-    path(famscan)
+    path(koprofiles)
 
     output:
     tuple val(meta), path("kofamscan_output.tsv.gz"), emit: kout
