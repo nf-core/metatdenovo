@@ -1,6 +1,6 @@
 process KOFAMSCAN_DOWNLOAD {
     tag "KEGG data"
-    label 'process_medium'
+    label 'process_long'
 
     conda "bioconda::gnu-wget=1.18"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
