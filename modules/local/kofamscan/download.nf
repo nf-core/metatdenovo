@@ -8,6 +8,8 @@ process KOFAMSCAN_DOWNLOAD {
         'quay.io/biocontainers/gnu-wget:1.18--hed695b0_4' }"
 
     input:
+    path(ko_list_file)
+    path(koprofiles_dir)
 
     output:
     path("profiles/*"), emit: profiles
