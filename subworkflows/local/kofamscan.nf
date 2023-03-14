@@ -18,8 +18,6 @@ workflow KOFAMSCAN {
         // We're assuming that if the ko_list_file exists, the koprofiles directory is also downloaded.
         if ( ! ko_list_file.exists() || ! koprofiles.HMMFILE.exists ) {
             DOWNLOAD ( )
-            ch_ko_profiles = DOWNLOAD.out.profiles
-            ch_ko_list     = DOWNLOAD.out.ko_list
             ch_versions    = ch_versions.mix(DOWNLOAD.out.versions)
             ch_ko_db = ch_ko_list
                 .map { [ [id: 'ko_database'], it ] }
