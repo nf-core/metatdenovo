@@ -126,6 +126,11 @@
                     "type": "boolean",
                     "description": "Skip FastQC."
                 },
+                "bbnorm": {
+                    "type": "boolean",
+                    "description": "Perform normalization to reduce sequencing depth.",
+                    "help_text": "Normalization is performed following the example in https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbnorm-guide/"
+                },
                 "diginorm": {
                     "type": "boolean",
                     "description": "Perform digital normalization to reduce sequencing depth.",

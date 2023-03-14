@@ -269,8 +269,6 @@ workflow METATDENOVO {
     //
     ch_pe_reads_to_assembly = Channel.empty()
     ch_se_reads_to_assembly = Channel.empty()
-    ch_interleaved.collect { meta, fastq -> fastq }.map {[ [id:'all_samples', single_end:true], it ] }.view()
-    //BBMAP_BBNORM(ch_interleaved.collect { meta, fastq -> fastq }.map {[ [id:'all_samples', single_end:true], it ] } )
 
     if ( ! params.assembly ) {
         if ( params.diginorm ) {
@@ -278,6 +276,10 @@ workflow METATDENOVO {
             ch_versions = ch_versions.mix(DIGINORM.out.versions)
             ch_pe_reads_to_assembly = DIGINORM.out.pairs
             ch_se_reads_to_assembly = DIGINORM.out.singles
+        } else if ( params.bbnorm) {
+                BBMAP_BBNORM(ch_interleaved.collect { meta, fastq -> fastq }.map {[ [id:'all_samples', single_end:true], it ] } )
+                ch_pe_reads_to_assembly = BBMAP_BBNORM.out.fastq.map { it[1] }
+                ch_se_reads_to_assembly = Channel.empty()
         } else {
             ch_pe_reads_to_assembly = ch_interleaved.map { meta, fastq -> fastq }
             ch_se_reads_to_assembly = Channel.empty()
