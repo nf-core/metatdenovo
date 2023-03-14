@@ -77,8 +77,13 @@ if(params.cat_db){
 }
 
 if( ! params.skip_kofamscan ) {
-    ch_ko_list = Channel.fromPath(params.ko_list)
-    ch_ko_profiles = Channel.fromPath(params.ko_profiles)
+    if ( params.kofam_dir ) {
+        ch_ko_list = Channel.fromPath(sprintf("%s/%s", params.kofam_dir, "NAME_OF_KO_LIST")
+        ch_koprofiles = Channel.fromPath(sprintf("%s/%s", params.kofam_dir, "NAME_OF_KOPROFILES")
+    } else {
+        ch_ko_list = Channel.fromPath(params.ko_list)
+        ch_ko_profiles = Channel.fromPath(params.ko_profiles)
+    }
     ch_ko_db = ch_ko_list
         .map { [ [id: 'ko_database'], it ] }
         .combine(ch_ko_profiles)
