@@ -212,14 +212,19 @@
                     "type": "boolean",
                     "description": "skip kofamscan run"
                 },
+                "kofam_dir": {
+                    "type": "string",
+                    "default": "./kofam",
+                    "description": "Path to a directory with KOfam files. Default directory for `--ko_list` and `--ko_profiles`. Will be created if it doesn't exist."
+                },
                 "ko_list": {
                     "type": "string",
-                    "default": null,
+                    "default": "None",
                     "description": "path to a file with a full list of KO terms. This database can be downloaded at https://www.genome.jp/ftp/db/kofam/ko_list.gz"
                 },
                 "ko_profiles": {
                     "type": "string",
-                    "default": null,
+                    "default": "None",
                     "description": "path to a folder that contains hmm profiles. The database can be downloaded at https://www.genome.jp/ftp/db/kofam/profiles.tar.gz"
                 }
             }
@@ -430,5 +435,6 @@
         {
             "$ref": "#/definitions/generic_options"
         }
-    ]
+    ],
+    "properties": {}
 }
