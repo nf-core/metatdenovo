@@ -126,6 +126,21 @@
                     "type": "boolean",
                     "description": "Skip FastQC."
                 },
+                "bbnorm": {
+                    "type": "boolean",
+                    "description": "Perform normalization to reduce sequencing depth.",
+                    "help_text": "Normalization is performed following the example in https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbnorm-guide/"
+                },
+                "bbnorm_target": {
+                    "type": "integer",
+                    "default": 100,
+                    "description": "produce an output file of reads with an average depth of nx. "
+                },
+                "bbnorm_min": {
+                    "type": "integer",
+                    "default": 5,
+                    "description": "Reads with an apparent depth of under nx will be presumed to be errors and discarded"
+                },
                 "diginorm": {
                     "type": "boolean",
                     "description": "Perform digital normalization to reduce sequencing depth.",
