@@ -9,17 +9,15 @@ workflow KOFAMSCAN {
 
     take:
         kofamscan // Channel: val(meta), path(fasta)
-        ko_list_file
-        koprofiles_dir
+        kofam_dir
 
     main:
         ch_versions = Channel.empty()
         
-        KOFAMSCAN_DOWNLOAD ( ko_list_file, koprofiles_dir )
-        ch_versions    = ch_versions.mix(KOFAMSCAN_DOWNLOAD.out.versions)
+        KOFAMSCAN_DOWNLOAD ( kofam_dir )
 
-        KOFAMSCAN_SCAN( kofamscan, KOFAMSCAN_DOWNLOAD.out.ko_list, KOFAMSCAN_DOWNLOAD.out.ko_profiles)
-        ch_versions    = ch_versions.mix(KOFAMSCAN_SCAN.out.versions)
+        KOFAMSCAN_SCAN( kofamscan, KOFAMSCAN_DOWNLOAD.out.ko_list, KOFAMSCAN_DOWNLOAD.out.koprofiles )
+        ch_versions = ch_versions.mix(KOFAMSCAN_SCAN.out.versions)
 
     emit:
         kofam_table_out = KOFAMSCAN_SCAN.out.kout

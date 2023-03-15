@@ -8,13 +8,12 @@ process KOFAMSCAN_DOWNLOAD {
         'quay.io/biocontainers/gnu-wget:1.18--hed695b0_4' }"
 
     input:
-    path(ko_list_file)
-    path(koprofiles_dir)
+    path kofam_dir
 
     output:
-    path("ko_list")    , emit: ko_list
-    path("profiles/*") , emit: ko_profiles
-    path "versions.yml", emit: versions
+    path "${kofam_dir}/ko_list" , emit: ko_list
+    path "${kofam_dir}/profiles", emit: koprofiles
+    path "versions.yml"         , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -23,15 +22,19 @@ process KOFAMSCAN_DOWNLOAD {
     def args = task.ext.args ?: ''
 
     """
-    wget -O $ko_list_file https://www.genome.jp/ftp/db/kofam/ko_list.gz
-    wget -P $koprofiles_dir https://www.genome.jp/ftp/db/kofam/profiles.tar.gz
-    
-    gunzip profiles.tar.gz
-    tar -xfz profiles.tar
+    if [ ! -e ${kofam_dir}/ko_list ]; then
+        wget https://www.genome.jp/ftp/db/kofam/ko_list.gz
+        gunzip -c ko_list.gz > ${kofam_dir}/ko_list
+    fi
+
+    if [ ! -e ${kofam_dir}/koprofiles ]; then
+        wget -P ${kofam_dir} -c https://www.genome.jp/ftp/db/kofam/profiles.tar.gz
+        gunzip -c kofam/profiles.tar.gz | tar vxf - -C kofam/
+    fi
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        wget: 1.18
+        wget: \$(wget --version | grep 'GNU Wget' | sed 's/GNU Wget \\([0-9.]\\+\\) .*/\\1/')
     END_VERSIONS
     """
 }
