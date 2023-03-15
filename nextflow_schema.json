@@ -136,7 +136,7 @@
                     "default": 100,
                     "description": "produce an output file of reads with an average depth of nx. "
                 },
-                "min": {
+                "bbnorm_min": {
                     "type": "integer",
                     "default": 5,
                     "description": "Reads with an apparent depth of under nx will be presumed to be errors and discarded"
