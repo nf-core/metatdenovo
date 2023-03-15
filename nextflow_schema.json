@@ -131,7 +131,7 @@
                     "description": "Perform normalization to reduce sequencing depth.",
                     "help_text": "Normalization is performed following the example in https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbnorm-guide/"
                 },
-                "target": {
+                "bbnorm_target": {
                     "type": "integer",
                     "default": 100,
                     "description": "produce an output file of reads with an average depth of nx. "
