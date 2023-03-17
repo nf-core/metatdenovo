@@ -442,15 +442,6 @@ workflow METATDENOVO {
     // SUBWORKFLOW: run kofamscan on the ORF-called amino acid sequences
     //
     if( !params.skip_kofamscan ) {
-            /**
-        //if ( params.ko_list && params.ko_profiles ) {
-            ch_ko_list     = Channel.fromPath(params.ko_list)
-            ch_ko_profiles = Channel.fromPath(params.ko_profiles)
-        } else if ( params.kofam_dir ) {
-            ch_ko_list     = Channel.fromPath("${params.kofam_dir}/ko_list")
-            ch_koprofiles  = Channel.fromPath("${params.kofam_dir}/koprofiles")
-        }
-        **/
         File kofam_dir = new File(params.kofam_dir)
         if ( ! kofam_dir.exists() ) { kofam_dir.mkdir() }
         ch_aa
