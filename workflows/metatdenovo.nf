@@ -76,7 +76,6 @@ if(params.cat_db){
     ch_cat_db_file = Channel.empty()
 }
 
-
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     CONFIG FILES
@@ -97,17 +96,17 @@ ch_multiqc_custom_methods_description = params.multiqc_methods_description ? fil
 //
 // MODULE: local
 //
-include { WRITESPADESYAML                  } from '../modules/local/writespadesyaml.nf'
-include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved.nf'
-include { COLLECT_FEATURECOUNTS            } from '../modules/local/collect_featurecounts.nf'
-include { COLLECT_STATS                    } from '../modules/local/collect_stats.nf'
+include { WRITESPADESYAML                  } from '../modules/local/writespadesyaml'
+include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved'
+include { COLLECT_FEATURECOUNTS            } from '../modules/local/collect_featurecounts'
+include { COLLECT_STATS                    } from '../modules/local/collect_stats'
 include { CAT_DB                           } from '../modules/local/cat/cat_db'
 include { CAT_DB_GENERATE                  } from '../modules/local/cat/cat_db_generate'
 include { CAT_CONTIGS                      } from '../modules/local/cat/cat_contigs'
 include { CAT_SUMMARY                      } from "../modules/local/cat/cat_summary"
-include { FORMATSPADES                     } from '../modules/local/formatspades.nf'
-include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz.nf'
-include { MERGE_TABLES                     } from '../modules/local/merge_summary_tables.nf'
+include { FORMATSPADES                     } from '../modules/local/formatspades'
+include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz'
+include { MERGE_TABLES                     } from '../modules/local/merge_summary_tables'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -125,6 +124,7 @@ include { TRANSDECODER      } from '../subworkflows/local/transdecoder'
 include { DIGINORM          } from '../subworkflows/local/diginorm'
 include { FASTQC_TRIMGALORE } from '../subworkflows/local/fastqc_trimgalore'
 include { PRODIGAL          } from '../subworkflows/local/prodigal'
+include { KOFAMSCAN         } from '../subworkflows/local/kofamscan'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -443,6 +443,21 @@ workflow METATDENOVO {
             .set { ch_merge_tables }
     }
 
+
+    //
+    // SUBWORKFLOW: run kofamscan on the ORF-called amino acid sequences
+    //
+    if( !params.skip_kofamscan ) {
+        File kofam_dir = new File(params.kofam_dir)
+        if ( ! kofam_dir.exists() ) { kofam_dir.mkdir() }
+        ch_aa
+            .map {[ [ id:"${it[0].id}.${params.orf_caller}" ], it[1] ] }
+            .set { ch_kofamscan }
+        KOFAMSCAN( ch_kofamscan, Channel.fromPath(params.kofam_dir))
+        //ch_versions = ch_versions.mix(KOFAMSCAN.out.versions)
+    }
+    
+    
     //
     // CAT: Bin Annotation Tool (BAT) are pipelines for the taxonomic classification of long DNA sequences and metagenome assembled genomes (MAGs/bins)
     //
