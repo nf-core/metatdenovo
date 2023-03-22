@@ -55,6 +55,7 @@ if ( params.hmmdir ) {
         .set { ch_hmmrs }
 }
 
+// Create a channel for EUKulele either with a named database or not. The latter means a user-provided database in a directory.
 ch_eukulele_db = Channel.empty()
 if ( !params.skip_eukulele ) {
     if ( params.eukulele_db ) {
@@ -69,6 +70,7 @@ if ( !params.skip_eukulele ) {
     }
 }
 
+// Create a channel for CAT that contains the path for the database
 if(params.cat_db){
     ch_cat_db_file = Channel
         .value(file( "${params.cat_db}" ))
@@ -200,17 +202,6 @@ workflow METATDENOVO {
 
     ch_versions = ch_versions.mix(CAT_FASTQ.out.versions.first().ifEmpty(null))
 
-    // Branch FastQ channels if 'auto' specified to infer strandedness
-    // DL & DDL: We're not using this channel -- delete or deal with the channel?
-    ch_cat_fastq
-        .branch {
-            meta, fastq ->
-                auto_strand : meta.strandedness == 'auto'
-                    return [ meta, fastq ]
-                known_strand: meta.strandedness != 'auto'
-                    return [ meta, fastq ]
-        }
-        .set { ch_strand_fastq }
     //
     // SUBWORKFLOW: Read QC and trim adapters
     //
