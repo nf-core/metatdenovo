@@ -27,7 +27,7 @@ process KOFAMSCAN_DOWNLOAD {
         gunzip -c ko_list.gz > ${kofam_dir}/ko_list
     fi
 
-    if [ ! -e ${kofam_dir}/koprofiles ]; then
+    if [ ! -e ${kofam_dir}/profiles ]; then
         wget -P ${kofam_dir} -c https://www.genome.jp/ftp/db/kofam/profiles.tar.gz
         gunzip -c kofam/profiles.tar.gz | tar vxf - -C kofam/
     fi
