@@ -66,7 +66,7 @@ There are two to run the digital normalization:
 
 - bbnorm (`--bbnorm`)
 
-you can run only one option per assembly. 
+you can run only one option per assembly.
 
 > Please, check the [khmer](https://khmer-protocols.readthedocs.io/en/v0.8.4/) and the [bbnorm](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbnorm-guide/) documentation for further information about these programs and how digital normalization works. Remember to check [Parameters](https://nf-co.re/metatdenovo/parameters) page for the full option that can be used for this step
 
