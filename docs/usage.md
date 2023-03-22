@@ -50,6 +50,26 @@ TREATMENT_REP3,AEG588A6_S6_L004_R1_001.fastq.gz,
 
 An [example samplesheet](../assets/samplesheet.csv) has been provided with the pipeline.
 
+## Filter/remove sequences from the samples (e.g. rRNA sequences with SILVA database)
+
+Metatdenovo can remove reads from the samples that matches specific sequences. By using BBMAP_BBduk module, it is possible to provide those sequences in fasta format.
+To add this function to the pipeline, just add the parameter `--sequence_filter sequence.fasta` to the command line or the `params.yml`file.
+You can check functionality and documentation of BBduk on the official [website](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbduk-guide/)
+
+## Digital normalization
+
+Metatdenovo can perform a digital normalization on the reads BEFORE the assembly. A digital normalization is useful for the assembly process because can reduce
+the number of over-rapresented sequences. N.B. the digital normalizatio is done only for the assembly while during the mapping process the reads will not be normalized.
+There are two to run the digital normalization:
+
+- Khmer_based approach (`--diginorm`)
+
+- bbnorm (`--bbnorm`)
+
+you can run only one option per assembly. 
+
+> Please, check the [khmer](https://khmer-protocols.readthedocs.io/en/v0.8.4/) and the [bbnorm](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbnorm-guide/) documentation for further information about these programs and how digital normalization works. Remember to check [Parameters](https://nf-co.re/metatdenovo/parameters) page for the full option that can be used for this step
+
 ## Assembler options
 
 By default, the pipeline uses Megahit (i.e. `--assembler megahit`) to assemble the cleaned and trimmed FastQ reads to create the reference genome.
@@ -102,14 +122,14 @@ By default, the metatdenovo pipeline will perform a functional annotation with t
 
 These options are:
 
-- [Eggnog](https://github.com/eggnogdb/eggnog-mapper/wiki) (`--eggnog`)
+- [Eggnog](https://github.com/eggnogdb/eggnog-mapper/wiki) (`--eggnog_dbpath`)
 
 - [hmmsearch](http://eddylab.org/software/hmmer/Userguide.pdf) (`--hmmdir` or `--hmmfiles`)
 
-- [Rundbcan3](https://github.com/linnabrown/run_dbcan) (`--run_dbcan`)
+- [kofamscan](https://github.com/takaram/kofam_scan) (`--kofam_dir`)
 
 All the options can run in the same time (e.g. `nextflow run main.nf -profile test,docker --eggnog --hmmdir hmms/ --rundbcan`) but each program has its own options that you will need to read carefully before running the pipeline.
-You can find the different options in [parameters]() page and read about the programs from their own website.
+You can find the different options in [parameters](https://nf-co.re/metatdenovo/parameters) page and read about the programs from their own website.
 
 If you don't want run eggNOG-mapper, you will need to add the flag `--skip_eggnog`, otherwise metatdenovo will run the program automatically.
 
