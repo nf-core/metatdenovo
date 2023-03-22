@@ -256,7 +256,7 @@ workflow METATDENOVO {
     }
 
     //
-    // SUBWORKFLOW: Perform digital normalization
+    // SUBWORKFLOW: Perform digital normalization. There are two options: diginrom or BBnorm. The latter is faster.
     //
     ch_pe_reads_to_assembly = Channel.empty()
     ch_se_reads_to_assembly = Channel.empty()
