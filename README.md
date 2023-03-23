@@ -24,22 +24,29 @@ On release, automated continuous integration tests run the pipeline on a full-si
 
 1. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
 2. Present QC for raw reads ([`MultiQC`](http://multiqc.info/))
-3. Quality trimming and adapters removal for raw reads ( [`Trimm Galore!`](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/))
-4. Merge trimmed, pair-end reads ( [`Seqtk`](https://github.com/lh3/seqtk))
-5. Choice of de novo assembly:
+3. Quality trimming and adapters removal for raw reads [`Trimm Galore!`](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/)
+4. Filter sequences with [`BBduk`](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbduk-guide/)
+5. Normalize the sequences with KHMER or [`BBnorm`](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbnorm-guide/)
+6. Merge trimmed, pair-end reads ( [`Seqtk`](https://github.com/lh3/seqtk))
+7. Choice of de novo assembly:
    1. [`RNAspade`](https://cab.spbu.ru/software/rnaspades/) suggested for Eukaryotes de novo assembly
    2. [`Megahit`](https://github.com/voutcn/megahit) suggested for Prokaryotes de novo assembly
-6. Choice of orf caller:
+8. Choice of orf caller:
    1. [`TransDecoder`](https://github.com/TransDecoder/TransDecoder) suggested for Eukaryotes
    2. [`Prokka`](https://github.com/tseemann/prokka) suggested for Prokaryotes
    3. [`Prodigal`](https://github.com/hyattpd/Prodigal) suggested for Prokaryotes
-7. Quantification of genes identified in assemblies:
+9. Quantification of genes identified in assemblies:
    1. generate index of assembly [`BBmap index`](https://sourceforge.net/projects/bbmap/)
    2. Mapping cleaned reads to the assembly for quantification [`BBmap`](https://sourceforge.net/projects/bbmap/)
    3. Get raw counts per each gene present in the assembly [`Featurecounts`](http://subread.sourceforge.net) -> TSV table with collected featurecounts output
-8. Taxonomical annotation:
+10. Functional annotation:
+   1. [`Eggnog`](https://github.com/eggnogdb/eggnog-mapper) -> Reformat TSV output "eggnog table"
+   2. [`KOfamscan`](https://github.com/takaram/kofam_scan)
+   3. [`HMMERsearch`](https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch) -> Ranking orfs based on HMMprofile with [`Hmmrank`](https://github.com/erikrikarddaniel/hmmrank)
+11. Taxonomical annotation:
    1. [`EUKulele`](https://github.com/AlexanderLabWHOI/EUKulele) -> Reformat TSV output "Reformat_tax.R"
-9. Choice of functional annotation: 1. [`Eggnog-mapper`](http://eggnog-mapper.embl.de) 2. [`Run-DBcan`](https://github.com/linnabrown/run_dbcan) 3. [`Hmmsearch`](https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch). Besides searching the ORFs, each ORF's hits will be ranked.
+   2. [`CAT`](https://github.com/dutilh/CAT)
+12. Choice of functional annotation: 1. [`Eggnog-mapper`](http://eggnog-mapper.embl.de) 2. [`Run-DBcan`](https://github.com/linnabrown/run_dbcan) 3. [`Hmmsearch`](https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch). Besides searching the ORFs, each ORF's hits will be ranked.
    10 Summary statistics table. Collect_stats.R
 
 ## Quick Start
@@ -75,10 +82,7 @@ The nf-core/metatdenovo pipeline comes with documentation about the pipeline [us
 
 ## Credits
 
-nf-core/metatdenovo was originally written by Danilo Di Leo, Emelie Nilsson & Daniel Lundin.
-
-We thank the following people for their extensive assistance in the development of this pipeline:
-Emelie Nilsson ([`emnilsson`](https://github.com/emnilsson)) and Danilo Di Leo ([`Danilo2771`](https://github.com/Danilo2771))
+nf-core/metatdenovo was originally written by Danilo Di Leo (@danilodileo), Emelie Nilsson (@emnilsson) & Daniel Lundin (@erikrikarddaniel).
 
 <!-- TODO nf-core: If applicable, make list of people who have also contributed -->
 
