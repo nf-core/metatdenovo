@@ -28,7 +28,7 @@ On release, automated continuous integration tests run the pipeline on a full-si
 4. Filter sequences with [`BBduk`](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbduk-guide/)
 5. Normalize the sequences with [khmer](https://khmer-protocols.readthedocs.io/en/latest/mrnaseq/2-diginorm.html) or [`BBnorm`](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbnorm-guide/)
 6. Merge trimmed, pair-end reads ( [`Seqtk`](https://github.com/lh3/seqtk))
-7. Choice of de novo assembly:
+7. Choice of de novo assembly programs:
    1. [`RNAspade`](https://cab.spbu.ru/software/rnaspades/) suggested for Eukaryotes de novo assembly
    2. [`Megahit`](https://github.com/voutcn/megahit) suggested for Prokaryotes de novo assembly
 8. Choice of orf caller:
