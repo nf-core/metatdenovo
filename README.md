@@ -40,9 +40,9 @@ On release, automated continuous integration tests run the pipeline on a full-si
    2. Mapping cleaned reads to the assembly for quantification [`BBmap`](https://sourceforge.net/projects/bbmap/)
    3. Get raw counts per each gene present in the assembly [`Featurecounts`](http://subread.sourceforge.net) -> TSV table with collected featurecounts output
 10. Functional annotation:
-11. [`Eggnog`](https://github.com/eggnogdb/eggnog-mapper) -> Reformat TSV output "eggnog table"
-12. [`KOfamscan`](https://github.com/takaram/kofam_scan)
-13. [`HMMERsearch`](https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch) -> Ranking orfs based on HMMprofile with [`Hmmrank`](https://github.com/erikrikarddaniel/hmmrank)
+    1. [`Eggnog`](https://github.com/eggnogdb/eggnog-mapper) -> Reformat TSV output "eggnog table"
+    2. [`KOfamscan`](https://github.com/takaram/kofam_scan)
+    3. [`HMMERsearch`](https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch) -> Ranking orfs based on HMMprofile with [`Hmmrank`](https://github.com/erikrikarddaniel/hmmrank)
 14. Taxonomical annotation:
 15. [`EUKulele`](https://github.com/AlexanderLabWHOI/EUKulele) -> Reformat TSV output "Reformat_tax.R"
 16. [`CAT`](https://github.com/dutilh/CAT)
