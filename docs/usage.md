@@ -130,7 +130,8 @@ These options are:
 - [kofamscan](https://github.com/takaram/kofam_scan) (`--kofam_dir`)
 
 All the options can run in the same time (e.g. `nextflow run main.nf -profile test,docker --eggnog --hmmdir hmms/ --rundbcan`) but each program has its own options that you will need to read carefully before running the pipeline.
-You can find the different options in [parameters](https://nf-co.re/metatdenovo/parameters) page and read about the programs from their own website.
+You can find more information about the different options in the [parameters page](https://nf-co.re/metatdenovo/parameters).
+For details about individual programs used, see their respective home pages.
 
 If you don't want run eggNOG-mapper, you will need to add the flag `--skip_eggnog`, otherwise metatdenovo will run the program automatically.
 
