@@ -52,9 +52,9 @@ An [example samplesheet](../assets/samplesheet.csv) has been provided with the p
 
 ## Filter/remove sequences from the samples (e.g. rRNA sequences with SILVA database)
 
-Metatdenovo can remove reads from the samples that matches specific sequences. By using BBMAP_BBduk module, it is possible to provide those sequences in fasta format.
-To add this function to the pipeline, just add the parameter `--sequence_filter sequence.fasta` to the command line or the `params.yml`file.
-You can check functionality and documentation of BBduk on the official [website](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbduk-guide/)
+The pipeline can remove potential contaminants using the BBduk program.
+Specify a fasta file, gzipped or not, with the --sequence_filter sequences.fasta parameter.
+For further documentation, see the [BBduk official website](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbduk-guide/).
 
 ## Digital normalization
 
