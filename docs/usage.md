@@ -58,9 +58,10 @@ For further documentation, see the [BBduk official website](https://jgi.doe.gov/
 
 ## Digital normalization
 
-Metatdenovo can perform a digital normalization on the reads BEFORE the assembly. A digital normalization is useful for the assembly process because can reduce
-the number of over-rapresented sequences. N.B. the digital normalizatio is done only for the assembly while during the mapping process the reads will not be normalized.
-There are two to run the digital normalization:
+Metatdenovo can perform "digital normalization" on the reads BEFORE the assembly.
+This will reduce coverage of highly abundant sequences and remove sequences that are below a threshold, and can be useful if the data set is too large to assemble but also potentially improve an assembly.
+N.B. the digital normalization is done only for the assembly and the non-normalized sequences will be used for quantification.
+There are two options for digital normalization in the pipeline:
 
 - Khmer_based approach (`--diginorm`)
 
