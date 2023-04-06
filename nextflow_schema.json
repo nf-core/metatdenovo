@@ -61,8 +61,8 @@
                 }
             }
         },
-        "trimming_option": {
-            "title": "trimming option",
+        "trimming_options": {
+            "title": "trimming options",
             "type": "object",
             "fa_icon": "fas fa-cut",
             "properties": {
@@ -107,8 +107,8 @@
             },
             "description": "all the trim option are listed below"
         },
-        "hmmer_search_option": {
-            "title": "HMMER search option",
+        "hmmer_search_options": {
+            "title": "HMMER search options",
             "type": "object",
             "description": "Options for HMMER search",
             "default": "",
@@ -136,8 +136,8 @@
                 }
             }
         },
-        "bbduk_option": {
-            "title": "BBDUK option",
+        "bbduk_options": {
+            "title": "BBDUK options",
             "type": "object",
             "description": "",
             "default": "",
@@ -151,8 +151,8 @@
             },
             "fa_icon": "fas fa-filter"
         },
-        "digital_normalization_option": {
-            "title": "Digital normalization option",
+        "digital_normalization_options": {
+            "title": "Digital normalization options",
             "type": "object",
             "description": "Use these option if you need to normalize the reads before the assembly",
             "default": "",
@@ -197,8 +197,8 @@
                 }
             }
         },
-        "assembler_option": {
-            "title": "Assembler option",
+        "assembler_options": {
+            "title": "Assembler options",
             "type": "object",
             "description": "",
             "default": "",
@@ -527,19 +527,19 @@
             "$ref": "#/definitions/quality_control_options"
         },
         {
-            "$ref": "#/definitions/trimming_option"
+            "$ref": "#/definitions/trimming_options"
         },
         {
-            "$ref": "#/definitions/hmmer_search_option"
+            "$ref": "#/definitions/hmmer_search_options"
         },
         {
-            "$ref": "#/definitions/bbduk_option"
+            "$ref": "#/definitions/bbduk_options"
         },
         {
-            "$ref": "#/definitions/digital_normalization_option"
+            "$ref": "#/definitions/digital_normalization_options"
         },
         {
-            "$ref": "#/definitions/assembler_option"
+            "$ref": "#/definitions/assembler_options"
         },
         {
             "$ref": "#/definitions/orf_caller_options"
