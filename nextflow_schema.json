@@ -253,6 +253,12 @@
                     "format": "file-path",
                     "mimetype": "text/plain",
                     "fa_icon": "far fa-file-code"
+                },
+                "hmmpattern": {
+                    "type": "string",
+                    "default": "*.hmm",
+                    "description": "specify which pattern hmm files end with",
+                    "fa_icon": "fas fa-barcode"
                 }
             },
             "fa_icon": "fas fa-clipboard"
@@ -542,13 +548,5 @@
         {
             "$ref": "#/definitions/generic_options"
         }
-    ],
-    "properties": {
-        "hmmpattern": {
-            "type": "string",
-            "default": "*.hmm",
-            "description": "specify which pattern hmm files end with",
-            "fa_icon": "fas fa-barcode"
-        }
-    }
+    ]
 }
