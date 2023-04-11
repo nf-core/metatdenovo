@@ -108,6 +108,7 @@ include { CAT_CONTIGS                      } from '../modules/local/cat/cat_cont
 include { CAT_SUMMARY                      } from "../modules/local/cat/cat_summary"
 include { FORMATSPADES                     } from '../modules/local/formatspades'
 include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz'
+include { UNPIGZ as UNPIGZ_GFF             } from '../modules/local/unpigz'
 include { MERGE_TABLES                     } from '../modules/local/merge_summary_tables'
 
 //
@@ -338,7 +339,7 @@ workflow METATDENOVO {
     // MODULE: Run PRODIGAL on assembly output.
     //
     if ( params.orf_caller == ORF_CALLER_PRODIGAL ) {
-        PRODIGAL( ch_assembly_contigs )
+        PRODIGAL( ch_assembly_contigs.map { [ [id: 'prodigal.megahit' ], it[1] ] } )
         ch_gff          = PRODIGAL.out.gff
         ch_aa           = PRODIGAL.out.faa
         ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
@@ -379,11 +380,13 @@ workflow METATDENOVO {
     //
     // MODULE: FeatureCounts. Create a table for each samples that provides raw counts as result of the alignment.
     //
+    UNPIGZ_GFF(ch_gff)
+
     BAM_SORT_STATS_SAMTOOLS ( BBMAP_ALIGN.out.bam, ch_assembly_contigs.map { it[1] } )
     ch_versions = ch_versions.mix(BAM_SORT_STATS_SAMTOOLS.out.versions)
 
     BAM_SORT_STATS_SAMTOOLS.out.bam
-        .combine(ch_gff.map { it[1] })
+        .combine(UNPIGZ_GFF.out.unzipped.map { it[1] } )
         .set { ch_featurecounts }
 
     ch_collect_stats
