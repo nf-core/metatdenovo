@@ -107,37 +107,8 @@
             },
             "description": "all the trim option are listed below"
         },
-        "hmmer_search_options": {
-            "title": "HMMER search options",
-            "type": "object",
-            "description": "Options for HMMER search",
-            "default": "",
-            "properties": {
-                "hmmdir": {
-                    "type": "string",
-                    "description": "Directory with hmm files which will be searched for among ORFs",
-                    "pattern": "^\\S+",
-                    "format": "directory-path",
-                    "fa_icon": "fas fa-folder-open"
-                },
-                "hmmpattern": {
-                    "type": "string",
-                    "default": "*.hmm",
-                    "description": "specify which pattern hmm files end with",
-                    "fa_icon": "fas fa-barcode"
-                },
-                "hmmfiles": {
-                    "type": "string",
-                    "description": "Comma-separated list of hmm files which will be searched for among ORFs",
-                    "pattern": "\\S+hmm(\\.gz)?",
-                    "format": "file-path",
-                    "mimetype": "text/plain",
-                    "fa_icon": "far fa-file-code"
-                }
-            }
-        },
         "bbduk_options": {
-            "title": "BBDUK options",
+            "title": "BBDuk contamination removal options",
             "type": "object",
             "description": "",
             "default": "",
@@ -267,6 +238,27 @@
                     "description": "Path to a directory with KOfam files. Will be created if it doesn't exist.",
                     "help_text": "If a `ko_list` file and/or `profiles` does not exist, they will be downloaded.",
                     "fa_icon": "fas fa-folder-open"
+                },
+                "hmmdir": {
+                    "type": "string",
+                    "description": "Directory with hmm files which will be searched for among ORFs",
+                    "pattern": "^\\S+",
+                    "format": "directory-path",
+                    "fa_icon": "fas fa-folder-open"
+                },
+                "hmmfiles": {
+                    "type": "string",
+                    "description": "Comma-separated list of hmm files which will be searched for among ORFs",
+                    "pattern": "\\S+hmm(\\.gz)?",
+                    "format": "file-path",
+                    "mimetype": "text/plain",
+                    "fa_icon": "far fa-file-code"
+                },
+                "hmmpattern": {
+                    "type": "string",
+                    "default": "*.hmm",
+                    "description": "specify which pattern hmm files end with",
+                    "fa_icon": "fas fa-barcode"
                 }
             },
             "fa_icon": "fas fa-clipboard"
@@ -528,9 +520,6 @@
         },
         {
             "$ref": "#/definitions/trimming_options"
-        },
-        {
-            "$ref": "#/definitions/hmmer_search_options"
         },
         {
             "$ref": "#/definitions/bbduk_options"
