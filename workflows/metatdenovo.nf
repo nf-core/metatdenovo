@@ -329,8 +329,9 @@ workflow METATDENOVO {
     //
     if ( params.orf_caller == ORF_CALLER_PROKKA ) {
         PROKKA_SUBSETS(ch_assembly_contigs)
+        UNPIGZ_GFF(PROKKA_SUBSETS.out.gff.map { [ [id: "${params.orf_caller}.${it[0].id}"], it[1] ] })
         ch_versions      = ch_versions.mix(PROKKA_SUBSETS.out.versions)
-        ch_gff           = PROKKA_SUBSETS.out.gff
+        ch_gff           = UNPIGZ_GFF.out.unzipped
         ch_aa            = PROKKA_SUBSETS.out.faa
         ch_multiqc_files = ch_multiqc_files.mix(PROKKA_SUBSETS.out.prokka_log.collect{it[1]}.ifEmpty([]))
     }
@@ -340,7 +341,8 @@ workflow METATDENOVO {
     //
     if ( params.orf_caller == ORF_CALLER_PRODIGAL ) {
         PRODIGAL( ch_assembly_contigs.map { [ [id: 'prodigal.megahit' ], it[1] ] } )
-        ch_gff          = PRODIGAL.out.gff
+        UNPIGZ_GFF(PRODIGAL.out.gff.map { [ [id: "${params.orf_caller}.${it[0].id}"], it[1] ] })
+        ch_gff          = UNPIGZ_GFF.out.unzipped
         ch_aa           = PRODIGAL.out.faa
         ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
     }
@@ -380,13 +382,13 @@ workflow METATDENOVO {
     //
     // MODULE: FeatureCounts. Create a table for each samples that provides raw counts as result of the alignment.
     //
-    UNPIGZ_GFF(ch_gff.map { [ [id: "transdecoder.${it[0].id}"], it[1] ] })
 
     BAM_SORT_STATS_SAMTOOLS ( BBMAP_ALIGN.out.bam, ch_assembly_contigs.map { it[1] } )
     ch_versions = ch_versions.mix(BAM_SORT_STATS_SAMTOOLS.out.versions)
 
+    // if ( orf_caller == 
     BAM_SORT_STATS_SAMTOOLS.out.bam
-        .combine(UNPIGZ_GFF.out.unzipped.map { it[1] } )
+        .combine(ch_gff.map { it[1] } )
         .set { ch_featurecounts }
 
     ch_collect_stats
