@@ -349,7 +349,7 @@ workflow METATDENOVO {
     // SUBWORKFLOW: run TRANSDECODER. Orf caller alternative for eukaryotes.
     //
     if ( params.orf_caller == ORF_CALLER_TRANSDECODER ) {
-        TRANSDECODER ( ch_assembly_contigs )
+        TRANSDECODER ( ch_assembly_contigs.map { [ [id: "transdecoder.${it[0].id}" ], it[1] ] } )
         ch_gff      = TRANSDECODER.out.gff
         ch_aa       = TRANSDECODER.out.pep
         ch_versions = ch_versions.mix(TRANSDECODER.out.versions)
@@ -380,7 +380,7 @@ workflow METATDENOVO {
     //
     // MODULE: FeatureCounts. Create a table for each samples that provides raw counts as result of the alignment.
     //
-    UNPIGZ_GFF(ch_gff)
+    UNPIGZ_GFF(ch_gff.map { [ [id: "transdecoder.${it[0].id}"], it[1] ] })
 
     BAM_SORT_STATS_SAMTOOLS ( BBMAP_ALIGN.out.bam, ch_assembly_contigs.map { it[1] } )
     ch_versions = ch_versions.mix(BAM_SORT_STATS_SAMTOOLS.out.versions)
