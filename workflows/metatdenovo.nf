@@ -205,7 +205,6 @@ workflow METATDENOVO {
     //
     // SUBWORKFLOW: Read QC and trim adapters
     //
-
     FASTQC_TRIMGALORE (
         ch_cat_fastq,
         params.skip_fastqc || params.skip_qc,
@@ -319,6 +318,43 @@ workflow METATDENOVO {
     }
 
     //
+    // Call ORFs
+    //
+    ch_gff = Channel.empty()
+    ch_aa  = Channel.empty()
+
+    //
+    // SUBWORKFLOW: Run PROKKA_SUBSETS on assmebly output, but split the fasta file in chunks of 10 MB, then concatenate and compress output.
+    //
+    if ( params.orf_caller == ORF_CALLER_PROKKA ) {
+        PROKKA_SUBSETS(ch_assembly_contigs)
+        ch_versions      = ch_versions.mix(PROKKA_SUBSETS.out.versions)
+        ch_gff           = PROKKA_SUBSETS.out.gff
+        ch_aa            = PROKKA_SUBSETS.out.faa
+        ch_multiqc_files = ch_multiqc_files.mix(PROKKA_SUBSETS.out.prokka_log.collect{it[1]}.ifEmpty([]))
+    }
+
+    //
+    // MODULE: Run PRODIGAL on assembly output.
+    //
+    if ( params.orf_caller == ORF_CALLER_PRODIGAL ) {
+        PRODIGAL( ch_assembly_contigs )
+        ch_gff          = PRODIGAL.out.gff
+        ch_aa           = PRODIGAL.out.faa
+        ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
+    }
+
+    //
+    // SUBWORKFLOW: run TRANSDECODER. Orf caller alternative for eukaryotes.
+    //
+    if ( params.orf_caller == ORF_CALLER_TRANSDECODER ) {
+        TRANSDECODER ( ch_assembly_contigs )
+        ch_gff      = TRANSDECODER.out.gff
+        ch_aa       = TRANSDECODER.out.pep
+        ch_versions = ch_versions.mix(TRANSDECODER.out.versions)
+    }
+
+    //
     // MODULE: Create a BBMap index
     //
     BBMAP_INDEX(ch_assembly_contigs.map { it[1] })
@@ -331,56 +367,8 @@ workflow METATDENOVO {
     ch_versions = ch_versions.mix(BBMAP_ALIGN.out.versions)
 
     //
-    // SUBWORKFLOW: sort bam file
-    //
-    BAM_SORT_SAMTOOLS ( BBMAP_ALIGN.out.bam )
-    ch_versions = ch_versions.mix(BAM_SORT_SAMTOOLS.out.versions)
-
-    //
-    // Call ORFs
-    //
-
-    ch_gff = Channel.empty()
-    ch_aa  = Channel.empty()
-
-    //
-    // SUBWORKFLOW: Run PROKKA_SUBSETS on assmebly output, but split the fasta file in chunks of 10 MB, then concatenate and compress output.
-    //
-
-    if ( params.orf_caller == ORF_CALLER_PROKKA ) {
-        PROKKA_SUBSETS(ch_assembly_contigs)
-        ch_versions      = ch_versions.mix(PROKKA_SUBSETS.out.versions)
-        ch_gff           = PROKKA_SUBSETS.out.gff
-        ch_aa            = PROKKA_SUBSETS.out.faa
-        ch_multiqc_files = ch_multiqc_files.mix(PROKKA_SUBSETS.out.prokka_log.collect{it[1]}.ifEmpty([]))
-    }
-
-    //
-    // MODULE: Run PRODIGAL on assembly output.
-    //
-
-    if ( params.orf_caller == ORF_CALLER_PRODIGAL ) {
-        PRODIGAL( ch_assembly_contigs )
-        ch_gff          = PRODIGAL.out.gff
-        ch_aa           = PRODIGAL.out.faa
-        ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
-    }
-
-    //
-    // SUBWORKFLOW: run TRANSDECODER. Orf caller alternative for eukaryotes.
-    //
-
-    if ( params.orf_caller == ORF_CALLER_TRANSDECODER ) {
-        TRANSDECODER ( ch_assembly_contigs )
-        ch_gff      = TRANSDECODER.out.gff
-        ch_aa       = TRANSDECODER.out.pep
-        ch_versions = ch_versions.mix(TRANSDECODER.out.versions)
-    }
-
-    //
     // SUBWORKFLOW: classify ORFs with a set of hmm files
     //
-
     ch_hmmrs
         .combine(ch_aa)
         .map { [ [id: it[0].baseName ], it[0], it[2] ] }
@@ -389,8 +377,10 @@ workflow METATDENOVO {
     ch_versions = ch_versions.mix(HMMCLASSIFY.out.versions)
 
     //
-    // MODULE: FeatureCounts
+    // MODULE: FeatureCounts. Create a table for each samples that provides raw counts as result of the alignment.
     //
+    BAM_SORT_SAMTOOLS ( BBMAP_ALIGN.out.bam )
+    ch_versions = ch_versions.mix(BAM_SORT_SAMTOOLS.out.versions)
 
     BAM_SORT_SAMTOOLS.out.bam
         .combine(ch_gff.map { it[1] })
@@ -406,7 +396,6 @@ workflow METATDENOVO {
     //
     // MODULE: Collect featurecounts output counts in one table
     //
-
     FEATURECOUNTS_CDS.out.counts
         .collect() { it[1] }
         .map { [ [ id:'all_samples'], it ] }
@@ -423,7 +412,6 @@ workflow METATDENOVO {
     //
     // SUBWORKFLOW: run eggnog_mapper on the ORF-called amino acid sequences
     //
-
     if ( ! params.skip_eggnog ) {
         EGGNOG(ch_aa, ch_fcs_for_summary )
         ch_versions = ch_versions.mix(EGGNOG.out.versions)
@@ -447,12 +435,11 @@ workflow METATDENOVO {
         KOFAMSCAN( ch_kofamscan, Channel.fromPath(params.kofam_dir))
         //ch_versions = ch_versions.mix(KOFAMSCAN.out.versions)
     }
-    
-    
+
+
     //
     // CAT: Bin Annotation Tool (BAT) are pipelines for the taxonomic classification of long DNA sequences and metagenome assembled genomes (MAGs/bins)
     //
- 
     ch_cat_db = Channel.empty()
     if (params.cat) {
         if (params.cat_db){
@@ -476,7 +463,6 @@ workflow METATDENOVO {
     //
     // SUBWORKFLOW: Eukulele
     //
-
     if( !params.skip_eukulele){
         File directory = new File(params.eukulele_dbpath)
         if ( ! directory.exists() ) { directory.mkdir() }
@@ -499,7 +485,6 @@ workflow METATDENOVO {
     //
     // MODULE: Collect statistics from mapping analysis
     //
-    
     if( !params.skip_eggnog  || !params.skip_eukulele ) {
         MERGE_TABLES ( ch_merge_tables )
         ch_collect_stats
@@ -521,7 +506,6 @@ workflow METATDENOVO {
     //
     // MODULE: MultiQC
     //
-
     workflow_summary    = WorkflowMetatdenovo.paramsSummaryMultiqc(workflow, summary_params)
     ch_workflow_summary = Channel.value(workflow_summary)
 
@@ -532,7 +516,7 @@ workflow METATDENOVO {
     ch_multiqc_files = ch_multiqc_files.mix(FASTQC_TRIMGALORE.out.trim_zip.collect{it[1]}.ifEmpty([]))
     ch_multiqc_files = ch_multiqc_files.mix(BAM_SORT_SAMTOOLS.out.idxstats.collect{it[1]}.ifEmpty([]))
     ch_multiqc_files = ch_multiqc_files.mix(FEATURECOUNTS_CDS.out.summary.collect{it[1]}.ifEmpty([]))
-    
+
 
     MULTIQC (
         ch_multiqc_files.collect(),
