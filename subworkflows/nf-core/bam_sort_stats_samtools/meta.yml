@@ -1,20 +1,16 @@
-name: samtools_index
-description: Index SAM/BAM/CRAM file
+name: bam_sort_stats_samtools
+description: Sort SAM/BAM/CRAM file
 keywords:
-  - index
+  - sort
   - bam
   - sam
   - cram
-tools:
-  - samtools:
-      description: |
-        SAMtools is a set of utilities for interacting with and post-processing
-        short DNA sequence read alignments in the SAM, BAM and CRAM formats, written by Heng Li.
-        These files are generated as output by short read aligners like BWA.
-      homepage: http://www.htslib.org/
-      documentation: http://www.htslib.org/doc/samtools.html
-      doi: 10.1093/bioinformatics/btp352
-      licence: ["MIT"]
+modules:
+  - samtools/sort
+  - samtools/index
+  - samtools/stats
+  - samtools/idxstats
+  - samtools/flagstat
 input:
   - meta:
       type: map
@@ -25,12 +21,21 @@ input:
       type: file
       description: BAM/CRAM/SAM file
       pattern: "*.{bam,cram,sam}"
+  - fasta:
+      type: file
+      description: Reference genome fasta file
+      pattern: "*.{fasta,fa}"
+# TODO Update when we decide on a standard for subworkflow docs
 output:
   - meta:
       type: map
       description: |
         Groovy Map containing sample information
         e.g. [ id:'test', single_end:false ]
+  - bam:
+      type: file
+      description: Sorted BAM/CRAM/SAM file
+      pattern: "*.{bam,cram,sam}"
   - bai:
       type: file
       description: BAM/CRAM/SAM index file
@@ -39,10 +44,18 @@ output:
       type: file
       description: BAM/CRAM/SAM index file
       pattern: "*.{bai,crai,sai}"
-  - csi:
+  - stats:
       type: file
-      description: CSI index file
-      pattern: "*.{csi}"
+      description: File containing samtools stats output
+      pattern: "*.{stats}"
+  - flagstat:
+      type: file
+      description: File containing samtools flagstat output
+      pattern: "*.{flagstat}"
+  - idxstats:
+      type: file
+      description: File containing samtools idxstats output
+      pattern: "*.{idxstats}"
   - versions:
       type: file
       description: File containing software versions
@@ -50,4 +63,3 @@ output:
 authors:
   - "@drpatelh"
   - "@ewels"
-  - "@maxulysse"
