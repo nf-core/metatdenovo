@@ -144,7 +144,7 @@ include { BBMAP_BBNORM                               } from '../modules/nf-core/
 include { SEQTK_MERGEPE                              } from '../modules/nf-core/seqtk/mergepe/main'
 include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS_CDS } from '../modules/nf-core/subread/featurecounts/main'
 include { SPADES                                     } from '../modules/nf-core/spades/main'
-include { CAT_FASTQ 	          	             } from '../modules/nf-core/cat/fastq/main'
+include { CAT_FASTQ 	          	                 } from '../modules/nf-core/cat/fastq/main'
 include { FASTQC                                     } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                                    } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS                } from '../modules/nf-core/custom/dumpsoftwareversions/main'
@@ -152,7 +152,7 @@ include { CUSTOM_DUMPSOFTWAREVERSIONS                } from '../modules/nf-core/
 //
 // SUBWORKFLOWS: Installed directly from nf-core/modules
 //
-include { BAM_SORT_SAMTOOLS                          } from '../subworkflows/nf-core/bam_sort_samtools/main'
+include { BAM_SORT_STATS_SAMTOOLS                    } from '../subworkflows/nf-core/bam_sort_stats_samtools/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -379,10 +379,10 @@ workflow METATDENOVO {
     //
     // MODULE: FeatureCounts. Create a table for each samples that provides raw counts as result of the alignment.
     //
-    BAM_SORT_SAMTOOLS ( BBMAP_ALIGN.out.bam )
-    ch_versions = ch_versions.mix(BAM_SORT_SAMTOOLS.out.versions)
+    BAM_SORT_STATS_SAMTOOLS ( BBMAP_ALIGN.out.bam, BBMAP_INDEX.out.index )
+    ch_versions = ch_versions.mix(BAM_SORT_STATS_SAMTOOLS.out.versions)
 
-    BAM_SORT_SAMTOOLS.out.bam
+    BAM_SORT_STATS_SAMTOOLS.out.bam
         .combine(ch_gff.map { it[1] })
         .set { ch_featurecounts }
 
