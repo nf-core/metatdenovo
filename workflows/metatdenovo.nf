@@ -379,7 +379,7 @@ workflow METATDENOVO {
     //
     // MODULE: FeatureCounts. Create a table for each samples that provides raw counts as result of the alignment.
     //
-    BAM_SORT_STATS_SAMTOOLS ( BBMAP_ALIGN.out.bam, BBMAP_INDEX.out.index )
+    BAM_SORT_STATS_SAMTOOLS ( BBMAP_ALIGN.out.bam, ch_assembly_contigs.map { it[1] } )
     ch_versions = ch_versions.mix(BAM_SORT_STATS_SAMTOOLS.out.versions)
 
     BAM_SORT_STATS_SAMTOOLS.out.bam
@@ -387,7 +387,7 @@ workflow METATDENOVO {
         .set { ch_featurecounts }
 
     ch_collect_stats
-        .combine(BAM_SORT_SAMTOOLS.out.idxstats.collect { it[1]}.map { [ it ] })
+        .combine(BAM_SORT_STATS_SAMTOOLS.out.idxstats.collect { it[1]}.map { [ it ] })
         .set { ch_collect_stats }
 
     FEATURECOUNTS_CDS ( ch_featurecounts)
@@ -514,7 +514,7 @@ workflow METATDENOVO {
 
     ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
     ch_multiqc_files = ch_multiqc_files.mix(FASTQC_TRIMGALORE.out.trim_zip.collect{it[1]}.ifEmpty([]))
-    ch_multiqc_files = ch_multiqc_files.mix(BAM_SORT_SAMTOOLS.out.idxstats.collect{it[1]}.ifEmpty([]))
+    ch_multiqc_files = ch_multiqc_files.mix(BAM_SORT_STATS_SAMTOOLS.out.idxstats.collect{it[1]}.ifEmpty([]))
     ch_multiqc_files = ch_multiqc_files.mix(FEATURECOUNTS_CDS.out.summary.collect{it[1]}.ifEmpty([]))
 
 
