@@ -108,7 +108,7 @@
             "description": "all the trim option are listed below"
         },
         "bbduk_options": {
-            "title": "BBDUK options",
+            "title": "BBDuk contamination removal options",
             "type": "object",
             "description": "",
             "default": "",
