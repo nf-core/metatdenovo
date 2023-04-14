@@ -32,6 +32,7 @@ process KOFAMSCAN_SCAN {
         --profile $koprofiles \\
         --ko-list $ko_list \\
         --format detail-tsv \\
+        --cpu $task.cpus \\
         $input \\
         -o kofamscan_output.tsv
 
