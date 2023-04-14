@@ -8,7 +8,7 @@ process KOFAMSCAN_SCAN {
         'quay.io/biocontainers/kofamscan:1.3.0--hdfd78af_2' }"
 
     input:
-    tuple val(meta), path(fastaprot)
+    tuple val(meta), path(fasta)
     path(ko_list)
     path(koprofiles)
 
@@ -22,13 +22,17 @@ process KOFAMSCAN_SCAN {
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
+    input    = fasta =~ /\.gz$/ ? fasta.name.take(fasta.name.lastIndexOf('.')) : fasta
+    gunzip   = fasta =~ /\.gz$/ ? "gunzip -c ${fasta} > ${input}" : ""
 
     """
+    $gunzip
+
     exec_annotation \\
         --profile $koprofiles \\
         --ko-list $ko_list \\
         --format detail-tsv \\
-        $fastaprot \\
+        $input \\
         -o kofamscan_output.tsv
 
     gzip kofamscan_output.tsv
