@@ -1,4 +1,4 @@
-process FORMAT_PRODIGAL {
+process FORMAT_PRODIGAL_GFF {
     tag "$meta.id"
     label 'process_low'
 
@@ -20,11 +20,10 @@ process FORMAT_PRODIGAL {
     script:
     def args = task.ext.args   ?: ''
     prefix   = task.ext.prefix ?: "${meta.id}"
+    cat_input = gff =~ /\.gz$/ ? "gunzip -c ${gff}" : "cat ${gff}"
 
     """
-    sed 's/\\(\\(k[0-9]\\+_[0-9]\\+\\).*\\)ID=[0-9]\\+\\(_[0-9]\\+\\)/\\1ID=\\2\\3/g' $gff > ${prefix}_format.gff
-    sed -i 's/\\(\\(NODE_[0-9]\\+\\).*\\)ID=[0-9]\\+\\(_[0-9]\\+\\)/\\1ID=\\2\\3/g' ${prefix}_format.gff
-    gzip ${prefix}_format.gff
+    $cat_input | sed 's/\\(\\(k[0-9]\\+_[0-9]\\+\\).*\\)ID=[0-9]\\+\\(_[0-9]\\+\\)/\\1ID=\\2\\3/g' | gzip -c > ${prefix}_format.gff.gz
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
