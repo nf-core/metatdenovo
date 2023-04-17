@@ -20,15 +20,10 @@ process FORMAT_PRODIGAL_GFF {
     script:
     def args = task.ext.args   ?: ''
     prefix   = task.ext.prefix ?: "${meta.id}"
-    input    = gff =~ /\.gz$/ ? gff.name.take(gff.name.lastIndexOf('.')) : gff
-    gunzip   = gff =~ /\.gz$/ ? "gunzip -c ${gff} > ${input}" : ""
+    cat_input = gff =~ /\.gz$/ ? "gunzip -c ${gff}" : "cat ${gff}"
 
     """
-    $gunzip
-
-    sed 's/\\(\\(k[0-9]\\+_[0-9]\\+\\).*\\)ID=[0-9]\\+\\(_[0-9]\\+\\)/\\1ID=\\2\\3/g' $input > ${prefix}_format.gff
-    sed -i 's/\\(\\(NODE_[0-9]\\+\\).*\\)ID=[0-9]\\+\\(_[0-9]\\+\\)/\\1ID=\\2\\3/g' ${prefix}_format.gff
-    gzip ${prefix}_format.gff
+    $cat_input | sed 's/\\(\\(k[0-9]\\+_[0-9]\\+\\).*\\)ID=[0-9]\\+\\(_[0-9]\\+\\)/\\1ID=\\2\\3/g' | gzip -c > ${prefix}_format.gff.gz
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
