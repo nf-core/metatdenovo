@@ -15,12 +15,10 @@ workflow PRODIGAL {
         
         PRODIGAL_MODULE     ( fastafile, 'gff' )
         FORMAT_PRODIGAL_GFF ( PRODIGAL_MODULE.out.gene_annotations )
-        FORMAT_PRODIGAL_FAA ( PRODIGAL_MODULE.out.amino_acid_fasta )
-
         ch_versions = ch_versions.mix(PRODIGAL_MODULE.out.versions)
 
     emit:
-        faa     = FORMAT_PRODIGAL_FAA.out.format_faa
+        faa     = PRODIGAL_MODULE.out.amino_acid_fasta
         gff     = FORMAT_PRODIGAL_GFF.out.format_gff
         versions = ch_versions
 

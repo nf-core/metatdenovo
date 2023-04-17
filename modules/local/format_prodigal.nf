@@ -1,4 +1,4 @@
-process FORMAT_PRODIGAL_FAA {
+process FORMAT_PRODIGAL_GFF {
     tag "$meta.id"
     label 'process_low'
 
@@ -8,10 +8,10 @@ process FORMAT_PRODIGAL_FAA {
         'quay.io/biocontainers/gzip:1.11 ' }"
 
     input:
-    tuple val(meta), path (fasta)
+    tuple val(meta), path (gff)
 
     output:
-    tuple val(meta), path("${prefix}_format.faa.gz"), emit: format_faa
+    tuple val(meta), path("${prefix}_format.gff.gz"), emit: format_gff
     path "versions.yml"                             , emit: versions
 
     when:
@@ -20,14 +20,15 @@ process FORMAT_PRODIGAL_FAA {
     script:
     def args = task.ext.args   ?: ''
     prefix   = task.ext.prefix ?: "${meta.id}"
-    input    = fasta =~ /\.gz$/ ? fasta.name.take(fasta.name.lastIndexOf('.')) : fasta
-    gunzip   = fasta =~ /\.gz$/ ? "gunzip -c ${fasta} > ${input}" : ""
+    input    = gff =~ /\.gz$/ ? gff.name.take(gff.name.lastIndexOf('.')) : gff
+    gunzip   = gff =~ /\.gz$/ ? "gunzip -c ${gff} > ${input}" : ""
 
     """
     $gunzip
-    sed 's/\\(\\(k[0-9]\\+_[0-9]\\+\\).*\\)ID=[0-9]\\+\\(_[0-9]\\+\\)/\\1ID=\\2\\3/g' $input > ${prefix}_format.faa
-    sed -i 's/\\(\\(NODE_[0-9]\\+\\).*\\)ID=[0-9]\\+\\(_[0-9]\\+\\)/\\1ID=\\2\\3/g' ${prefix}_format.faa
-    gzip ${prefix}_format.faa
+
+    sed 's/\\(\\(k[0-9]\\+_[0-9]\\+\\).*\\)ID=[0-9]\\+\\(_[0-9]\\+\\)/\\1ID=\\2\\3/g' $input > ${prefix}_format.gff
+    sed -i 's/\\(\\(NODE_[0-9]\\+\\).*\\)ID=[0-9]\\+\\(_[0-9]\\+\\)/\\1ID=\\2\\3/g' ${prefix}_format.gff
+    gzip ${prefix}_format.gff
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
