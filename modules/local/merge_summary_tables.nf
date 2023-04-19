@@ -12,8 +12,8 @@ process MERGE_TABLES {
     tuple val(meta), path(eggtab), path(taxtab)
 
     output:
-    tuple val(meta), path("${meta.id}_merged_table.tsv") , emit: merged_table
-    path "versions.yml"                                  , emit: versions
+    tuple val(meta), path("${meta.id}_merged_table.tsv.gz") , emit: merged_table
+    path "versions.yml"                                     , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -32,10 +32,10 @@ process MERGE_TABLES {
     library(stringr)
 
     summary <- data.frame(sample = character(), database = character(),field = character(),  value = numeric(), stringsAsFactors = FALSE) %>%
-        union(list.files(pattern = "*.tsv") %>%
+        union(list.files(pattern = "*.tsv.gz") %>%
         map_df(~read_tsv(.,  show_col_types  = TRUE))) %>%
         pivot_wider(names_from = c(database,field), values_from = value) %>%
-        write_tsv('${prefix}_merged_table.tsv')
+        write_tsv('${prefix}_merged_table.tsv.gz')
 
     writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")), paste0("    dplyr: ", packageVersion('dplyr')),
         paste0("    dtplyr: ", packageVersion('dtplyr')), paste0("    data.table: ", packageVersion('data.table')), paste0("    readr: ", packageVersion('readr')),

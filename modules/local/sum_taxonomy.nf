@@ -14,8 +14,8 @@ process SUM_TAXONOMY {
 
     output:
 
-    tuple val(meta), path("*_summary.tsv") , emit: taxonomy_summary
-    path "versions.yml"                    , emit: versions
+    tuple val(meta), path("*_summary.tsv.gz") , emit: taxonomy_summary
+    path "versions.yml"                       , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -31,7 +31,7 @@ process SUM_TAXONOMY {
 
     TYPE_ORDER = c('sample', 'database', 'field', 'value')
     # call the tables into variables
-    taxonomy <- read_tsv("${prefix}_taxonomy_classification.tsv", show_col_types = FALSE )
+    taxonomy <- read_tsv("${prefix}_taxonomy_classification.tsv.gz", show_col_types = FALSE )
 
     counts <- list.files(pattern = "*_counts.tsv.gz") %>%
         map_df(~read_tsv(.,  show_col_types  = FALSE))
@@ -44,7 +44,7 @@ process SUM_TAXONOMY {
         summarise( value = sum(n), .groups = 'drop') %>%
         add_column(database = "${prefix}", field = "n_orfs") %>%
         relocate(value, .after = last_col()) %>%
-        write_tsv('${prefix}_summary.tsv')
+        write_tsv('${prefix}_summary.tsv.gz')
 
     writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")), paste0("    tidyverse: ", packageVersion('tidyverse'))),
         "versions.yml")
