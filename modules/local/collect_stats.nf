@@ -11,8 +11,8 @@ process COLLECT_STATS {
     tuple val(meta), val(samples), path(trimlogs), path(bblogs), path(idxstats), path(fcs), path(mergetab)
 
     output:
-    path "${meta.id}_overall_stats.tsv", emit: overall_stats
-    path "versions.yml"     , emit: versions
+    path "${meta.id}_overall_stats.tsv.gz", emit: overall_stats
+    path "versions.yml"                   , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -43,7 +43,7 @@ process COLLECT_STATS {
     if (mergetab) {
         read_mergetab = """
 
-        mergetab <- list.files(pattern = "*_merged_table.tsv" ) %>%
+        mergetab <- list.files(pattern = "*_merged_table.tsv.gz" ) %>%
             map_df(~read_tsv(.,  show_col_types  = FALSE))
         """
     } else {
@@ -110,7 +110,7 @@ process COLLECT_STATS {
         arrange(sample, m) %>%
         pivot_wider(names_from = m, values_from = v) %>%
         left_join(mergetab, by = 'sample') %>%
-        write_tsv('${prefix}_overall_stats.tsv')
+        write_tsv('${prefix}_overall_stats.tsv.gz')
 
         writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")), paste0("    dplyr: ", packageVersion('dplyr')),
             paste0("    dtplyr: ", packageVersion('dtplyr')), paste0("    data.table: ", packageVersion('data.table')), paste0("    readr: ", packageVersion('readr')),

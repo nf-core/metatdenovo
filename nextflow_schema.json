@@ -107,8 +107,8 @@
             },
             "description": "all the trim option are listed below"
         },
-        "bbduk_options": {
-            "title": "BBDuk contamination removal options",
+        "bbnorm_options": {
+            "title": "BBnorm options",
             "type": "object",
             "description": "",
             "default": "",
@@ -118,6 +118,11 @@
                     "description": "Fasta file with sequences to filter away before running assembly etc..",
                     "help_text": "Read sequences matching this file will be filtered out from samples with BBDuk before mapping. If no file is specified, BBDuk will not be run.",
                     "fa_icon": "fas fa-filter"
+                },
+                "save_bam": {
+                    "type": "boolean",
+                    "description": "save the output from BBMap align",
+                    "fa_icon": "fas fa-align-center"
                 }
             },
             "fa_icon": "fas fa-filter"
@@ -522,7 +527,7 @@
             "$ref": "#/definitions/trimming_options"
         },
         {
-            "$ref": "#/definitions/bbduk_options"
+            "$ref": "#/definitions/bbnorm_options"
         },
         {
             "$ref": "#/definitions/digital_normalization_options"
