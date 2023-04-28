@@ -4,7 +4,6 @@
     nf-core/metatdenovo
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Github : https://github.com/nf-core/metatdenovo
-
     Website: https://nf-co.re/metatdenovo
     Slack  : https://nfcore.slack.com/channels/metatdenovo
 ----------------------------------------------------------------------------------------
