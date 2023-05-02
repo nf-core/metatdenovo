@@ -10,3 +10,4 @@ testing*
 .screenrc
 eggnog
 kofam/
+.nextflow.log

@@ -12,23 +12,13 @@ WorkflowMetatdenovo.initialise(params, log)
 // Validate parameters for orf_caller:
 ORF_CALLER_PRODIGAL     = 'prodigal'
 ORF_CALLER_PROKKA       = 'prokka'
-ORF_CALLER_TRANSDECODER = 'transdecoder'
 
 // Validate parameters for assembler:
-RNASPADES = 'rnaspades'
 MEGAHIT   = 'megahit'
 
-// validate parameters for eukulele database:
-EUKULELE_DB_PHYLODB     = 'phylodb'
-EUKULELE_DB_MMETSP      = 'mmetsp'
-EUKULELE_DB_EUKPROT     = 'eukprot'
-EUKULELE_DB_EUKZOO      = 'eukzoo'
-EUKULELE_DB_GTDB        = 'gtdb'
-
 def valid_params = [
-    orf_caller      : [ ORF_CALLER_PRODIGAL, ORF_CALLER_PROKKA, ORF_CALLER_TRANSDECODER ],
-    assembler       : [ RNASPADES, MEGAHIT ],
-    eukulele_db     : [ EUKULELE_DB_PHYLODB, EUKULELE_DB_MMETSP, EUKULELE_DB_EUKPROT, EUKULELE_DB_EUKZOO, EUKULELE_DB_GTDB ]
+    orf_caller      : [ ORF_CALLER_PRODIGAL, ORF_CALLER_PROKKA ],
+    assembler       : [ MEGAHIT ]
 ]
 
 // Check input path parameters to see if they exist
@@ -55,28 +45,6 @@ if ( params.hmmdir ) {
         .set { ch_hmmrs }
 }
 
-// Create a channel for EUKulele either with a named database or not. The latter means a user-provided database in a directory.
-ch_eukulele_db = Channel.empty()
-if ( !params.skip_eukulele ) {
-    if ( params.eukulele_db ) {
-        Channel
-            .of ( params.eukulele_db.split(',') )
-            .map { [ it, file(params.eukulele_dbpath) ] }
-            .set { ch_eukulele_db }
-    } else {
-        Channel.fromPath(params.eukulele_dbpath)
-            .map { [ [], it ] }
-            .set { ch_eukulele_db }
-    }
-}
-
-// Create a channel for CAT that contains the path for the database
-if(params.cat_db){
-    ch_cat_db_file = Channel
-        .value(file( "${params.cat_db}" ))
-} else {
-    ch_cat_db_file = Channel.empty()
-}
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -98,15 +66,9 @@ ch_multiqc_custom_methods_description = params.multiqc_methods_description ? fil
 //
 // MODULE: local
 //
-include { WRITESPADESYAML                  } from '../modules/local/writespadesyaml'
 include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved'
 include { COLLECT_FEATURECOUNTS            } from '../modules/local/collect_featurecounts'
 include { COLLECT_STATS                    } from '../modules/local/collect_stats'
-include { CAT_DB                           } from '../modules/local/cat/cat_db'
-include { CAT_DB_GENERATE                  } from '../modules/local/cat/cat_db_generate'
-include { CAT_CONTIGS                      } from '../modules/local/cat/cat_contigs'
-include { CAT_SUMMARY                      } from "../modules/local/cat/cat_summary"
-include { FORMATSPADES                     } from '../modules/local/formatspades'
 include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz'
 include { UNPIGZ as UNPIGZ_GFF             } from '../modules/local/unpigz'
 include { MERGE_TABLES                     } from '../modules/local/merge_summary_tables'
@@ -120,14 +82,11 @@ include { INPUT_CHECK } from '../subworkflows/local/input_check'
 // SUBWORKFLOW: Consisting of local modules
 //
 include { EGGNOG            } from '../subworkflows/local/eggnog'
-include { SUB_EUKULELE      } from '../subworkflows/local/eukulele'
 include { HMMCLASSIFY       } from '../subworkflows/local/hmmclassify'
 include { PROKKA_SUBSETS    } from '../subworkflows/local/prokka_subsets'
-include { TRANSDECODER      } from '../subworkflows/local/transdecoder'
 include { DIGINORM          } from '../subworkflows/local/diginorm'
 include { FASTQC_TRIMGALORE } from '../subworkflows/local/fastqc_trimgalore'
 include { PRODIGAL          } from '../subworkflows/local/prodigal'
-include { KOFAMSCAN         } from '../subworkflows/local/kofamscan'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -138,13 +97,10 @@ include { KOFAMSCAN         } from '../subworkflows/local/kofamscan'
 //
 // MODULE: Installed directly from nf-core/modules
 //
-include { BBMAP_BBDUK                                } from '../modules/nf-core/bbmap/bbduk/main'
 include { BBMAP_INDEX                                } from '../modules/nf-core/bbmap/index/main'
 include { BBMAP_ALIGN                                } from '../modules/nf-core/bbmap/align/main'
 include { BBMAP_BBNORM                               } from '../modules/nf-core/bbmap/bbnorm/main'
-include { SEQTK_MERGEPE                              } from '../modules/nf-core/seqtk/mergepe/main'
 include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS_CDS } from '../modules/nf-core/subread/featurecounts/main'
-include { SPADES                                     } from '../modules/nf-core/spades/main'
 include { CAT_FASTQ 	          	                 } from '../modules/nf-core/cat/fastq/main'
 include { FASTQC                                     } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                                    } from '../modules/nf-core/multiqc/main'
@@ -168,7 +124,7 @@ workflow METATDENOVO {
 
     ch_versions = Channel.empty()
 
-    //
+    // STEP 0: Validate input
     // SUBWORKFLOW: Read in samplesheet, validate and stage input files
     //
     INPUT_CHECK (
@@ -191,7 +147,7 @@ workflow METATDENOVO {
     .set { ch_fastq }
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
 
-    //
+    // 
     // MODULE: Concatenate FastQ files from same sample if required
     //
     CAT_FASTQ (
@@ -203,7 +159,7 @@ workflow METATDENOVO {
 
     ch_versions = ch_versions.mix(CAT_FASTQ.out.versions.first().ifEmpty(null))
 
-    //
+    // Step 1 + Step 3: FastQC and Trim Galore!
     // SUBWORKFLOW: Read QC and trim adapters
     //
     FASTQC_TRIMGALORE (
@@ -224,38 +180,23 @@ workflow METATDENOVO {
             .set { ch_collect_stats }
     }
 
+    // Step 4
+    // Remove host sequences, bowtie2 align to Bos taurus
     //
-    // MODULE: Run BBDuk to clean out whatever sequences the user supplied via params.sequence_filter
-    //
-    if ( params.sequence_filter ) {
-        BBMAP_BBDUK ( FASTQC_TRIMGALORE.out.reads, params.sequence_filter )
-        ch_clean_reads  = BBMAP_BBDUK.out.reads
-        ch_bbduk_logs = BBMAP_BBDUK.out.log.collect { it[1] }.map { [ it ] }
-        ch_versions   = ch_versions.mix(BBMAP_BBDUK.out.versions)
-        ch_collect_stats
-            .combine(ch_bbduk_logs)
-            .set {ch_collect_stats}
-        ch_multiqc_files = ch_multiqc_files.mix(BBMAP_BBDUK.out.log.collect{it[1]}.ifEmpty([]))
-    } else {
-        ch_clean_reads  = FASTQC_TRIMGALORE.out.reads
-        ch_bbduk_logs = Channel.empty()
-        ch_collect_stats
-            .map { [ it[0], it[1], it[2], [] ] }
-            .set { ch_collect_stats }
-    }
 
+    // Step 5
+    // rRNA remove (sortmerna)
     //
-    // MODULE: Interleave sequences for assembly
-    //
-    // DL & DDL: We can probably not deal with single end input
-    ch_interleaved = Channel.empty()
-    if ( ! params.assembly ) {
-        SEQTK_MERGEPE(ch_clean_reads)
-        ch_interleaved = SEQTK_MERGEPE.out.reads
-        ch_versions    = ch_versions.mix(SEQTK_MERGEPE.out.versions)
-    }
 
+    // Step 6
+    // Deduplication with BBdup
     //
+
+    // Step 7
+    // Filter by taxa with Kraken2
+    //
+
+    // Step 8
     // SUBWORKFLOW: Perform digital normalization. There are two options: khmer or BBnorm. The latter is faster.
     //
     ch_pe_reads_to_assembly = Channel.empty()
@@ -277,35 +218,13 @@ workflow METATDENOVO {
         }
     }
 
-    //
-    // MODULE: Run Megahit or RNAspades on all interleaved fastq files
+    // Step 9
+    // MODULE: Run Megahit on all interleaved fastq files
     //
     if ( params.assembly ) {
         Channel
             .value ( [ [ id: 'user_assembly' ], file(params.assembly) ] )
             .set { ch_assembly_contigs }
-    } else if ( params.assembler == RNASPADES ) {
-        // 1. Write a yaml file for Spades
-        WRITESPADESYAML (
-            ch_pe_reads_to_assembly.collect().ifEmpty([]),
-            ch_se_reads_to_assembly.collect().ifEmpty([])
-        )
-        // 2. Call the module with a channel with all fastq files plus the yaml
-        Channel.empty()
-            .mix(ch_pe_reads_to_assembly)
-            .mix(ch_se_reads_to_assembly)
-            .collect()
-            .map { [ [ id:'rnaspades' ], it, [], [] ] }
-            .set { ch_spades }
-        SPADES (
-            ch_spades,
-            WRITESPADESYAML.out.yaml,
-            []
-        )
-        ch_assembly = SPADES.out.transcripts
-        ch_versions = ch_versions.mix(SPADES.out.versions)
-        FORMATSPADES( ch_assembly )
-        ch_assembly_contigs = FORMATSPADES.out.assembly
     } else if ( params.assembler == MEGAHIT ) {
         MEGAHIT_INTERLEAVED(
             ch_pe_reads_to_assembly.collect().ifEmpty([]),
@@ -318,7 +237,12 @@ workflow METATDENOVO {
         ch_versions = ch_versions.mix(MEGAHIT_INTERLEAVED.out.versions)
     }
 
+    // Step 10
+    // Clustering with CD-HIT-EST
+    // (for concatenating multiple assemblies)
     //
+
+    // Step 11
     // Call ORFs
     //
     ch_gff = Channel.empty()
@@ -348,16 +272,6 @@ workflow METATDENOVO {
     }
 
     //
-    // SUBWORKFLOW: run TRANSDECODER. Orf caller alternative for eukaryotes.
-    //
-    if ( params.orf_caller == ORF_CALLER_TRANSDECODER ) {
-        TRANSDECODER ( ch_assembly_contigs.map { [ [id: "transdecoder.${it[0].id}" ], it[1] ] } )
-        ch_gff      = TRANSDECODER.out.gff
-        ch_aa       = TRANSDECODER.out.pep
-        ch_versions = ch_versions.mix(TRANSDECODER.out.versions)
-    }
-
-    //
     // MODULE: Create a BBMap index
     //
     BBMAP_INDEX(ch_assembly_contigs.map { it[1] })
@@ -369,7 +283,11 @@ workflow METATDENOVO {
     BBMAP_ALIGN ( ch_clean_reads, BBMAP_INDEX.out.index )
     ch_versions = ch_versions.mix(BBMAP_ALIGN.out.versions)
 
+    // Step 12
+    // Quantification (salmon, rsem, or bbmap)
     //
+
+    // Step 13
     // SUBWORKFLOW: classify ORFs with a set of hmm files
     //
     ch_hmmrs
@@ -427,67 +345,11 @@ workflow METATDENOVO {
             .set { ch_merge_tables }
     }
 
+    // Step 14
+    // Kraken2 taxonomical annotation
+    //
 
-    //
-    // SUBWORKFLOW: run kofamscan on the ORF-called amino acid sequences
-    //
-    if( !params.skip_kofamscan ) {
-        File kofam_dir = new File(params.kofam_dir)
-        if ( ! kofam_dir.exists() ) { kofam_dir.mkdir() }
-        ch_aa
-            .map {[ [ id:"${it[0].id}.${params.orf_caller}" ], it[1] ] }
-            .set { ch_kofamscan }
-        KOFAMSCAN( ch_kofamscan, Channel.fromPath(params.kofam_dir))
-        //ch_versions = ch_versions.mix(KOFAMSCAN.out.versions)
-    }
-
-
-    //
-    // CAT: Bin Annotation Tool (BAT) are pipelines for the taxonomic classification of long DNA sequences and metagenome assembled genomes (MAGs/bins)
-    //
-    ch_cat_db = Channel.empty()
-    if (params.cat) {
-        if (params.cat_db){
-            CAT_DB ( ch_cat_db_file )
-            ch_cat_db = CAT_DB.out.db
-        } else if (params.cat_db_generate){
-            CAT_DB_GENERATE ()
-            ch_cat_db = CAT_DB_GENERATE.out.db
-        }
-        UNPIGZ_CONTIGS(ch_assembly_contigs)
-        CAT_CONTIGS (
-            UNPIGZ_CONTIGS.out.unzipped,
-            ch_cat_db
-        )
-        CAT_SUMMARY(
-            CAT_CONTIGS.out.tax_classification.collect()
-        )
-        ch_versions = ch_versions.mix(CAT_CONTIGS.out.versions)
-        ch_versions = ch_versions.mix(CAT_SUMMARY.out.versions)
-    }
-    //
-    // SUBWORKFLOW: Eukulele
-    //
-    if( !params.skip_eukulele){
-        File directory = new File(params.eukulele_dbpath)
-        if ( ! directory.exists() ) { directory.mkdir() }
-        ch_directory = Channel.fromPath( directory )
-            ch_aa
-                .map {[ [ id:"${it[0].id}.${params.orf_caller}" ], it[1] ] }
-                .combine( ch_eukulele_db )
-                .set { ch_eukulele }
-            SUB_EUKULELE( ch_eukulele, ch_fcs_for_summary )
-            ch_taxonomy_summary = SUB_EUKULELE.out.taxonomy_summary.collect().map { it[1] }
-            ch_merge_tables
-                .combine( ch_taxonomy_summary )
-                .set { ch_merge_tables }
-    } else {
-        ch_merge_tables
-            .map { [ it[0], it[1], [] ] }
-            .set { ch_merge_tables }
-    }
-
-    //
+    // Step 15
     // MODULE: Collect statistics from mapping analysis
     //
     if( !params.skip_eggnog  || !params.skip_eukulele ) {
@@ -508,7 +370,7 @@ workflow METATDENOVO {
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
     )
 
-    //
+    // Step 2
     // MODULE: MultiQC
     //
     workflow_summary    = WorkflowMetatdenovo.paramsSummaryMultiqc(workflow, summary_params)
