@@ -21,17 +21,15 @@ process EUKULELE_SEARCH {
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
     input    = fasta =~ /\.gz$/ ? fasta.name.take(fasta.name.lastIndexOf('.')) : fasta
-    gunzip   = fasta =~ /\.gz$/ ? "gunzip -c ${fasta} > ${input}" : ""
+    gunzip   = fasta =~ /\.gz$/ ? "gunzip -c ${fasta} > ./contigs/${input}" : ""
     def database = dbname ? "--database ${dbname}" : ''
     db       = dbname ? "${dbname}" : 'default'
 
     """
-
-    $gunzip
-
     rc=0
     mkdir contigs
-    cp $input ./contigs/
+    $gunzip
+
 
     EUKulele \\
         $args \\
