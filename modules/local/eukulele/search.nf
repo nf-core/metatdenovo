@@ -1,4 +1,4 @@
-process EUKULELE {
+process EUKULELE_SEARCH {
     tag "$meta.id"
     label 'process_high'
 

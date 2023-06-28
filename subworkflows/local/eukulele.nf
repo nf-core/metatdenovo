@@ -2,7 +2,7 @@
 // Run EUKULELE on protein fasta from orf_caller output
 //
 
-include { EUKULELE                          } from '../../modules/local/eukulele/main'
+include { EUKULELE_SEARCH                   } from '../../modules/local/eukulele/search'
 include { EUKULELE_DOWNLOAD                 } from '../../modules/local/eukulele/download'
 include { FORMAT_TAX                        } from '../../modules/local/format_tax'
 include { SUM_TAXONOMY                      } from '../../modules/local/sum_taxonomy'
@@ -23,15 +23,15 @@ workflow SUB_EUKULELE {
             .merge( eukulele.map{ [ it[0], it[1] ] } )
             .map { [ it[2], it[3], it[0], it[1] ] } 
             .set { ch_eukulele }
-        EUKULELE( ch_eukulele )
+        EUKULELE_SEARCH( ch_eukulele )
 
-        FORMAT_TAX( EUKULELE.out.taxonomy_estimation.map { [ [id: it[2]], it[1] ] } )
+        FORMAT_TAX( EUKULELE_SEARCH.out.taxonomy_estimation.map { [ [id: it[2]], it[1] ] } )
         SUM_TAXONOMY( FORMAT_TAX.out.tax, collect_fcs )
 
     emit:
         taxonomy_summary    = SUM_TAXONOMY.out.taxonomy_summary
-        taxonomy_estimation = EUKULELE.out.taxonomy_estimation
-        taxonomy_counts     = EUKULELE.out.taxonomy_counts
-        diamond             = EUKULELE.out.diamond
-        versions            = EUKULELE.out.versions
+        taxonomy_estimation = EUKULELE_SEARCH.out.taxonomy_estimation
+        taxonomy_counts     = EUKULELE_SEARCH.out.taxonomy_counts
+        diamond             = EUKULELE_SEARCH.out.diamond
+        versions            = EUKULELE_SEARCH.out.versions
 }
