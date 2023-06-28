@@ -34,7 +34,8 @@ process SUM_TAXONOMY {
     taxonomy <- read_tsv("${prefix}_taxonomy_classification.tsv.gz", show_col_types = FALSE )
 
     counts <- list.files(pattern = "*_counts.tsv.gz") %>%
-        map_df(~read_tsv(.,  show_col_types  = FALSE))
+        map_df(~read_tsv(.,  show_col_types  = FALSE)) %>%
+        mutate(sample = as.character(sample))
 
     counts %>%
         right_join(taxonomy, by = 'orf') %>%

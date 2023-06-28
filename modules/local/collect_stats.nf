@@ -44,7 +44,9 @@ process COLLECT_STATS {
         read_mergetab = """
 
         mergetab <- list.files(pattern = "*_merged_table.tsv.gz" ) %>%
-            map_df(~read_tsv(.,  show_col_types  = FALSE))
+            map_df(~read_tsv(.,  show_col_types  = FALSE)) %>%
+            mutate(sample = as.character(sample))
+
         """
     } else {
         read_mergetab = """
@@ -87,6 +89,7 @@ process COLLECT_STATS {
                 mutate(d = map(file, function(f) fread(cmd = sprintf("gunzip -c %s", f), sep = '\\t'))) %>%
                 as_tibble() %>%
                 unnest(d) %>%
+                mutate(sample = as.character(sample)) %>%
                 group_by(sample) %>% summarise(n_feature_count = sum(count), .groups = 'drop') %>%
                 pivot_longer(2:ncol(.), names_to = 'm', values_to = 'v')
             )
