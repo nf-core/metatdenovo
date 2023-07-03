@@ -145,7 +145,7 @@ include { BBMAP_BBNORM                               } from '../modules/nf-core/
 include { SEQTK_MERGEPE                              } from '../modules/nf-core/seqtk/mergepe/main'
 include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS_CDS } from '../modules/nf-core/subread/featurecounts/main'
 include { SPADES                                     } from '../modules/nf-core/spades/main'
-include { CAT_FASTQ 	          	                 } from '../modules/nf-core/cat/fastq/main'
+include { CAT_FASTQ            	                     } from '../modules/nf-core/cat/fastq/main'
 include { FASTQC                                     } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                                    } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS                } from '../modules/nf-core/custom/dumpsoftwareversions/main'
@@ -437,11 +437,18 @@ workflow METATDENOVO {
         ch_aa
             .map {[ [ id:"${it[0].id}.${params.orf_caller}" ], it[1] ] }
             .set { ch_kofamscan }
-        KOFAMSCAN( ch_kofamscan, Channel.fromPath(params.kofam_dir))
-        //ch_versions = ch_versions.mix(KOFAMSCAN.out.versions)
+        KOFAMSCAN( ch_kofamscan, Channel.fromPath(params.kofam_dir), ch_fcs_for_summary)
+        ch_versions = ch_versions.mix(KOFAMSCAN.out.versions)
+        ch_kofamscan_summary = KOFAMSCAN.out.kofamscan_summary.collect().map { it[1] }
+        ch_merge_tables
+            .combine( ch_kofamscan_summary )
+            .set { ch_merge_tables }
+    } else {
+        ch_merge_tables
+            .map { [ it[0], it[1], [] ] }
+            .set { ch_merge_tables }
+
     }
-
-
     //
     // CAT: Bin Annotation Tool (BAT) are pipelines for the taxonomic classification of long DNA sequences and metagenome assembled genomes (MAGs/bins)
     //
@@ -465,6 +472,7 @@ workflow METATDENOVO {
         ch_versions = ch_versions.mix(CAT_CONTIGS.out.versions)
         ch_versions = ch_versions.mix(CAT_SUMMARY.out.versions)
     }
+
     //
     // SUBWORKFLOW: Eukulele
     //
@@ -483,14 +491,14 @@ workflow METATDENOVO {
                 .set { ch_merge_tables }
     } else {
         ch_merge_tables
-            .map { [ it[0], it[1], [] ] }
+            .map { [ it[0], it[1], it[2], [] ] }
             .set { ch_merge_tables }
     }
 
     //
     // MODULE: Collect statistics from mapping analysis
     //
-    if( !params.skip_eggnog  || !params.skip_eukulele ) {
+    if( !params.skip_eggnog  || !params.skip_eukulele || !params.skip_kofamscan) {
         MERGE_TABLES ( ch_merge_tables )
         ch_collect_stats
             .combine(MERGE_TABLES.out.merged_table.collect{ it[1]}.map { [ it ] })
