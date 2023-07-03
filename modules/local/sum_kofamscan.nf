@@ -1,4 +1,4 @@
-process MERGE_TABLES {
+process SUM_KOFAMSCAN {
     tag "$meta.id"
     label 'process_low'
 
@@ -9,11 +9,13 @@ process MERGE_TABLES {
 
     input:
 
-    tuple val(meta), path(eggtab), path(taxtab), path(kofamscan)
+    tuple val(meta), path(kofmascan)
+    path(fcs)
 
     output:
-    tuple val(meta), path("${meta.id}_merged_table.tsv.gz") , emit: merged_table
-    path "versions.yml"                                     , emit: versions
+
+    tuple val(meta), path("${meta.id}.kofamscan_summary.tsv.gz") , emit: kofamscan_summary
+    path "versions.yml"                                          , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -27,16 +29,30 @@ process MERGE_TABLES {
 
     library(dplyr)
     library(readr)
-    library(purrr)
     library(tidyr)
     library(stringr)
+    library(tidyverse)
 
-    summary <- data.frame(sample = character(), database = character(), field = character(), value = numeric(), stringsAsFactors = FALSE) %>%
-        union(list.files(pattern = "*.tsv.gz") %>%
-            map_df(~ read_tsv(., show_col_types = TRUE) %>%
-            mutate(sample = as.character(sample)))) %>%
-        pivot_wider(names_from = c(database,field), values_from = value) %>%
-        write_tsv('${prefix}_merged_table.tsv.gz')
+    # call the tables into variables
+    kofams <- read_tsv("kofamscan_output.tsv.gz", show_col_types = FALSE ) %>%
+        select(-"#") %>%
+        slice(-1) %>%
+        rename(orf = "gene name") %>%
+        distinct(orf, .keep_all = TRUE)
+
+    counts <- list.files(pattern = "*_counts.tsv.gz") %>%
+        map_df(~read_tsv(.,  show_col_types  = FALSE)) %>%
+        mutate(sample = as.character(sample))
+
+    counts %>% select(1, 7) %>%
+        right_join(kofams, by = 'orf') %>%
+        group_by(sample) %>%
+        drop_na() %>%
+        count(orf) %>%
+        summarise( value = sum(n), .groups = 'drop') %>%
+        add_column(database = "kofamscan", field = "n_orfs") %>%
+        relocate(value, .after = last_col()) %>%
+        write_tsv('${meta.id}.kofamscan_summary.tsv.gz')
 
     writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")), paste0("    dplyr: ", packageVersion('dplyr')),
         paste0("    dtplyr: ", packageVersion('dtplyr')), paste0("    data.table: ", packageVersion('data.table')), paste0("    readr: ", packageVersion('readr')),
