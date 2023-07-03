@@ -29,7 +29,7 @@ process KOFAMSCAN_DOWNLOAD {
 
     if [ ! -e ${kofam_dir}/profiles ]; then
         wget -P ${kofam_dir} -c https://www.genome.jp/ftp/db/kofam/profiles.tar.gz
-        gunzip -c kofam/profiles.tar.gz | tar vxf - -C kofam/
+        gunzip -c ${kofam_dir}/profiles.tar.gz | tar vxf - -C ${kofam_dir}/
     fi
 
     cat <<-END_VERSIONS > versions.yml
