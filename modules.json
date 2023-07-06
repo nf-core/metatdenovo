@@ -37,7 +37,7 @@
                     },
                     "custom/dumpsoftwareversions": {
                         "branch": "master",
-                        "git_sha": "7101db4432d3268b7fcb5b8f75fa0a022dc5561b",
+                        "git_sha": "76cc4938c1f6ea5c7d83fed1eeffc146787f9543",
                         "installed_by": ["modules"]
                     },
                     "fastqc": {
@@ -138,6 +138,11 @@
                         "branch": "master",
                         "git_sha": "b4b7f89e7fd6d2293f0c176213f710e0bcdaf19e",
                         "installed_by": ["bam_sort_samtools", "bam_sort_stats_samtools"]
+                    },
+                    "multiqc": {
+                        "branch": "master",
+                        "git_sha": "f2d63bd5b68925f98f572eed70993d205cc694b7",
+                        "installed_by": ["modules"]
                     }
                 }
             }
