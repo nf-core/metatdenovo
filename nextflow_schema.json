@@ -578,11 +578,5 @@
         {
             "$ref": "#/definitions/generic_options"
         }
-    ],
-    "properties": {
-        "enable_conda": {
-            "type": "string",
-            "default": null
-        }
-    }
+    ]
 }
