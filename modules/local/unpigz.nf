@@ -2,10 +2,10 @@ process UNPIGZ {
     tag "$file"
     label 'process_low'
 
-    conda (params.enable_conda ? "pigz=2.3.4" : null)
+    conda "conda-forge::pigz=2.3.4"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/pigz:2.3.4':
-        'quay.io/biocontainers/pigz:2.3.4' }"
+        'biocontainers/pigz:2.3.4' }"
 
     input:
     tuple val(meta), path(file)
