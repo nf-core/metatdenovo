@@ -71,7 +71,6 @@ Each row represents a fastq file (single-end) or a pair of fastq files (paired e
 
 Now, you can run the pipeline using:
 
-
 ```bash
 nextflow run nf-core/metatdenovo \
    --input samplesheet.csv \
