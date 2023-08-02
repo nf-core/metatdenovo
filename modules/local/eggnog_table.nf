@@ -5,7 +5,7 @@ process EGGNOG_TABLE {
     conda "conda-forge::gzip=1.12"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/gzip:1.11 ':
-        'quay.io/biocontainers/gzip:1.11 ' }"
+        'biocontainers/gzip:1.11 ' }"
 
     input:
     tuple val(meta), path(eggnog)
