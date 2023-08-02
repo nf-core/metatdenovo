@@ -388,7 +388,7 @@ workflow METATDENOVO {
     // MODULE: FeatureCounts. Create a table for each samples that provides raw counts as result of the alignment.
     //
 
-    BAM_SORT_STATS_SAMTOOLS ( BBMAP_ALIGN.out.bam, ch_assembly_contigs.map { it[1] } )
+    BAM_SORT_STATS_SAMTOOLS ( BBMAP_ALIGN.out.bam, ch_assembly_contigs )
     ch_versions = ch_versions.mix(BAM_SORT_STATS_SAMTOOLS.out.versions)
 
     // if ( orf_caller == 
