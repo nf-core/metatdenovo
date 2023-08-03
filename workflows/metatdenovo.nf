@@ -339,8 +339,8 @@ workflow METATDENOVO {
     // MODULE: Run PRODIGAL on assembly output.
     //
     if ( params.orf_caller == ORF_CALLER_PRODIGAL ) {
-        PRODIGAL( ch_assembly_contigs.map { [ [id: 'prodigal.megahit' ], it[1] ] } )
-        UNPIGZ_GFF(PRODIGAL.out.gff.map { [ [id: "${params.orf_caller}.${it[0].id}"], it[1] ] })
+        PRODIGAL( ch_assembly_contigs.map { [ [id: "${params.assembler}.${params.orf_caller}"], it[1] ] } )
+        UNPIGZ_GFF(PRODIGAL.out.gff.map { [ [id: "${it[0].id}.${params.orf_caller}"], it[1] ] })
         ch_gff          = UNPIGZ_GFF.out.unzipped
         ch_aa           = PRODIGAL.out.faa
         ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
@@ -480,7 +480,7 @@ workflow METATDENOVO {
         if ( ! directory.exists() ) { directory.mkdir() }
         ch_directory = Channel.fromPath( directory )
             ch_aa
-                .map {[ [ id:"${it[0].id}.${params.orf_caller}" ], it[1] ] }
+                .map {[ [ id:"${it[0].id}" ], it[1] ] }
                 .combine( ch_eukulele_db )
                 .set { ch_eukulele }
             SUB_EUKULELE( ch_eukulele, ch_fcs_for_summary )
