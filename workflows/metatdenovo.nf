@@ -126,7 +126,6 @@ include { SUB_EUKULELE      } from '../subworkflows/local/eukulele'
 include { HMMCLASSIFY       } from '../subworkflows/local/hmmclassify'
 include { PROKKA_SUBSETS    } from '../subworkflows/local/prokka_subsets'
 include { TRANSDECODER      } from '../subworkflows/local/transdecoder'
-include { DIGINORM          } from '../subworkflows/local/diginorm'
 include { FASTQC_TRIMGALORE } from '../subworkflows/local/fastqc_trimgalore'
 include { PRODIGAL          } from '../subworkflows/local/prodigal'
 include { KOFAMSCAN         } from '../subworkflows/local/kofamscan'
@@ -267,12 +266,7 @@ workflow METATDENOVO {
     ch_se_reads_to_assembly = Channel.empty()
 
     if ( ! params.assembly ) {
-        if ( params.diginorm ) {
-            DIGINORM(ch_interleaved.collect { meta, fastq -> fastq }, [], 'all_samples')
-            ch_versions = ch_versions.mix(DIGINORM.out.versions)
-            ch_pe_reads_to_assembly = DIGINORM.out.pairs
-            ch_se_reads_to_assembly = DIGINORM.out.singles
-        } else if ( params.bbnorm) {
+        if ( params.bbnorm) {
                 BBMAP_BBNORM(ch_interleaved.collect { meta, fastq -> fastq }.map {[ [id:'all_samples', single_end:true], it ] } )
                 ch_pe_reads_to_assembly = BBMAP_BBNORM.out.fastq.map { it[1] }
                 ch_se_reads_to_assembly = Channel.empty()

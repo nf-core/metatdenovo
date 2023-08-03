@@ -151,25 +151,6 @@
                     "default": 5,
                     "description": "Reads with an apparent depth of under nx will be presumed to be errors and discarded",
                     "fa_icon": "fas fa-align-justify"
-                },
-                "diginorm": {
-                    "type": "boolean",
-                    "description": "Perform digital normalization to reduce sequencing depth.",
-                    "help_text": "Digital normalization is performed following the example in https://khmer-protocols.readthedocs.io/en/latest/mrnaseq/2-diginorm.html.\\nThere are (hidden) parameters for the cutoff coverage and kmer length for `normalize-by-median.py`, set to defaults following the example above (cutoff: 20 and kmer length: 20).",
-                    "fa_icon": "fas fa-align-justify"
-                },
-                "diginorm_C": {
-                    "type": "integer",
-                    "default": 20,
-                    "description": "Median coverage to keep a read, default 20.",
-                    "help_text": "This parameter is passed to `normalize-by-median.py` as the value to `-C` and to `filter-abund.py` as value to both `-C` and `-Z`",
-                    "fa_icon": "fas fa-align-justify"
-                },
-                "diginorm_k": {
-                    "type": "integer",
-                    "default": 20,
-                    "description": "Kmer length in first call of normalize-by-median.py, default 20.",
-                    "fa_icon": "fas fa-align-justify"
                 }
             }
         },
