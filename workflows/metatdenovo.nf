@@ -112,6 +112,7 @@ include { FORMATSPADES                     } from '../modules/local/formatspades
 include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz'
 include { UNPIGZ as UNPIGZ_GFF             } from '../modules/local/unpigz'
 include { MERGE_TABLES                     } from '../modules/local/merge_summary_tables'
+include { TRANSRATE                        } from '../modules/local/transrate'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -318,6 +319,13 @@ workflow METATDENOVO {
     }
 
     //
+    // MODULE: Use TransRate to judge assembly quality
+    //
+    TRANSRATE(ch_assembly_contigs)
+    ch_versions = ch_versions.mix(TRANSRATE.out.versions)
+
+
+    //
     // Call ORFs
     //
     ch_gff = Channel.empty()
@@ -385,7 +393,7 @@ workflow METATDENOVO {
     BAM_SORT_STATS_SAMTOOLS ( BBMAP_ALIGN.out.bam, ch_assembly_contigs )
     ch_versions = ch_versions.mix(BAM_SORT_STATS_SAMTOOLS.out.versions)
 
-    // if ( orf_caller == 
+    // if ( orf_caller ==
     BAM_SORT_STATS_SAMTOOLS.out.bam
         .combine(ch_gff.map { it[1] } )
         .set { ch_featurecounts }

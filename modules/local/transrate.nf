@@ -31,6 +31,8 @@ process TRANSRATE {
         --output ${prefix}_transrate \\
         $args
 
+    mv ${prefix}_transrate/assemblies.csv ${prefix}_assemblies_mqc.csv
+
     transrate --version > version.txt
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
