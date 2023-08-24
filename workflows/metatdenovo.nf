@@ -321,7 +321,7 @@ workflow METATDENOVO {
     //
     // MODULE: Use TransRate to judge assembly quality
     //
-    TRANSRATE(ch_assembly_contigs)
+    TRANSRATE(UNPIGZ_CONTIGS.out.unzipped)
     ch_versions = ch_versions.mix(TRANSRATE.out.versions)
 
 
