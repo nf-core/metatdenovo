@@ -217,15 +217,22 @@ workflow METATDENOVO {
     )
     ch_versions = ch_versions.mix(FASTQC_TRIMGALORE.out.versions)
 
+    FASTQC_TRIMGALORE.out.trim_log.collect { it[1] }
     ch_collect_stats = ch_cat_fastq.collect { it[0].id }.map { [ [ id:"${params.assembler}.${params.orf_caller}" ], it ] }
     if ( params.skip_trimming ) {
         ch_collect_stats
             .map { [ it[0], it[1], [] ] }
             .set { ch_collect_stats }
     } else {
-        ch_collect_stats
-            .combine(FASTQC_TRIMGALORE.out.trim_log.collect { it[1][0] }.map { [ it ] })
-            .set { ch_collect_stats }
+        if ( params.se_reads ) {
+            ch_collect_stats
+                .combine(FASTQC_TRIMGALORE.out.trim_log.collect { it[1] } )
+                .set { ch_collect_stats }
+        } else {
+            ch_collect_stats
+                .combine(FASTQC_TRIMGALORE.out.trim_log.collect { it[1][0] }.map { [ it ] })
+                .set { ch_collect_stats }
+        }
     }
 
     //
@@ -254,22 +261,35 @@ workflow METATDENOVO {
     // DL & DDL: We can probably not deal with single end input
     ch_interleaved = Channel.empty()
     if ( ! params.assembly ) {
+        if ( params.se_reads) {
         SEQTK_MERGEPE(ch_clean_reads)
-        ch_interleaved = SEQTK_MERGEPE.out.reads
-        ch_versions    = ch_versions.mix(SEQTK_MERGEPE.out.versions)
+        ch_interleaved_se = SEQTK_MERGEPE.out.reads
+        ch_versions       = ch_versions.mix(SEQTK_MERGEPE.out.versions)
+        } else {
+            SEQTK_MERGEPE(ch_clean_reads)
+            ch_interleaved = SEQTK_MERGEPE.out.reads
+            ch_versions    = ch_versions.mix(SEQTK_MERGEPE.out.versions)
+        }
     }
 
     //
     // SUBWORKFLOW: Perform digital normalization. There are two options: khmer or BBnorm. The latter is faster.
     //
-    ch_pe_reads_to_assembly = Channel.empty()
-    ch_se_reads_to_assembly = Channel.empty()
-
     if ( ! params.assembly ) {
-        if ( params.bbnorm) {
-                BBMAP_BBNORM(ch_interleaved.collect { meta, fastq -> fastq }.map {[ [id:'all_samples', single_end:true], it ] } )
-                ch_pe_reads_to_assembly = BBMAP_BBNORM.out.fastq.map { it[1] }
-                ch_se_reads_to_assembly = Channel.empty()
+        if ( params.se_reads ) {
+            if ( params.bbnorm ) {
+                BBMAP_BBNORM(ch_interleaved_se.collect { meta, fastq -> fastq }.map {[ [id:'all_samples', single_end:true], it ] } )
+                ch_se_reads_to_assembly = BBMAP_BBNORM.out.fastq.map { it[1] }
+                ch_pe_reads_to_assembly = Channel.empty()
+            } else {
+                ch_se_reads_to_assembly = ch_interleaved_se.map { meta, fastq -> fastq }
+                ch_pe_reads_to_assembly = Channel.empty()
+            }
+        } 
+        else if ( params.bbnorm ) {
+            BBMAP_BBNORM(ch_interleaved.collect { meta, fastq -> fastq }.map {[ [id:'all_samples', single_end:true], it ] } )
+            ch_pe_reads_to_assembly = BBMAP_BBNORM.out.fastq.map { it[1] }
+            ch_se_reads_to_assembly = Channel.empty()
         } else {
             ch_pe_reads_to_assembly = ch_interleaved.map { meta, fastq -> fastq }
             ch_se_reads_to_assembly = Channel.empty()

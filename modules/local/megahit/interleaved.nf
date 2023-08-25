@@ -25,11 +25,12 @@ process MEGAHIT_INTERLEAVED {
     def args = task.ext.args ?: ''
     def args2 = task.ext.args2 ?: ''
     def prefix = task.ext.prefix ?: ''
-    single_ends = se_reads ? "-r ${se_reads.join(',')}" : ""
+    single_ends = se_reads ? "--read ${se_reads.join(',')}" : ""
+    pair_ends = intl_pe_reads ? "--12 ${intl_pe_reads.join(',')}" : ""
 
     """
     megahit \\
-        --12 ${intl_pe_reads.join(',')} \\
+        $pair_ends \\
         ${single_ends} \\
         -t $task.cpus \\
         $args \\
