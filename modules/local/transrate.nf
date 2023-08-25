@@ -23,11 +23,10 @@ process TRANSRATE {
 
     // transrate flashes a warning about a ruby gem being out of date, so call the version before it is being piped into the yaml
     """
-    gzip -d -c $assembly > assembly_unzipped.fa
 
     transrate \\
         --threads $task.cpus \\
-        --assembly assembly_unzipped.fa \\
+        --assembly $assembly \\
         --output ${prefix}_transrate \\
         $args
 

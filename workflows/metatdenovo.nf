@@ -319,13 +319,6 @@ workflow METATDENOVO {
     }
 
     //
-    // MODULE: Use TransRate to judge assembly quality
-    //
-    TRANSRATE(UNPIGZ_CONTIGS.out.unzipped)
-    ch_versions = ch_versions.mix(TRANSRATE.out.versions)
-
-
-    //
     // Call ORFs
     //
     ch_gff = Channel.empty()
@@ -456,6 +449,12 @@ workflow METATDENOVO {
             .set { ch_merge_tables }
 
     }
+
+    // set up contig channel to use in CAT and TransRate
+    UNPIGZ_CONTIGS(ch_assembly_contigs)
+    ch_unzipped_contigs = UNPIGZ_CONTIGS.out.unzipped
+    ch_versions = ch_versions.mix(UNPIGZ_CONTIGS.out.versions)
+
     //
     // CAT: Bin Annotation Tool (BAT) are pipelines for the taxonomic classification of long DNA sequences and metagenome assembled genomes (MAGs/bins)
     //
@@ -468,9 +467,8 @@ workflow METATDENOVO {
             CAT_DB_GENERATE ()
             ch_cat_db = CAT_DB_GENERATE.out.db
         }
-        UNPIGZ_CONTIGS(ch_assembly_contigs)
         CAT_CONTIGS (
-            UNPIGZ_CONTIGS.out.unzipped,
+            ch_unzipped_contigs,
             ch_cat_db
         )
         CAT_SUMMARY(
@@ -479,6 +477,12 @@ workflow METATDENOVO {
         ch_versions = ch_versions.mix(CAT_CONTIGS.out.versions)
         ch_versions = ch_versions.mix(CAT_SUMMARY.out.versions)
     }
+
+    //
+    // MODULE: Use TransRate to judge assembly quality, piped into MultiQC
+    //
+    TRANSRATE(ch_unzipped_contigs)
+    ch_versions = ch_versions.mix(TRANSRATE.out.versions)
 
     //
     // SUBWORKFLOW: Eukulele
