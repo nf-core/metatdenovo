@@ -8,11 +8,11 @@ process PROKKAGFF2TSV {
         'biocontainers/mulled-v2-b2ec1fea5791d428eebb8c8ea7409c350d31dada:a447f6b7a6afde38352b24c30ae9cd6e39df95c4-1' }"
 
     input:
-    tuple val(meta), path(bam)
+    tuple val(meta), path(gff)
 
     output:
-    tuple val(meta), path("*.bam"), emit: bam
-    path "versions.yml"           , emit: versions
+    tuple val(meta), path("*.annotations.tsv.gz"), emit: tsv
+    path "versions.yml"                          , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -20,28 +20,39 @@ process PROKKAGFF2TSV {
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
-    // TODO nf-core: Where possible, a command MUST be provided to obtain the version number of the software e.g. 1.10
-    //               If the software is unable to output a version number on the command-line then it can be manually specified
-    //               e.g. https://github.com/nf-core/modules/blob/master/modules/nf-core/homer/annotatepeaks/main.nf
-    //               Each software used MUST provide the software name and version number in the YAML version file (versions.yml)
-    // TODO nf-core: It MUST be possible to pass additional parameters to the tool as a command-line string via the "task.ext.args" directive
-    // TODO nf-core: If the tool supports multi-threading then you MUST provide the appropriate parameter
-    //               using the Nextflow "task" variable e.g. "--threads $task.cpus"
-    // TODO nf-core: Please replace the example samtools command below with your module's command
-    // TODO nf-core: Please indent the command appropriately (4 spaces!!) to help with readability ;)
-    """
-    samtools \\
-        sort \\
-        $args \\
-        -@ $task.cpus \\
-        -o ${prefix}.bam \\
-        -T $prefix \\
-        $bam
 
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        : \$(echo \$(samtools --version 2>&1) | sed 's/^.*samtools //; s/Using.*\$//' ))
-    END_VERSIONS
+    """
+    #!/usr/bin/env Rscript
+
+    library(data.table)
+    library(dtplyr)
+    library(dplyr)
+    library(tidyr)
+    library(readr)
+
+    fread(
+        cmd = "zgrep -P '\\t' $gff",
+        col.names = c('contig', 'gene_caller', 'feature', 'start', 'end', 'a', 'strand', 'b', 'c')
+    ) %>%
+        separate_rows(c, sep = ';') %>%
+        separate(c, c('k', 'v'), sep = '=') %>%
+        pivot_wider(names_from = k, values_from = v) %>%
+        select(-a, -b) %>%
+        as.data.table() %>%
+        write_tsv("${prefix}.annotations.tsv.gz")
+
+    writeLines(
+        c(
+            "\\"${task.process}\\":",
+            paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")),
+            paste0("    data.table: ", packageVersion("data.table")),
+            paste0("    dtplyr: "    , packageVersion("dtplyr")),
+            paste0("    dplyr: "     , packageVersion("dplyr")),
+            paste0("    tidyr: "     , packageVersion("tidyr")),
+            paste0("    readr: "     , packageVersion("readr"))
+        ),
+        "versions.yml"
+    )
     """
 
     stub:
