@@ -2,10 +2,10 @@ process EGGNOG_DOWNLOAD {
     tag '$meta.id'
     label 'process_low'
 
-    conda (params.enable_conda ? "bioconda::eggnog-mapper=2.1.6" : null)
+    conda "bioconda::eggnog-mapper=2.1.6"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/eggnog-mapper:2.1.6--pyhdfd78af_0':
-        'quay.io/biocontainers/eggnog-mapper:2.1.6--pyhdfd78af_0' }"
+        'biocontainers/eggnog-mapper:2.1.6--pyhdfd78af_0' }"
 
     output:
     path("./eggnog")   , emit: db

@@ -2,10 +2,10 @@ process EUKULELE_DOWNLOAD {
     tag "$meta.id"
     label 'process_long'
 
-    conda (params.enable_conda ? "bioconda::eukulele=2.0.3" : null)
+    conda "bioconda::eukulele=2.0.3"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/eukulele:2.0.3--pyh723bec7_0' :
-        'quay.io/biocontainers/eukulele:2.0.3--pyh723bec7_0' }"
+        'biocontainers/eukulele:2.0.3--pyh723bec7_0' }"
 
     input:
     tuple val(db), path(directory)

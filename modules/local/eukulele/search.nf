@@ -2,10 +2,10 @@ process EUKULELE_SEARCH {
     tag "$meta.id"
     label 'process_high'
 
-    conda (params.enable_conda ? "bioconda::eukulele=2.0.3" : null)
+    conda "bioconda::eukulele=2.0.3"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/eukulele:2.0.3--pyh723bec7_0' :
-        'quay.io/biocontainers/eukulele:2.0.3--pyh723bec7_0' }"
+        'biocontainers/eukulele:2.0.3--pyh723bec7_0' }"
 
     input:
     tuple val(meta), path(fasta), val(dbname), path(eukdb)
