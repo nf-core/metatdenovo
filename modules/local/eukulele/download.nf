@@ -1,5 +1,5 @@
 process EUKULELE_DOWNLOAD {
-    tag '$meta.id'
+    tag "$meta.id"
     label 'process_long'
 
     conda (params.enable_conda ? "bioconda::eukulele=2.0.3" : null)
