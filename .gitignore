@@ -9,5 +9,6 @@ testing*
 .*.sw?
 .screenrc
 eggnog
-kofam/
-eukulele/
+kofam
+kofamscan
+eukulele
