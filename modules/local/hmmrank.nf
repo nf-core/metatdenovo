@@ -1,4 +1,5 @@
 process HMMRANK {
+    tag "$meta.id"
     label 'process_low'
 
     conda "conda-forge::r-tidyverse=1.3.1 conda-forge::r-data.table=1.14.0 conda-forge::r-dtplyr=1.1.0"
@@ -7,18 +8,17 @@ process HMMRANK {
         'biocontainers/mulled-v2-508c9bc5e929a77a9708902b1deca248c0c84689:0bb5bee2557136d28549f41d3faa08485e967aa1-0' } "
 
     input:
-
-    path hmmtargsums
+    tuple val(meta), path(hmmtargsums)
 
     output:
-
-    path "hmmrank.tsv.gz", emit: hmmrank
-    path "versions.yml"  , emit: versions
+    path "*.hmmrank.tsv.gz", emit: hmmrank
+    path "versions.yml"    , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
 
     script:
+    def prefix = task.ext.prefix ?: "${meta.id}"
 
     """
     #!/usr/bin/env Rscript
@@ -52,7 +52,7 @@ process HMMRANK {
         arrange(desc(score), evalue, profile) %>%
         mutate(rank = row_number()) %>%
         ungroup() %>%
-        write_tsv('hmmrank.tsv.gz')
+        write_tsv('${prefix}.hmmrank.tsv.gz')
 
     writeLines(
         c(

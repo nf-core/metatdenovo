@@ -394,7 +394,7 @@ workflow METATDENOVO {
     //
     ch_hmmrs
         .combine(ch_aa)
-        .map { [ [id: it[0].baseName ], it[0], it[2] ] }
+        .map { [ [ id: "${params.assembler}.${params.orf_caller}" ], it[0], it[2] ] }
         .set { ch_hmmclassify }
     HMMCLASSIFY ( ch_hmmclassify )
     ch_versions = ch_versions.mix(HMMCLASSIFY.out.versions)
