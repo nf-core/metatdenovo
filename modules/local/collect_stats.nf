@@ -11,7 +11,7 @@ process COLLECT_STATS {
     tuple val(meta), val(samples), path(trimlogs), path(bblogs), path(idxstats), path(fcs), path(mergetab)
 
     output:
-    path "${meta.id}_overall_stats.tsv.gz", emit: overall_stats
+    path "${meta.id}.overall_stats.tsv.gz", emit: overall_stats
     path "versions.yml"                   , emit: versions
 
     when:
@@ -113,7 +113,7 @@ process COLLECT_STATS {
         arrange(sample, m) %>%
         pivot_wider(names_from = m, values_from = v) %>%
         left_join(mergetab, by = 'sample') %>%
-        write_tsv('${prefix}_overall_stats.tsv.gz')
+        write_tsv('${prefix}.overall_stats.tsv.gz')
 
         writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")), paste0("    dplyr: ", packageVersion('dplyr')),
             paste0("    dtplyr: ", packageVersion('dtplyr')), paste0("    data.table: ", packageVersion('data.table')), paste0("    readr: ", packageVersion('readr')),
