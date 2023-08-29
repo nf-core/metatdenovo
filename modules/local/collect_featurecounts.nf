@@ -11,8 +11,8 @@ process COLLECT_FEATURECOUNTS {
     tuple val(meta), path(inputfiles)
 
     output:
-    tuple val(meta), path("*.tsv.gz")   , emit: counts
-    path "versions.yml"                 , emit: versions
+    tuple val(meta), path("*.counts.tsv.gz"), emit: counts
+    path "versions.yml"                     , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -54,7 +54,7 @@ process COLLECT_FEATURECOUNTS {
         ) %>%
         tidyr::unnest(d) %>%
         select(-f) %>%
-        write_tsv("${prefix}_counts.tsv.gz")
+        write_tsv("${prefix}.counts.tsv.gz")
 
         writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")), paste0("    dplyr: ", packageVersion('dplyr')),
             paste0("    dtplyr: ", packageVersion('dtplyr')), paste0("    data.table: ", packageVersion('data.table')) ), "versions.yml")

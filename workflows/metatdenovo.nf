@@ -423,7 +423,7 @@ workflow METATDENOVO {
     //
     FEATURECOUNTS_CDS.out.counts
         .collect() { it[1] }
-        .map { [ [ id:'all_samples'], it ] }
+        .map { [ [ id:"${params.assembler}.${params.orf_caller}" ], it ] }
         .set { ch_collect_feature }
 
     COLLECT_FEATURECOUNTS ( ch_collect_feature )
