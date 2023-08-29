@@ -23,7 +23,7 @@ process FORMAT_PRODIGAL_GFF {
     cat_input = gff =~ /\.gz$/ ? "gunzip -c ${gff}" : "cat ${gff}"
 
     """
-    $cat_input | sed 's/\\(\\(k[0-9]\\+_[0-9]\\+\\).*\\)ID=[0-9]\\+\\(_[0-9]\\+\\)/\\1ID=\\2\\3/g' | gzip -c > ${prefix}_format.gff.gz
+    $cat_input | sed 's/^\\([^\\t]\\+\\)\\(.*ID=\\)[0-9]\\+\\(_[0-9]\\+\\)/\\1\\2\\1\\3/' | gzip -c > ${prefix}_format.gff.gz
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

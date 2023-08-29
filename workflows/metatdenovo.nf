@@ -112,6 +112,7 @@ include { FORMATSPADES                     } from '../modules/local/formatspades
 include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz'
 include { UNPIGZ as UNPIGZ_GFF             } from '../modules/local/unpigz'
 include { MERGE_TABLES                     } from '../modules/local/merge_summary_tables'
+include { TRANSRATE                        } from '../modules/local/transrate'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -405,7 +406,7 @@ workflow METATDENOVO {
     BAM_SORT_STATS_SAMTOOLS ( BBMAP_ALIGN.out.bam, ch_assembly_contigs )
     ch_versions = ch_versions.mix(BAM_SORT_STATS_SAMTOOLS.out.versions)
 
-    // if ( orf_caller == 
+    // if ( orf_caller ==
     BAM_SORT_STATS_SAMTOOLS.out.bam
         .combine(ch_gff.map { it[1] } )
         .set { ch_featurecounts }
@@ -468,6 +469,12 @@ workflow METATDENOVO {
             .set { ch_merge_tables }
 
     }
+
+    // set up contig channel to use in CAT and TransRate
+    UNPIGZ_CONTIGS(ch_assembly_contigs)
+    ch_unzipped_contigs = UNPIGZ_CONTIGS.out.unzipped
+    ch_versions = ch_versions.mix(UNPIGZ_CONTIGS.out.versions)
+
     //
     // CAT: Bin Annotation Tool (BAT) are pipelines for the taxonomic classification of long DNA sequences and metagenome assembled genomes (MAGs/bins)
     //
@@ -480,9 +487,8 @@ workflow METATDENOVO {
             CAT_DB_GENERATE ()
             ch_cat_db = CAT_DB_GENERATE.out.db
         }
-        UNPIGZ_CONTIGS(ch_assembly_contigs)
         CAT_CONTIGS (
-            UNPIGZ_CONTIGS.out.unzipped,
+            ch_unzipped_contigs,
             ch_cat_db
         )
         CAT_SUMMARY(
@@ -491,6 +497,12 @@ workflow METATDENOVO {
         ch_versions = ch_versions.mix(CAT_CONTIGS.out.versions)
         ch_versions = ch_versions.mix(CAT_SUMMARY.out.versions)
     }
+
+    //
+    // MODULE: Use TransRate to judge assembly quality, piped into MultiQC
+    //
+    TRANSRATE(ch_unzipped_contigs)
+    ch_versions = ch_versions.mix(TRANSRATE.out.versions)
 
     //
     // SUBWORKFLOW: Eukulele
@@ -546,6 +558,7 @@ workflow METATDENOVO {
 
     ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
     ch_multiqc_files = ch_multiqc_files.mix(FASTQC_TRIMGALORE.out.trim_zip.collect{it[1]}.ifEmpty([]))
+    ch_multiqc_files = ch_multiqc_files.mix(TRANSRATE.out.assembly_qc.collect{it[1]}.ifEmpty([]))
     ch_multiqc_files = ch_multiqc_files.mix(BAM_SORT_STATS_SAMTOOLS.out.idxstats.collect{it[1]}.ifEmpty([]))
     ch_multiqc_files = ch_multiqc_files.mix(FEATURECOUNTS_CDS.out.summary.collect{it[1]}.ifEmpty([]))
 
