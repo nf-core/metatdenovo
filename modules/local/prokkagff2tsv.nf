@@ -38,6 +38,8 @@ process PROKKAGFF2TSV {
         separate(c, c('k', 'v'), sep = '=') %>%
         pivot_wider(names_from = k, values_from = v) %>%
         select(-a, -b) %>%
+        rename(orf = ID) %>%
+        relocate(orf) %>%
         as.data.table() %>%
         write_tsv("${prefix}.annotations.tsv.gz")
 
