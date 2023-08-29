@@ -11,7 +11,7 @@ process FORMAT_TAX {
     tuple val(meta), path(taxtable)
 
     output:
-    tuple val(meta), path("*_taxonomy_classification.tsv.gz"), emit: tax
+    tuple val(meta), path("*.taxonomy_classification.tsv.gz"), emit: tax
     path "versions.yml"                                      , emit: versions
 
     when:
@@ -54,7 +54,7 @@ process FORMAT_TAX {
                 Species = ifelse(is.na(Species) | Species == '', sprintf("%s uncl.", str_remove(Genus, ' unclassified')),  Species)
             ) %>%
             na.omit() %>%
-            write_tsv("${prefix}_taxonomy_classification.tsv.gz")
+            write_tsv("${prefix}.taxonomy_classification.tsv.gz")
 
     writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")),paste0("    dplyr: ", packageVersion("dplyr")) ), "versions.yml")
     """
