@@ -6,6 +6,7 @@ include { PROKKA               } from '../../modules/nf-core/prokka/main'
 include { CAT_CAT as GFF_CAT   } from '../../modules/nf-core/cat/cat/main'
 include { CAT_CAT as FAA_CAT   } from '../../modules/nf-core/cat/cat/main'
 include { CAT_CAT as FNA_CAT   } from '../../modules/nf-core/cat/cat/main'
+include { PROKKAGFF2TSV        } from '../../modules/local/prokkagff2tsv'
 
 workflow PROKKA_SUBSETS {
     take:
@@ -17,6 +18,7 @@ workflow PROKKA_SUBSETS {
         PROKKA ( contigs.map{ it[1] }.splitFasta(size: 10.MB, file: true).map { contigs -> [ [ id: contigs.getBaseName() ], contigs] }, [], []  )
         ch_versions = ch_versions.mix(PROKKA.out.versions)
         ch_log  = PROKKA.out.txt.collect()
+
         contigs.map{ [ id:"${it[0].id}.prokka" ] }
             .combine(PROKKA.out.gff.collect { it[1] }.map { [ it ] })
             .set { ch_gff }
@@ -35,10 +37,14 @@ workflow PROKKA_SUBSETS {
         FNA_CAT ( ch_fna )
         ch_versions = ch_versions.mix(FNA_CAT.out.versions)
 
+        PROKKAGFF2TSV ( GFF_CAT.out.file_out)
+        ch_versions = ch_versions.mix(PROKKAGFF2TSV.out.versions)
+
     emit:
         gff        = GFF_CAT.out.file_out
         faa        = FAA_CAT.out.file_out
         fna        = FNA_CAT.out.file_out
+        gfftsv     = PROKKAGFF2TSV.out.tsv
         prokka_log = ch_log
         versions   = ch_versions
 
