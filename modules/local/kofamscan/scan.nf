@@ -14,6 +14,7 @@ process KOFAMSCAN_SCAN {
 
     output:
     tuple val(meta), path("kofamscan_output.tsv.gz"), emit: kout
+    path("kofamscan.tsv.gz")                        , emit: kofamtsv
     path "versions.yml"                             , emit: versions
 
     when:
@@ -36,6 +37,8 @@ process KOFAMSCAN_SCAN {
         $input \\
         -o kofamscan_output.tsv
 
+    echo "orf	ko	thrshld	score	evalue	ko_definition" | gzip -c > kofamscan.tsv.gz
+    grep -v '#' kofamscan_output.tsv | cut -f 2-7|sed 's/\t"/\t/' | sed 's/"\$//' | gzip -c >> kofamscan.tsv.gz
     gzip kofamscan_output.tsv
 
     cat <<-END_VERSIONS > versions.yml

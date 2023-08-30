@@ -40,7 +40,7 @@ process SUM_KOFAMSCAN {
         rename(orf = "gene name") %>%
         distinct(orf, .keep_all = TRUE)
 
-    counts <- list.files(pattern = "*_counts.tsv.gz") %>%
+    counts <- list.files(pattern = "*.counts.tsv.gz") %>%
         map_df(~read_tsv(.,  show_col_types  = FALSE)) %>%
         mutate(sample = as.character(sample))
 

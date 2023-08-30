@@ -455,7 +455,8 @@ workflow METATDENOVO {
         File kofam_dir = new File(params.kofam_dir)
         if ( ! kofam_dir.exists() ) { kofam_dir.mkdir() }
         ch_aa
-            .map {[ [ id:"${it[0].id}.${params.orf_caller}" ], it[1] ] }
+            //.map { [ [ id:"${it[0].id}" ], it[1] ] }
+            .map { [ it[0], it[1] ] }
             .set { ch_kofamscan }
         KOFAMSCAN( ch_kofamscan, Channel.fromPath(params.kofam_dir), ch_fcs_for_summary)
         ch_versions = ch_versions.mix(KOFAMSCAN.out.versions)
