@@ -4,7 +4,6 @@
 
 include { EGGNOG_DOWNLOAD } from '../../modules/local/eggnog/download'
 include { EGGNOG_MAPPER   } from '../../modules/local/eggnog/mapper'
-include { EGGNOG_TABLE    } from '../../modules/local/eggnog/table'
 include { EGGNOG_SUM      } from '../../modules/local/eggnog/sum'
 
 workflow EGGNOG {
@@ -37,16 +36,13 @@ workflow EGGNOG {
         EGGNOG_MAPPER ( faa, ch_dbpath)
         ch_versions = ch_versions.mix ( EGGNOG_MAPPER.out.versions )
 
-        EGGNOG_TABLE ( EGGNOG_MAPPER.out.annotations )
-        ch_versions = ch_versions.mix ( EGGNOG_TABLE.out.versions )
-
-        EGGNOG_SUM ( EGGNOG_TABLE.out.eggtab, collect_fcs )
+        EGGNOG_SUM ( EGGNOG_MAPPER.out.emappertsv, collect_fcs )
         ch_versions = ch_versions.mix ( EGGNOG_SUM.out.versions )
 
     emit:
-        hits              = EGGNOG_MAPPER.out.hits
-        formateggnogtable = EGGNOG_TABLE.out.eggtab
-        versions          = ch_versions
-        sumtable          = EGGNOG_SUM.out.eggnog_summary
+        hits       = EGGNOG_MAPPER.out.hits
+        emappertsv = EGGNOG_MAPPER.out.emappertsv
+        versions   = ch_versions
+        sumtable   = EGGNOG_SUM.out.eggnog_summary
 
 }

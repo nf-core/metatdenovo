@@ -12,16 +12,17 @@ process EGGNOG_MAPPER {
     path(db)
 
     output:
-    tuple val(meta), path("*.emapper.hits")                , emit: hits
-    tuple val(meta), path("*.emapper.seed_orthologs")      , emit: seed_orthologs
-    tuple val(meta), path("*.emapper.annotations")         , emit: annotations
-    tuple val(meta), path("*.emapper.annotations.xlsx")    , emit: xlsx,      optional: true
-    tuple val(meta), path("*.emapper.orthologs")           , emit: orthologs, optional: true
-    tuple val(meta), path("*.emapper.genepred.fasta")      , emit: genepred,  optional: true
-    tuple val(meta), path("*.emapper.gff")                 , emit: gff,       optional: true
-    tuple val(meta), path("*.emapper.no_annotations.fasta"), emit: no_anno,   optional: true
-    tuple val(meta), path("*.emapper.pfam")                , emit: pfam,      optional: true
-    path "versions.yml"                                    , emit: versions
+    tuple val(meta), path("*.emapper.hits.gz")                , emit: hits
+    tuple val(meta), path("*.emapper.seed_orthologs.gz")      , emit: seed_orthologs
+    tuple val(meta), path("*.emapper.annotations.gz")         , emit: annotations
+    tuple val(meta), path("*.emapper.tsv.gz")                 , emit: emappertsv
+    tuple val(meta), path("*.emapper.annotations.xlsx")       , emit: xlsx,      optional: true
+    tuple val(meta), path("*.emapper.orthologs.gz")           , emit: orthologs, optional: true
+    tuple val(meta), path("*.emapper.genepred.fasta.gz")      , emit: genepred,  optional: true
+    tuple val(meta), path("*.emapper.gff.gz")                 , emit: gff,       optional: true
+    tuple val(meta), path("*.emapper.no_annotations.fasta.gz"), emit: no_anno,   optional: true
+    tuple val(meta), path("*.emapper.pfam.gz")                , emit: pfam,      optional: true
+    path "versions.yml"                                       , emit: versions
 
     script:
     def args = task.ext.args   ?: ''
@@ -38,6 +39,9 @@ process EGGNOG_MAPPER {
         --data_dir $db \\
         --output $prefix \\
         -i $input
+
+    gzip ${prefix}.emapper.*
+    zgrep -v '^##' ${prefix}.emapper.annotations |sed 's/^#//' | sed 's/query/orf/' | gzip -c > ${prefix}.emapper.tsv.gz
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
