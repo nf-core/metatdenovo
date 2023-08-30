@@ -44,7 +44,7 @@ process EUKULELE_SEARCH {
     gzip ${prefix}/mets_full/diamond/*.out
     gzip ${prefix}/taxonomy_counts/*.csv
     gzip ${prefix}/taxonomy_estimation/*.out
-    
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         eukulele: \$(echo \$(EUKulele --version 2>&1) | sed 's/Running EUKulele with command line arguments, as no valid configuration file was provided.//; s/The current EUKulele version is//g')
