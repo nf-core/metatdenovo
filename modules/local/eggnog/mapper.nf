@@ -41,7 +41,7 @@ process EGGNOG_MAPPER {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        eggnog: \$( echo \$(emapper.py --version 2>&1)| sed 's/.* emapper-//' | sed 's/\\/ Expected eggNOG DB version: 5.0.2 \\/ Installed eggNOG DB version: unknown \\/ Diamond version found: diamond version 2.1.4 \\/ MMseqs2 version found: 13.45111//g' )
+        eggnog: \$( echo \$(emapper.py --version 2>&1)| sed 's/.* emapper-//' | sed 's/ \\/ Expected.*//')
     END_VERSIONS
     """
 

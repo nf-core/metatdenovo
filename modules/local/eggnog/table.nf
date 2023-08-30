@@ -12,7 +12,7 @@ process EGGNOG_TABLE {
 
     output:
     tuple val(meta), path("*.eggnogs.tsv.gz"), emit: eggtab
-    path "versions.yml"                    , emit: versions
+    path "versions.yml"                      , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -26,7 +26,7 @@ process EGGNOG_TABLE {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        gzip: \$( echo \$(gzip --version 2>&1)| sed 's/.* gzip//')
+        gzip: \$( echo \$(gzip --version 2>&1)| sed 's/.*gzip //' | sed 's/ Copy.*//')
     END_VERSIONS
     """
 }

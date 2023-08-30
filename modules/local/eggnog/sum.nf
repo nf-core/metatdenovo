@@ -1,4 +1,4 @@
-process SUM_EGGNOG {
+process EGGNOG_SUM {
     tag "$meta.id"
     label 'process_low'
 
