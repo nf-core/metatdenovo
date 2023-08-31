@@ -15,17 +15,19 @@ workflow SUB_EUKULELE {
 
     main:
         ch_versions = Channel.empty()
+
         EUKULELE_DOWNLOAD ( eukulele.filter{ it[2] }.map { [ it[2], it[3] ] } )
         ch_download = EUKULELE_DOWNLOAD.out.db
+
         Channel.empty()
             .mix ( EUKULELE_DOWNLOAD.out.db )
             .mix(eukulele.filter{ ! it[2] }.map { [ [], it[3] ] } )
             .merge( eukulele.map{ [ it[0], it[1] ] } )
-            .map { [ it[2], it[3], it[0], it[1] ] } 
+            .map { [ [ id: "${it[2].id}.${it[0]}" ], it[3], it[0], it[1] ] } 
             .set { ch_eukulele }
         EUKULELE_SEARCH( ch_eukulele )
 
-        FORMAT_TAX( EUKULELE_SEARCH.out.taxonomy_estimation.map { [ [id: it[2]], it[1] ] } )
+        FORMAT_TAX( EUKULELE_SEARCH.out.taxonomy_estimation.map { [ it[0], it[1] ] } )
         SUM_TAXONOMY( FORMAT_TAX.out.tax, collect_fcs )
 
     emit:

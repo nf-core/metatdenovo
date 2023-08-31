@@ -1,4 +1,4 @@
-process SUM_EGGNOG {
+process EGGNOG_SUM {
     tag "$meta.id"
     label 'process_low'
 
@@ -34,9 +34,9 @@ process SUM_EGGNOG {
     library(tidyverse)
 
     # call the tables into variables
-    eggnog <- read_tsv("eggnogs.tsv.gz", show_col_types = FALSE )
+    eggnog <- read_tsv("${eggnog}", show_col_types = FALSE )
 
-    counts <- list.files(pattern = "*_counts.tsv.gz") %>%
+    counts <- list.files(pattern = "*.counts.tsv.gz") %>%
         map_df(~read_tsv(.,  show_col_types  = FALSE)) %>%
         mutate(sample = as.character(sample))
 

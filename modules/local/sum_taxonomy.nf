@@ -31,9 +31,9 @@ process SUM_TAXONOMY {
 
     TYPE_ORDER = c('sample', 'database', 'field', 'value')
     # call the tables into variables
-    taxonomy <- read_tsv("${prefix}_taxonomy_classification.tsv.gz", show_col_types = FALSE )
+    taxonomy <- read_tsv("${prefix}.taxonomy_classification.tsv.gz", show_col_types = FALSE )
 
-    counts <- list.files(pattern = "*_counts.tsv.gz") %>%
+    counts <- list.files(pattern = "*.counts.tsv.gz") %>%
         map_df(~read_tsv(.,  show_col_types  = FALSE)) %>%
         mutate(sample = as.character(sample))
 

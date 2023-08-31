@@ -4,49 +4,45 @@
 
 include { EGGNOG_DOWNLOAD } from '../../modules/local/eggnog/download'
 include { EGGNOG_MAPPER   } from '../../modules/local/eggnog/mapper'
-include { EGGNOG_TABLE    } from '../../modules/local/eggnog_table'
-include { SUM_EGGNOG      } from '../../modules/local/sum_eggnog.nf'
+include { EGGNOG_SUM      } from '../../modules/local/eggnog/sum'
 
 workflow EGGNOG {
     take:
+        eggnog_dbpath
         faa
         collect_fcs
+
     main:
         ch_versions = Channel.empty()
 
-        String directoryName = params.eggnog_dbpath
-        File directory = new File(directoryName)
-        String eggnogDB = params.eggnog_dbpath + "eggnog.db"
-        File test = new File(eggnogDB)
+        String directoryName = eggnog_dbpath
+        File directory       = new File(directoryName)
+        String eggnogDB      = eggnog_dbpath + "eggnog.db"
+        File eggnogfile      = new File(eggnogDB)
 
-        if (! directory.exists()){
+        if ( ! directory.exists() ) {
             directory.mkdir()
-            EGGNOG_DOWNLOAD()
-            EGGNOG_MAPPER(faa, EGGNOG_DOWNLOAD.out.db)
-            EGGNOG_TABLE(EGGNOG_MAPPER.out.annotations)
-            SUM_EGGNOG(EGGNOG_TABLE.out.eggtab, collect_fcs )
-        } else {
-            if (! test.exists()){
-                EGGNOG_DOWNLOAD()
-                EGGNOG_MAPPER(faa, EGGNOG_DOWNLOAD.out.db)
-                EGGNOG_TABLE(EGGNOG_MAPPER.out.annotations)
-                SUM_EGGNOG(EGGNOG_TABLE.out.eggtab, collect_fcs )
-            }  else {
-            ch_dbpath = Channel.fromPath(params.eggnog_dbpath)
-            EGGNOG_MAPPER(faa, ch_dbpath)
-            EGGNOG_TABLE(EGGNOG_MAPPER.out.annotations)
-            SUM_EGGNOG(EGGNOG_TABLE.out.eggtab, collect_fcs )
-            }
         }
 
-        //ch_versions = ch_versions.mix(EGGNOG_MAPPER.out.versions)
-        ch_versions = ch_versions.mix(EGGNOG_TABLE.out.versions)
-        ch_versions = ch_versions.mix(SUM_EGGNOG.out.versions)
+        if ( ! eggnogfile.exists() ) {
+            EGGNOG_DOWNLOAD()
+            ch_dpath = EGGNOG_DOWNLOAD.out.db
+
+            ch_versions = ch_versions.mix ( EGGNOG_DOWNLOAD.out.versions )
+        } else {
+            ch_dbpath = Channel.fromPath(eggnog_dbpath)
+        }
+
+        EGGNOG_MAPPER ( faa, ch_dbpath)
+        ch_versions = ch_versions.mix ( EGGNOG_MAPPER.out.versions )
+
+        EGGNOG_SUM ( EGGNOG_MAPPER.out.emappertsv, collect_fcs )
+        ch_versions = ch_versions.mix ( EGGNOG_SUM.out.versions )
 
     emit:
-        hits              = EGGNOG_MAPPER.out.hits
-        formateggnogtable = EGGNOG_TABLE.out.eggtab
-        versions          = ch_versions
-        sumtable          = SUM_EGGNOG.out.eggnog_summary
+        hits       = EGGNOG_MAPPER.out.hits
+        emappertsv = EGGNOG_MAPPER.out.emappertsv
+        versions   = ch_versions
+        sumtable   = EGGNOG_SUM.out.eggnog_summary
 
 }

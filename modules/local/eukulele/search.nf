@@ -11,19 +11,20 @@ process EUKULELE_SEARCH {
     tuple val(meta), path(fasta), val(dbname), path(eukdb)
 
     output:
-    tuple val(meta), path("${meta.id}_*/taxonomy_estimation/*.out"), val("${db}")    , emit: taxonomy_estimation
-    tuple val(meta), path("${meta.id}_*/taxonomy_counts/*_counts.csv")               , emit: taxonomy_counts
-    tuple val(meta), path("${meta.id}_*/mets_full/diamond/*")                        , emit: diamond
+    tuple val(meta), path("*/taxonomy_estimation/*.out.gz"), val("${db}") , emit: taxonomy_estimation
+    tuple val(meta), path("*/taxonomy_counts/*.csv.gz")                   , emit: taxonomy_counts
+    tuple val(meta), path("*/mets_full/diamond/*")                        , emit: diamond
 
-    path "versions.yml"                                                              , emit: versions
+    path "versions.yml"                                                   , emit: versions
 
     script:
-    def args = task.ext.args ?: ''
-    def prefix = task.ext.prefix ?: "${meta.id}"
-    input    = fasta =~ /\.gz$/ ? fasta.name.take(fasta.name.lastIndexOf('.')) : fasta
-    gunzip   = fasta =~ /\.gz$/ ? "gunzip -c ${fasta} > ./contigs/${input}" : ""
+    def args     = task.ext.args ?: ''
+    def prefix   = task.ext.prefix ?: "${meta.id}"
+    def input    = fasta =~ /\.gz$/ ? fasta.name.take(fasta.name.lastIndexOf('.')) : fasta
+    // I have my doubts here: What happens if a non-gzipped input fasta file is specified and it's not in the contigs directory?
+    def gunzip   = fasta =~ /\.gz$/ ? "gunzip -c ${fasta} > ./contigs/${input}" : ""
     def database = dbname ? "--database ${dbname}" : ''
-    db       = dbname ? "${dbname}" : 'default'
+    def db       = dbname ? "${dbname}" : 'default'
 
     """
     rc=0
@@ -35,10 +36,14 @@ process EUKULELE_SEARCH {
         $args \\
         $database \\
         --reference_dir $eukdb \\
-        -o ${meta.id}_${db} \\
+        -o ${prefix} \\
         --CPUs ${task.cpus} \\
         -s \\
         contigs || rc=\$?
+
+    gzip ${prefix}/mets_full/diamond/*.out
+    gzip ${prefix}/taxonomy_counts/*.csv
+    gzip ${prefix}/taxonomy_estimation/*.out
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

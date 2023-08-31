@@ -11,7 +11,7 @@ process COLLECT_STATS {
     tuple val(meta), val(samples), path(trimlogs), path(bblogs), path(idxstats), path(fcs), path(mergetab)
 
     output:
-    path "${meta.id}_overall_stats.tsv.gz", emit: overall_stats
+    path "${meta.id}.overall_stats.tsv.gz", emit: overall_stats
     path "versions.yml"                   , emit: versions
 
     when:
@@ -69,38 +69,38 @@ process COLLECT_STATS {
 
     # Collect stats for each sample, create a table in long format that can be appended to
     t <- tibble(sample = c("${samples.join('", "')}")) ${read_trimlogs}
-    # add samtools idxstats output
+        # add samtools idxstats output
         mutate(
             i = map(
                 sample,
                 function(s) {
                     fread(cmd = sprintf("grep -v '^*' %s*idxstats", s), sep = '\\t', col.names = c('chr', 'length', 'idxs_n_mapped', 'idxs_n_unmapped')) %>%
-                    lazy_dt() %>%
-                    summarise(idxs_n_mapped = sum(idxs_n_mapped), idxs_n_unmapped = sum(idxs_n_unmapped)) %>%
-                    as_tibble()
+                        lazy_dt() %>%
+                        summarise(idxs_n_mapped = sum(idxs_n_mapped), idxs_n_unmapped = sum(idxs_n_unmapped)) %>%
+                        as_tibble()
                 }
             )
         ) %>%
         unnest(i) %>%
-            pivot_longer(2:ncol(.), names_to = 'm', values_to = 'v') %>%
-            union(
+        pivot_longer(2:ncol(.), names_to = 'm', values_to = 'v') %>%
+        union(
             # Total observation after featureCounts
-                tibble(file = Sys.glob('*_counts.tsv.gz')) %>%
+            tibble(file = Sys.glob('*.counts.tsv.gz')) %>%
                 mutate(d = map(file, function(f) fread(cmd = sprintf("gunzip -c %s", f), sep = '\\t'))) %>%
                 as_tibble() %>%
                 unnest(d) %>%
                 mutate(sample = as.character(sample)) %>%
                 group_by(sample) %>% summarise(n_feature_count = sum(count), .groups = 'drop') %>%
                 pivot_longer(2:ncol(.), names_to = 'm', values_to = 'v')
-            )
+        )
 
     # Add in stats from BBDuk, if present
     for ( f in Sys.glob('*.bbduk.log') ) {
         s = str_remove(f, '.bbduk.log')
         t <- t %>% union(
             fread(cmd = sprintf("grep 'Result:' %s | sed 's/Result:[ \\t]*//; s/ reads.*//'", f), col.names = c('v')) %>%
-            as_tibble() %>%
-            mutate(sample = s, m = 'n_non_contaminated')
+                as_tibble() %>%
+                mutate(sample = s, m = 'n_non_contaminated')
         )
     }
 
@@ -113,11 +113,21 @@ process COLLECT_STATS {
         arrange(sample, m) %>%
         pivot_wider(names_from = m, values_from = v) %>%
         left_join(mergetab, by = 'sample') %>%
-        write_tsv('${prefix}_overall_stats.tsv.gz')
+        write_tsv('${prefix}.overall_stats.tsv.gz')
 
-        writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")), paste0("    dplyr: ", packageVersion('dplyr')),
-            paste0("    dtplyr: ", packageVersion('dtplyr')), paste0("    data.table: ", packageVersion('data.table')), paste0("    readr: ", packageVersion('readr')),
-            paste0("    purrr: ", packageVersion('purrr')), paste0("    tidyr: ", packageVersion('tidyr')), paste0("    stringr: ", packageVersion('stringr')) ),
-            "versions.yml")
+    writeLines(
+        c(
+            "\\"${task.process}\\":",
+            paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")),
+            paste0("    dplyr: ", packageVersion('dplyr')),
+            paste0("    dtplyr: ", packageVersion('dtplyr')),
+            paste0("    data.table: ", packageVersion('data.table')),
+            paste0("    readr: ", packageVersion('readr')),
+            paste0("    purrr: ", packageVersion('purrr')),
+            paste0("    tidyr: ", packageVersion('tidyr')),
+            paste0("    stringr: ", packageVersion('stringr'))
+        ),
+        "versions.yml"
+    )
     """
 }
