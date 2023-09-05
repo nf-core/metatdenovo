@@ -10,11 +10,21 @@ include { SUM_TAXONOMY                      } from '../../modules/local/sum_taxo
 workflow SUB_EUKULELE {
 
     take:
-        eukulele // Channel: val(meta), path(fasta), val(database), path(directory) 
+        eukulele // Channel: val(meta), path(fasta), val(database), path(directory)
         collect_fcs
 
     main:
         ch_versions = Channel.empty()
+
+        String directoryName = eukulele
+        File directory       = new File(directoryName)
+        String eukdb         = directoryName + "**/reference.pep.fa"
+        File eukpepfa      = new File(eukdb)
+
+        if ( ! directory.exists() ) {
+            directory.mkdir()
+        }
+
 
         EUKULELE_DOWNLOAD ( eukulele.filter{ it[2] }.map { [ it[2], it[3] ] } )
         ch_download = EUKULELE_DOWNLOAD.out.db
@@ -23,7 +33,7 @@ workflow SUB_EUKULELE {
             .mix ( EUKULELE_DOWNLOAD.out.db )
             .mix(eukulele.filter{ ! it[2] }.map { [ [], it[3] ] } )
             .merge( eukulele.map{ [ it[0], it[1] ] } )
-            .map { [ [ id: "${it[2].id}.${it[0]}" ], it[3], it[0], it[1] ] } 
+            .map { [ [ id: "${it[2].id}.${it[0]}" ], it[3], it[0], it[1] ] }
             .set { ch_eukulele }
         EUKULELE_SEARCH( ch_eukulele )
 

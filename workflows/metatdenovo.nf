@@ -286,7 +286,7 @@ workflow METATDENOVO {
                 ch_se_reads_to_assembly = ch_interleaved_se.map { meta, fastq -> fastq }
                 ch_pe_reads_to_assembly = Channel.empty()
             }
-        } 
+        }
         else if ( params.bbnorm ) {
             BBMAP_BBNORM(ch_interleaved.collect { meta, fastq -> fastq }.map {[ [id:'all_samples', single_end:true], it ] } )
             ch_pe_reads_to_assembly = BBMAP_BBNORM.out.fastq.map { it[1] }
@@ -452,8 +452,6 @@ workflow METATDENOVO {
     // SUBWORKFLOW: run kofamscan on the ORF-called amino acid sequences
     //
     if( !params.skip_kofamscan ) {
-        File kofam_dir = new File(params.kofam_dir)
-        if ( ! kofam_dir.exists() ) { kofam_dir.mkdir() }
         ch_aa
             //.map { [ [ id:"${it[0].id}" ], it[1] ] }
             .map { [ it[0], it[1] ] }
@@ -468,7 +466,6 @@ workflow METATDENOVO {
         ch_merge_tables
             .map { [ it[0], it[1], [] ] }
             .set { ch_merge_tables }
-
     }
 
     // set up contig channel to use in CAT and TransRate
