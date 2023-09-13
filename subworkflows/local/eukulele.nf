@@ -34,8 +34,6 @@ workflow SUB_EUKULELE {
             .join(ch_eukulele)
             .map { [ it[0], it[3], it[1] ] }
             .set { ch_sum_taxonomy }
-        ch_sum_taxonomy.view()
-        feature_counts.view()
 
         SUM_TAXONOMY ( ch_sum_taxonomy, feature_counts )
 
