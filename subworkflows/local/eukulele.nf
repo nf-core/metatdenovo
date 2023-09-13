@@ -11,12 +11,13 @@ workflow SUB_EUKULELE {
 
     take:
         eukulele // Channel: val(meta), path(fasta), val(database), path(directory) 
-        collect_fcs
+        feature_counts
 
     main:
         ch_versions = Channel.empty()
 
-        EUKULELE_DOWNLOAD ( eukulele.filter{ it[2] }.map { [ it[2], it[3] ] } )
+
+        EUKULELE_DOWNLOAD ( eukulele.filter { it[2] }.map { [ it[2], it[3] ] } )
         ch_download = EUKULELE_DOWNLOAD.out.db
 
         Channel.empty()
@@ -28,7 +29,15 @@ workflow SUB_EUKULELE {
         EUKULELE_SEARCH( ch_eukulele )
 
         FORMAT_TAX( EUKULELE_SEARCH.out.taxonomy_estimation.map { [ it[0], it[1] ] } )
-        SUM_TAXONOMY( FORMAT_TAX.out.tax, collect_fcs )
+
+        FORMAT_TAX.out.tax
+            .join(ch_eukulele)
+            .map { [ it[0], it[3], it[1] ] }
+            .set { ch_sum_taxonomy }
+        ch_sum_taxonomy.view()
+        feature_counts.view()
+
+        SUM_TAXONOMY ( ch_sum_taxonomy, feature_counts )
 
     emit:
         taxonomy_summary    = SUM_TAXONOMY.out.taxonomy_summary
