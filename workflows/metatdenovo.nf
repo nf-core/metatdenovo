@@ -456,7 +456,7 @@ workflow METATDENOVO {
             //.map { [ [ id:"${it[0].id}" ], it[1] ] }
             .map { [ it[0], it[1] ] }
             .set { ch_kofamscan }
-        KOFAMSCAN( ch_kofamscan, Channel.fromPath(params.kofam_dir), ch_fcs_for_summary)
+        KOFAMSCAN( ch_kofamscan, params.kofam_dir, ch_fcs_for_summary)
         ch_versions = ch_versions.mix(KOFAMSCAN.out.versions)
         ch_kofamscan_summary = KOFAMSCAN.out.kofamscan_summary.collect().map { it[1] }
         ch_merge_tables
@@ -506,18 +506,15 @@ workflow METATDENOVO {
     // SUBWORKFLOW: Eukulele
     //
     if( !params.skip_eukulele){
-        File directory = new File(params.eukulele_dbpath)
-        if ( ! directory.exists() ) { directory.mkdir() }
-        ch_directory = Channel.fromPath( directory )
-            ch_aa
-                .map {[ [ id:"${it[0].id}" ], it[1] ] }
-                .combine( ch_eukulele_db )
-                .set { ch_eukulele }
-            SUB_EUKULELE( ch_eukulele, ch_fcs_for_summary )
-            ch_taxonomy_summary = SUB_EUKULELE.out.taxonomy_summary.collect().map { it[1] }
-            ch_merge_tables
-                .combine( ch_taxonomy_summary )
-                .set { ch_merge_tables }
+        ch_aa
+            .map {[ [ id:"${it[0].id}" ], it[1] ] }
+            .combine( ch_eukulele_db )
+            .set { ch_eukulele }
+        SUB_EUKULELE( ch_eukulele, ch_fcs_for_summary )
+        ch_taxonomy_summary = SUB_EUKULELE.out.taxonomy_summary.collect().map { it[1] }
+        ch_merge_tables
+            .combine( ch_taxonomy_summary )
+            .set { ch_merge_tables }
     } else {
         ch_merge_tables
             .map { [ it[0], it[1], it[2], [] ] }

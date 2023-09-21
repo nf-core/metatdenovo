@@ -16,21 +16,31 @@ workflow SUB_EUKULELE {
     main:
         ch_versions = Channel.empty()
 
-        String directoryName = eukulele
+        String directoryName = params.eukulele_dbpath
         File directory       = new File(directoryName)
-        String eukdb         = directoryName + "**/reference.pep.fa"
-        File eukpepfa      = new File(eukdb)
+        // get files in euk directory, and checks if there is a reference.pep.fa in the
+        // first one. Not the most robust but if this fails it will simply download
+        // the database anyways.
+        List euk_files       = []
+        new File(directoryName).eachFile() {
+            file-> euk_files.add(file)
+        }
+        String eukdb         = euk_files.get(0).toString().plus("/reference.pep.fa")
+        File eukpepfa        = new File(eukdb)
 
         if ( ! directory.exists() ) {
             directory.mkdir()
         }
 
-
-        EUKULELE_DOWNLOAD ( eukulele.filter{ it[2] }.map { [ it[2], it[3] ] } )
-        ch_download = EUKULELE_DOWNLOAD.out.db
+        if ( ! eukpepfa.exists() ) {
+            EUKULELE_DOWNLOAD ( eukulele.filter{ it[2] }.map { [ it[2], it[3] ] } )
+            ch_download = EUKULELE_DOWNLOAD.out.db
+        } else {
+            ch_download = Channel.fromPath(directory)
+        }
 
         Channel.empty()
-            .mix ( EUKULELE_DOWNLOAD.out.db )
+            .mix ( ch_download )
             .mix(eukulele.filter{ ! it[2] }.map { [ [], it[3] ] } )
             .merge( eukulele.map{ [ it[0], it[1] ] } )
             .map { [ [ id: "${it[2].id}.${it[0]}" ], it[3], it[0], it[1] ] }

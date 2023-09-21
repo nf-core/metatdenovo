@@ -18,7 +18,7 @@ workflow KOFAMSCAN {
 
         String directoryName = kofam_dir
         File directory       = new File(directoryName)
-        String kofamdb       = directoryName + "ko_list"
+        String kofamdb       = directoryName + "/ko_list"
         File kolistfile      = new File(kofamdb)
 
         if ( ! directory.exists() ) {
@@ -33,7 +33,7 @@ workflow KOFAMSCAN {
             ch_versions = ch_versions.mix ( KOFAMSCAN_DOWNLOAD.out.versions )
         } else {
             ch_dbpath   = Channel.fromPath(kolistfile)
-            ch_profiles = Channel.fromPath(kofam_dir + "profiles")
+            ch_profiles = Channel.fromPath(kofam_dir + "/profiles")
         }
 
         KOFAMSCAN_SCAN( kofamscan, ch_dbpath, ch_profiles )
