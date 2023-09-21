@@ -143,7 +143,7 @@
                 "bbnorm_target": {
                     "type": "integer",
                     "default": 100,
-                    "description": "produce an output file of reads with an average depth of nx. ",
+                    "description": "Reduce the number of reads for assembly average coverage of this number.",
                     "fa_icon": "fas fa-align-justify"
                 },
                 "bbnorm_min": {
@@ -178,6 +178,12 @@
                     "mimetype": "text/plain",
                     "description": "Path to a fasta file with a finished assembly. Assembly will be skipped by the pipeline.",
                     "fa_icon": "far fa-file-code"
+                },
+                "min_contig_length": {
+                    "type": "integer",
+                    "default": 0,
+                    "description": "Filter out contigs shorter than this.",
+                    "fa_icon": "fas fa-align-justify"
                 }
             },
             "fa_icon": "fas fa-bezier-curve"
