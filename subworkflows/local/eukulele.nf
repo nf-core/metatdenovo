@@ -25,8 +25,8 @@ workflow SUB_EUKULELE {
         new File(directoryName).eachFile() {
             file-> euk_files.add(file)
         }
-        String eukdb         = euk_files.get(0).toString().plus("/reference.pep.fa")
-        File eukpepfa        = new File(eukdb)
+        String eukdb         = euk_files.get(0).toString()
+        File eukpepfa        = new File(eukdb.plus("/reference.pep.fa"))
 
         if ( ! directory.exists() ) {
             directory.mkdir()
@@ -36,7 +36,12 @@ workflow SUB_EUKULELE {
             EUKULELE_DOWNLOAD ( eukulele.filter{ it[2] }.map { [ it[2], it[3] ] } )
             ch_download = EUKULELE_DOWNLOAD.out.db
         } else {
-            ch_download = Channel.fromPath(directory)
+            // tuple val("${db}"), path("${directory}/${db}"), emit: db
+            // mimic download output with subdir and db name
+            String db = eukdb.split("/")[0]
+            Channel.empty()
+                .map { tuple val(db), Channel.fromPath(eukdb) }
+                .set { ch_download }
         }
 
         Channel.empty()
