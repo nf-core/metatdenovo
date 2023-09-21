@@ -129,9 +129,13 @@ These options are:
 
 - [kofamscan](https://github.com/takaram/kofam_scan) (`--kofam_dir`)
 
+- [EUKulele](https://github.com/AlexanderLabWHOI/EUKulele) (`--eukulele_dbpath`)
+
 All the options can run in the same time (e.g. `nextflow run main.nf -profile test,docker --eggnog --hmmdir hmms/ --rundbcan`) but each program has its own options that you will need to read carefully before running the pipeline.
 You can find more information about the different options in the [parameters page](https://nf-co.re/metatdenovo/parameters).
 For details about individual programs used, see their respective home pages.
+
+If an Eggnog, kofam, or EUKulele database is already available, they can be specified with the above commands to skip the automatic download that the pipeline performs.
 
 If you don't want run eggNOG-mapper, you will need to add the flag `--skip_eggnog`, otherwise metatdenovo will run the program automatically.
 
