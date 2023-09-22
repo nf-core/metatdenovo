@@ -24,7 +24,7 @@
                 },
                 "se_reads": {
                     "type": "boolean",
-                    "default": "false",
+                    "default": false,
                     "description": "activate when using single end reads input"
                 },
                 "outdir": {
@@ -113,7 +113,7 @@
             "description": "all the trim option are listed below"
         },
         "bbnorm_options": {
-            "title": "BBnorm options",
+            "title": "Filtering options",
             "type": "object",
             "description": "",
             "default": "",
@@ -123,11 +123,6 @@
                     "description": "Fasta file with sequences to filter away before running assembly etc..",
                     "help_text": "Read sequences matching this file will be filtered out from samples with BBDuk before mapping. If no file is specified, BBDuk will not be run.",
                     "fa_icon": "fas fa-filter"
-                },
-                "save_bam": {
-                    "type": "boolean",
-                    "description": "save the output from BBMap align",
-                    "fa_icon": "fas fa-align-center"
                 }
             },
             "fa_icon": "fas fa-filter"
@@ -148,7 +143,7 @@
                 "bbnorm_target": {
                     "type": "integer",
                     "default": 100,
-                    "description": "produce an output file of reads with an average depth of nx. ",
+                    "description": "Reduce the number of reads for assembly average coverage of this number.",
                     "fa_icon": "fas fa-align-justify"
                 },
                 "bbnorm_min": {
@@ -156,6 +151,11 @@
                     "default": 5,
                     "description": "Reads with an apparent depth of under nx will be presumed to be errors and discarded",
                     "fa_icon": "fas fa-align-justify"
+                },
+                "save_bbnorm_fastq": {
+                    "type": "boolean",
+                    "description": "save the resulting fastq files from normalization",
+                    "fa_icon": "fas fa-align-center"
                 }
             }
         },
@@ -178,9 +178,29 @@
                     "mimetype": "text/plain",
                     "description": "Path to a fasta file with a finished assembly. Assembly will be skipped by the pipeline.",
                     "fa_icon": "far fa-file-code"
+                },
+                "min_contig_length": {
+                    "type": "integer",
+                    "default": 0,
+                    "description": "Filter out contigs shorter than this.",
+                    "fa_icon": "fas fa-align-justify"
                 }
             },
             "fa_icon": "fas fa-bezier-curve"
+        },
+        "mapping_options": {
+            "title": "Mapping options",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "save_bam": {
+                    "type": "boolean",
+                    "description": "save the bam files from mapping",
+                    "fa_icon": "fas fa-align-center"
+                }
+            },
+            "fa_icon": "fas fa-filter"
         },
         "orf_caller_options": {
             "title": "Orf Caller options",
@@ -292,9 +312,8 @@
                 },
                 "cat_db": {
                     "type": "string",
-                    "default": "None",
                     "description": "path to cat database",
-                    "help_text": "This parameter is mutual exclusive with \u00b4cat_db_generate\u00b4. You need to provide a version of CAT database that has the same DIAMOND version of the module (DIAMOND 2.0.8) otherwise you might encounter issues of incompatibility and the module will fail. We recommend to always use the database provided by CAT website: https://tbb.bio.uu.nl/bastiaan/CAT_prepare/",
+                    "help_text": "This parameter is mutually exclusive with \u00b4cat_db_generate\u00b4. You need to provide a version of CAT database that has the same DIAMOND version of the module (DIAMOND 2.0.8) otherwise you might encounter issues of incompatibility and the module will fail. We recommend to always use the database provided by CAT website: https://tbb.bio.uu.nl/bastiaan/CAT_prepare/",
                     "fa_icon": "fas fa-database"
                 },
                 "cat_db_generate": {
@@ -535,6 +554,9 @@
         },
         {
             "$ref": "#/definitions/assembler_options"
+        },
+        {
+            "$ref": "#/definitions/mapping_options"
         },
         {
             "$ref": "#/definitions/orf_caller_options"
