@@ -147,6 +147,7 @@ include { BBMAP_BBNORM                               } from '../modules/nf-core/
 include { SEQTK_MERGEPE                              } from '../modules/nf-core/seqtk/mergepe/main'
 include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS_CDS } from '../modules/nf-core/subread/featurecounts/main'
 include { SPADES                                     } from '../modules/nf-core/spades/main'
+include { SEQTK_SEQ as SEQTK_SEQ_CONTIG_FILTER       } from '../modules/nf-core/seqtk/seq/main'
 include { CAT_FASTQ            	                     } from '../modules/nf-core/cat/fastq/main'
 include { FASTQC                                     } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                                    } from '../modules/nf-core/multiqc/main'
@@ -336,6 +337,12 @@ workflow METATDENOVO {
             .map { [ [ id: 'megahit' ], it ] }
             .set { ch_assembly_contigs }
         ch_versions = ch_versions.mix(MEGAHIT_INTERLEAVED.out.versions)
+    }
+
+    // If the user asked for length filtering, perform that with SEQTK_SEQ (the actual length parameter is used in modules.config)
+    if ( params.min_contig_length > 0 ) {
+        SEQTK_SEQ_CONTIG_FILTER ( ch_assembly_contigs )
+        ch_assembly_contigs = SEQTK_SEQ_CONTIG_FILTER.out.fastx
     }
 
     //
@@ -582,6 +589,7 @@ workflow.onComplete {
     if (params.email || params.email_on_fail) {
         NfcoreTemplate.email(workflow, params, summary_params, projectDir, log, multiqc_report)
     }
+    NfcoreTemplate.dump_parameters(workflow, params)
     NfcoreTemplate.summary(workflow, params, log)
     if (params.hook_url) {
         NfcoreTemplate.IM_notification(workflow, params, summary_params, projectDir, log)
