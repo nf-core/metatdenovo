@@ -16,7 +16,6 @@ workflow SUB_EUKULELE {
     main:
         ch_versions = Channel.empty()
 
-
         EUKULELE_DOWNLOAD ( eukulele.filter { it[2] }.map { [ it[2], it[3] ] } )
         ch_download = EUKULELE_DOWNLOAD.out.db
 
