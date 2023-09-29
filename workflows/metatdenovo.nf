@@ -228,7 +228,7 @@ workflow METATDENOVO {
     } else {
         if ( params.se_reads ) {
             ch_collect_stats
-                .combine(FASTQC_TRIMGALORE.out.trim_log.collect { it[1] } )
+                .combine(FASTQC_TRIMGALORE.out.trim_log.collect { it[1] }.map { [ it ] })
                 .set { ch_collect_stats }
         } else {
             ch_collect_stats
@@ -462,7 +462,6 @@ workflow METATDENOVO {
         File kofam_dir = new File(params.kofam_dir)
         if ( ! kofam_dir.exists() ) { kofam_dir.mkdir() }
         ch_aa
-            //.map { [ [ id:"${it[0].id}" ], it[1] ] }
             .map { [ it[0], it[1] ] }
             .set { ch_kofamscan }
         KOFAMSCAN( ch_kofamscan, Channel.fromPath(params.kofam_dir), ch_fcs_for_summary)
