@@ -26,7 +26,7 @@ workflow EGGNOG {
 
         if ( ! eggnogfile.exists() ) {
             EGGNOG_DOWNLOAD()
-            ch_dpath = EGGNOG_DOWNLOAD.out.db
+            ch_dbpath = EGGNOG_DOWNLOAD.out.db
 
             ch_versions = ch_versions.mix ( EGGNOG_DOWNLOAD.out.versions )
         } else {
