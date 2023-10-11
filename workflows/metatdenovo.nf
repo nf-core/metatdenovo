@@ -147,6 +147,7 @@ include { BBMAP_BBNORM                               } from '../modules/nf-core/
 include { SEQTK_MERGEPE                              } from '../modules/nf-core/seqtk/mergepe/main'
 include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS_CDS } from '../modules/nf-core/subread/featurecounts/main'
 include { SPADES                                     } from '../modules/nf-core/spades/main'
+include { SEQTK_SEQ as SEQTK_SEQ_CONTIG_FILTER       } from '../modules/nf-core/seqtk/seq/main'
 include { CAT_FASTQ            	                     } from '../modules/nf-core/cat/fastq/main'
 include { FASTQC                                     } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                                    } from '../modules/nf-core/multiqc/main'
@@ -227,7 +228,7 @@ workflow METATDENOVO {
     } else {
         if ( params.se_reads ) {
             ch_collect_stats
-                .combine(FASTQC_TRIMGALORE.out.trim_log.collect { it[1] } )
+                .combine(FASTQC_TRIMGALORE.out.trim_log.collect { it[1] }.map { [ it ] })
                 .set { ch_collect_stats }
         } else {
             ch_collect_stats
@@ -336,6 +337,12 @@ workflow METATDENOVO {
             .map { [ [ id: 'megahit' ], it ] }
             .set { ch_assembly_contigs }
         ch_versions = ch_versions.mix(MEGAHIT_INTERLEAVED.out.versions)
+    }
+
+    // If the user asked for length filtering, perform that with SEQTK_SEQ (the actual length parameter is used in modules.config)
+    if ( params.min_contig_length > 0 ) {
+        SEQTK_SEQ_CONTIG_FILTER ( ch_assembly_contigs )
+        ch_assembly_contigs = SEQTK_SEQ_CONTIG_FILTER.out.fastx
     }
 
     //
@@ -453,7 +460,6 @@ workflow METATDENOVO {
     //
     if( !params.skip_kofamscan ) {
         ch_aa
-            //.map { [ [ id:"${it[0].id}" ], it[1] ] }
             .map { [ it[0], it[1] ] }
             .set { ch_kofamscan }
         KOFAMSCAN( ch_kofamscan, params.kofam_dir, ch_fcs_for_summary)
@@ -506,15 +512,19 @@ workflow METATDENOVO {
     // SUBWORKFLOW: Eukulele
     //
     if( !params.skip_eukulele){
-        ch_aa
-            .map {[ [ id:"${it[0].id}" ], it[1] ] }
-            .combine( ch_eukulele_db )
-            .set { ch_eukulele }
-        SUB_EUKULELE( ch_eukulele, ch_fcs_for_summary )
-        ch_taxonomy_summary = SUB_EUKULELE.out.taxonomy_summary.collect().map { it[1] }
-        ch_merge_tables
-            .combine( ch_taxonomy_summary )
-            .set { ch_merge_tables }
+        File directory = new File(params.eukulele_dbpath)
+        if ( ! directory.exists() ) { directory.mkdir() }
+        ch_directory = Channel.fromPath( directory )
+            ch_aa
+                .map {[ [ id:"${it[0].id}" ], it[1] ] }
+                .combine( ch_eukulele_db )
+                .set { ch_eukulele }
+            SUB_EUKULELE( ch_eukulele, ch_fcs_for_summary )
+            ch_taxonomy_summary = SUB_EUKULELE.out.taxonomy_summary.collect().map { it[1] }
+            ch_versions = ch_versions.mix(SUB_EUKULELE.out.versions)
+            ch_merge_tables
+                .combine( ch_taxonomy_summary )
+                .set { ch_merge_tables }
     } else {
         ch_merge_tables
             .map { [ it[0], it[1], it[2], [] ] }
@@ -577,6 +587,7 @@ workflow.onComplete {
     if (params.email || params.email_on_fail) {
         NfcoreTemplate.email(workflow, params, summary_params, projectDir, log, multiqc_report)
     }
+    NfcoreTemplate.dump_parameters(workflow, params)
     NfcoreTemplate.summary(workflow, params, log)
     if (params.hook_url) {
         NfcoreTemplate.IM_notification(workflow, params, summary_params, projectDir, log)

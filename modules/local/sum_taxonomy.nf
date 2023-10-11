@@ -9,8 +9,8 @@ process SUM_TAXONOMY {
 
     input:
 
-    tuple val(meta), path(taxonomy)
-    path(fcs)
+    tuple val(meta), val(db), path(taxonomy)
+    path feature_counts
 
     output:
 
@@ -29,21 +29,17 @@ process SUM_TAXONOMY {
 
     library(tidyverse)
 
-    TYPE_ORDER = c('sample', 'database', 'field', 'value')
-    # call the tables into variables
-    taxonomy <- read_tsv("${prefix}.taxonomy_classification.tsv.gz", show_col_types = FALSE )
+    # Read the taxonomy and counts tables
+    taxonomy <- read_tsv("${taxonomy}", show_col_types = FALSE )
 
-    counts <- list.files(pattern = "*.counts.tsv.gz") %>%
-        map_df(~read_tsv(.,  show_col_types  = FALSE)) %>%
+    counts <- read_tsv("${feature_counts}", show_col_types = FALSE) %>%
         mutate(sample = as.character(sample))
 
+    # Join the two and count the number of ORFs with assigned taxonomy
     counts %>%
-        right_join(taxonomy, by = 'orf') %>%
-        group_by(sample) %>%
-        drop_na() %>%
-        count(orf) %>%
-        summarise( value = sum(n), .groups = 'drop') %>%
-        add_column(database = "${prefix}", field = "n_orfs") %>%
+        inner_join(taxonomy, by = 'orf') %>%
+        count(sample, name = 'value') %>%
+        mutate(database = "${db}", field = "eukulele_n_orfs") %>%
         relocate(value, .after = last_col()) %>%
         write_tsv('${prefix}_summary.tsv.gz')
 
