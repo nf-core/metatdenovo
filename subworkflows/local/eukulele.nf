@@ -9,6 +9,7 @@ include { SUM_TAXONOMY                      } from '../../modules/local/sum_taxo
 workflow SUB_EUKULELE {
 
     take:
+
         eukulele // Channel: val(meta), path(fasta), val(database), path(directory) 
         feature_counts
 
