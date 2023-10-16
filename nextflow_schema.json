@@ -570,5 +570,11 @@
         {
             "$ref": "#/definitions/generic_options"
         }
-    ]
+    ],
+    "properties": {
+        "dbname": {
+            "type": "string",
+            "default": null
+        }
+    }
 }
