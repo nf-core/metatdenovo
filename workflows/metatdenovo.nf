@@ -337,7 +337,7 @@ workflow METATDENOVO {
             .map { [ [ id: 'megahit' ], it ] }
             .set { ch_assembly_contigs }
         ch_versions = ch_versions.mix(MEGAHIT_INTERLEAVED.out.versions)
-    }
+    } else { exit 1, 'Assembler not specified!' }
 
     // If the user asked for length filtering, perform that with SEQTK_SEQ (the actual length parameter is used in modules.config)
     if ( params.min_contig_length > 0 ) {
