@@ -7,15 +7,18 @@ process EGGNOG_DOWNLOAD {
         'https://depot.galaxyproject.org/singularity/eggnog-mapper:2.1.6--pyhdfd78af_0':
         'biocontainers/eggnog-mapper:2.1.6--pyhdfd78af_0' }"
 
+    input:
+    path(dbpath)
+
     output:
-    path("./eggnog")   , emit: db
-    path("*.db")       , emit: eggnog_db
-    path("*.taxa.db")  , emit: eggnog_taxa
-    path("*.pkl")      , emit: eggnog_traverse
-    path("*.dmnd")     , emit: proteins, optional: true
-    path("hmmer/")     , emit: hmmer   , optional: true
-    path("mmseqs/")    , emit: mmseqs  , optional: true
-    path("pfam/")      , emit: pfam    , optional: true
+    path("./eggnog/")  , emit: db
+    path("$dbpath/*.db")       , emit: eggnog_db
+    path("$dbpath/*.taxa.db")  , emit: eggnog_taxa
+    path("$dbpath/*.pkl")      , emit: eggnog_traverse
+    path("$dbpath/*.dmnd")     , emit: proteins, optional: true
+    path("$dbpath/hmmer/")   , emit: hmmer   , optional: true
+    path("$dbpath/mmseqs/")  , emit: mmseqs  , optional: true
+    path("$dbpath/pfam/")    , emit: pfam    , optional: true
     path "versions.yml", emit: versions
 
     script:
@@ -28,9 +31,9 @@ process EGGNOG_DOWNLOAD {
     download_eggnog_data.py \\
         $args \\
         -y \\
-        --data_dir ./eggnog/
+        --data_dir $dbpath
 
-    ln -s ./eggnog/* ./
+    cp -r $dbpath/* eggnog/
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
