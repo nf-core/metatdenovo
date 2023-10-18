@@ -445,6 +445,8 @@ workflow METATDENOVO {
     // SUBWORKFLOW: run eggnog_mapper on the ORF-called amino acid sequences
     //
     if ( ! params.skip_eggnog ) {
+        File directory       = new File(params.eggnog_dbpath)
+        if ( ! directory.exists() ) { directory.mkdir() }
         EGGNOG(params.eggnog_dbpath, ch_aa, ch_fcs_for_summary )
         ch_versions = ch_versions.mix(EGGNOG.out.versions)
         ch_merge_tables = EGGNOG.out.sumtable
