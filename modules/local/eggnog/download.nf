@@ -14,7 +14,7 @@ process EGGNOG_DOWNLOAD {
     path("$dbpath/*.db")          , emit: eggnog_db
     path("$dbpath/*.taxa.db")     , emit: eggnog_taxa
     path("$dbpath/*.pkl")         , emit: eggnog_traverse
-    path("$dbpath/")              , emit: db_ready
+    path("$dbpath/")              , emit: db
     path("$dbpath/*.dmnd")        , emit: proteins, optional: true
     path("$dbpath/hmmer/")        , emit: hmmer   , optional: true
     path("$dbpath/mmseqs/")       , emit: mmseqs  , optional: true
