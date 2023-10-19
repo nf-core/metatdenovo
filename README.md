@@ -27,7 +27,7 @@ On release, automated continuous integration tests run the pipeline on a full-si
 2. Present QC for raw reads ([`MultiQC`](http://multiqc.info/))
 3. Quality trimming and adapters removal for raw reads [`Trimm Galore!`](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/)
 4. Filter sequences with [`BBduk`](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbduk-guide/)
-5. Normalize the sequences with [`BBnorm`](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbnorm-guide/)
+5. Normalize the sequencing depth with [`BBnorm`](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbnorm-guide/)
 6. Merge trimmed, pair-end reads ( [`Seqtk`](https://github.com/lh3/seqtk))
 7. Choice of de novo assembly programs:
    1. [`RNAspade`](https://cab.spbu.ru/software/rnaspades/) suggested for Eukaryotes de novo assembly
