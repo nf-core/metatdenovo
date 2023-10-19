@@ -18,7 +18,7 @@ process EGGNOG_DOWNLOAD {
     path("$dbpath/*.dmnd")        , emit: proteins, optional: true
     path("$dbpath/hmmer/")        , emit: hmmer   , optional: true
     path("$dbpath/mmseqs/")       , emit: mmseqs  , optional: true
-    path("$dbpath/pfam/")         , emit: pfam    , optional: true   
+    path("$dbpath/pfam/")         , emit: pfam    , optional: true
     path "versions.yml"           , emit: versions
 
     script:
@@ -31,12 +31,10 @@ process EGGNOG_DOWNLOAD {
         -y \\
         --data_dir $dbpath
 
-
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         eggnog: \$( echo \$(emapper.py --version 2>&1)| sed 's/.* emapper-//' )
     END_VERSIONS
-
 
     """
 
