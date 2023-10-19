@@ -11,35 +11,30 @@ process EGGNOG_DOWNLOAD {
     path(dbpath)
 
     output:
-    path("./eggnog/")  , emit: db
-    path("$dbpath/*.db")       , emit: eggnog_db
-    path("$dbpath/*.taxa.db")  , emit: eggnog_taxa
-    path("$dbpath/*.pkl")      , emit: eggnog_traverse
-    path("$dbpath/*.dmnd")     , emit: proteins, optional: true
-    path("$dbpath/hmmer/")   , emit: hmmer   , optional: true
-    path("$dbpath/mmseqs/")  , emit: mmseqs  , optional: true
-    path("$dbpath/pfam/")    , emit: pfam    , optional: true
-    path "versions.yml", emit: versions
+    path("$dbpath/*.db")          , emit: eggnog_db
+    path("$dbpath/*.taxa.db")     , emit: eggnog_taxa
+    path("$dbpath/*.pkl")         , emit: eggnog_traverse
+    path("$dbpath/")              , emit: db
+    path("$dbpath/*.dmnd")        , emit: proteins, optional: true
+    path("$dbpath/hmmer/")        , emit: hmmer   , optional: true
+    path("$dbpath/mmseqs/")       , emit: mmseqs  , optional: true
+    path("$dbpath/pfam/")         , emit: pfam    , optional: true
+    path "versions.yml"           , emit: versions
 
     script:
     def args = task.ext.args ?: ''
 
     """
 
-    mkdir eggnog
-
     download_eggnog_data.py \\
         $args \\
         -y \\
         --data_dir $dbpath
 
-    cp -r $dbpath/* eggnog/
-
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         eggnog: \$( echo \$(emapper.py --version 2>&1)| sed 's/.* emapper-//' )
     END_VERSIONS
-
 
     """
 
