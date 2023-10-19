@@ -27,7 +27,7 @@ On release, automated continuous integration tests run the pipeline on a full-si
 2. Present QC for raw reads ([`MultiQC`](http://multiqc.info/))
 3. Quality trimming and adapters removal for raw reads [`Trimm Galore!`](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/)
 4. Filter sequences with [`BBduk`](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbduk-guide/)
-5. Normalize the sequences with [khmer](https://khmer-protocols.readthedocs.io/en/latest/mrnaseq/2-diginorm.html) or [`BBnorm`](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbnorm-guide/)
+5. Normalize the sequences with [`BBnorm`](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbnorm-guide/)
 6. Merge trimmed, pair-end reads ( [`Seqtk`](https://github.com/lh3/seqtk))
 7. Choice of de novo assembly programs:
    1. [`RNAspade`](https://cab.spbu.ru/software/rnaspades/) suggested for Eukaryotes de novo assembly
@@ -47,7 +47,6 @@ On release, automated continuous integration tests run the pipeline on a full-si
 11. Taxonomical annotation:
     1. [`EUKulele`](https://github.com/AlexanderLabWHOI/EUKulele) -> Reformat TSV output "Reformat_tax.R"
     2. [`CAT`](https://github.com/dutilh/CAT)
-    3. Choice of functional annotation: 1. [`Eggnog-mapper`](http://eggnog-mapper.embl.de) 2. [`Run-DBcan`](https://github.com/linnabrown/run_dbcan) 3. [`Hmmsearch`](https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch). Besides searching the ORFs, each ORF's hits will be ranked.
 12. Summary statistics table. Collect_stats.R
 
 ## Usage
