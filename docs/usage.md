@@ -125,7 +125,7 @@ These options are:
 
 - [kofamscan](https://github.com/takaram/kofam_scan) (`--kofam_dir`)
 
-All the options can run in the same time (e.g. `nextflow run main.nf -profile test,docker --eggnog --hmmdir hmms/ `) but each program has its own options that you will need to read carefully before running the pipeline.
+All the options can run at the same time (e.g. `nextflow run main.nf -profile test,docker --eggnog --hmmdir hmms/ `) but each program has its own options that you will need to read carefully before running the pipeline.
 You can find more information about the different options in the [parameters page](https://nf-co.re/metatdenovo/parameters).
 For details about individual programs used, see their respective home pages.
 
