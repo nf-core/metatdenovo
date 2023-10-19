@@ -44,7 +44,7 @@ On release, automated continuous integration tests run the pipeline on a full-si
     1. [`Eggnog`](https://github.com/eggnogdb/eggnog-mapper) -> Reformat TSV output "eggnog table"
     2. [`KOfamscan`](https://github.com/takaram/kofam_scan)
     3. [`HMMERsearch`](https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch) -> Ranking orfs based on HMMprofile with [`Hmmrank`](https://github.com/erikrikarddaniel/hmmrank)
-11. Taxonomical annotation:
+11. Taxonomic annotation:
     1. [`EUKulele`](https://github.com/AlexanderLabWHOI/EUKulele) -> Reformat TSV output "Reformat_tax.R"
     2. [`CAT`](https://github.com/dutilh/CAT)
 12. Summary statistics table. Collect_stats.R
