@@ -298,6 +298,10 @@
                     "help_text": "This option allows the user to specify which database (or set of databases, separated by comma) to use with EUKulele. Databases that are provided with EUKulele will be downloaded if not already present inside the database directory (see --eukulele_dbpath). Possible alternatives: phylodb, mmetsp, marmmetsp, eukprot. NB: you can't use this option with a custom database as eukulele will not recognize the name and it will start to download phylodb by default. If you want to use a custom database, please skip this option and specify only --eukulele_dbpath.",
                     "fa_icon": "far fa-file-code"
                 },
+                "dbname": {
+                    "type": "string",
+                    "default": null
+                },
                 "eukulele_dbpath": {
                     "type": "string",
                     "default": "./eukulele",
@@ -570,11 +574,5 @@
         {
             "$ref": "#/definitions/generic_options"
         }
-    ],
-    "properties": {
-        "dbname": {
-            "type": "string",
-            "default": null
-        }
-    }
+    ]
 }
