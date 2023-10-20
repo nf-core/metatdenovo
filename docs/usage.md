@@ -135,7 +135,7 @@ If you don't want run eggNOG-mapper, you will need to add the flag `--skip_eggno
 
 ## Example pipeline command with some common features
 
-```nextflow
+````nextflow
 nextflow run lnuc-eemis/metatdenovo -profile docker --input samplesheet.csv --assembler rnaspades --orf_caller transdecoder --eggnog
 
 In this example, we are running metatdenovo with `rnaspades` as assembler, `transdecoder` as ORF caller and `eggnog` for functional annotation.
@@ -146,7 +146,7 @@ The typical command for running the pipeline is as follows:
 
 ```bash
 nextflow run nf-core/metatdenovo --input ./samplesheet.csv --outdir ./results -profile docker
-```
+````
 
 This will launch the pipeline with the `docker` configuration profile. See below for more information about profiles.
 
