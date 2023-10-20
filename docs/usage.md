@@ -61,15 +61,11 @@ For further documentation, see the [BBduk official website](https://jgi.doe.gov/
 Metatdenovo can perform "digital normalization" on the reads BEFORE the assembly.
 This will reduce coverage of highly abundant sequences and remove sequences that are below a threshold, and can be useful if the data set is too large to assemble but also potentially improve an assembly.
 N.B. the digital normalization is done only for the assembly and the non-normalized sequences will be used for quantification.
-There are two options for digital normalization in the pipeline:
-
-- Khmer_based approach (`--diginorm`)
+There is one option for digital normalization in the pipeline:
 
 - bbnorm (`--bbnorm`)
 
-you can run only one option per assembly.
-
-> Please, check the [khmer](https://khmer-protocols.readthedocs.io/en/v0.8.4/) and the [bbnorm](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbnorm-guide/) documentation for further information about these programs and how digital normalization works. Remember to check [Parameters](https://nf-co.re/metatdenovo/parameters) page for the full option that can be used for this step
+> Please, check the [bbnorm](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbnorm-guide/) documentation for further information about these programs and how digital normalization works. Remember to check [Parameters](https://nf-co.re/metatdenovo/parameters) page for the all options that can be used for this step.
 
 ## Assembler options
 
@@ -129,9 +125,7 @@ These options are:
 
 - [kofamscan](https://github.com/takaram/kofam_scan) (`--kofam_dir`)
 
-- [EUKulele](https://github.com/AlexanderLabWHOI/EUKulele) (`--eukulele_dbpath`)
-
-All the options can run in the same time (e.g. `nextflow run main.nf -profile test,docker --eggnog --hmmdir hmms/ --rundbcan`) but each program has its own options that you will need to read carefully before running the pipeline.
+All the options can run at the same time (e.g. `nextflow run main.nf -profile test,docker --eggnog --hmmdir hmms/ `) but each program has its own options that you will need to read carefully before running the pipeline.
 You can find more information about the different options in the [parameters page](https://nf-co.re/metatdenovo/parameters).
 For details about individual programs used, see their respective home pages.
 
@@ -141,9 +135,10 @@ If you don't want run eggNOG-mapper, you will need to add the flag `--skip_eggno
 
 ## Example pipeline command with some common features
 
-`nextflow run lnuc-eemis/metatdenovo -profile docker --input samplesheet.csv --assembler rnaspades --orf_caller transdecoder --eggnog --run_dbcan`
+````nextflow
+nextflow run lnuc-eemis/metatdenovo -profile docker --input samplesheet.csv --assembler rnaspades --orf_caller transdecoder --eggnog
 
-In this example, we are running metatdenovo with `rnaspades` as assembler, `transdecoder` as ORF caller, `eggnog` and `run_dbcan` for functional annotation.
+In this example, we are running metatdenovo with `rnaspades` as assembler, `transdecoder` as ORF caller and `eggnog` for functional annotation.
 
 ## Running the pipeline
 
@@ -151,7 +146,7 @@ The typical command for running the pipeline is as follows:
 
 ```bash
 nextflow run nf-core/metatdenovo --input ./samplesheet.csv --outdir ./results -profile docker
-```
+````
 
 This will launch the pipeline with the `docker` configuration profile. See below for more information about profiles.
 
