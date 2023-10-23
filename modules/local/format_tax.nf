@@ -24,37 +24,33 @@ process FORMAT_TAX {
     """
     #!/usr/bin/env Rscript
 
-    library(data.table)
     library(readr)
-    library(dtplyr)
     library(dplyr)
     library(purrr)
     library(tidyr)
     library(stringr)
 
-    setDTthreads($task.cpus)
-
     # create a table with taxonomy categories in each column
-    tax <- list.files(pattern = "*.out") %>%
-                map_df(~read.table(.,  sep = "\t", header = TRUE, fill = TRUE))
-
-    tax <- tax[,-c(1,3,5,6,7,8)]
-
-    colnames(tax)[1] <- "orf"
-
-    tax <- tax %>%
-            separate('full_classification',c("Domain","Phylum", "Class", "Order", "Family", "Genus", "Species"), ";") %>%
-            mutate(
-                Domain = ifelse(is.na(Domain)   | Domain == '',  sprintf("%s uncl.", Domain), Domain),
-                Phylum = ifelse(is.na(Phylum)   | Phylum == '',  sprintf("%s uncl.", Phylum), Phylum),
-                Class = ifelse(is.na(Class)     | Class == '',   sprintf("%s uncl.", str_remove(Phylum, ' unclassified')), Class),
-                Order = ifelse(is.na(Order)     | Order == '',   sprintf("%s uncl.", str_remove(Class,  ' unclassified')),  Order),
-                Family = ifelse(is.na(Family)   | Family == '',  sprintf("%s uncl.", str_remove(Order,  ' unclassified')),  Family),
-                Genus = ifelse(is.na(Genus)     | Genus == '',   sprintf("%s uncl.", str_remove(Family, ' unclassified')), Genus),
-                Species = ifelse(is.na(Species) | Species == '', sprintf("%s uncl.", str_remove(Genus, ' unclassified')),  Species)
-            ) %>%
-            na.omit() %>%
-            write_tsv("${prefix}.taxonomy_classification.tsv.gz")
+    tax <- read_tsv(Sys.glob('*.out', id = 'filename') %>%
+        select(-1) %>%
+        rename(orf = transcript_name) %>%
+        group_by(orf) %>%
+        filter(max_pid == max(max_pid)) %>%
+        separate(
+            'full_classification',
+            c("domain","phylum", "class", "order", "family", "genus", "species"), 
+            sep = ";"
+        ) %>%
+        mutate(
+            domain  = ifelse(is.na(domain)  | domain == '',  'Uncl.'), domain),
+            phylum  = ifelse(is.na(phylum)  | phylum == '',  sprintf("%s uncl.", domain), phylum),
+            class   = ifelse(is.na(class)   | class == '',   sprintf("%s uncl.", phylum), class),
+            order   = ifelse(is.na(order)   | order == '',   sprintf("%s uncl.", class),  order),
+            family  = ifelse(is.na(family)  | family == '',  sprintf("%s uncl.", order),  family),
+            genus   = ifelse(is.na(genus)   | genus == '',   sprintf("%s uncl.", family), genus),
+            species = ifelse(is.na(species) | species == '', sprintf("%s uncl.", genus),  species)
+        ) %>%
+        write_tsv("${prefix}.taxonomy_classification.tsv.gz")
 
     writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")),paste0("    dplyr: ", packageVersion("dplyr")) ), "versions.yml")
     """
