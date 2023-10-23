@@ -26,9 +26,7 @@ process FORMAT_TAX {
 
     library(readr)
     library(dplyr)
-    library(purrr)
     library(tidyr)
-    library(stringr)
 
     # create a table with taxonomy categories in each column
     read_tsv(Sys.glob('*.out.gz')) %>%
@@ -40,7 +38,7 @@ process FORMAT_TAX {
         separate(
             full_classification,
             c("domain","phylum", "class", "order", "family", "genus", "species"),
-            sep = ";"
+            sep = "\\\\s*;\\\\s*"
         ) %>%
         mutate(
             domain  = ifelse(is.na(domain)  | domain  == '', 'Uncl.',                     domain),
