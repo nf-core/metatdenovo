@@ -28,8 +28,8 @@ process FORMAT_TAX {
     library(dplyr)
     library(tidyr)
 
-    # create a table with taxonomy categories in each column
-    read_tsv(Sys.glob('*.out.gz')) %>%
+    # Create and write a table with taxonomy categories in each column
+    read_tsv("${taxtable}") %>%
         select(-1) %>%
         rename(orf = transcript_name) %>%
         group_by(orf) %>%
