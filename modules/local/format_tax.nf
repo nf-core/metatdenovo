@@ -18,7 +18,7 @@ process FORMAT_TAX {
     task.ext.when == null || task.ext.when
 
     script:
-    def args = task.ext.args ?: ''
+    def args   = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
 
     """
@@ -31,23 +31,24 @@ process FORMAT_TAX {
     library(stringr)
 
     # create a table with taxonomy categories in each column
-    tax <- read_tsv(Sys.glob('*.out', id = 'filename') %>%
+    read_tsv(Sys.glob('*.out.gz')) %>%
         select(-1) %>%
         rename(orf = transcript_name) %>%
         group_by(orf) %>%
         filter(max_pid == max(max_pid)) %>%
+        ungroup() %>%
         separate(
-            'full_classification',
+            full_classification,
             c("domain","phylum", "class", "order", "family", "genus", "species"),
             sep = ";"
         ) %>%
         mutate(
-            domain  = ifelse(is.na(domain)  | domain == '',  'Uncl.'), domain),
-            phylum  = ifelse(is.na(phylum)  | phylum == '',  sprintf("%s uncl.", domain), phylum),
-            class   = ifelse(is.na(class)   | class == '',   sprintf("%s uncl.", phylum), class),
-            order   = ifelse(is.na(order)   | order == '',   sprintf("%s uncl.", class),  order),
-            family  = ifelse(is.na(family)  | family == '',  sprintf("%s uncl.", order),  family),
-            genus   = ifelse(is.na(genus)   | genus == '',   sprintf("%s uncl.", family), genus),
+            domain  = ifelse(is.na(domain)  | domain  == '', 'Uncl.',                     domain),
+            phylum  = ifelse(is.na(phylum)  | phylum  == '', sprintf("%s uncl.", domain), phylum),
+            class   = ifelse(is.na(class)   | class   == '', sprintf("%s uncl.", phylum), class),
+            order   = ifelse(is.na(order)   | order   == '', sprintf("%s uncl.", class),  order),
+            family  = ifelse(is.na(family)  | family  == '', sprintf("%s uncl.", order),  family),
+            genus   = ifelse(is.na(genus)   | genus   == '', sprintf("%s uncl.", family), genus),
             species = ifelse(is.na(species) | species == '', sprintf("%s uncl.", genus),  species)
         ) %>%
         write_tsv("${prefix}.taxonomy_classification.tsv.gz")
