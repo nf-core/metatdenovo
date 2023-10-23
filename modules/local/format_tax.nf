@@ -38,7 +38,7 @@ process FORMAT_TAX {
         filter(max_pid == max(max_pid)) %>%
         separate(
             'full_classification',
-            c("domain","phylum", "class", "order", "family", "genus", "species"), 
+            c("domain","phylum", "class", "order", "family", "genus", "species"),
             sep = ";"
         ) %>%
         mutate(
