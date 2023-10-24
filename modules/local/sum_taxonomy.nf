@@ -39,7 +39,7 @@ process SUM_TAXONOMY {
     counts %>%
         inner_join(taxonomy, by = 'orf') %>%
         count(sample, name = 'value') %>%
-        mutate(database = "${db}", field = "eukulele_n_orfs") %>%
+        mutate(database = "${db ?: 'userdb'}", field = "eukulele_n_orfs") %>%
         relocate(value, .after = last_col()) %>%
         write_tsv('${prefix}_summary.tsv.gz')
 
