@@ -19,15 +19,16 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
   - [BBnorm](#bbnorm) - Normalize the reads in the samples for a better assembly output (optional)
 - [Assembly step](#assembly-step) - Generate contigs with an assembler program
   - [Megahit](#megahit) - Output from Megahit assembly (default)
-  - [RNASpades](#spades) - Output from Spades assembly (optional)
-- [Orf Caller](#Orf-caller) - Generate amino acids fasta file with an orf caller program
+  - [RNASpades](#rnaspades) - Output from Spades assembly (optional)
+- [Orf Caller](#orf-caller) - Generate amino acids fasta file with an orf caller program
   - [Prodigal](#prodigal) - Output from Prodigal (default)
   - [Prokka](#prokka) - Output from Prokka (optional)
   - [TransDecoder](#transdecoder) - Output from transdecoder (optional) 
 - [Functional and taxonomical annotation](#functional-and-taxonomical-annotation) - Predict the function out of the amino acids fasta file
-  - [HMMER](#hmmer) - Swedish Biodiversity Infrastructure (SBDI) submission file
-  - [EggNOG](#eggnog) - Phyloseq R objects
-  - [KOfamSCAN](#kofamscan) - Report of read counts during various steps of the pipeline
+  - [HMMER](#hmmer) - Analysis made with Hmmr profiles
+  - [EggNOG](#eggnog) - Run EggNOG-mapper on amino acids fasta file
+  - [KOfamSCAN](#kofamscan) - Run KOfamSCAN on amino acids fasta file
+  - [EUKulele](#eukulele) - Run taxonomical annotation on amino acids fasta file
 - [Pipeline information](#pipeline-information) - Report metrics generated during the workflow execution
 
 ### Summary tables folder
@@ -121,6 +122,7 @@ BBnorm is built-in tool from BBmap
 
 [Megahit](https://github.com/voutcn/megahit) is used to assemble the cleaned and trimmed FastQ reads to create the reference genome.
 
+<summary>Output file</summary>
 - `megahit/megahit_out/`
   - `*.log`: it is a log file of Megahit run.
   - `megahit_assembly.contigs.fa.gz`: Reference genome created by Megahit.
@@ -142,8 +144,109 @@ NB: we reccomend to use this assembler for eukaryotes rathern then prokaryotes.
   - `rnaspades.transcripts.fa.gz`: Reference genome created by RNASpades
 </details>
 
-### Orf Caller
+### Orf caller
 
+#### Prodigal
+
+As default, you can use Prodigal to find ORFs on your reference genome. 
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `prodigal/`
+  - `*.fna.gz`: nucleotides fasta file output
+  - `*.faa.gz`: amino acids fasta file output
+  - `*.gff.gz`: genome feature file output
+
+</details>
+
+#### Prokka
+
+As one alternative, you can use Prokka to find ORFs on your reference genome. 
+NB: Prodigal and Prokka are reccomended for prokaryotic samples
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `prokka/`
+  - `*.ffn.gz`: nucleotides fasta file output
+  - `*.faa.gz`: amino acids fasta file output
+  - `*.gff.gz`: genome feature file output
+
+</details>
+
+#### TransDecoder
+
+Another alternative is TransDecoder to find ORFs on your reference genome. 
+TransDecoder is reccomended for Eukaryotic samples
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `transdecoder/`
+  - `*.cds`: nucleotides fasta file output
+  - `*.pep`: amino acids fasta file output
+  - `*.gff3`: genome feature file output
+
+</details>
+
+### Functional and taxonomical annotation
+
+#### Hmmer
+As one alternative, you can use Prokka to find ORFs on your reference genome. 
+NB: Prodigal and Prokka are reccomended for prokaryotic samples
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `prokka/`
+  - `*.ffn.gz`: nucleotides fasta file output
+  - `*.faa.gz`: amino acids fasta file output
+  - `*.gff.gz`: genome feature file output
+
+</details>
+
+#### EggNOG
+As one alternative, you can use Prokka to find ORFs on your reference genome. 
+NB: Prodigal and Prokka are reccomended for prokaryotic samples
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `prokka/`
+  - `*.ffn.gz`: nucleotides fasta file output
+  - `*.faa.gz`: amino acids fasta file output
+  - `*.gff.gz`: genome feature file output
+
+</details>
+
+#### KOfamScan
+As one alternative, you can use Prokka to find ORFs on your reference genome. 
+NB: Prodigal and Prokka are reccomended for prokaryotic samples
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `prokka/`
+  - `*.ffn.gz`: nucleotides fasta file output
+  - `*.faa.gz`: amino acids fasta file output
+  - `*.gff.gz`: genome feature file output
+
+</details>
+
+#### EUKulele
+As one alternative, you can use Prokka to find ORFs on your reference genome. 
+NB: Prodigal and Prokka are reccomended for prokaryotic samples
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `prokka/`
+  - `*.ffn.gz`: nucleotides fasta file output
+  - `*.faa.gz`: amino acids fasta file output
+  - `*.gff.gz`: genome feature file output
+
+</details>
 
 ### Pipeline information
 
