@@ -20,7 +20,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 - [Assembly step](#assembly-step) - Generate contigs with an assembler program
   - [Megahit](#megahit) - Output from Megahit assembly (default)
   - [RNASpades](#rnaspades) - Output from Spades assembly (optional)
-- [Orf Caller](#orf-caller) - Generate amino acids fasta file with an orf caller program
+- [Orf Caller step](#orf-caller-step) - Generate amino acids fasta file with an orf caller program
   - [Prodigal](#prodigal) - Output from Prodigal (default)
   - [Prokka](#prokka) - Output from Prokka (optional)
   - [TransDecoder](#transdecoder) - Output from transdecoder (optional) 
@@ -144,7 +144,7 @@ NB: we reccomend to use this assembler for eukaryotes rathern then prokaryotes.
   - `rnaspades.transcripts.fa.gz`: Reference genome created by RNASpades
 </details>
 
-### Orf caller
+### Orf caller step
 
 #### Prodigal
 
@@ -193,27 +193,32 @@ TransDecoder is reccomended for Eukaryotic samples
 ### Functional and taxonomical annotation
 
 #### Hmmer
-As one alternative, you can use Prokka to find ORFs on your reference genome. 
-NB: Prodigal and Prokka are reccomended for prokaryotic samples
+You can run HMMer scan on the reference amino acids fasta file by giving hmm profiles to the pipeline.
 
 <details markdown="1">
 <summary>Output files</summary>
 
-- `prokka/`
-  - `*.ffn.gz`: nucleotides fasta file output
-  - `*.faa.gz`: amino acids fasta file output
-  - `*.gff.gz`: genome feature file output
+- `hmmer/`
+  - `*.tbl.gz`: 
+
+</details>
+
+Automatically, the pipline will run Hmmrank in order to find the best rank for each ORFs of your reference file. 
+<details markdown="1">
+<summary>Output files</summary>
+
+- `hmmrank/`
+  - `*.tsv.gz`: tab separeted file with the ranked ORFs for each HMM profile.
 
 </details>
 
 #### EggNOG
-As one alternative, you can use Prokka to find ORFs on your reference genome. 
-NB: Prodigal and Prokka are reccomended for prokaryotic samples
+EggNOG-mapper will perform an analysis to functional annotate the ORFs
 
 <details markdown="1">
 <summary>Output files</summary>
 
-- `prokka/`
+- `eggnog/`
   - `*.ffn.gz`: nucleotides fasta file output
   - `*.faa.gz`: amino acids fasta file output
   - `*.gff.gz`: genome feature file output
@@ -221,8 +226,7 @@ NB: Prodigal and Prokka are reccomended for prokaryotic samples
 </details>
 
 #### KOfamScan
-As one alternative, you can use Prokka to find ORFs on your reference genome. 
-NB: Prodigal and Prokka are reccomended for prokaryotic samples
+
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -235,8 +239,7 @@ NB: Prodigal and Prokka are reccomended for prokaryotic samples
 </details>
 
 #### EUKulele
-As one alternative, you can use Prokka to find ORFs on your reference genome. 
-NB: Prodigal and Prokka are reccomended for prokaryotic samples
+
 
 <details markdown="1">
 <summary>Output files</summary>
