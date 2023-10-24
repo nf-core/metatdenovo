@@ -37,8 +37,11 @@ process KOFAMSCAN_SCAN {
         $input \\
         -o kofamscan_output.tsv
 
+    # Create a cleaned up version for summary_tables
     echo "orf	ko	thrshld	score	evalue	ko_definition" | gzip -c > kofamscan.tsv.gz
     grep -v '#' kofamscan_output.tsv | cut -f 2-7|sed 's/\t"/\t/' | sed 's/"\$//' | gzip -c >> kofamscan.tsv.gz
+
+    # Gzip the original file
     gzip kofamscan_output.tsv
 
     cat <<-END_VERSIONS > versions.yml
