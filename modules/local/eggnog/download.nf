@@ -7,36 +7,34 @@ process EGGNOG_DOWNLOAD {
         'https://depot.galaxyproject.org/singularity/eggnog-mapper:2.1.6--pyhdfd78af_0':
         'biocontainers/eggnog-mapper:2.1.6--pyhdfd78af_0' }"
 
+    input:
+    path(dbpath)
+
     output:
-    path("./eggnog")   , emit: db
-    path("*.db")       , emit: eggnog_db
-    path("*.taxa.db")  , emit: eggnog_taxa
-    path("*.pkl")      , emit: eggnog_traverse
-    path("*.dmnd")     , emit: proteins, optional: true
-    path("hmmer/")     , emit: hmmer   , optional: true
-    path("mmseqs/")    , emit: mmseqs  , optional: true
-    path("pfam/")      , emit: pfam    , optional: true
-    path "versions.yml", emit: versions
+    path("$dbpath/*.db")          , emit: eggnog_db
+    path("$dbpath/*.taxa.db")     , emit: eggnog_taxa
+    path("$dbpath/*.pkl")         , emit: eggnog_traverse
+    path("$dbpath/")              , emit: db
+    path("$dbpath/*.dmnd")        , emit: proteins, optional: true
+    path("$dbpath/hmmer/")        , emit: hmmer   , optional: true
+    path("$dbpath/mmseqs/")       , emit: mmseqs  , optional: true
+    path("$dbpath/pfam/")         , emit: pfam    , optional: true
+    path "versions.yml"           , emit: versions
 
     script:
     def args = task.ext.args ?: ''
 
     """
 
-    mkdir eggnog
-
     download_eggnog_data.py \\
         $args \\
         -y \\
-        --data_dir ./eggnog/
-
-    ln -s ./eggnog/* ./
+        --data_dir $dbpath
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         eggnog: \$( echo \$(emapper.py --version 2>&1)| sed 's/.* emapper-//' )
     END_VERSIONS
-
 
     """
 

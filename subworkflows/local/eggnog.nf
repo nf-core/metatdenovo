@@ -15,17 +15,11 @@ workflow EGGNOG {
     main:
         ch_versions = Channel.empty()
 
-        String directoryName = eggnog_dbpath
-        File directory       = new File(directoryName)
-        String eggnogDB      = eggnog_dbpath + "eggnog.db"
+        String eggnogDB      = eggnog_dbpath + "/eggnog.db"
         File eggnogfile      = new File(eggnogDB)
 
-        if ( ! directory.exists() ) {
-            directory.mkdir()
-        }
-
         if ( ! eggnogfile.exists() ) {
-            EGGNOG_DOWNLOAD()
+            EGGNOG_DOWNLOAD(Channel.fromPath(eggnog_dbpath))
             ch_dbpath = EGGNOG_DOWNLOAD.out.db
 
             ch_versions = ch_versions.mix ( EGGNOG_DOWNLOAD.out.versions )
