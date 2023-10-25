@@ -264,9 +264,7 @@ workflow METATDENOVO {
     ch_interleaved = Channel.empty()
     if ( ! params.assembly ) {
         if ( params.se_reads) {
-        SEQTK_MERGEPE(ch_clean_reads)
-        ch_interleaved_se = SEQTK_MERGEPE.out.reads
-        ch_versions       = ch_versions.mix(SEQTK_MERGEPE.out.versions)
+            ch_single_end = ch_clean_reads
         } else {
             SEQTK_MERGEPE(ch_clean_reads)
             ch_interleaved = SEQTK_MERGEPE.out.reads
@@ -280,11 +278,11 @@ workflow METATDENOVO {
     if ( ! params.assembly ) {
         if ( params.se_reads ) {
             if ( params.bbnorm ) {
-                BBMAP_BBNORM(ch_interleaved_se.collect { meta, fastq -> fastq }.map {[ [id:'all_samples', single_end:true], it ] } )
+                BBMAP_BBNORM(ch_single_end.collect { meta, fastq -> fastq }.map {[ [id:'all_samples', single_end:true], it ] } )
                 ch_se_reads_to_assembly = BBMAP_BBNORM.out.fastq.map { it[1] }
                 ch_pe_reads_to_assembly = Channel.empty()
             } else {
-                ch_se_reads_to_assembly = ch_interleaved_se.map { meta, fastq -> fastq }
+                ch_se_reads_to_assembly = ch_single_end.map { meta, fastq -> fastq }
                 ch_pe_reads_to_assembly = Channel.empty()
             }
         }
