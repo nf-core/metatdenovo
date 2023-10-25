@@ -25,7 +25,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
   - [Prokka](#prokka) - Output from Prokka (optional)
   - [TransDecoder](#transdecoder) - Output from transdecoder (optional) 
 - [Functional and taxonomical annotation](#functional-and-taxonomical-annotation) - Predict the function and the taxonomy of the amino acids fasta file
-  - [HMMER](#hmmer) - Analysis made with Hmmr profiles
+  - [Hmmrsearch](#Hmmrsearch) - Analysis made with Hmmr profiles
   - [EggNOG](#eggnog) - Run EggNOG-mapper on amino acids fasta file
   - [KOfamSCAN](#kofamscan) - Run KOfamSCAN on amino acids fasta file
   - [EUKulele](#eukulele) - Run taxonomical annotation on amino acids fasta file
@@ -132,7 +132,7 @@ BBnorm is built-in tool from BBmap
 
 #### RNASpades
 
-Optionally, you can use RNASpades to assemble your reference genome. 
+Optionally, you can use [RNASpades](https://cab.spbu.ru/software/rnaspades/) to assemble your reference genome. 
 NB: we reccomend to use this assembler for eukaryotes rathern then prokaryotes.
 
 <details markdown="1">
@@ -148,7 +148,7 @@ NB: we reccomend to use this assembler for eukaryotes rathern then prokaryotes.
 
 #### Prodigal
 
-As default, you can use Prodigal to find ORFs on your reference genome. 
+As default, you can use [Prodigal](https://github.com/hyattpd/Prodigal) to find ORFs on your reference genome. 
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -162,7 +162,7 @@ As default, you can use Prodigal to find ORFs on your reference genome.
 
 #### Prokka
 
-As one alternative, you can use Prokka to find ORFs on your reference genome. 
+As one alternative, you can use [Prokka](https://github.com/tseemann/prokka) to find ORFs on your reference genome. 
 NB: Prodigal and Prokka are reccomended for prokaryotic samples
 
 <details markdown="1">
@@ -177,7 +177,7 @@ NB: Prodigal and Prokka are reccomended for prokaryotic samples
 
 #### TransDecoder
 
-Another alternative is TransDecoder to find ORFs on your reference genome. 
+Another alternative is [TransDecoder](https://github.com/sghignone/TransDecoder) to find ORFs on your reference genome. 
 TransDecoder is reccomended for Eukaryotic samples
 
 <details markdown="1">
@@ -192,9 +192,9 @@ TransDecoder is reccomended for Eukaryotic samples
 
 ### Functional and taxonomical annotation
 
-#### Hmmer
+#### Hmmrsearch
 
-You can run HMMer scan on the reference amino acids fasta file by giving hmm profiles to the pipeline.
+You can run [Hmmsearch](https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch) scan on the reference amino acids fasta file by giving hmm profiles to the pipeline.
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -216,7 +216,7 @@ Automatically, the pipline will run Hmmrank in order to find the best rank for e
 
 #### EggNOG
 
-EggNOG-mapper will perform an analysis to assign a function to the ORFs
+[EggNOG-mapper](https://github.com/eggnogdb/eggnog-mapper) will perform an analysis to assign a function to the ORFs
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -230,7 +230,7 @@ EggNOG-mapper will perform an analysis to assign a function to the ORFs
 
 #### KOfamScan
 
-KOfamScan will perform an analysis to assign a function to the ORFs
+[KOfamScan](https://github.com/takaram/kofam_scan) will perform an analysis to assign a function to the ORFs
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -242,7 +242,7 @@ KOfamScan will perform an analysis to assign a function to the ORFs
 
 #### EUKulele
 
-EUKulele will perform an analysis to assign a taxonomy to the ORFs
+[EUKulele](https://github.com/AlexanderLabWHOI/EUKulele) will perform an analysis to assign a taxonomy to the ORFs
 <details markdown="1">
 <summary>Output files</summary>
 
