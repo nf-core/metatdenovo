@@ -13,7 +13,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 - [Summary tables folder](#summary-tables-folder) - Final tables that can be imported directly in R
 - [Preprocessing](#preprocessing)
   - [FastQC](#fastqc) - Read quality control
-  - [Trimgalore](#trimgalore) - Primer trimming
+  - [Trim galore!](#trimgalore) - Primer trimming
   - [MultiQC](#multiqc) - Aggregate report describing results
   - [BBduk](#bbduk) - Filter out sequences from samples based on a fasta file (optional)
   - [BBnorm](#bbnorm) - Normalize the reads in the samples for a better assembly output (optional)
@@ -24,7 +24,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
   - [Prodigal](#prodigal) - Output from Prodigal (default)
   - [Prokka](#prokka) - Output from Prokka (optional)
   - [TransDecoder](#transdecoder) - Output from transdecoder (optional) 
-- [Functional and taxonomical annotation](#functional-and-taxonomical-annotation) - Predict the function out of the amino acids fasta file
+- [Functional and taxonomical annotation](#functional-and-taxonomical-annotation) - Predict the function and the taxonomy of the amino acids fasta file
   - [HMMER](#hmmer) - Analysis made with Hmmr profiles
   - [EggNOG](#eggnog) - Run EggNOG-mapper on amino acids fasta file
   - [KOfamSCAN](#kofamscan) - Run KOfamSCAN on amino acids fasta file
@@ -40,7 +40,7 @@ A summary report for all statistics results in tsv format. The report gives a ge
 - `summary_tables/`
   - `overall_stats.tsv`: statistics summary report.
   - `*counts.tsv`: summary table for featureCounts outputs
-  - `*.tsv`: several tables based on different combination of the pipeline. From taxonomical to functional annotation (optional)
+  - `*.tsv`: several tables based on the different combinations of the pipeline. From taxonomical to functional annotation (optional)
 
 </details>
 
@@ -48,7 +48,7 @@ A summary report for all statistics results in tsv format. The report gives a ge
 
 #### FastQC
 
-[FastQC](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/) gives general quality metrics about your sequenced reads. It provides information about the quality score distribution across your reads, per base sequence content (%A/T/G/C), adapter contamination and overrepresented sequences. For further reading and documentation see the [FastQC help pages](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/). FastQC runs in trimgalore therefore its output can be found in Trimgalore's folder.
+[FastQC](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/) gives general quality metrics about your sequenced reads. It provides information about the quality score distribution across your reads, per base sequence content (%A/T/G/C), adapter contamination and overrepresented sequences. For further reading and documentation see the [FastQC help pages](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/). FastQC runs in Trim galore! therefore its output can be found in Trimgalore's folder.
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -58,7 +58,7 @@ A summary report for all statistics results in tsv format. The report gives a ge
 
 </details>
 
-#### Trimgalore
+#### Trim galore!
 
 [Trimgalore](https://github.com/FelixKrueger/TrimGalore) is trimming primer sequences from sequencing reads. Primer sequences are non-biological sequences that often introduce point mutations that do not reflect sample sequences. This is especially true for degenerated PCR primer. If primer trimming would be omitted, artifactual amplicon sequence variants might be computed by the denoising tool or sequences might be lost due to become labelled as PCR chimera.
 
@@ -193,6 +193,7 @@ TransDecoder is reccomended for Eukaryotic samples
 ### Functional and taxonomical annotation
 
 #### Hmmer
+
 You can run HMMer scan on the reference amino acids fasta file by giving hmm profiles to the pipeline.
 
 <details markdown="1">
@@ -204,6 +205,7 @@ You can run HMMer scan on the reference amino acids fasta file by giving hmm pro
 </details>
 
 Automatically, the pipline will run Hmmrank in order to find the best rank for each ORFs of your reference file. 
+
 <details markdown="1">
 <summary>Output files</summary>
 
@@ -213,7 +215,8 @@ Automatically, the pipline will run Hmmrank in order to find the best rank for e
 </details>
 
 #### EggNOG
-EggNOG-mapper will perform an analysis to functional annotate the ORFs
+
+EggNOG-mapper will perform an analysis to assign a function to the ORFs
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -227,6 +230,7 @@ EggNOG-mapper will perform an analysis to functional annotate the ORFs
 
 #### KOfamScan
 
+KOfamScan will perform an analysis to assign a function to the ORFs
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -238,7 +242,7 @@ EggNOG-mapper will perform an analysis to functional annotate the ORFs
 
 #### EUKulele
 
-
+EUKulele will perform an analysis to assign a taxonomy to the ORFs
 <details markdown="1">
 <summary>Output files</summary>
 
@@ -246,7 +250,6 @@ EggNOG-mapper will perform an analysis to functional annotate the ORFs
   - `*.diamond.out.gz`: Diamond output
  - `eukulele/assembler.orfcaller/taxonomy_estimation/`
   - `*-estimated-taxonomy.out.gz`: EUKulele output
-
 
 </details>
 
