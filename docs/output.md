@@ -23,7 +23,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 - [Orf Caller step](#orf-caller-step) - Generate amino acids fasta file with an orf caller program
   - [Prodigal](#prodigal) - Output from Prodigal (default)
   - [Prokka](#prokka) - Output from Prokka (optional)
-  - [TransDecoder](#transdecoder) - Output from transdecoder (optional) 
+  - [TransDecoder](#transdecoder) - Output from transdecoder (optional)
 - [Functional and taxonomical annotation](#functional-and-taxonomical-annotation) - Predict the function and the taxonomy of the amino acids fasta file
   - [Hmmrsearch](#Hmmrsearch) - Analysis made with Hmmr profiles
   - [EggNOG](#eggnog) - Run EggNOG-mapper on amino acids fasta file
@@ -34,6 +34,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 ### Summary tables folder
 
 A summary report for all statistics results in tsv format. The report gives a general overview of the analysis, includes featureCounts output, taxonomical and functional annotation tables.
+
 <details markdown="1">
 <summary>Output file</summary>
 
@@ -66,7 +67,7 @@ A summary report for all statistics results in tsv format. The report gives a ge
 <summary>Output files</summary>
 
 - `trimgalore/`: directory containing log files with retained reads, trimming percentage, etc. for each sample.
-  - `*trimming_report.txt`: Report  of read numbers that pass trimgalore.
+  - `*trimming_report.txt`: Report of read numbers that pass trimgalore.
 
 </details>
 
@@ -132,7 +133,7 @@ BBnorm is built-in tool from BBmap
 
 #### RNASpades
 
-Optionally, you can use [RNASpades](https://cab.spbu.ru/software/rnaspades/) to assemble your reference genome. 
+Optionally, you can use [RNASpades](https://cab.spbu.ru/software/rnaspades/) to assemble your reference genome.
 NB: we reccomend to use this assembler for eukaryotes rathern then prokaryotes.
 
 <details markdown="1">
@@ -142,13 +143,13 @@ NB: we reccomend to use this assembler for eukaryotes rathern then prokaryotes.
   - `rnaspades.assembly.gfa.gz`: gfa file output from rnaspades
   - `rnaspades.spades.log`: log file output from rnaspades run
   - `rnaspades.transcripts.fa.gz`: Reference genome created by RNASpades
-</details>
+  </details>
 
 ### Orf caller step
 
 #### Prodigal
 
-As default, you can use [Prodigal](https://github.com/hyattpd/Prodigal) to find ORFs on your reference genome. 
+As default, you can use [Prodigal](https://github.com/hyattpd/Prodigal) to find ORFs on your reference genome.
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -162,7 +163,7 @@ As default, you can use [Prodigal](https://github.com/hyattpd/Prodigal) to find 
 
 #### Prokka
 
-As one alternative, you can use [Prokka](https://github.com/tseemann/prokka) to find ORFs on your reference genome. 
+As one alternative, you can use [Prokka](https://github.com/tseemann/prokka) to find ORFs on your reference genome.
 NB: Prodigal and Prokka are reccomended for prokaryotic samples
 
 <details markdown="1">
@@ -177,7 +178,7 @@ NB: Prodigal and Prokka are reccomended for prokaryotic samples
 
 #### TransDecoder
 
-Another alternative is [TransDecoder](https://github.com/sghignone/TransDecoder) to find ORFs on your reference genome. 
+Another alternative is [TransDecoder](https://github.com/sghignone/TransDecoder) to find ORFs on your reference genome.
 TransDecoder is reccomended for Eukaryotic samples
 
 <details markdown="1">
@@ -200,11 +201,11 @@ You can run [Hmmsearch](https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch) scan
 <summary>Output files</summary>
 
 - `hmmer/`
-  - `*.tbl.gz`: 
+  - `*.tbl.gz`:
 
 </details>
 
-Automatically, the pipline will run Hmmrank in order to find the best rank for each ORFs of your reference file. 
+Automatically, the pipline will run Hmmrank in order to find the best rank for each ORFs of your reference file.
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -243,13 +244,14 @@ Automatically, the pipline will run Hmmrank in order to find the best rank for e
 #### EUKulele
 
 [EUKulele](https://github.com/AlexanderLabWHOI/EUKulele) will perform an analysis to assign a taxonomy to the ORFs
+
 <details markdown="1">
 <summary>Output files</summary>
 
 - `eukulele/assembler.orfcaller/mets_full/diamond/`
   - `*.diamond.out.gz`: Diamond output
- - `eukulele/assembler.orfcaller/taxonomy_estimation/`
-  - `*-estimated-taxonomy.out.gz`: EUKulele output
+- `eukulele/assembler.orfcaller/taxonomy_estimation/`
+- `*-estimated-taxonomy.out.gz`: EUKulele output
 
 </details>
 
