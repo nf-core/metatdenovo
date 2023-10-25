@@ -219,9 +219,9 @@ EggNOG-mapper will perform an analysis to functional annotate the ORFs
 <summary>Output files</summary>
 
 - `eggnog/`
-  - `*.ffn.gz`: nucleotides fasta file output
-  - `*.faa.gz`: amino acids fasta file output
-  - `*.gff.gz`: genome feature file output
+  - `*.emapper.annotations.gz`: A file with the results from the annotation phase. Therefore, each row represents the annotation reported for a given query.
+  - `*.emapper.hits.gz`: A file with the results from the search phase, from HMMER, Diamond or MMseqs2.
+  - `*.emapper.seed_orthologs.gz`: A file with the results from parsing the hits. Each row links a query with a seed ortholog. This file has the same format independently of which searcher was used, except that it can be in short format (4 fields), or full.
 
 </details>
 
@@ -231,10 +231,8 @@ EggNOG-mapper will perform an analysis to functional annotate the ORFs
 <details markdown="1">
 <summary>Output files</summary>
 
-- `prokka/`
-  - `*.ffn.gz`: nucleotides fasta file output
-  - `*.faa.gz`: amino acids fasta file output
-  - `*.gff.gz`: genome feature file output
+- `kofamscan/`
+  - `*.kofamscan_output.tsv.gz`: kofamscan output.
 
 </details>
 
@@ -244,10 +242,11 @@ EggNOG-mapper will perform an analysis to functional annotate the ORFs
 <details markdown="1">
 <summary>Output files</summary>
 
-- `prokka/`
-  - `*.ffn.gz`: nucleotides fasta file output
-  - `*.faa.gz`: amino acids fasta file output
-  - `*.gff.gz`: genome feature file output
+- `eukulele/assembler.orfcaller/mets_full/diamond/`
+  - `*.diamond.out.gz`: Diamond output
+ - `eukulele/assembler.orfcaller/taxonomy_estimation/`
+  - `*-estimated-taxonomy.out.gz`: EUKulele output
+
 
 </details>
 
