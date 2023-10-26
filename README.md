@@ -24,7 +24,7 @@ On release, automated continuous integration tests run the pipeline on a full-si
 
 ## Pipeline summary
 
-![nf-core/rnaseq metro map](docs/images/nf-core-metatdenovo_metro_map.png)
+![nf-core/rnaseq metro map](docs/images/metatdenovo.png)
 
 1. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
 2. Present QC for raw reads ([`MultiQC`](http://multiqc.info/))
