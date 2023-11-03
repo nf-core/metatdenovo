@@ -2,7 +2,7 @@ process FORMATSPADES {
     tag "$meta.id"
     label 'process_low'
 
-    conda "bioconda::gzip=1.11"
+    conda "conda-forge::gzip=1.11"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/gzip:1.11':
         'biocontainers/gzip:1.11' }"
