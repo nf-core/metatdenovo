@@ -30,7 +30,7 @@ process HMMRANK {
     # Read all the tblout files
     tibble(fname = Sys.glob('*.tbl.gz')) %>%
         mutate(
-            profile = basename(fname) %>% str_remove('.tbl.gz'),
+            profile = basename(fname) %>% str_remove('.tbl.gz') %>% str_remove('${prefix}\\\\.'),
             d = purrr::map(
                 fname,
                 function(f) {
