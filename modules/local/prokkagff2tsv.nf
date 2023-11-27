@@ -41,7 +41,7 @@ process PROKKAGFF2TSV {
         select(-a, -b) %>%
         rename(orf = ID) %>%
         rename_all(str_to_lower) %>%
-        relocate(sort(colnames(.)[9:ncol(.)]), .after = 8) %>%
+        relocate(sort(colnames(.)[8:ncol(.)]), .after = 7) %>%
         relocate(orf) %>%
         as.data.table() %>%
         write_tsv("${prefix}.prokka-annotations.tsv.gz")
