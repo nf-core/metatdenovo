@@ -11,7 +11,7 @@ process PROKKAGFF2TSV {
     tuple val(meta), path(gff)
 
     output:
-    tuple val(meta), path("*.annotations.tsv.gz"), emit: tsv
+    tuple val(meta), path("*.prokka-annotations.tsv.gz"), emit: tsv
     path "versions.yml"                          , emit: versions
 
     when:
@@ -44,7 +44,7 @@ process PROKKAGFF2TSV {
         relocate(sort(colnames(.)[9:ncol(.)]), .after = 8) %>%
         relocate(orf) %>%
         as.data.table() %>%
-        write_tsv("${prefix}.annotations.tsv.gz")
+        write_tsv("${prefix}.prokka-annotations.tsv.gz")
 
     writeLines(
         c(
