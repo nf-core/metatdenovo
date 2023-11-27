@@ -44,13 +44,11 @@ process SUM_KOFAMSCAN {
         map_df(~read_tsv(.,  show_col_types  = FALSE)) %>%
         mutate(sample = as.character(sample))
 
-    counts %>% select(1, 7) %>%
-        right_join(kofams, by = 'orf') %>%
+    counts %>%
+        inner_join(kofams, by = 'orf') %>%
         group_by(sample) %>%
-        drop_na() %>%
-        count(orf) %>%
-        summarise( value = sum(n), .groups = 'drop') %>%
-        add_column(database = "kofamscan", field = "n_orfs") %>%
+        summarise(value = sum(count), .groups = 'drop') %>%
+        add_column(database = "kofamscan", field = "kofamscan_n_counts") %>%
         relocate(value, .after = last_col()) %>%
         write_tsv('${meta.id}.kofamscan_summary.tsv.gz')
 

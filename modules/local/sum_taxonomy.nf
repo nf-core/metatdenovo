@@ -38,8 +38,9 @@ process SUM_TAXONOMY {
     # Join the two and count the number of ORFs with assigned taxonomy
     counts %>%
         inner_join(taxonomy, by = 'orf') %>%
-        count(sample, name = 'value') %>%
-        mutate(database = "${db ?: 'userdb'}", field = "eukulele_n_orfs") %>%
+        group_by(sample) %>%
+        summarise(value = sum(count), .groups = 'drop') %>%
+        mutate(database = "${db ?: 'userdb'}", field = "eukulele_n_counts") %>%
         relocate(value, .after = last_col()) %>%
         write_tsv('${prefix}_summary.tsv.gz')
 
