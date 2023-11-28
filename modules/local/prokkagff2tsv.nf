@@ -11,7 +11,7 @@ process PROKKAGFF2TSV {
     tuple val(meta), path(gff)
 
     output:
-    tuple val(meta), path("*.annotations.tsv.gz"), emit: tsv
+    tuple val(meta), path("*.prokka-annotations.tsv.gz"), emit: tsv
     path "versions.yml"                          , emit: versions
 
     when:
@@ -29,6 +29,7 @@ process PROKKAGFF2TSV {
     library(dplyr)
     library(tidyr)
     library(readr)
+    library(stringr)
 
     fread(
         cmd = "zgrep -P '\\t' $gff",
@@ -39,9 +40,11 @@ process PROKKAGFF2TSV {
         pivot_wider(names_from = k, values_from = v) %>%
         select(-a, -b) %>%
         rename(orf = ID) %>%
+        rename_all(str_to_lower) %>%
+        relocate(sort(colnames(.)[8:ncol(.)]), .after = 7) %>%
         relocate(orf) %>%
         as.data.table() %>%
-        write_tsv("${prefix}.annotations.tsv.gz")
+        write_tsv("${prefix}.prokka-annotations.tsv.gz")
 
     writeLines(
         c(
