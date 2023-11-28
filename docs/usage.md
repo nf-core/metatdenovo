@@ -151,20 +151,11 @@ ORF-HMM combination will be ranked according to score and E-value.
 
 ## Example pipeline command with some common features
 
-````nextflow
-nextflow run lnuc-eemis/metatdenovo -profile docker --input samplesheet.csv --assembler rnaspades --orf_caller transdecoder --eggnog
-
-In this example, we are running metatdenovo with `rnaspades` as assembler, `transdecoder` as ORF caller and `eggnog` for functional annotation.
-
-## Running the pipeline
-
-The typical command for running the pipeline is as follows:
-
 ```bash
-nextflow run nf-core/metatdenovo --input ./samplesheet.csv --outdir ./results -profile docker
-````
+nextflow run nf-core/metatdenovo -profile docker --input samplesheet.csv --assembler rnaspades --orf_caller prokka --eggnog --eukulele_db gtdb
+```
 
-This will launch the pipeline with the `docker` configuration profile. See below for more information about profiles.
+In this example, we are running metatdenovo with `rnaspades` as assembler, `prokka` as ORF caller, `eggnog` for functional annotation and EUKulele with the GTDB database for taxonomic annotation.
 
 Note that the pipeline will create the following files in your working directory:
 
@@ -192,9 +183,11 @@ nextflow run nf-core/metatdenovo -profile docker -params-file params.yaml
 with `params.yaml` containing:
 
 ```yaml
-input: './samplesheet.csv'
-outdir: './results/'
-genome: 'GRCh37'
+input: 'samplesheet.csv.
+assembler: 'rnaspades'
+orf_caller: 'prokka'
+eggnog: true
+eukulele_db: 'gtdb'
 <...>
 ```
 
