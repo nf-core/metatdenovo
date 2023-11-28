@@ -31,7 +31,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and the results
     - [EUKulele](#eukulele) - Output from EUKulele taxonomy annotation (default; optional)
     - [Hmmsearch](#hmmsearch) - Output from HMMER run with user-supplied HMM profiles (optional)
 - [Custom metatdenovo output](#metatdenovo-output)
-  - [Summary tables folder](#summary-tables-folder) - Tabb separated tables ready for further analysis in tools like R and Python
+  - [Summary tables folder](#summary-tables) - Tabb separated tables ready for further analysis in tools like R and Python
   - [Pipeline information](#pipeline-information) - Report metrics generated during the workflow execution
 
 ## Original output
@@ -97,8 +97,10 @@ BBduk is built-in tool from BBmap
 
 #### BBnorm
 
-[BBnorm](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbduk-guide/) is a tool from BBmap that allows to reduce the coverage of highly abundant sequences and remove the sequences that are below a threshold, and can be useful if the data set is too large to assemble but also potentially improve an assembly. N.B. the digital normalization is done only for the assembly and the non-normalized sequences will be used for quantification
-BBnorm is built-in tool from BBmap
+[BBnorm](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbduk-guide/) is a tool from BBmap that allows to reduce the coverage of highly abundant sequence kmers and remove sequences representing kmers that are below a threshold.
+It can be useful if the data set is too large to assemble but also potentially improve an assembly.
+N.B. the digital normalization is done only for the assembly and the non-normalized sequences will be used for quantification.
+BBnorm is a BBmap tool.
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -112,11 +114,11 @@ BBnorm is built-in tool from BBmap
 
 #### Megahit
 
-[Megahit](https://github.com/voutcn/megahit) is used to assemble the cleaned and trimmed FastQ reads to create the reference genome.
+[Megahit](https://github.com/voutcn/megahit) is used to assemble the cleaned and trimmed FastQ reads into contigs.
 
 <summary>Output file</summary>
 - `megahit/megahit_out/`
-  - `*.log`: it is a log file of Megahit run.
+  - `*.log`: log file of Megahit run.
   - `megahit_assembly.contigs.fa.gz`: Reference genome created by Megahit.
   - `intermediate_contigs`: Folder that contains the intermediate steps of Megahit run.
     
@@ -124,8 +126,7 @@ BBnorm is built-in tool from BBmap
 
 #### RNASpades
 
-Optionally, you can use [RNASpades](https://cab.spbu.ru/software/rnaspades/) to assemble your reference genome.
-NB: we reccomend to use this assembler for eukaryotes rathern then prokaryotes.
+Optionally, you can use [RNASpades](https://cab.spbu.ru/software/rnaspades/) to assemble reads into contigs.
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -136,11 +137,11 @@ NB: we reccomend to use this assembler for eukaryotes rathern then prokaryotes.
   - `rnaspades.transcripts.fa.gz`: Reference genome created by RNASpades
   </details>
 
-### Orf caller step
+### ORF caller step
 
 #### Prodigal
 
-As default, you can use [Prodigal](https://github.com/hyattpd/Prodigal) to find ORFs on your reference genome.
+As default, [Prodigal](https://github.com/hyattpd/Prodigal) is used to identify ORFs in the assembly.
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -154,8 +155,9 @@ As default, you can use [Prodigal](https://github.com/hyattpd/Prodigal) to find 
 
 #### Prokka
 
-As one alternative, you can use [Prokka](https://github.com/tseemann/prokka) to find ORFs on your reference genome.
-NB: Prodigal and Prokka are reccomended for prokaryotic samples
+As one alternative, you can use [Prokka](https://github.com/tseemann/prokka) to identify ORFs in the assembly.
+In addition to calling ORFs (done with Prodigal) Prokka will filter ORFs to only retain quality ORFs and will functionally annotate the ORFs.
+NB: Prodigal or Prokka are recomended for prokaryotic samples
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -169,8 +171,8 @@ NB: Prodigal and Prokka are reccomended for prokaryotic samples
 
 #### TransDecoder
 
-Another alternative is [TransDecoder](https://github.com/sghignone/TransDecoder) to find ORFs on your reference genome.
-TransDecoder is reccomended for Eukaryotic samples
+Another alternative is [TransDecoder](https://github.com/sghignone/TransDecoder) to find ORFs in the assembly.
+N.B. TransDecoder is recomended for eukaryotic samples
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -186,13 +188,13 @@ TransDecoder is reccomended for Eukaryotic samples
 
 #### EggNOG
 
-[EggNOG-mapper](https://github.com/eggnogdb/eggnog-mapper) will perform an analysis to assign a function to the ORFs
+[EggNOG-mapper](https://github.com/eggnogdb/eggnog-mapper) will perform an analysis to assign functions to the ORFs.
 
 <details markdown="1">
 <summary>Output files</summary>
 
 - `eggnog/`
-  - `*.emapper.annotations.gz`: A file with the results from the annotation phase. Therefore, each row represents the annotation reported for a given query.
+  - `*.emapper.annotations.gz`: A file with the results from the annotation phase, see the [EggNOG-mapper documentation](https://github.com/eggnogdb/eggnog-mapper/wiki/).
   - `*.emapper.hits.gz`: A file with the results from the search phase, from HMMER, Diamond or MMseqs2.
   - `*.emapper.seed_orthologs.gz`: A file with the results from parsing the hits. Each row links a query with a seed ortholog. This file has the same format independently of which searcher was used, except that it can be in short format (4 fields), or full.
 
@@ -200,7 +202,7 @@ TransDecoder is reccomended for Eukaryotic samples
 
 #### KOfamScan
 
-[KOfamScan](https://github.com/takaram/kofam_scan) will perform an analysis to assign a function to the ORFs
+[KOfamScan](https://github.com/takaram/kofam_scan) will perform an analysis to assign KEGG orthologs to ORFs.
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -212,7 +214,9 @@ TransDecoder is reccomended for Eukaryotic samples
 
 #### EUKulele
 
-[EUKulele](https://github.com/AlexanderLabWHOI/EUKulele) will perform an analysis to assign a taxonomy to the ORFs
+[EUKulele](https://github.com/AlexanderLabWHOI/EUKulele) will perform an analysis to assign taxonomy to the ORFs.
+A number of databases are supported: MMETSP, PhyloDB and GTDB.
+GTDB currently only works as a user provided database, i.e. data must be downloaded before running nf-core/metatdenovo.
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -226,7 +230,7 @@ TransDecoder is reccomended for Eukaryotic samples
 
 #### Hmmsearch
 
-You can run [Hmmsearch](https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch) scan on the reference amino acids fasta file by giving hmm profiles to the pipeline.
+You can run [hmmsearch](https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch) of ORFs using a set of HMM profiles provided to the pipeline (see the `--hmmdir`, `--hmmpatern` and `--hmmfiles` parameters).
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -236,7 +240,7 @@ You can run [Hmmsearch](https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch) scan
 
 </details>
 
-Automatically, the pipline will run Hmmrank in order to find the best rank for each ORFs of your reference file.
+After the search, hits for each ORF and HMM will be summarised and ranked based on scores for the hits (see also output in [summary tables](#summary-tables)).
 
 <details markdown="1">
 <summary>Output files</summary>
