@@ -4,7 +4,8 @@
 
 This document describes the output produced by the pipeline.
 
-The directories listed below will be created in the results directory after the pipeline has finished. All paths are relative to the top-level results directory.
+The directories listed below will be created in the results directory after the pipeline has finished.
+All paths are relative to the top-level results directory.
 
 ## Pipeline overview
 
@@ -13,31 +14,32 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and the results
 - [Original output](#original-output) 
   - [Preprocessing](#preprocessing)
     - [FastQC](#fastqc) - Read quality control
-    - [Trim galore!](#trimgalore) - Primer trimming
+    - [Trim galore!](#trim-galore) - Primer trimming
     - [MultiQC](#multiqc) - Aggregate report describing results
-    - [BBduk](#bbduk) - Filter out sequences from samples based on a fasta file (optional)
-    - [BBnorm](#bbnorm) - Normalize the reads in the samples for a better assembly output (optional)
+    - [BBduk](#bbduk) - Filter out sequences from samples that matches sequences in a user-provided fasta file (optional)
+    - [BBnorm](#bbnorm) - Normalize the reads in the samples to use less resources for assembly (optional)
   - [Assembly step](#assembly-step) - Generate contigs with an assembler program
     - [Megahit](#megahit) - Output from Megahit assembly (default)
     - [RNASpades](#rnaspades) - Output from Spades assembly (optional)
-  - [Orf Caller step](#orf-caller-step) - Generate amino acids fasta file with an orf caller program
+  - [Orf Caller step](#orf-caller-step) - Identify protein-coding genes (ORFs) with an ORF caller
     - [Prodigal](#prodigal) - Output from Prodigal (default)
     - [Prokka](#prokka) - Output from Prokka (optional)
     - [TransDecoder](#transdecoder) - Output from transdecoder (optional)
-  - [Functional and taxonomical annotation](#functional-and-taxonomical-annotation) - Predict the function and the taxonomy of the amino acids fasta file
-    - [Hmmrsearch](#Hmmrsearch) - Analysis made with Hmmr profiles
-    - [EggNOG](#eggnog) - Run EggNOG-mapper on amino acids fasta file
-    - [KOfamSCAN](#kofamscan) - Run KOfamSCAN on amino acids fasta file
-    - [EUKulele](#eukulele) - Run taxonomical annotation on amino acids fasta file
+  - [Functional and taxonomical annotation](#functional-and-taxonomical-annotation) - Predict the function and the taxonomy of ORFs
+    - [EggNOG](#eggnog) - Output from EggNOG-mapper (default; optional)
+    - [KOfamSCAN](#kofamscan) - Output KOfamSCAN (optional)
+    - [EUKulele](#eukulele) - Output from EUKulele taxonomy annotation (default; optional)
+    - [Hmmsearch](#hmmsearch) - Output from HMMER run with user-supplied HMM profiles (optional)
 - [Custom metatdenovo output](#metatdenovo-output)
-  - [Summary tables folder](#summary-tables-folder) - Final tables that can be imported directly in R
+  - [Summary tables folder](#summary-tables-folder) - Tabb separated tables ready for further analysis in tools like R and Python
   - [Pipeline information](#pipeline-information) - Report metrics generated during the workflow execution
 
 
-### Original output
-#### Preprocessing
+## Original output
 
-##### FastQC
+### Preprocessing
+
+#### FastQC
 
 [FastQC](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/) gives general quality metrics about your sequenced reads. It provides information about the quality score distribution across your reads, per base sequence content (%A/T/G/C), adapter contamination and overrepresented sequences. For further reading and documentation see the [FastQC help pages](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/). FastQC runs in Trim galore! therefore its output can be found in Trimgalore's folder.
 
@@ -49,7 +51,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and the results
 
 </details>
 
-##### Trim galore!
+#### Trim galore!
 
 [Trimgalore](https://github.com/FelixKrueger/TrimGalore) is trimming primer sequences from sequencing reads. Primer sequences are non-biological sequences that often introduce point mutations that do not reflect sample sequences. This is especially true for degenerated PCR primer. If primer trimming would be omitted, artifactual amplicon sequence variants might be computed by the denoising tool or sequences might be lost due to become labelled as PCR chimera.
 
@@ -183,28 +185,6 @@ TransDecoder is reccomended for Eukaryotic samples
 
 #### Functional and taxonomical annotation
 
-##### Hmmrsearch
-
-You can run [Hmmsearch](https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch) scan on the reference amino acids fasta file by giving hmm profiles to the pipeline.
-
-<details markdown="1">
-<summary>Output files</summary>
-
-- `hmmer/`
-  - `*.tbl.gz`:
-
-</details>
-
-Automatically, the pipline will run Hmmrank in order to find the best rank for each ORFs of your reference file.
-
-<details markdown="1">
-<summary>Output files</summary>
-
-- `hmmrank/`
-  - `*.tsv.gz`: tab separeted file with the ranked ORFs for each HMM profile.
-
-</details>
-
 ##### EggNOG
 
 [EggNOG-mapper](https://github.com/eggnogdb/eggnog-mapper) will perform an analysis to assign a function to the ORFs
@@ -242,6 +222,29 @@ Automatically, the pipline will run Hmmrank in order to find the best rank for e
   - `*.diamond.out.gz`: Diamond output
 - `eukulele/assembler.orfcaller/taxonomy_estimation/`
 - `*-estimated-taxonomy.out.gz`: EUKulele output
+
+</details>
+
+
+##### Hmmsearch
+
+You can run [Hmmsearch](https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch) scan on the reference amino acids fasta file by giving hmm profiles to the pipeline.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `hmmer/`
+  - `*.tbl.gz`:
+
+</details>
+
+Automatically, the pipline will run Hmmrank in order to find the best rank for each ORFs of your reference file.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `hmmrank/`
+  - `*.tsv.gz`: tab separeted file with the ranked ORFs for each HMM profile.
 
 </details>
 
