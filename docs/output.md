@@ -11,7 +11,7 @@ All paths are relative to the top-level results directory.
 
 The pipeline is built using [Nextflow](https://www.nextflow.io/) and the results are organized as follow:
 
-- [Original output](#original-output) 
+- [Original output](#original-output)
   - [Preprocessing](#preprocessing)
     - [FastQC](#fastqc) - Read quality control
     - [Trim galore!](#trim-galore) - Primer trimming
@@ -33,7 +33,6 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and the results
 - [Custom metatdenovo output](#metatdenovo-output)
   - [Summary tables folder](#summary-tables-folder) - Tabb separated tables ready for further analysis in tools like R and Python
   - [Pipeline information](#pipeline-information) - Report metrics generated during the workflow execution
-
 
 ## Original output
 
@@ -224,7 +223,6 @@ TransDecoder is reccomended for Eukaryotic samples
 - `*-estimated-taxonomy.out.gz`: EUKulele output
 
 </details>
-
 
 #### Hmmsearch
 
