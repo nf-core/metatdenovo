@@ -1,6 +1,6 @@
 ﻿# nf-core/metatdenovo: Usage
 
-## :warning: Please read this documentation on the nf-core website: [https://nf-co.re/metatdenovo/usage] (the link is not working) (https://nf-co.re/metatdenovo/usage)
+## :warning: Please read this documentation on the nf-core website: [https://nf-co.re/metatdenovo/usage](https://nf-co.re/metatdenovo/usage)
 
 > _Documentation of pipeline parameters is generated automatically from the pipeline schema and can no longer be found in markdown files._
 
@@ -12,7 +12,7 @@ Since the workflow includes gene callers and annotation tools and databases both
 organism groups and mixed communities can be handled by trying different gene callers and comparing the results.
 
 While the rationale for writing the workflow was metatranscriptomes, there is nothing in the workflow that precludes use for single organisms rather than
-communities nor transcriptomes rather than genomes.
+communities nor genomes rather than transcriptomes.
 Instead, the workflow should be usable for any project in which a de novo assembly followed by quantification and annotation is suitable.
 
 ## Running the workflow
@@ -108,7 +108,7 @@ For eukaryotic genes, we recommend users to use Transdecoder (`--orf_caller tran
 Metatdenovo uses EUKulele as the main program for taxonomy annotation.
 EUKulele can be run with different reference datasets.
 The default dataset is PhyloDB (`--eukulele_db phylodb` ) which works for mixed communities of prokaryotes and eukaryotes.
-Other databases options for running the pipeline are MMETSP (`--eukulele_db mmetsp`; for marine protists) and GTDB (`--eukulele_db gtdb`; for prokarytes
+Other database options for running the pipeline are MMETSP (`--eukulele_db mmetsp`; for marine protists) and GTDB (`--eukulele_db gtdb`; for prokarytes
 [under development]).
 
 Options:
@@ -183,7 +183,7 @@ nextflow run nf-core/metatdenovo -profile docker -params-file params.yaml
 with `params.yaml` containing:
 
 ```yaml
-input: 'samplesheet.csv.
+input: 'samplesheet.csv'
 assembler: 'rnaspades'
 orf_caller: 'prokka'
 eggnog: true
