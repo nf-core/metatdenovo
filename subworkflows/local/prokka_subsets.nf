@@ -10,12 +10,13 @@ include { PROKKAGFF2TSV        } from '../../modules/local/prokkagff2tsv'
 
 workflow PROKKA_SUBSETS {
     take:
-        contigs // channel:  tuple val(meta), file(contigs)
+        contigs   // channel:  tuple val(meta), file(contigs)
+        batchsize // channel: strings like '10.MB'. Usually from params.prokka_batchsize
 
     main:
         ch_versions = Channel.empty()
 
-        PROKKA ( contigs.map{ it[1] }.splitFasta(size: 10.MB, file: true).map { contigs -> [ [ id: contigs.getBaseName() ], contigs] }, [], []  )
+        PROKKA ( contigs.map{ it[1] }.splitFasta(size: batchsize, file: true).map { contigs -> [ [ id: contigs.getBaseName() ], contigs] }, [], []  )
         ch_versions = ch_versions.mix(PROKKA.out.versions)
         ch_log  = PROKKA.out.txt.collect()
 
