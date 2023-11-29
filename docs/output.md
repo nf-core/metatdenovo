@@ -21,7 +21,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and the results
   - [Assembly step](#assembly-step) - Generate contigs with an assembler program
     - [Megahit](#megahit) - Output from Megahit assembly (default)
     - [RNASpades](#rnaspades) - Output from Spades assembly (optional)
-  - [Orf Caller step](#orf-caller-step) - Identify protein-coding genes (ORFs) with an ORF caller
+  - [ORF Caller step](#orf-caller-step) - Identify protein-coding genes (ORFs) with an ORF caller
     - [Prodigal](#prodigal) - Output from Prodigal (default)
     - [Prokka](#prokka) - Output from Prokka (optional)
     - [TransDecoder](#transdecoder) - Output from transdecoder (optional)
@@ -31,7 +31,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and the results
     - [EUKulele](#eukulele) - Output from EUKulele taxonomy annotation (default; optional)
     - [Hmmsearch](#hmmsearch) - Output from HMMER run with user-supplied HMM profiles (optional)
 - [Custom metatdenovo output](#metatdenovo-output)
-  - [Summary tables folder](#summary-tables) - Tabb separated tables ready for further analysis in tools like R and Python
+  - [Summary tables folder](#summary-tables) - Tab separated tables ready for further analysis in tools like R and Python
   - [Pipeline information](#pipeline-information) - Report metrics generated during the workflow execution
 
 ## Original output
@@ -40,7 +40,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and the results
 
 #### FastQC
 
-[FastQC](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/) gives general quality metrics about your sequenced reads. It provides information about the quality score distribution across your reads, per base sequence content (%A/T/G/C), adapter contamination and overrepresented sequences. For further reading and documentation see the [FastQC help pages](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/). FastQC runs in Trim galore! therefore its output can be found in Trimgalore's folder.
+[FastQC](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/) gives general quality metrics about your sequenced reads. It provides information about the quality score distribution across your reads, per base sequence content (%A/T/G/C), adapter contamination and overrepresented sequences. For further reading and documentation see the [FastQC help pages](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/). FastQC is run as part of Trim galore! therefore its output can be found in Trimgalore's folder.
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -52,13 +52,13 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and the results
 
 #### Trim galore!
 
-[Trimgalore](https://github.com/FelixKrueger/TrimGalore) is trimming primer sequences from sequencing reads. Primer sequences are non-biological sequences that often introduce point mutations that do not reflect sample sequences. This is especially true for degenerated PCR primer. If primer trimming would be omitted, artifactual amplicon sequence variants might be computed by the denoising tool or sequences might be lost due to become labelled as PCR chimera.
+[Trimgalore](https://github.com/FelixKrueger/TrimGalore) is trimming primer sequences from sequencing reads. Primer sequences are non-biological sequences that often introduce point mutations that do not reflect sample sequences. This is especially true for degenerated PCR primers. If primer trimming would be omitted, artifactual amplicon sequence variants might be computed by the denoising tool or sequences might be lost due to become labelled as PCR chimera.
 
 <details markdown="1">
 <summary>Output files</summary>
 
 - `trimgalore/`: directory containing log files with retained reads, trimming percentage, etc. for each sample.
-  - `*trimming_report.txt`: Report of read numbers that pass trimgalore.
+  - `*trimming_report.txt`: report of read numbers that pass trimgalore.
 
 </details>
 
@@ -116,11 +116,13 @@ BBnorm is a BBmap tool.
 
 [Megahit](https://github.com/voutcn/megahit) is used to assemble the cleaned and trimmed FastQ reads into contigs.
 
+<details markdown="1">
 <summary>Output file</summary>
+  
 - `megahit/megahit_out/`
   - `*.log`: log file of Megahit run.
-  - `megahit_assembly.contigs.fa.gz`: Reference genome created by Megahit.
-  - `intermediate_contigs`: Folder that contains the intermediate steps of Megahit run.
+  - `megahit_assembly.contigs.fa.gz`: reference genome created by Megahit.
+  - `intermediate_contigs`: folder that contains the intermediate steps of Megahit run.
     
 </details>
 
@@ -134,8 +136,9 @@ Optionally, you can use [RNASpades](https://cab.spbu.ru/software/rnaspades/) to 
 - `rnaspades/`
   - `rnaspades.assembly.gfa.gz`: gfa file output from rnaspades
   - `rnaspades.spades.log`: log file output from rnaspades run
-  - `rnaspades.transcripts.fa.gz`: Reference genome created by RNASpades
-  </details>
+  - `rnaspades.transcripts.fa.gz`: reference genome created by RNASpades
+
+</details>
 
 ### ORF caller step
 
@@ -184,7 +187,7 @@ N.B. TransDecoder is recomended for eukaryotic samples
 
 </details>
 
-### Functional and taxonomic annotation
+### Functional and taxonomical annotation
 
 #### EggNOG
 
@@ -194,9 +197,9 @@ N.B. TransDecoder is recomended for eukaryotic samples
 <summary>Output files</summary>
 
 - `eggnog/`
-  - `*.emapper.annotations.gz`: A file with the results from the annotation phase, see the [EggNOG-mapper documentation](https://github.com/eggnogdb/eggnog-mapper/wiki/).
-  - `*.emapper.hits.gz`: A file with the results from the search phase, from HMMER, Diamond or MMseqs2.
-  - `*.emapper.seed_orthologs.gz`: A file with the results from parsing the hits. Each row links a query with a seed ortholog. This file has the same format independently of which searcher was used, except that it can be in short format (4 fields), or full.
+  - `*.emapper.annotations.gz`: a file with the results from the annotation phase, see the [EggNOG-mapper documentation](https://github.com/eggnogdb/eggnog-mapper/wiki/).
+  - `*.emapper.hits.gz`: a file with the results from the search phase, from HMMER, Diamond or MMseqs2.
+  - `*.emapper.seed_orthologs.gz`: a file with the results from parsing the hits. Each row links a query with a seed ortholog. This file has the same format independently of which searcher was used, except that it can be in short format (4 fields), or full.
 
 </details>
 
@@ -230,7 +233,7 @@ GTDB currently only works as a user provided database, i.e. data must be downloa
 
 #### Hmmsearch
 
-You can run [hmmsearch](https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch) of ORFs using a set of HMM profiles provided to the pipeline (see the `--hmmdir`, `--hmmpatern` and `--hmmfiles` parameters).
+You can run [hmmsearch](https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch) on ORFs using a set of HMM profiles provided to the pipeline (see the `--hmmdir`, `--hmmpatern` and `--hmmfiles` parameters).
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -261,12 +264,12 @@ Filenames start with assembly program and ORF caller, to allow reruns of the pip
 <summary>Output file</summary>
 
 - `summary_tables/`
-  - `{assembler}.{orf_caller}.overall_stats.tsv.gz`: Overall statistics from the pipeline, e.g. number of reads, number of called ORFs, number of reads mapping back to contigs/ORFs etc.
-  - `{assembler}.{orf_caller}.counts.tsv.gz`: Read counts per ORF and sample.
-  - `{assembler}.{orf_caller}.emapper.tsv.gz`: Reformatted output from EggNOG-mapper.
-  - `{assembler}.{orf_caller}.{db}_eukulele.tsv.gz`: Taxonomic annotation per ORF for specific database.
-  - `{assembler}.{orf_caller}.prokka-annotations.tsv.gz`: Reformatted annotation output from Prokka.
-  - `{assembler}.{orf_caller}.hmmrank.tsv.gz`: Ranked summary table from HMMER results.
+  - `{assembler}.{orf_caller}.overall_stats.tsv.gz`: overall statistics from the pipeline, e.g. number of reads, number of called ORFs, number of reads mapping back to contigs/ORFs etc.
+  - `{assembler}.{orf_caller}.counts.tsv.gz`: read counts per ORF and sample.
+  - `{assembler}.{orf_caller}.emapper.tsv.gz`: reformatted output from EggNOG-mapper.
+  - `{assembler}.{orf_caller}.{db}_eukulele.tsv.gz`: taxonomic annotation per ORF for specific database.
+  - `{assembler}.{orf_caller}.prokka-annotations.tsv.gz`: reformatted annotation output from Prokka.
+  - `{assembler}.{orf_caller}.hmmrank.tsv.gz`: ranked summary table from HMMER results.
 
 </details>
 
@@ -276,9 +279,9 @@ Filenames start with assembly program and ORF caller, to allow reruns of the pip
 <summary>Output files</summary>
 
 - `pipeline_info/`
-  - Reports generated by Nextflow: `execution_report.html`, `execution_timeline.html`, `execution_trace.txt` and `pipeline_dag.dot`/`pipeline_dag.svg`.
-  - Reports generated by the pipeline: `pipeline_report.html`, `pipeline_report.txt` and `software_versions.yml`. The `pipeline_report*` files will only be present if the `--email` / `--email_on_fail` parameter's are used when running the pipeline.
-  - Reformatted samplesheet files used as input to the pipeline: `samplesheet.valid.csv`.
-  - Parameters used by the pipeline run: `params.json`.
+  - reports generated by Nextflow: `execution_report.html`, `execution_timeline.html`, `execution_trace.txt` and `pipeline_dag.dot`/`pipeline_dag.svg`.
+  - reports generated by the pipeline: `pipeline_report.html`, `pipeline_report.txt` and `software_versions.yml`. The `pipeline_report*` files will only be present if the `--email` / `--email_on_fail` parameter's are used when running the pipeline.
+  - reformatted samplesheet files used as input to the pipeline: `samplesheet.valid.csv`.
+  - parameters used by the pipeline run: `params.json`.
 
 </details>
