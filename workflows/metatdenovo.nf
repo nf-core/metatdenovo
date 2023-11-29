@@ -353,7 +353,7 @@ workflow METATDENOVO {
     // SUBWORKFLOW: Run PROKKA_SUBSETS on assmebly output, but split the fasta file in chunks of 10 MB, then concatenate and compress output.
     //
     if ( params.orf_caller == ORF_CALLER_PROKKA ) {
-        PROKKA_SUBSETS(ch_assembly_contigs)
+        PROKKA_SUBSETS(ch_assembly_contigs, params.prokka_batchsize)
         UNPIGZ_GFF(PROKKA_SUBSETS.out.gff.map { [ [id: "${params.orf_caller}.${it[0].id}"], it[1] ] })
         ch_versions      = ch_versions.mix(PROKKA_SUBSETS.out.versions)
         ch_gff           = UNPIGZ_GFF.out.unzipped
