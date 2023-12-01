@@ -8,7 +8,7 @@ process HMMRANK {
         'biocontainers/mulled-v2-b2ec1fea5791d428eebb8c8ea7409c350d31dada:a447f6b7a6afde38352b24c30ae9cd6e39df95c4-1' }"
 
     input:
-    tuple val(meta), path(hmmtargsums)
+    tuple val(meta), path(tblouts)
 
     output:
     tuple val(meta), path("*.hmmrank.tsv.gz"), emit: hmmrank
@@ -28,25 +28,15 @@ process HMMRANK {
     library(stringr)
 
     # Read all the tblout files
-    tibble(fname = Sys.glob('*.tbl.gz')) %>%
-        mutate(
-            profile = basename(fname) %>% str_remove('.tbl.gz') %>% str_remove('${prefix}\\\\.'),
-            d = purrr::map(
-                fname,
-                function(f) {
-                    read_fwf(f, fwf_cols(content = c(1, NA)), col_types = cols(content = col_character()), comment='#') %>%
-                        filter(! grepl('^ *#', content)) %>%
-                        separate(
-                            content,
-                            c('accno', 't0', 'profile_desc', 't1', 'evalue', 'score', 'bias', 'f0', 'f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'rest'),
-                            '\\\\s+',  extra='merge', convert = FALSE
-                        ) %>%
-                        transmute(accno, profile_desc, evalue = as.double(evalue), score = as.double(score))
-                }
-            )
-        ) %>%
-        unnest(d) %>%
-        select(-fname) %>%
+
+   read_fwf(c('${tblouts.join("','")}'), fwf_cols(content = c(1, NA)), col_types = cols(content = col_character()), comment='#', id = 'fname') %>%
+       filter(! grepl('^ *#', content)) %>%
+       separate(
+           content,
+           c('accno', 't0', 'profile_desc', 't1', 'evalue', 'score', 'bias', 'f0', 'f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'rest'),
+           '\\\\s+',  extra='merge', convert = FALSE
+       ) %>%
+       transmute(profile = basename(fname), accno, profile_desc, evalue = as.double(evalue), score = as.double(score)) %>%
         # Group and calculate a rank based on score and evalue; let ties be resolved by profile in alphabetical order
         group_by(accno) %>%
         arrange(desc(score), evalue, profile) %>%
