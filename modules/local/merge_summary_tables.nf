@@ -31,10 +31,9 @@ process MERGE_TABLES {
     library(tidyr)
     library(stringr)
 
-    summary <- data.frame(sample = character(), database = character(), field = character(), value = numeric(), stringsAsFactors = FALSE) %>%
-        union(list.files(pattern = "*.tsv.gz") %>%
-            map_df(~ read_tsv(., show_col_types = TRUE) %>%
-            mutate(sample = as.character(sample)))) %>%
+    Sys.glob('*.tsv.gz') %>%
+        read_tsv() %>%
+        mutate(sample = as.character(sample)) %>%
         pivot_wider(names_from = c(database,field), values_from = value) %>%
         write_tsv('${prefix}_merged_table.tsv.gz')
 
