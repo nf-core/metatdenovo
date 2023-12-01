@@ -1,12 +1,31 @@
 ﻿# nf-core/metatdenovo: Usage
 
-## :warning: Please read this documentation on the nf-core website: [https://nf-co.re/metatdenovo/usage] (the link is not working) (https://nf-co.re/metatdenovo/usage)
+## :warning: Please read this documentation on the nf-core website: [https://nf-co.re/metatdenovo/usage](https://nf-co.re/metatdenovo/usage)
 
 > _Documentation of pipeline parameters is generated automatically from the pipeline schema and can no longer be found in markdown files._
 
 ## Introduction
 
-## Samplesheet input
+Metatdenovo is a workflow primarily designed for annotation of metatranscriptomes for which reference genomes are not available.
+The approach is to first create an assembly, then call genes and finally quantify and annotate the genes.
+Since the workflow includes gene callers and annotation tools and databases both for prokaryotes and eukaryotes, the workflow should be suitable for both
+organism groups and mixed communities can be handled by trying different gene callers and comparing the results.
+
+While the rationale for writing the workflow was metatranscriptomes, there is nothing in the workflow that precludes use for single organisms rather than
+communities nor genomes rather than transcriptomes.
+Instead, the workflow should be usable for any project in which a de novo assembly followed by quantification and annotation is suitable.
+
+## Running the workflow
+
+### Quickstart
+
+A typical command for running the workflow is:
+
+```bash
+nextflow run nf-core/metatdenovo -profile docker --outdir results/ --input samples.csv
+```
+
+### Samplesheet input
 
 You will need to create a samplesheet with information about the samples you would like to analyse before running the pipeline. Use this parameter to specify its location. It must be a comma-separated file with 3 columns, and a header row as shown in the examples below
 
@@ -14,32 +33,23 @@ You will need to create a samplesheet with information about the samples you wou
 --input '[path to samplesheet file]'
 ```
 
-### Multiple runs of the same sample
+#### Full samplesheet
 
-The `sample` identifiers have to be the same when you have re-sequenced the same sample more than once e.g. to increase sequencing depth. The pipeline will concatenate the raw reads before performing any downstream analysis. Below is an example for the same sample sequenced across 3 lanes:
+<!-- I commented out text about single-end samples as we don't know whether this works yet. -->
+<!-- The pipeline will auto-detect whether a sample is single- or paired-end using the information provided in the samplesheet. The samplesheet can have as many columns as you desire, however, there is a strict requirement for the first 3 columns to match those defined in the table below. -->
 
-```console
-sample,fastq_1,fastq_2
-CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz
-CONTROL_REP1,AEG588A1_S1_L003_R1_001.fastq.gz,AEG588A1_S1_L003_R2_001.fastq.gz
-CONTROL_REP1,AEG588A1_S1_L004_R1_001.fastq.gz,AEG588A1_S1_L004_R2_001.fastq.gz
-```
+<!-- A final samplesheet file consisting of both single- and paired-end data may look something like the one below. This is for 6 samples, where `TREATMENT_REP3` has been sequenced twice. -->
 
-### Full samplesheet
-
-The pipeline will auto-detect whether a sample is single- or paired-end using the information provided in the samplesheet. The samplesheet can have as many columns as you desire, however, there is a strict requirement for the first 3 columns to match those defined in the table below.
-
-A final samplesheet file consisting of both single- and paired-end data may look something like the one below. This is for 6 samples, where `TREATMENT_REP3` has been sequenced twice.
+A final samplesheet file consisting of samples taken at time 0 and 24 in triplicate may look like the one below.
 
 ```console
 sample,fastq_1,fastq_2
-CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz
-CONTROL_REP2,AEG588A2_S2_L002_R1_001.fastq.gz,AEG588A2_S2_L002_R2_001.fastq.gz
-CONTROL_REP3,AEG588A3_S3_L002_R1_001.fastq.gz,AEG588A3_S3_L002_R2_001.fastq.gz
-TREATMENT_REP1,AEG588A4_S4_L003_R1_001.fastq.gz,
-TREATMENT_REP2,AEG588A5_S5_L003_R1_001.fastq.gz,
-TREATMENT_REP3,AEG588A6_S6_L003_R1_001.fastq.gz,
-TREATMENT_REP3,AEG588A6_S6_L004_R1_001.fastq.gz,
+T0a,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz
+T0b,AEG588A2_S2_L002_R1_001.fastq.gz,AEG588A2_S2_L002_R2_001.fastq.gz
+T0c,AEG588A3_S3_L002_R1_001.fastq.gz,AEG588A3_S3_L002_R2_001.fastq.gz
+T24a,AEG588A4_S1_L002_R1_001.fastq.gz,AEG588A4_S1_L002_R2_001.fastq.gz
+T24b,AEG588A5_S2_L002_R1_001.fastq.gz,AEG588A5_S2_L002_R2_001.fastq.gz
+T24c,AEG588A6_S3_L002_R1_001.fastq.gz,AEG588A6_S3_L002_R2_001.fastq.gz
 ```
 
 | Column    | Description                                                                                                                                                                            |
@@ -50,105 +60,102 @@ TREATMENT_REP3,AEG588A6_S6_L004_R1_001.fastq.gz,
 
 An [example samplesheet](../assets/samplesheet.csv) has been provided with the pipeline.
 
-## Filter/remove sequences from the samples (e.g. rRNA sequences with SILVA database)
+#### Multiple runs of the same sample
+
+The `sample` identifiers have to be the same when you have re-sequenced the same sample more than once e.g. to increase sequencing depth. The pipeline will concatenate the raw reads before performing any downstream analysis. Below is an example for the same sample sequenced across 3 lanes:
+
+```console
+sample,fastq_1,fastq_2
+T0a,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz
+T0a,AEG588A1_S1_L003_R1_001.fastq.gz,AEG588A1_S1_L003_R2_001.fastq.gz
+T0a,AEG588A1_S1_L004_R1_001.fastq.gz,AEG588A1_S1_L004_R2_001.fastq.gz
+```
+
+### Filter/remove sequences from the samples (e.g. rRNA sequences with SILVA database)
 
 The pipeline can remove potential contaminants using the BBduk program.
 Specify a fasta file, gzipped or not, with the --sequence_filter sequences.fasta parameter.
 For further documentation, see the [BBduk official website](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbduk-guide/).
 
-## Digital normalization
+### Digital normalization
 
-Metatdenovo can perform "digital normalization" on the reads BEFORE the assembly.
+Metatdenovo can perform "digital normalization" of the reads before the assembly.
 This will reduce coverage of highly abundant sequences and remove sequences that are below a threshold, and can be useful if the data set is too large to assemble but also potentially improve an assembly.
-N.B. the digital normalization is done only for the assembly and the non-normalized sequences will be used for quantification.
-There is one option for digital normalization in the pipeline:
-
-- bbnorm (`--bbnorm`)
+N.B. the digital normalization is done only for the assembly and the full set of sequences will be used for quantification.
+To turn on digital normalization, use the `--bbnorm` parameter and, if required, adjust the `--bbnorm_target` and `--bbnorm_min` parameters.
 
 > Please, check the [bbnorm](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbnorm-guide/) documentation for further information about these programs and how digital normalization works. Remember to check [Parameters](https://nf-co.re/metatdenovo/parameters) page for the all options that can be used for this step.
 
-## Assembler options
+### Assembler options
 
-By default, the pipeline uses Megahit (i.e. `--assembler megahit`) to assemble the cleaned and trimmed FastQ reads to create the reference genome.
-Megahit is fast and it requires a not a lot of memory to run, typically is suggested to be used with prokaryotic samples.
-The pipeline allows you to choose another assembler RNAspades, (i.e. `--assembler rnaspades` ), that is usually suggested to use for eukaryotic samples.
+By default, the pipeline uses Megahit (`--assembler megahit`) to assemble the cleaned and trimmed reads to create the reference contigs.
+Megahit is fast and it does not require a lot of memory to run, making it ideal for large sets of samples.
+The workflow also supports RNAspades, (`--assembler rnaspades` ) as an alternative.
+
 You can also choose to input contigs from an assembly that you made outside the pipeline using the `--assembly file.fna` (where `file.fna` is the name of a fasta file with contigs) option.
 
-> N.B. you can use `Megahit` for eukaryotic samples too, we just suggest what is the best option according to our experience (literature?).
+### ORF caller options
 
-## Orf caller options
+By default, the pipeline uses prodigal (`--orf_caller prodigal` ) to call genes/ORFs from the assembly.
+This is suitable for prokaryotes, as is the Prokka alternative (`--orf_caller prokka`).
+The latter uses Prodigal internally making it suitable for prokaryotic genes.
+It also performs functional annotation of ORFs.
 
-By default, the pipeline uses prodigal (i.e. `--orf_caller prodigal` ) to generate the genome feature file (.gff) and to generate gene structure from the assembly.
+For eukaryotic genes, we recommend users to use Transdecoder (`--orf_caller transdecoder`) to call ORFs.
 
-Other orf caller options for running the pipeline are:
+### Taxonomic annotation options
 
-- Prokka (`--orf_caller prokka`)
+Metatdenovo uses EUKulele as the main program for taxonomy annotation.
+EUKulele can be run with different reference datasets.
+The default dataset is PhyloDB (`--eukulele_db phylodb` ) which works for mixed communities of prokaryotes and eukaryotes.
+Other database options for running the pipeline are MMETSP (`--eukulele_db mmetsp`; for marine protists) and GTDB (`--eukulele_db gtdb`; for prokarytes
+[under development]).
 
-- Transdecoder (`--orf_caller transdecoder`)
+Options:
 
-> N.B. Prokka and prodigal are suggested to run with prokaryotes while transdecoder is specific for eukaryotes.
+- PhyloDB: default, covers both prokaryotes and eukaryotes
+- MMETSP: marine protists
+- GTDB: prokaryotes, both bacteria and archaea
 
-## Taxonomical annotation options
+You can also provide your own database, see the [EUKulele documentation](https://eukulele.readthedocs.io/en/latest/#) documentation.
 
-Metatdenovo uses `EUKulele` as the main program for taxonomy annotation. `EUKulele` can be run with different reference datasets. The default dataset is PhyloDB (i.e. `--eukulele_db phylodb` ) which works for mixed communities of prokaryotes and eukaryotes.
-
-Other databases options for running the pipeline are:
-
-- MMETSP (`--eukulele_db mmetsp`)
-
-- GTDB (`--eukulele_db gtdb`) [under development]
-
-PhyloDB and GTDB are recommended for prokaryotic datasets and MMETSP for eukaryotes, although PhyoDB can be also recognize eukaryotes and can be used for this purpose.
-
-If you already have these databases ready in your working directory, you can point to the folder so the pipeline will not download the database (e.g. `--eukulele_dbpath your/path/database/`). N.B. When you are using a custom database, don't specify the `--eukulele_db` option. The pipeline will provide a default name for the database to avoid that EUKulele will try to download a new database.
+Databases are automatically downloaded by the workflow, but if you already have them available you can use the `--eukulele_dbpath path/to/db` pointing
+to the root directory of the EUKulele databases.
+(The default for this parameter is `eukulele`.)
 
 > Please, check the [EUKulele documentation](https://eukulele.readthedocs.io/en/latest/#) for more information about the databases.
 
-An alternative to EUKulele is the CAT program. In contrast to EUKulele that annotates open reading frames (ORFs), CAT annotates the contigs from the assembly.
+<!-- I commented out the CAT documentation as we're not certain that we want to support this. -->
+<!-- An alternative to EUKulele is the CAT program. In contrast to EUKulele that annotates open reading frames (ORFs), CAT annotates the contigs from the assembly.
 
 CAT is uses Prodigal to call ORFs and DIAMOND for the alignment to a reference database. Subsequently, DIAMOND hits for individual ORFs are translated by CAT into contig annotations.
 
 The database can be generated with the option `--cat_db_generate` or you can provide a prepared database that you downloaded from [CAT website](https://tbb.bio.uu.nl/bastiaan/CAT_prepare/).
 Check the also the [options]() documentation to learn how to configure CATproperly.
 
-> Please, check the `CAT` documentation for more information about the database cited [HERE](https://github.com/dutilh/CAT)
+> Please, check the `CAT` documentation for more information about the database cited [HERE](https://github.com/dutilh/CAT) -->
 
-## Functional annotation options
+### Functional annotation options
 
-By default, the metatdenovo pipeline will perform a functional annotation with the [eggNOG-mapper](http://eggnog-mapper.embl.de/) program. In order to run the other programs, you will need to specify them as additional options.
+Besides the functional annotation that the gene caller Prokka gives (see above) there are two general purpose functional annotation programs available
+in the workflow: the [eggNOG-mapper](http://eggnog-mapper.embl.de/) and [KofamScan](https://github.com/takaram/kofam_scan).
+Both are suitable for both prokaryotic and eukaryotic genes and both are run by default, but can be skipped using the `--skip_eggnog` and
+`--skip_kofamscan` options respectivelly.
+The tools use large databases which are downloaded automatically but paths can be provided by the user through the `--eggnog_dbpath directory`
+`--kofam_dir dir` parameters respectively.
 
-These options are:
-
-- [Eggnog](https://github.com/eggnogdb/eggnog-mapper/wiki) (`--eggnog_dbpath`)
-
-- [hmmsearch](http://eddylab.org/software/hmmer/Userguide.pdf) (`--hmmdir` or `--hmmfiles`)
-
-- [kofamscan](https://github.com/takaram/kofam_scan) (`--kofam_dir`)
-
-All the options can run at the same time (e.g. `nextflow run main.nf -profile test,docker --eggnog --hmmdir hmms/ `) but each program has its own options that you will need to read carefully before running the pipeline.
-You can find more information about the different options in the [parameters page](https://nf-co.re/metatdenovo/parameters).
-For details about individual programs used, see their respective home pages.
-
-If an Eggnog, kofam, or EUKulele database is already available, they can be specified with the above commands to skip the automatic download that the pipeline performs.
-
-If you don't want run eggNOG-mapper, you will need to add the flag `--skip_eggnog`, otherwise metatdenovo will run the program automatically.
+A more targeted annotation option offered by the workflow is the possibility for the user to provide a set of
+[HMMER HMM profiles](http://eddylab.org/software/hmmer/Userguide.pdf) through the `--hmmdir dir` or `hmmfiles file0.hmm,file1.hmm,...,filen.hmm` parameters.
+Each HMM file will be used to search the amino acid sequences of the ORF set and the results will be summarized in a tab separated file in which each
+ORF-HMM combination will be ranked according to score and E-value.
 
 ## Example pipeline command with some common features
 
-````nextflow
-nextflow run lnuc-eemis/metatdenovo -profile docker --input samplesheet.csv --assembler rnaspades --orf_caller transdecoder --eggnog
-
-In this example, we are running metatdenovo with `rnaspades` as assembler, `transdecoder` as ORF caller and `eggnog` for functional annotation.
-
-## Running the pipeline
-
-The typical command for running the pipeline is as follows:
-
 ```bash
-nextflow run nf-core/metatdenovo --input ./samplesheet.csv --outdir ./results -profile docker
-````
+nextflow run nf-core/metatdenovo -profile docker --input samplesheet.csv --assembler rnaspades --orf_caller prokka --eggnog --eukulele_db gtdb
+```
 
-This will launch the pipeline with the `docker` configuration profile. See below for more information about profiles.
+In this example, we are running metatdenovo with `rnaspades` as assembler, `prokka` as ORF caller, `eggnog` for functional annotation and EUKulele with the GTDB database for taxonomic annotation.
 
 Note that the pipeline will create the following files in your working directory:
 
@@ -176,9 +183,11 @@ nextflow run nf-core/metatdenovo -profile docker -params-file params.yaml
 with `params.yaml` containing:
 
 ```yaml
-input: './samplesheet.csv'
-outdir: './results/'
-genome: 'GRCh37'
+input: 'samplesheet.csv'
+assembler: 'rnaspades'
+orf_caller: 'prokka'
+eggnog: true
+eukulele_db: 'gtdb'
 <...>
 ```
 

@@ -4,52 +4,43 @@
 
 This document describes the output produced by the pipeline.
 
-The directories listed below will be created in the results directory after the pipeline has finished. All paths are relative to the top-level results directory.
+The directories listed below will be created in the results directory after the pipeline has finished.
+All paths are relative to the top-level results directory.
 
 ## Pipeline overview
 
-The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes data using the following steps:
+The pipeline is built using [Nextflow](https://www.nextflow.io/) and the results are organized as follow:
 
-- [Summary tables folder](#summary-tables-folder) - Final tables that can be imported directly in R
-- [Preprocessing](#preprocessing)
-  - [FastQC](#fastqc) - Read quality control
-  - [Trim galore!](#trimgalore) - Primer trimming
-  - [MultiQC](#multiqc) - Aggregate report describing results
-  - [BBduk](#bbduk) - Filter out sequences from samples based on a fasta file (optional)
-  - [BBnorm](#bbnorm) - Normalize the reads in the samples for a better assembly output (optional)
-- [Assembly step](#assembly-step) - Generate contigs with an assembler program
-  - [Megahit](#megahit) - Output from Megahit assembly (default)
-  - [RNASpades](#rnaspades) - Output from Spades assembly (optional)
-- [Orf Caller step](#orf-caller-step) - Generate amino acids fasta file with an orf caller program
-  - [Prodigal](#prodigal) - Output from Prodigal (default)
-  - [Prokka](#prokka) - Output from Prokka (optional)
-  - [TransDecoder](#transdecoder) - Output from transdecoder (optional)
-- [Functional and taxonomical annotation](#functional-and-taxonomical-annotation) - Predict the function and the taxonomy of the amino acids fasta file
-  - [Hmmrsearch](#Hmmrsearch) - Analysis made with Hmmr profiles
-  - [EggNOG](#eggnog) - Run EggNOG-mapper on amino acids fasta file
-  - [KOfamSCAN](#kofamscan) - Run KOfamSCAN on amino acids fasta file
-  - [EUKulele](#eukulele) - Run taxonomical annotation on amino acids fasta file
-- [Pipeline information](#pipeline-information) - Report metrics generated during the workflow execution
+- [Original output](#original-output)
+  - [Preprocessing](#preprocessing)
+    - [FastQC](#fastqc) - Read quality control
+    - [Trim galore!](#trim-galore) - Primer trimming
+    - [MultiQC](#multiqc) - Aggregate report describing results
+    - [BBduk](#bbduk) - Filter out sequences from samples that matches sequences in a user-provided fasta file (optional)
+    - [BBnorm](#bbnorm) - Normalize the reads in the samples to use less resources for assembly (optional)
+  - [Assembly step](#assembly-step) - Generate contigs with an assembler program
+    - [Megahit](#megahit) - Output from Megahit assembly (default)
+    - [RNASpades](#rnaspades) - Output from Spades assembly (optional)
+  - [ORF Caller step](#orf-caller-step) - Identify protein-coding genes (ORFs) with an ORF caller
+    - [Prodigal](#prodigal) - Output from Prodigal (default)
+    - [Prokka](#prokka) - Output from Prokka (optional)
+    - [TransDecoder](#transdecoder) - Output from transdecoder (optional)
+  - [Functional and taxonomical annotation](#functional-and-taxonomical-annotation) - Predict the function and the taxonomy of ORFs
+    - [EggNOG](#eggnog) - Output from EggNOG-mapper (default; optional)
+    - [KOfamSCAN](#kofamscan) - Output KOfamSCAN (optional)
+    - [EUKulele](#eukulele) - Output from EUKulele taxonomy annotation (default; optional)
+    - [Hmmsearch](#hmmsearch) - Output from HMMER run with user-supplied HMM profiles (optional)
+- [Custom metatdenovo output](#metatdenovo-output)
+  - [Summary tables folder](#summary-tables) - Tab separated tables ready for further analysis in tools like R and Python
+  - [Pipeline information](#pipeline-information) - Report metrics generated during the workflow execution
 
-### Summary tables folder
-
-A summary report for all statistics results in tsv format. The report gives a general overview of the analysis, includes featureCounts output, taxonomical and functional annotation tables.
-
-<details markdown="1">
-<summary>Output file</summary>
-
-- `summary_tables/`
-  - `overall_stats.tsv`: statistics summary report.
-  - `*counts.tsv`: summary table for featureCounts outputs
-  - `*.tsv`: several tables based on the different combinations of the pipeline. From taxonomical to functional annotation (optional)
-
-</details>
+## Original output
 
 ### Preprocessing
 
 #### FastQC
 
-[FastQC](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/) gives general quality metrics about your sequenced reads. It provides information about the quality score distribution across your reads, per base sequence content (%A/T/G/C), adapter contamination and overrepresented sequences. For further reading and documentation see the [FastQC help pages](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/). FastQC runs in Trim galore! therefore its output can be found in Trimgalore's folder.
+[FastQC](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/) gives general quality metrics about your sequenced reads. It provides information about the quality score distribution across your reads, per base sequence content (%A/T/G/C), adapter contamination and overrepresented sequences. For further reading and documentation see the [FastQC help pages](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/). FastQC is run as part of Trim galore! therefore its output can be found in Trimgalore's folder.
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -61,13 +52,13 @@ A summary report for all statistics results in tsv format. The report gives a ge
 
 #### Trim galore!
 
-[Trimgalore](https://github.com/FelixKrueger/TrimGalore) is trimming primer sequences from sequencing reads. Primer sequences are non-biological sequences that often introduce point mutations that do not reflect sample sequences. This is especially true for degenerated PCR primer. If primer trimming would be omitted, artifactual amplicon sequence variants might be computed by the denoising tool or sequences might be lost due to become labelled as PCR chimera.
+[Trimgalore](https://github.com/FelixKrueger/TrimGalore) is trimming primer sequences from sequencing reads. Primer sequences are non-biological sequences that often introduce point mutations that do not reflect sample sequences. This is especially true for degenerated PCR primers. If primer trimming would be omitted, artifactual amplicon sequence variants might be computed by the denoising tool or sequences might be lost due to become labelled as PCR chimera.
 
 <details markdown="1">
 <summary>Output files</summary>
 
 - `trimgalore/`: directory containing log files with retained reads, trimming percentage, etc. for each sample.
-  - `*trimming_report.txt`: Report of read numbers that pass trimgalore.
+  - `*trimming_report.txt`: report of read numbers that pass trimgalore.
 
 </details>
 
@@ -106,8 +97,10 @@ BBduk is built-in tool from BBmap
 
 #### BBnorm
 
-[BBnorm](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbduk-guide/) is a tool from BBmap that allows to reduce the coverage of highly abundant sequences and remove the sequences that are below a threshold, and can be useful if the data set is too large to assemble but also potentially improve an assembly. N.B. the digital normalization is done only for the assembly and the non-normalized sequences will be used for quantification
-BBnorm is built-in tool from BBmap
+[BBnorm](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbduk-guide/) is a tool from BBmap that allows to reduce the coverage of highly abundant sequence kmers and remove sequences representing kmers that are below a threshold.
+It can be useful if the data set is too large to assemble but also potentially improve an assembly.
+N.B. the digital normalization is done only for the assembly and the non-normalized sequences will be used for quantification.
+BBnorm is a BBmap tool.
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -121,20 +114,21 @@ BBnorm is built-in tool from BBmap
 
 #### Megahit
 
-[Megahit](https://github.com/voutcn/megahit) is used to assemble the cleaned and trimmed FastQ reads to create the reference genome.
+[Megahit](https://github.com/voutcn/megahit) is used to assemble the cleaned and trimmed FastQ reads into contigs.
 
+<details markdown="1">
 <summary>Output file</summary>
+  
 - `megahit/megahit_out/`
-  - `*.log`: it is a log file of Megahit run.
-  - `megahit_assembly.contigs.fa.gz`: Reference genome created by Megahit.
-  - `intermediate_contigs`: Folder that contains the intermediate steps of Megahit run.
+  - `*.log`: log file of Megahit run.
+  - `megahit_assembly.contigs.fa.gz`: reference genome created by Megahit.
+  - `intermediate_contigs`: folder that contains the intermediate steps of Megahit run.
     
 </details>
 
 #### RNASpades
 
-Optionally, you can use [RNASpades](https://cab.spbu.ru/software/rnaspades/) to assemble your reference genome.
-NB: we reccomend to use this assembler for eukaryotes rathern then prokaryotes.
+Optionally, you can use [RNASpades](https://cab.spbu.ru/software/rnaspades/) to assemble reads into contigs.
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -142,14 +136,15 @@ NB: we reccomend to use this assembler for eukaryotes rathern then prokaryotes.
 - `rnaspades/`
   - `rnaspades.assembly.gfa.gz`: gfa file output from rnaspades
   - `rnaspades.spades.log`: log file output from rnaspades run
-  - `rnaspades.transcripts.fa.gz`: Reference genome created by RNASpades
-  </details>
+  - `rnaspades.transcripts.fa.gz`: reference genome created by RNASpades
 
-### Orf caller step
+</details>
+
+### ORF caller step
 
 #### Prodigal
 
-As default, you can use [Prodigal](https://github.com/hyattpd/Prodigal) to find ORFs on your reference genome.
+As default, [Prodigal](https://github.com/hyattpd/Prodigal) is used to identify ORFs in the assembly.
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -163,8 +158,9 @@ As default, you can use [Prodigal](https://github.com/hyattpd/Prodigal) to find 
 
 #### Prokka
 
-As one alternative, you can use [Prokka](https://github.com/tseemann/prokka) to find ORFs on your reference genome.
-NB: Prodigal and Prokka are reccomended for prokaryotic samples
+As one alternative, you can use [Prokka](https://github.com/tseemann/prokka) to identify ORFs in the assembly.
+In addition to calling ORFs (done with Prodigal) Prokka will filter ORFs to only retain quality ORFs and will functionally annotate the ORFs.
+NB: Prodigal or Prokka are recomended for prokaryotic samples
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -178,8 +174,8 @@ NB: Prodigal and Prokka are reccomended for prokaryotic samples
 
 #### TransDecoder
 
-Another alternative is [TransDecoder](https://github.com/sghignone/TransDecoder) to find ORFs on your reference genome.
-TransDecoder is reccomended for Eukaryotic samples
+Another alternative is [TransDecoder](https://github.com/sghignone/TransDecoder) to find ORFs in the assembly.
+N.B. TransDecoder is recomended for eukaryotic samples
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -193,45 +189,23 @@ TransDecoder is reccomended for Eukaryotic samples
 
 ### Functional and taxonomical annotation
 
-#### Hmmrsearch
-
-You can run [Hmmsearch](https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch) scan on the reference amino acids fasta file by giving hmm profiles to the pipeline.
-
-<details markdown="1">
-<summary>Output files</summary>
-
-- `hmmer/`
-  - `*.tbl.gz`:
-
-</details>
-
-Automatically, the pipline will run Hmmrank in order to find the best rank for each ORFs of your reference file.
-
-<details markdown="1">
-<summary>Output files</summary>
-
-- `hmmrank/`
-  - `*.tsv.gz`: tab separeted file with the ranked ORFs for each HMM profile.
-
-</details>
-
 #### EggNOG
 
-[EggNOG-mapper](https://github.com/eggnogdb/eggnog-mapper) will perform an analysis to assign a function to the ORFs
+[EggNOG-mapper](https://github.com/eggnogdb/eggnog-mapper) will perform an analysis to assign functions to the ORFs.
 
 <details markdown="1">
 <summary>Output files</summary>
 
 - `eggnog/`
-  - `*.emapper.annotations.gz`: A file with the results from the annotation phase. Therefore, each row represents the annotation reported for a given query.
-  - `*.emapper.hits.gz`: A file with the results from the search phase, from HMMER, Diamond or MMseqs2.
-  - `*.emapper.seed_orthologs.gz`: A file with the results from parsing the hits. Each row links a query with a seed ortholog. This file has the same format independently of which searcher was used, except that it can be in short format (4 fields), or full.
+  - `*.emapper.annotations.gz`: a file with the results from the annotation phase, see the [EggNOG-mapper documentation](https://github.com/eggnogdb/eggnog-mapper/wiki/).
+  - `*.emapper.hits.gz`: a file with the results from the search phase, from HMMER, Diamond or MMseqs2.
+  - `*.emapper.seed_orthologs.gz`: a file with the results from parsing the hits. Each row links a query with a seed ortholog. This file has the same format independently of which searcher was used, except that it can be in short format (4 fields), or full.
 
 </details>
 
 #### KOfamScan
 
-[KOfamScan](https://github.com/takaram/kofam_scan) will perform an analysis to assign a function to the ORFs
+[KOfamScan](https://github.com/takaram/kofam_scan) will perform an analysis to assign KEGG orthologs to ORFs.
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -243,7 +217,9 @@ Automatically, the pipline will run Hmmrank in order to find the best rank for e
 
 #### EUKulele
 
-[EUKulele](https://github.com/AlexanderLabWHOI/EUKulele) will perform an analysis to assign a taxonomy to the ORFs
+[EUKulele](https://github.com/AlexanderLabWHOI/EUKulele) will perform an analysis to assign taxonomy to the ORFs.
+A number of databases are supported: MMETSP, PhyloDB and GTDB.
+GTDB currently only works as a user provided database, i.e. data must be downloaded before running nf-core/metatdenovo.
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -255,15 +231,57 @@ Automatically, the pipline will run Hmmrank in order to find the best rank for e
 
 </details>
 
+#### Hmmsearch
+
+You can run [hmmsearch](https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch) on ORFs using a set of HMM profiles provided to the pipeline (see the `--hmmdir`, `--hmmpatern` and `--hmmfiles` parameters).
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `hmmer/`
+  - `*.tbl.gz`:
+
+</details>
+
+After the search, hits for each ORF and HMM will be summarised and ranked based on scores for the hits (see also output in [summary tables](#summary-tables)).
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `hmmrank/`
+  - `*.tsv.gz`: tab separeted file with the ranked ORFs for each HMM profile.
+
+</details>
+
+## Metatdenovo output
+
+### Summary tables
+
+Consistently named and formated output tables in tsv format ready for further analysis.
+Filenames start with assembly program and ORF caller, to allow reruns of the pipeline with different parameter settings without overwriting output files.
+
+<details markdown="1">
+<summary>Output file</summary>
+
+- `summary_tables/`
+  - `{assembler}.{orf_caller}.overall_stats.tsv.gz`: overall statistics from the pipeline, e.g. number of reads, number of called ORFs, number of reads mapping back to contigs/ORFs etc.
+  - `{assembler}.{orf_caller}.counts.tsv.gz`: read counts per ORF and sample.
+  - `{assembler}.{orf_caller}.emapper.tsv.gz`: reformatted output from EggNOG-mapper.
+  - `{assembler}.{orf_caller}.{db}_eukulele.tsv.gz`: taxonomic annotation per ORF for specific database.
+  - `{assembler}.{orf_caller}.prokka-annotations.tsv.gz`: reformatted annotation output from Prokka.
+  - `{assembler}.{orf_caller}.hmmrank.tsv.gz`: ranked summary table from HMMER results.
+
+</details>
+
 ### Pipeline information
 
 <details markdown="1">
 <summary>Output files</summary>
 
 - `pipeline_info/`
-  - Reports generated by Nextflow: `execution_report.html`, `execution_timeline.html`, `execution_trace.txt` and `pipeline_dag.dot`/`pipeline_dag.svg`.
-  - Reports generated by the pipeline: `pipeline_report.html`, `pipeline_report.txt` and `software_versions.yml`. The `pipeline_report*` files will only be present if the `--email` / `--email_on_fail` parameter's are used when running the pipeline.
-  - Reformatted samplesheet files used as input to the pipeline: `samplesheet.valid.csv`.
-  - Parameters used by the pipeline run: `params.json`.
+  - reports generated by Nextflow: `execution_report.html`, `execution_timeline.html`, `execution_trace.txt` and `pipeline_dag.dot`/`pipeline_dag.svg`.
+  - reports generated by the pipeline: `pipeline_report.html`, `pipeline_report.txt` and `software_versions.yml`. The `pipeline_report*` files will only be present if the `--email` / `--email_on_fail` parameter's are used when running the pipeline.
+  - reformatted samplesheet files used as input to the pipeline: `samplesheet.valid.csv`.
+  - parameters used by the pipeline run: `params.json`.
 
 </details>

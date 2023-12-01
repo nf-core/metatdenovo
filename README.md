@@ -24,25 +24,25 @@ On release, automated continuous integration tests run the pipeline on a full-si
 
 ## Pipeline summary
 
-![nf-core/rnaseq metro map](docs/images/nf-core-metatdenovo_metro_map.png)
+![nf-core/metatdenovo metro map](docs/images/metatdenovo.png)
 
 1. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
 2. Present QC for raw reads ([`MultiQC`](http://multiqc.info/))
-3. Quality trimming and adapters removal for raw reads [`Trimm Galore!`](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/)
-4. Filter sequences with [`BBduk`](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbduk-guide/)
-5. Normalize the sequencing depth with [`BBnorm`](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbnorm-guide/)
-6. Merge trimmed, pair-end reads ( [`Seqtk`](https://github.com/lh3/seqtk))
+3. Quality trimming and adapter removal for raw reads ([`Trim Galore!`](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/))
+4. Optional: Filter sequences with [`BBduk`](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbduk-guide/)
+5. Optional: Normalize the sequencing depth with [`BBnorm`](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbnorm-guide/)
+6. Merge trimmed, pair-end reads ([`Seqtk`](https://github.com/lh3/seqtk))
 7. Choice of de novo assembly programs:
-   1. [`RNAspade`](https://cab.spbu.ru/software/rnaspades/) suggested for Eukaryotes de novo assembly
+   1. [`RNAspades`](https://cab.spbu.ru/software/rnaspades/) suggested for Eukaryotes de novo assembly
    2. [`Megahit`](https://github.com/voutcn/megahit) suggested for Prokaryotes de novo assembly
 8. Choice of orf caller:
    1. [`TransDecoder`](https://github.com/TransDecoder/TransDecoder) suggested for Eukaryotes
    2. [`Prokka`](https://github.com/tseemann/prokka) suggested for Prokaryotes
    3. [`Prodigal`](https://github.com/hyattpd/Prodigal) suggested for Prokaryotes
 9. Quantification of genes identified in assemblies:
-   1. generate index of assembly [`BBmap index`](https://sourceforge.net/projects/bbmap/)
-   2. Mapping cleaned reads to the assembly for quantification [`BBmap`](https://sourceforge.net/projects/bbmap/)
-   3. Get raw counts per each gene present in the assembly [`Featurecounts`](http://subread.sourceforge.net) -> TSV table with collected featurecounts output
+   1. Generate index of assembly ([`BBmap index`](https://sourceforge.net/projects/bbmap/))
+   2. Mapping cleaned reads to the assembly for quantification ([`BBmap`](https://sourceforge.net/projects/bbmap/))
+   3. Get raw counts per each gene present in the assembly ([`Featurecounts`](http://subread.sourceforge.net)) -> TSV table with collected featurecounts output
 10. Functional annotation:
     1. [`Eggnog`](https://github.com/eggnogdb/eggnog-mapper) -> Reformat TSV output "eggnog table"
     2. [`KOfamscan`](https://github.com/takaram/kofam_scan)
@@ -50,7 +50,7 @@ On release, automated continuous integration tests run the pipeline on a full-si
 11. Taxonomic annotation:
     1. [`EUKulele`](https://github.com/AlexanderLabWHOI/EUKulele) -> Reformat TSV output "Reformat_tax.R"
     2. [`CAT`](https://github.com/dutilh/CAT)
-12. Summary statistics table. Collect_stats.R
+12. Summary statistics table. "Collect_stats.R"
 
 ## Usage
 
@@ -70,8 +70,6 @@ CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz
 ```
 
 Each row represents a fastq file (single-end) or a pair of fastq files (paired end).
-
--->
 
 Now, you can run the pipeline using:
 
@@ -96,6 +94,9 @@ For more details and further functionality, please refer to the [usage documenta
 To see the results of an example test run with a full size dataset refer to the [results](https://nf-co.re/metatdenovo/results) tab on the nf-core website pipeline page.
 For more details about the output files and reports, please refer to the
 [output documentation](https://nf-co.re/metatdenovo/output).
+
+_Note_ the `summary_tables` directory under the output directory.
+This will contain tsv tables that we have made especially for further analysis in tools like R or Python.
 
 ## Credits
 
