@@ -29,14 +29,14 @@ process HMMRANK {
 
     # Read all the tblout files
 
-   read_fwf(c('${tblouts.join("','")}'), fwf_cols(content = c(1, NA)), col_types = cols(content = col_character()), comment='#', id = 'fname') %>%
-       filter(! grepl('^ *#', content)) %>%
-       separate(
-           content,
-           c('accno', 't0', 'profile_desc', 't1', 'evalue', 'score', 'bias', 'f0', 'f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'rest'),
-           '\\\\s+',  extra='merge', convert = FALSE
-       ) %>%
-       transmute(profile = basename(fname), accno, profile_desc, evalue = as.double(evalue), score = as.double(score)) %>%
+    read_fwf(c('${tblouts.join("','")}'), fwf_cols(content = c(1, NA)), col_types = cols(content = col_character()), comment='#', id = 'fname') %>%
+        filter(! grepl('^ *#', content)) %>%
+        separate(
+            content,
+            c('accno', 't0', 'profile_desc', 't1', 'evalue', 'score', 'bias', 'f0', 'f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'rest'),
+            '\\\\s+',  extra='merge', convert = FALSE
+        ) %>%
+        transmute(profile = basename(fname), accno, profile_desc, evalue = as.double(evalue), score = as.double(score)) %>%
         # Group and calculate a rank based on score and evalue; let ties be resolved by profile in alphabetical order
         group_by(accno) %>%
         arrange(desc(score), evalue, profile) %>%
