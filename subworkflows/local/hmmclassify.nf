@@ -15,12 +15,13 @@ workflow HMMCLASSIFY {
     )
     ch_versions = ch_versions.mix(HMMER_HMMSEARCH.out.versions.first())
 
+    
     HMMRANK (
         ch_hmmclassify
             .map { it[0] }
             .distinct()
             .combine ( HMMER_HMMSEARCH.out.target_summary.collect { it[1] } )
-            .map { [ it[0], [ it[1] ] ] }
+            .map { [ it[0], it[1..-1] ] }
     )
     ch_versions = ch_versions.mix(HMMRANK.out.versions)
 
