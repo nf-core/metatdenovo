@@ -4,8 +4,8 @@ process EUKULELE_SEARCH {
 
     conda "bioconda::eukulele=2.0.5"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/eukulele:2.0.5--pyh723bec7_0' :
-        'biocontainers/eukulele:2.0.5--pyh723bec7_0' }"
+        'https://depot.galaxyproject.org/singularity/eukulele:2.0.7--pyh78b79e7_0' :
+        'biocontainers/eukulele:2.0.7--pyh78b79e7_0' }"
 
     input:
     tuple val(meta), path(fasta), val(dbname), path(eukdb)

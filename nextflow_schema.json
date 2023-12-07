@@ -24,8 +24,8 @@
                 },
                 "se_reads": {
                     "type": "boolean",
-                    "default": false,
-                    "description": "activate when using single end reads input"
+                    "description": "activate when using single end reads input",
+                    "fa_icon": "fas fa-long-arrow-alt-right"
                 },
                 "outdir": {
                     "type": "string",
@@ -510,7 +510,6 @@
                 "validate_params": {
                     "type": "boolean",
                     "description": "Boolean whether to validate parameters against the schema at runtime",
-                    "default": false,
                     "fa_icon": "fas fa-check-square",
                     "hidden": true
                 },
