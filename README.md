@@ -95,8 +95,9 @@ To see the results of an example test run with a full size dataset refer to the 
 For more details about the output files and reports, please refer to the
 [output documentation](https://nf-co.re/metatdenovo/output).
 
-_Note_ the `summary_tables` directory under the output directory.
-This will contain tsv tables that we have made especially for further analysis in tools like R or Python.
+:::note
+Tables in `summary_tables` directory under the output directory are made especially for further analysis in tools like R or Python.
+:::
 
 ## Credits
 
