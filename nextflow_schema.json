@@ -298,6 +298,7 @@
                     "type": "string",
                     "default": "mets",
                     "description": "Specify which method to use for EUKulele. the alternatives are: mets (metatranscriptomics) or  mags (Metagenome Assembled Genomes). default: mets",
+                    "enum": ["mets", "mags"],
                     "fa_icon": "fas fa-bezier-curve"
                 },
                 "eukulele_db": {
