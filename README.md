@@ -64,9 +64,13 @@ First, prepare a samplesheet with your input data that looks as follows:
 
 `samplesheet.csv`:
 
-```csv
-sample,fastq_1,fastq_2
-CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz
+```
+| sample   | fastq_1                   | fastq_2
+| -------- | ------------------------- | ------------------------- |
+| sample1  | ./data/S1_R1_001.fastq.gz | ./data/S1_R2_001.fastq.gz |
+| sample2  | ./data/S2_fw.fastq.gz     | ./data/S2_rv.fastq.gz     |
+| sample3  | ./S4x.fastq.gz            | ./S4y.fastq.gz            |
+| sample4  | ./a.fastq.gz              | ./b.fastq.gz              |
 ```
 
 Each row represents a fastq file (single-end) or a pair of fastq files (paired end).
