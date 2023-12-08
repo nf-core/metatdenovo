@@ -12,7 +12,6 @@ process SUM_TAXONOMY {
     path feature_counts
 
     output:
-
     tuple val(meta), path("*_summary.tsv.gz") , emit: taxonomy_summary
     path "versions.yml"                       , emit: versions
 
