@@ -23,7 +23,6 @@ process SUM_KOFAMSCAN {
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
-
     """
     #!/usr/bin/env Rscript
 

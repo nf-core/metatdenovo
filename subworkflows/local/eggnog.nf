@@ -8,13 +8,12 @@ include { EGGNOG_SUM      } from '../../modules/local/eggnog/sum'
 
 workflow EGGNOG {
     take:
-        eggnog_dbpath
-        faa
-        collect_fcs
+    eggnog_dbpath
+    faa
+    collect_fcs
 
     main:
-        ch_versions = Channel.empty()
-
+    ch_versions = Channel.empty()
         String eggnogDB      = eggnog_dbpath + "/eggnog.db"
         File eggnogfile      = new File(eggnogDB)
 

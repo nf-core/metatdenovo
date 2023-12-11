@@ -16,7 +16,7 @@
 
 ## Introduction
 
-**nf-core/metatdenovo** is a bioinformatics best-practice analysis pipeline for Assembly and annotation of metatranscriptomic data, both prokaryotic and eukaryotic.
+**nf-core/metatdenovo** is a bioinformatics best-practice analysis pipeline for assembly and annotation of metatranscriptomic data, both prokaryotic and eukaryotic.
 
 The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool to run tasks across multiple compute infrastructures in a very portable manner. It uses Docker/Singularity containers making installation trivial and results highly reproducible. The [Nextflow DSL2](https://www.nextflow.io/docs/latest/dsl2.html) implementation of this pipeline uses one container per process which makes it much easier to maintain and update software dependencies. Where possible, these processes have been submitted to and installed from [nf-core/modules](https://github.com/nf-core/modules) in order to make them available to all nf-core pipelines, and to everyone within the Nextflow community!
 
@@ -24,7 +24,7 @@ On release, automated continuous integration tests run the pipeline on a full-si
 
 ## Pipeline summary
 
-![nf-core/metatdenovo metro map](docs/images/metatdenovo.png)
+![nf-core/metatdenovo metro map](docs/images/metat_v6.svg)
 
 1. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
 2. Present QC for raw reads ([`MultiQC`](http://multiqc.info/))
@@ -64,9 +64,13 @@ First, prepare a samplesheet with your input data that looks as follows:
 
 `samplesheet.csv`:
 
-```csv
-sample,fastq_1,fastq_2
-CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz
+```
+| sample   | fastq_1                   | fastq_2
+| -------- | ------------------------- | ------------------------- |
+| sample1  | ./data/S1_R1_001.fastq.gz | ./data/S1_R2_001.fastq.gz |
+| sample2  | ./data/S2_fw.fastq.gz     | ./data/S2_rv.fastq.gz     |
+| sample3  | ./S4x.fastq.gz            | ./S4y.fastq.gz            |
+| sample4  | ./a.fastq.gz              | ./b.fastq.gz              |
 ```
 
 Each row represents a fastq file (single-end) or a pair of fastq files (paired end).
@@ -95,8 +99,9 @@ To see the results of an example test run with a full size dataset refer to the 
 For more details about the output files and reports, please refer to the
 [output documentation](https://nf-co.re/metatdenovo/output).
 
-_Note_ the `summary_tables` directory under the output directory.
-This will contain tsv tables that we have made especially for further analysis in tools like R or Python.
+:::note
+Tables in `summary_tables` directory under the output directory are made especially for further analysis in tools like R or Python.
+:::
 
 ## Credits
 
