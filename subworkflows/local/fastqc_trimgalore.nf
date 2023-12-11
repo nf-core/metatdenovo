@@ -37,13 +37,10 @@ workflow FASTQC_TRIMGALORE {
 
     emit:
     reads = trim_reads // channel: [ val(meta), [ reads ] ]
-
     fastqc_html        // channel: [ val(meta), [ html ] ]
     fastqc_zip         // channel: [ val(meta), [ zip ] ]
-
     trim_html          // channel: [ val(meta), [ html ] ]
     trim_zip           // channel: [ val(meta), [ zip ] ]
     trim_log           // channel: [ val(meta), [ txt ] ]
-
     versions = ch_versions.ifEmpty(null) // channel: [ versions.yml ]
 }
