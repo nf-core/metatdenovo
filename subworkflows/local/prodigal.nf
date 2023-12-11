@@ -7,18 +7,18 @@ include { FORMAT_PRODIGAL_GFF         } from '../../modules/local/format_prodiga
 
 workflow PRODIGAL {
     take:
-        fastafile
+    fastafile
 
     main:
-        ch_versions = Channel.empty()
+    ch_versions = Channel.empty()
 
-        PRODIGAL_MODULE     ( fastafile, 'gff' )
-        FORMAT_PRODIGAL_GFF ( PRODIGAL_MODULE.out.gene_annotations )
-        ch_versions = ch_versions.mix(PRODIGAL_MODULE.out.versions)
+    PRODIGAL_MODULE     ( fastafile, 'gff' )
+    FORMAT_PRODIGAL_GFF ( PRODIGAL_MODULE.out.gene_annotations )
+    ch_versions = ch_versions.mix(PRODIGAL_MODULE.out.versions)
 
     emit:
-        faa     = PRODIGAL_MODULE.out.amino_acid_fasta
-        gff     = FORMAT_PRODIGAL_GFF.out.format_gff
-        versions = ch_versions
+    faa     = PRODIGAL_MODULE.out.amino_acid_fasta
+    gff     = FORMAT_PRODIGAL_GFF.out.format_gff
+    versions = ch_versions
 
 }

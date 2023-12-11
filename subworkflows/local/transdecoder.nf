@@ -7,21 +7,21 @@ include { TRANSDECODER_PREDICT as PREDICT } from '../../modules/nf-core/transdec
 
 workflow TRANSDECODER {
     take:
-        contigs       // channel: [ val(meta), [ contigs ] ]
+    contigs       // channel: [ val(meta), [ contigs ] ]
 
     main:
-        ch_versions  = Channel.empty()
+    ch_versions  = Channel.empty()
 
-        LONGORF (contigs)
-        PREDICT (contigs, LONGORF.out.folder)
-        ch_versions = ch_versions.mix(LONGORF.out.versions)
+    LONGORF (contigs)
+    PREDICT (contigs, LONGORF.out.folder)
+    ch_versions = ch_versions.mix(LONGORF.out.versions)
 
     emit:
-        gff      = PREDICT.out.gff3
-        cds      = PREDICT.out.cds
-        pep      = PREDICT.out.pep
-        bed      = PREDICT.out.bed
+    gff      = PREDICT.out.gff3
+    cds      = PREDICT.out.cds
+    pep      = PREDICT.out.pep
+    bed      = PREDICT.out.bed
 
-        versions = ch_versions
+    versions = ch_versions
 
 }
