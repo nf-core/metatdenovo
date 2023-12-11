@@ -27,7 +27,7 @@
                     },
                     "cat/cat": {
                         "branch": "master",
-                        "git_sha": "3f5420aa22e00bd030a2556dfdffc9e164ec0ec5",
+                        "git_sha": "8c51ed82c6b60e6a505c5cf474deb95f6cfddabf",
                         "installed_by": ["modules"]
                     },
                     "cat/fastq": {
@@ -42,7 +42,7 @@
                     },
                     "fastqc": {
                         "branch": "master",
-                        "git_sha": "3e8b0c1144ccf60b7848efbdc2be285ff20b49ee",
+                        "git_sha": "65ad3e0b9a4099592e1102e92e10455dc661cf53",
                         "installed_by": ["modules"]
                     },
                     "hmmer/hmmsearch": {
