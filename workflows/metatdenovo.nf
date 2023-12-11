@@ -10,28 +10,6 @@ def logo = NfcoreTemplate.logo(workflow, params.monochrome_logs)
 def citation = '\n' + WorkflowMain.citation(workflow) + '\n'
 def summary_params = paramsSummaryMap(workflow)
 
-// Validate parameters for orf_caller:
-ORF_CALLER_PRODIGAL     = 'prodigal'
-ORF_CALLER_PROKKA       = 'prokka'
-ORF_CALLER_TRANSDECODER = 'transdecoder'
-
-// Validate parameters for assembler:
-RNASPADES = 'rnaspades'
-MEGAHIT   = 'megahit'
-
-// validate parameters for eukulele database:
-EUKULELE_DB_PHYLODB     = 'phylodb'
-EUKULELE_DB_MMETSP      = 'mmetsp'
-EUKULELE_DB_EUKPROT     = 'eukprot'
-EUKULELE_DB_EUKZOO      = 'eukzoo'
-EUKULELE_DB_GTDB        = 'gtdb'
-
-def valid_params = [
-    orf_caller      : [ ORF_CALLER_PRODIGAL, ORF_CALLER_PROKKA, ORF_CALLER_TRANSDECODER ],
-    assembler       : [ RNASPADES, MEGAHIT ],
-    eukulele_db     : [ EUKULELE_DB_PHYLODB, EUKULELE_DB_MMETSP, EUKULELE_DB_EUKPROT, EUKULELE_DB_EUKZOO, EUKULELE_DB_GTDB ]
-]
-
 // Check input path parameters to see if they exist
 def checkPathParamList = [ params.input, params.multiqc_config ]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
@@ -303,7 +281,7 @@ workflow METATDENOVO {
         Channel
             .value ( [ [ id: 'user_assembly' ], file(params.assembly) ] )
             .set { ch_assembly_contigs }
-    } else if ( params.assembler == RNASPADES ) {
+    } else if ( params.assembler == 'rnaspades' ) {
         // 1. Write a yaml file for Spades
         WRITESPADESYAML (
             ch_pe_reads_to_assembly.collect().ifEmpty([]),
@@ -325,7 +303,7 @@ workflow METATDENOVO {
         ch_versions = ch_versions.mix(SPADES.out.versions)
         FORMATSPADES( ch_assembly )
         ch_assembly_contigs = FORMATSPADES.out.assembly
-    } else if ( params.assembler == MEGAHIT ) {
+    } else if ( params.assembler == 'megahit' ) {
         MEGAHIT_INTERLEAVED(
             ch_pe_reads_to_assembly.collect().ifEmpty([]),
             ch_se_reads_to_assembly.collect().ifEmpty([]),
@@ -352,7 +330,7 @@ workflow METATDENOVO {
     //
     // SUBWORKFLOW: Run PROKKA_SUBSETS on assmebly output, but split the fasta file in chunks of 10 MB, then concatenate and compress output.
     //
-    if ( params.orf_caller == ORF_CALLER_PROKKA ) {
+    if ( params.orf_caller == 'prokka' ) {
         PROKKA_SUBSETS(ch_assembly_contigs, params.prokka_batchsize)
         UNPIGZ_GFF(PROKKA_SUBSETS.out.gff.map { [ [id: "${params.orf_caller}.${it[0].id}"], it[1] ] })
         ch_versions      = ch_versions.mix(PROKKA_SUBSETS.out.versions)
@@ -364,7 +342,7 @@ workflow METATDENOVO {
     //
     // MODULE: Run PRODIGAL on assembly output.
     //
-    if ( params.orf_caller == ORF_CALLER_PRODIGAL ) {
+    if ( params.orf_caller == 'prodigal' ) {
         PRODIGAL( ch_assembly_contigs.map { [ [id: "${params.assembler}.${params.orf_caller}"], it[1] ] } )
         UNPIGZ_GFF(PRODIGAL.out.gff.map { [ [id: "${it[0].id}.${params.orf_caller}"], it[1] ] })
         ch_gff          = UNPIGZ_GFF.out.unzipped
@@ -375,7 +353,7 @@ workflow METATDENOVO {
     //
     // SUBWORKFLOW: run TRANSDECODER. Orf caller alternative for eukaryotes.
     //
-    if ( params.orf_caller == ORF_CALLER_TRANSDECODER ) {
+    if ( params.orf_caller == 'transdecoder' ) {
         TRANSDECODER ( ch_assembly_contigs.map { [ [id: "transdecoder.${it[0].id}" ], it[1] ] } )
         ch_gff      = TRANSDECODER.out.gff
         ch_aa       = TRANSDECODER.out.pep
