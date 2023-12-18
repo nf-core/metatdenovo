@@ -47,7 +47,7 @@ jobs:
     strategy:
       matrix:
         # Run remaining test profiles with minimum nextflow version
-        profile: [test]
+        profile: [test, test_cat, test_eggnog, test_eukulele, test_filter, test_full, test_kofamscan, test_prokka, test_rnaspades, test_transdecoder]
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v2
