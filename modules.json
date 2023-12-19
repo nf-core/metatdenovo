@@ -27,7 +27,7 @@
                     },
                     "cat/cat": {
                         "branch": "master",
-                        "git_sha": "8c51ed82c6b60e6a505c5cf474deb95f6cfddabf",
+                        "git_sha": "d593e8f6b7d1bbbb2acf43a4b9efeeac8d6720f2",
                         "installed_by": ["modules"]
                     },
                     "cat/fastq": {
@@ -62,7 +62,7 @@
                     },
                     "prokka": {
                         "branch": "master",
-                        "git_sha": "3f5420aa22e00bd030a2556dfdffc9e164ec0ec5",
+                        "git_sha": "49ebda931c36c2b282f7958d00e1236b751f1031",
                         "installed_by": ["modules"]
                     },
                     "samtools/flagstat": {
