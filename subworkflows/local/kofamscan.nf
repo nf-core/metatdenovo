@@ -26,7 +26,7 @@ workflow KOFAMSCAN {
     }
 
     if ( ! kolistfile.exists() ) {
-        KOFAMSCAN_DOWNLOAD ( kofam_dir )
+        KOFAMSCAN_DOWNLOAD ( Channel.fromPath(kofam_dir))
         ch_dbpath   = KOFAMSCAN_DOWNLOAD.out.ko_list
         ch_profiles = KOFAMSCAN_DOWNLOAD.out.koprofiles
 

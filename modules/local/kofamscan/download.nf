@@ -4,8 +4,8 @@ process KOFAMSCAN_DOWNLOAD {
 
     conda "bioconda::gnu-wget=1.18"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/gnu-wget:1.18--hed695b0_4':
-        'quay.io/biocontainers/gnu-wget:1.18--hed695b0_4' }"
+        'https://depot.galaxyproject.org/singularity/curl:7.80.0':
+        'quay.io/biocontainers/curl:7.80.0' }"
 
     input:
     path kofam_dir
@@ -23,7 +23,7 @@ process KOFAMSCAN_DOWNLOAD {
 
     """
     if [ ! -e ${kofam_dir}/ko_list ]; then
-        wget https://www.genome.jp/ftp/db/kofam/ko_list.gz
+        curl https://www.genome.jp/ftp/db/kofam/ko_list.gz > ko_list.gz
         gunzip -c ko_list.gz > ${kofam_dir}/ko_list
     fi
 
