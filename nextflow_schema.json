@@ -610,7 +610,7 @@
     ],
     "properties": {
         "save_samtools": {
-            "type": "string",
+            "type": "boolean",
             "default": "false"
         }
     }
