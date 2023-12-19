@@ -203,8 +203,13 @@
             "properties": {
                 "save_bam": {
                     "type": "boolean",
-                    "description": "save the bam files from mapping",
+                    "description": "Save the bam files from mapping",
                     "fa_icon": "fas fa-align-center"
+                },
+                "save_samtools": {
+                    "type": "boolean",
+                    "default": "false",
+                    "description": "Save the output from samtools"
                 }
             },
             "fa_icon": "fas fa-filter"
@@ -607,11 +612,5 @@
         {
             "$ref": "#/definitions/generic_options"
         }
-    ],
-    "properties": {
-        "save_samtools": {
-            "type": "boolean",
-            "default": "false"
-        }
-    }
+    ]
 }
