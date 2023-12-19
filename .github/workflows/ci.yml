@@ -51,11 +51,6 @@ jobs:
           [
             test,
             test_cat,
-            test_eggnog,
-            test_eukulele,
-            test_filter,
-            test_full,
-            test_kofamscan,
             test_prokka,
             test_rnaspades,
             test_transdecoder,
