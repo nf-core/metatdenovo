@@ -23,7 +23,6 @@ process EGGNOG_DOWNLOAD {
 
     script:
     def args = task.ext.args ?: ''
-
     """
 
     download_eggnog_data.py \\
