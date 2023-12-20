@@ -202,7 +202,7 @@
                 },
                 "save_samtools": {
                     "type": "boolean",
-                    "default": "false",
+                    "default": false,
                     "description": "Save the output from samtools"
                 }
             },
