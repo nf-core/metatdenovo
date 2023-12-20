@@ -30,8 +30,6 @@ process EUKULELE_SEARCH {
     rc=0
     mkdir contigs
     $gunzip
-
-
     EUKulele \\
         $args \\
         $database \\
