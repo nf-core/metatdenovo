@@ -12,7 +12,6 @@ process SUM_KOFAMSCAN {
     path(fcs)
 
     output:
-
     tuple val(meta), path("${meta.id}.kofamscan_summary.tsv.gz") , emit: kofamscan_summary
     path "versions.yml"                                          , emit: versions
 
