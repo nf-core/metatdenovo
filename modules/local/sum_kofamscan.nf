@@ -8,7 +8,6 @@ process SUM_KOFAMSCAN {
         'biocontainers/mulled-v2-b2ec1fea5791d428eebb8c8ea7409c350d31dada:a447f6b7a6afde38352b24c30ae9cd6e39df95c4-1' }"
 
     input:
-
     tuple val(meta), path(kofmascan)
     path(fcs)
 
