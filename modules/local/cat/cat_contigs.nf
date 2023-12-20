@@ -25,7 +25,10 @@ process CAT_CONTIGS {
     """
     CAT contigs -c "$assembly" -d database/ -t taxonomy/ -n 4 -o "${meta.id}" --top 11 --I_know_what_Im_doing
     CAT add_names -i "${meta.id}.ORF2LCA.txt" -o "${meta.id}.ORF2LCA.names.txt" -t taxonomy/ ${official_taxonomy}
-    CAT add_names -i "${meta.id}.contig2classification.txt" -o "${meta.id}.contig2classification.names.txt" -t taxonomy/ ${official_taxonomy}
+    CAT add_names \\
+        -i "${meta.id}.contig2classification.txt" \\
+        -o "${meta.id}.contig2classification.names.txt" \\
+        -t taxonomy/ ${official_taxonomy}
 
     mkdir raw
     mv *.ORF2LCA.txt *.predicted_proteins.faa *.predicted_proteins.gff *.log *.contig2classification.txt raw/
