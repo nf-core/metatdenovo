@@ -10,7 +10,10 @@
             "type": "object",
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
-            "required": ["input", "outdir"],
+            "required": [
+                "input",
+                "outdir"
+            ],
             "properties": {
                 "input": {
                     "type": "string",
@@ -168,7 +171,10 @@
                 "assembler": {
                     "type": "string",
                     "default": "megahit",
-                    "enum": ["megahit", "rnaspades"],
+                    "enum": [
+                        "megahit",
+                        "rnaspades"
+                    ],
                     "description": "Specify which assembler you would like to run, possible alternatives: megahit, rnaspades. default: megahit",
                     "fa_icon": "fas fa-bezier-curve"
                 },
@@ -202,7 +208,7 @@
                 },
                 "save_samtools": {
                     "type": "boolean",
-                    "default": "false",
+                    "default": false,
                     "description": "Save the output from samtools"
                 }
             },
@@ -217,7 +223,11 @@
                 "orf_caller": {
                     "type": "string",
                     "default": "prodigal",
-                    "enum": ["prodigal", "prokka", "transdecoder"],
+                    "enum": [
+                        "prodigal",
+                        "prokka",
+                        "transdecoder"
+                    ],
                     "description": "Specify which ORF caller you would like to run, possible alternatives: prodigal, prokka, transdecoder, default: prodigal.",
                     "fa_icon": "fas fa-phone-volume"
                 },
@@ -305,12 +315,21 @@
                     "type": "string",
                     "default": "mets",
                     "description": "Specify which method to use for EUKulele. the alternatives are: mets (metatranscriptomics) or  mags (Metagenome Assembled Genomes). default: mets",
-                    "enum": ["mets", "mags"],
+                    "enum": [
+                        "mets",
+                        "mags"
+                    ],
                     "fa_icon": "fas fa-bezier-curve"
                 },
                 "eukulele_db": {
                     "type": "string",
-                    "enum": ["gtdb", "phylodb", "marmmetsp", "mmetsp", "eukprot"],
+                    "enum": [
+                        "gtdb",
+                        "phylodb",
+                        "marmmetsp",
+                        "mmetsp",
+                        "eukprot"
+                    ],
                     "description": "EUKulele database.",
                     "help_text": "This option allows the user to specify which database (or set of databases, separated by comma) to use with EUKulele. Databases that are provided with EUKulele will be downloaded if not already present inside the database directory (see --eukulele_dbpath). Possible alternatives: phylodb, mmetsp, marmmetsp, eukprot. NB: you can't use this option with a custom database as eukulele will not recognize the name and it will start to download phylodb by default. If you want to use a custom database, please skip this option and specify only --eukulele_dbpath.",
                     "fa_icon": "far fa-file-code"
@@ -460,7 +479,14 @@
                     "description": "Method used to save pipeline results to output directory.",
                     "help_text": "The Nextflow `publishDir` option specifies which intermediate files should be saved to the output directory. This option tells the pipeline what method should be used to move these files. See [Nextflow docs](https://www.nextflow.io/docs/latest/process.html#publishdir) for details.",
                     "fa_icon": "fas fa-copy",
-                    "enum": ["symlink", "rellink", "link", "copy", "copyNoFollow", "move"],
+                    "enum": [
+                        "symlink",
+                        "rellink",
+                        "link",
+                        "copy",
+                        "copyNoFollow",
+                        "move"
+                    ],
                     "hidden": true
                 },
                 "email_on_fail": {
