@@ -31,7 +31,8 @@
                     "type": "string",
                     "format": "directory-path",
                     "description": "The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.",
-                    "fa_icon": "fas fa-folder-open"
+                    "fa_icon": "fas fa-folder-open",
+                    "default": "./results"
                 },
                 "email": {
                     "type": "string",
@@ -202,7 +203,6 @@
                 },
                 "save_samtools": {
                     "type": "boolean",
-                    "default": false,
                     "description": "Save the output from samtools"
                 }
             },
@@ -229,7 +229,7 @@
                 "prokka_batchsize": {
                     "type": "string",
                     "description": "Size of individual files annotated by Prokka in one batch.",
-                    "default": "10.MB",
+                    "default": "10 MB",
                     "pattern": "^\\d+(\\.\\d+)?\\.?\\s*(K|M|G|T)?B$",
                     "hidden": true,
                     "help_text": "Prokka usually fails on very large input files. This parameter controls the size of smaller batches for which Prokka will be called. Should be a string in the format integer-unit e.g. `--prokka_batchsize '8.MB'`"
@@ -250,7 +250,7 @@
                 },
                 "eggnog_dbpath": {
                     "type": "string",
-                    "default": "./eggnog",
+                    "default": "./eggnog/",
                     "description": "Specify EGGNOG database path",
                     "fa_icon": "far fa-file-code"
                 },
@@ -261,7 +261,7 @@
                 },
                 "kofam_dir": {
                     "type": "string",
-                    "default": "./kofam",
+                    "default": "./kofam/",
                     "description": "Path to a directory with KOfam files. Will be created if it doesn't exist.",
                     "help_text": "If a `ko_list` file and/or `profiles` does not exist, they will be downloaded.",
                     "fa_icon": "fas fa-folder-open"
@@ -317,7 +317,7 @@
                 },
                 "eukulele_dbpath": {
                     "type": "string",
-                    "default": "./eukulele",
+                    "default": "./eukulele/",
                     "description": "EUKulele database folder.",
                     "help_text": "If this parameter is set, EUKulele will look for a database to use in this folder. If --eukulele_db also is set, the specified database will be searched for in this directory and if it is not present it will be downloaded. If a custom database (see EUKulele documentation) should be used, EUKulele will assume that it is present in this folder - N.B. only works with one custom database (if using a custom database, point to a directory that only contains that database).",
                     "fa_icon": "far fa-file-code"
