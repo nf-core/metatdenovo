@@ -27,7 +27,7 @@ process FORMATSPADES {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        formatspades: \$( echo \$(gzip --version 2>&1)| sed 's/.* gzip//')
+        gzip: \$( echo \$(gzip --version 2>&1)| sed 's/.* gzip//')
     END_VERSIONS
     """
 }
