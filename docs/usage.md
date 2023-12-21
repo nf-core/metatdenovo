@@ -29,8 +29,11 @@ nextflow run nf-core/metatdenovo -profile docker --outdir results/ --input sampl
 
 You will need to create a samplesheet with information about the samples you would like to analyse before running the pipeline. Use this parameter to specify its location. It must be a comma-separated file with 3 columns, and a header row as shown in the examples below
 
-```bash
---input '[path to samplesheet file]'
+```csv title="samplesheet.csv"
+sample,fastq_1,fastq_2
+CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz
+CONTROL_REP1,AEG588A1_S1_L003_R1_001.fastq.gz,AEG588A1_S1_L003_R2_001.fastq.gz
+CONTROL_REP1,AEG588A1_S1_L004_R1_001.fastq.gz,AEG588A1_S1_L004_R2_001.fastq.gz
 ```
 
 #### Full samplesheet
@@ -42,7 +45,7 @@ You will need to create a samplesheet with information about the samples you wou
 
 A final samplesheet file consisting of samples taken at time 0 and 24 in triplicate may look like the one below.
 
-```console
+```csv title="samplesheet.csv"
 sample,fastq_1,fastq_2
 T0a,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz
 T0b,AEG588A2_S2_L002_R1_001.fastq.gz,AEG588A2_S2_L002_R2_001.fastq.gz
