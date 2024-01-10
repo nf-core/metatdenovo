@@ -214,7 +214,7 @@
             "description": "",
             "default": "",
             "properties": {
-                "protein": {
+                "protein_fasta": {
                     "type": "string",
                     "fa_icon": "fas fa-file-code",
                     "description": "Path to a protein fasta file"
