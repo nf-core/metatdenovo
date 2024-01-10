@@ -327,37 +327,47 @@ workflow METATDENOVO {
     ch_gff = Channel.empty()
     ch_aa  = Channel.empty()
 
+    if ( ! params.protein || ! params.gff ) {
+
     //
     // SUBWORKFLOW: Run PROKKA_SUBSETS on assmebly output, but split the fasta file in chunks of 10 MB, then concatenate and compress output.
     //
-    if ( params.orf_caller == 'prokka' ) {
-        PROKKA_SUBSETS(ch_assembly_contigs, params.prokka_batchsize)
-        UNPIGZ_GFF(PROKKA_SUBSETS.out.gff.map { [ [id: "${params.orf_caller}.${it[0].id}"], it[1] ] })
-        ch_versions      = ch_versions.mix(PROKKA_SUBSETS.out.versions)
-        ch_gff           = UNPIGZ_GFF.out.unzipped
-        ch_aa            = PROKKA_SUBSETS.out.faa
-        ch_multiqc_files = ch_multiqc_files.mix(PROKKA_SUBSETS.out.prokka_log.collect{it[1]}.ifEmpty([]))
-    }
+        if ( params.orf_caller == 'prokka' ) {
+            PROKKA_SUBSETS(ch_assembly_contigs, params.prokka_batchsize)
+            UNPIGZ_GFF(PROKKA_SUBSETS.out.gff.map { [ [id: "${params.orf_caller}.${it[0].id}"], it[1] ] })
+            ch_versions      = ch_versions.mix(PROKKA_SUBSETS.out.versions)
+            ch_gff           = UNPIGZ_GFF.out.unzipped
+            ch_aa            = PROKKA_SUBSETS.out.faa
+            ch_multiqc_files = ch_multiqc_files.mix(PROKKA_SUBSETS.out.prokka_log.collect{it[1]}.ifEmpty([]))
+        }
 
     //
     // MODULE: Run PRODIGAL on assembly output.
     //
-    if ( params.orf_caller == 'prodigal' ) {
-        PRODIGAL( ch_assembly_contigs.map { [ [id: "${params.assembler}.${params.orf_caller}"], it[1] ] } )
-        UNPIGZ_GFF(PRODIGAL.out.gff.map { [ [id: "${it[0].id}.${params.orf_caller}"], it[1] ] })
-        ch_gff          = UNPIGZ_GFF.out.unzipped
-        ch_aa           = PRODIGAL.out.faa
-        ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
-    }
+        if ( params.orf_caller == 'prodigal' ) {
+            PRODIGAL( ch_assembly_contigs.map { [ [id: "${params.assembler}.${params.orf_caller}"], it[1] ] } )
+            UNPIGZ_GFF(PRODIGAL.out.gff.map { [ [id: "${it[0].id}.${params.orf_caller}"], it[1] ] })
+            ch_gff          = UNPIGZ_GFF.out.unzipped
+            ch_aa           = PRODIGAL.out.faa
+            ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
+        }
 
     //
     // SUBWORKFLOW: run TRANSDECODER. Orf caller alternative for eukaryotes.
     //
-    if ( params.orf_caller == 'transdecoder' ) {
-        TRANSDECODER ( ch_assembly_contigs.map { [ [id: "transdecoder.${it[0].id}" ], it[1] ] } )
-        ch_gff      = TRANSDECODER.out.gff
-        ch_aa       = TRANSDECODER.out.pep
-        ch_versions = ch_versions.mix(TRANSDECODER.out.versions)
+        if ( params.orf_caller == 'transdecoder' ) {
+            TRANSDECODER ( ch_assembly_contigs.map { [ [id: "transdecoder.${it[0].id}" ], it[1] ] } )
+            ch_gff      = TRANSDECODER.out.gff
+            ch_aa       = TRANSDECODER.out.pep
+            ch_versions = ch_versions.mix(TRANSDECODER.out.versions)
+        }
+    } else {
+        Channel
+            .value ( [ [ id: 'user_gff' ], file(params.gff) ] )
+            .set { ch_gff }
+        Channel
+            .value ( [ [ id: 'user_protein' ], file(params.protein) ] )
+            .set { ch_protein }
     }
 
     //
