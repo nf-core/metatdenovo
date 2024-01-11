@@ -214,6 +214,17 @@
             "description": "",
             "default": "",
             "properties": {
+                "protein_fasta": {
+                    "type": "string",
+                    "fa_icon": "fas fa-file-code",
+                    "description": "Path to a protein fasta file"
+                },
+                "gff": {
+                    "type": "string",
+                    "fa_icon": "fas fa-file-code",
+                    "description": "Path to a gff file",
+                    "help_text": ""
+                },
                 "orf_caller": {
                     "type": "string",
                     "default": "prodigal",
