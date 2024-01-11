@@ -327,7 +327,7 @@ workflow METATDENOVO {
     ch_gff = Channel.empty()
     ch_aa  = Channel.empty()
 
-    if ( ! params.protein_fasta || ! params.gff ) {
+    if ( ! params.protein_fasta & ! params.gff ) {
 
     //
     // SUBWORKFLOW: Run PROKKA_SUBSETS on assmebly output, but split the fasta file in chunks of 10 MB, then concatenate and compress output.
@@ -361,12 +361,16 @@ workflow METATDENOVO {
             ch_aa       = TRANSDECODER.out.pep
             ch_versions = ch_versions.mix(TRANSDECODER.out.versions)
         }
+    } else if ( ! params.protein_fasta ) {
+        exit 1, 'protein fasta file is missing!'
+    } else if ( ! params.gff ) {
+        exit 1, 'gff file is missing!'
     } else {
         Channel
             .value ( [ [ id: 'user_gff' ], file(params.gff) ] )
             .set { ch_gff }
         Channel
-            .value ( [ [ id: 'user_protein' ], file(params.protein) ] )
+            .value ( [ [ id: 'user_protein' ], file(params.protein_fasta) ] )
             .set { ch_protein }
     }
 
