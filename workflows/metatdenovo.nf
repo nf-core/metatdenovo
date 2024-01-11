@@ -327,7 +327,7 @@ workflow METATDENOVO {
     ch_gff = Channel.empty()
     ch_aa  = Channel.empty()
 
-    if ( ! params.protein || ! params.gff ) {
+    if ( ! params.protein_fasta || ! params.gff ) {
 
     //
     // SUBWORKFLOW: Run PROKKA_SUBSETS on assmebly output, but split the fasta file in chunks of 10 MB, then concatenate and compress output.
