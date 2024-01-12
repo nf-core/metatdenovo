@@ -367,10 +367,10 @@ workflow METATDENOVO {
         exit 1, 'gff file is missing!'
     } else {
         Channel
-            .value ( [ [ id: 'user_gff' ], file(params.gff) ] )
+            .value ( [ [ id: "${params.assembler}.user_orfs" ], file(params.gff) ] )
             .set { ch_gff }
         Channel
-            .value ( [ [ id: 'user_protein' ], file(params.protein_fasta) ] )
+            .value ( [ [ id: "${params.assembler}.user_orfs" ], file(params.protein_fasta) ] )
             .set { ch_protein }
     }
 
@@ -403,7 +403,6 @@ workflow METATDENOVO {
     BAM_SORT_STATS_SAMTOOLS ( BBMAP_ALIGN.out.bam, ch_assembly_contigs )
     ch_versions = ch_versions.mix(BAM_SORT_STATS_SAMTOOLS.out.versions)
 
-    // if ( orf_caller ==
     BAM_SORT_STATS_SAMTOOLS.out.bam
         .combine(ch_gff.map { it[1] } )
         .set { ch_featurecounts }
