@@ -28,7 +28,7 @@ process UNPIGZ {
         ${file} > $gunzip
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        pigz: 2.3.4  \$( pigz --version)
+        pigz: \$( pigz --version )
     END_VERSIONS
     """
 }
