@@ -106,7 +106,7 @@ BBnorm is a BBmap tool.
 <summary>Output files</summary>
 
 - `bbmap/bbnorm/logs/`
-  - `*.logs`: it is a log file of the bbnorm run
+  - `*.logs`: it is a log file of the bbnorm run.
 
 </details>
 
