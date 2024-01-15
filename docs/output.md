@@ -261,7 +261,7 @@ Consistently named and formated output tables in tsv format ready for further an
 Filenames start with assembly program and ORF caller, to allow reruns of the pipeline with different parameter settings without overwriting output files.
 
 <details markdown="1">
-<summary>Output file</summary>
+<summary>Output files</summary>
 
 - `summary_tables/`
   - `{assembler}.{orf_caller}.overall_stats.tsv.gz`: overall statistics from the pipeline, e.g. number of reads, number of called ORFs, number of reads mapping back to contigs/ORFs etc.
