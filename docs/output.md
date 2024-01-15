@@ -227,7 +227,7 @@ GTDB currently only works as a user provided database, i.e. data must be downloa
 - `eukulele/assembler.orfcaller/mets_full/diamond/`
   - `*.diamond.out.gz`: Diamond output
 - `eukulele/assembler.orfcaller/taxonomy_estimation/`
-- `*-estimated-taxonomy.out.gz`: EUKulele output
+  - `*-estimated-taxonomy.out.gz`: EUKulele output
 
 </details>
 
