@@ -85,7 +85,7 @@ The FastQC plots displayed in the MultiQC report shows _untrimmed_ reads. They m
 #### BBduk
 
 [BBduk](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbnorm-guide/) is a filtering tool that removes specific sequences from the samples using a reference fasta file.
-BBduk is built-in tool from BBmap
+BBduk is built-in tool from BBmap.
 
 <details markdown="1">
 <summary>Output files</summary>
