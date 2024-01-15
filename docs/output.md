@@ -117,7 +117,7 @@ BBnorm is a BBmap tool.
 [Megahit](https://github.com/voutcn/megahit) is used to assemble the cleaned and trimmed FastQ reads into contigs.
 
 <details markdown="1">
-<summary>Output file</summary>
+<summary>Output files</summary>
   
 - `megahit/megahit_out/`
   - `*.log`: log file of Megahit run.
