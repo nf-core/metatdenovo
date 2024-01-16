@@ -324,7 +324,7 @@ workflow METATDENOVO {
     //
     // Call ORFs
     //
-    ch_gff = Channel.empty()
+    ch_gff       = Channel.empty()
     ch_protein  = Channel.empty()
 
     if ( ! params.protein_fasta & ! params.gff ) {
