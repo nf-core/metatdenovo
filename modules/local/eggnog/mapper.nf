@@ -41,7 +41,7 @@ process EGGNOG_MAPPER {
         -i $input
 
     gzip ${prefix}.emapper.*
-    zgrep -v '^##' ${prefix}.emapper.annotations |sed 's/^#//' | sed 's/query/orf/' | gzip -c > ${prefix}.emapper.tsv.gz
+    zgrep -v '^##' ${prefix}.emapper.annotations |sed 's/^#//' | sed '/^query/s/.*/\\L&/' | sed 's/query/orf/' | gzip -c > ${prefix}.emapper.tsv.gz
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
