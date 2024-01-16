@@ -324,7 +324,7 @@ workflow METATDENOVO {
     //
     // Call ORFs
     //
-    ch_gff = Channel.empty()
+    ch_gff       = Channel.empty()
     ch_protein  = Channel.empty()
 
     if ( ! params.protein_fasta & ! params.gff ) {
@@ -337,7 +337,7 @@ workflow METATDENOVO {
             UNPIGZ_GFF(PROKKA_SUBSETS.out.gff.map { [ [id: "${params.orf_caller}.${it[0].id}"], it[1] ] })
             ch_versions      = ch_versions.mix(PROKKA_SUBSETS.out.versions)
             ch_gff           = UNPIGZ_GFF.out.unzipped
-            ch_protein            = PROKKA_SUBSETS.out.faa
+            ch_protein      = PROKKA_SUBSETS.out.faa
             ch_multiqc_files = ch_multiqc_files.mix(PROKKA_SUBSETS.out.prokka_log.collect{it[1]}.ifEmpty([]))
         }
 
@@ -348,7 +348,7 @@ workflow METATDENOVO {
             PRODIGAL( ch_assembly_contigs.map { [ [id: "${params.assembler}.${params.orf_caller}"], it[1] ] } )
             UNPIGZ_GFF(PRODIGAL.out.gff.map { [ [id: "${it[0].id}.${params.orf_caller}"], it[1] ] })
             ch_gff          = UNPIGZ_GFF.out.unzipped
-            ch_protein           = PRODIGAL.out.faa
+            ch_protein      = PRODIGAL.out.faa
             ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
         }
 
@@ -358,7 +358,7 @@ workflow METATDENOVO {
         if ( params.orf_caller == 'transdecoder' ) {
             TRANSDECODER ( ch_assembly_contigs.map { [ [id: "transdecoder.${it[0].id}" ], it[1] ] } )
             ch_gff      = TRANSDECODER.out.gff
-            ch_protein       = TRANSDECODER.out.pep
+            ch_protein  = TRANSDECODER.out.pep
             ch_versions = ch_versions.mix(TRANSDECODER.out.versions)
         }
     } else if ( ! params.protein_fasta ) {
