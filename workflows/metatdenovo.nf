@@ -325,7 +325,7 @@ workflow METATDENOVO {
     // Call ORFs
     //
     ch_gff = Channel.empty()
-    ch_aa  = Channel.empty()
+    ch_protein  = Channel.empty()
 
     if ( ! params.protein_fasta & ! params.gff ) {
 
@@ -337,7 +337,7 @@ workflow METATDENOVO {
             UNPIGZ_GFF(PROKKA_SUBSETS.out.gff.map { [ [id: "${params.orf_caller}.${it[0].id}"], it[1] ] })
             ch_versions      = ch_versions.mix(PROKKA_SUBSETS.out.versions)
             ch_gff           = UNPIGZ_GFF.out.unzipped
-            ch_aa            = PROKKA_SUBSETS.out.faa
+            ch_protein            = PROKKA_SUBSETS.out.faa
             ch_multiqc_files = ch_multiqc_files.mix(PROKKA_SUBSETS.out.prokka_log.collect{it[1]}.ifEmpty([]))
         }
 
@@ -348,7 +348,7 @@ workflow METATDENOVO {
             PRODIGAL( ch_assembly_contigs.map { [ [id: "${params.assembler}.${params.orf_caller}"], it[1] ] } )
             UNPIGZ_GFF(PRODIGAL.out.gff.map { [ [id: "${it[0].id}.${params.orf_caller}"], it[1] ] })
             ch_gff          = UNPIGZ_GFF.out.unzipped
-            ch_aa           = PRODIGAL.out.faa
+            ch_protein           = PRODIGAL.out.faa
             ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
         }
 
@@ -358,7 +358,7 @@ workflow METATDENOVO {
         if ( params.orf_caller == 'transdecoder' ) {
             TRANSDECODER ( ch_assembly_contigs.map { [ [id: "transdecoder.${it[0].id}" ], it[1] ] } )
             ch_gff      = TRANSDECODER.out.gff
-            ch_aa       = TRANSDECODER.out.pep
+            ch_protein       = TRANSDECODER.out.pep
             ch_versions = ch_versions.mix(TRANSDECODER.out.versions)
         }
     } else if ( ! params.protein_fasta ) {
@@ -390,7 +390,7 @@ workflow METATDENOVO {
     // SUBWORKFLOW: classify ORFs with a set of hmm files
     //
     ch_hmmrs
-        .combine(ch_aa)
+        .combine(ch_protein)
         .map { [ [ id: "${params.assembler}.${params.orf_caller}" ], it[0], it[2] ] }
         .set { ch_hmmclassify }
     HMMCLASSIFY ( ch_hmmclassify )
@@ -436,11 +436,11 @@ workflow METATDENOVO {
     if ( ! params.skip_eggnog ) {
         File directory       = new File(params.eggnog_dbpath)
         if ( ! directory.exists() ) { directory.mkdir() }
-        EGGNOG(params.eggnog_dbpath, ch_aa, ch_fcs_for_summary )
+        EGGNOG(params.eggnog_dbpath, ch_protein, ch_fcs_for_summary )
         ch_versions = ch_versions.mix(EGGNOG.out.versions)
         ch_merge_tables = EGGNOG.out.sumtable
     } else {
-        ch_aa
+        ch_protein
             .map { [ it[0], [] ] }
             .set { ch_merge_tables }
     }
@@ -450,7 +450,7 @@ workflow METATDENOVO {
     // SUBWORKFLOW: run kofamscan on the ORF-called amino acid sequences
     //
     if( !params.skip_kofamscan ) {
-        ch_aa
+        ch_protein
             .map { [ it[0], it[1] ] }
             .set { ch_kofamscan }
         KOFAMSCAN( ch_kofamscan, params.kofam_dir, ch_fcs_for_summary)
@@ -506,7 +506,7 @@ workflow METATDENOVO {
         File directory = new File(params.eukulele_dbpath)
         if ( ! directory.exists() ) { directory.mkdir() }
         ch_directory = Channel.fromPath( directory )
-            ch_aa
+            ch_protein
                 .map {[ [ id:"${it[0].id}" ], it[1] ] }
                 .combine( ch_eukulele_db )
                 .set { ch_eukulele }
