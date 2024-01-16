@@ -358,7 +358,7 @@ workflow METATDENOVO {
         if ( params.orf_caller == 'transdecoder' ) {
             TRANSDECODER ( ch_assembly_contigs.map { [ [id: "transdecoder.${it[0].id}" ], it[1] ] } )
             ch_gff      = TRANSDECODER.out.gff
-            ch_protein       = TRANSDECODER.out.pep
+            ch_protein  = TRANSDECODER.out.pep
             ch_versions = ch_versions.mix(TRANSDECODER.out.versions)
         }
     } else if ( ! params.protein_fasta ) {
