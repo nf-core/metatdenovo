@@ -85,7 +85,7 @@ The FastQC plots displayed in the MultiQC report shows _untrimmed_ reads. They m
 #### BBduk
 
 [BBduk](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbnorm-guide/) is a filtering tool that removes specific sequences from the samples using a reference fasta file.
-BBduk is built-in tool from BBmap
+BBduk is built-in tool from BBmap.
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -106,7 +106,7 @@ BBnorm is a BBmap tool.
 <summary>Output files</summary>
 
 - `bbmap/bbnorm/logs/`
-  - `*.logs`: it is a log file of the bbnorm run
+  - `*.logs`: it is a log file of the bbnorm run.
 
 </details>
 
@@ -117,7 +117,7 @@ BBnorm is a BBmap tool.
 [Megahit](https://github.com/voutcn/megahit) is used to assemble the cleaned and trimmed FastQ reads into contigs.
 
 <details markdown="1">
-<summary>Output file</summary>
+<summary>Output files</summary>
   
 - `megahit/megahit_out/`
   - `*.log`: log file of Megahit run.
@@ -227,7 +227,7 @@ GTDB currently only works as a user provided database, i.e. data must be downloa
 - `eukulele/assembler.orfcaller/mets_full/diamond/`
   - `*.diamond.out.gz`: Diamond output
 - `eukulele/assembler.orfcaller/taxonomy_estimation/`
-- `*-estimated-taxonomy.out.gz`: EUKulele output
+  - `*-estimated-taxonomy.out.gz`: EUKulele output
 
 </details>
 
@@ -261,7 +261,7 @@ Consistently named and formated output tables in tsv format ready for further an
 Filenames start with assembly program and ORF caller, to allow reruns of the pipeline with different parameter settings without overwriting output files.
 
 <details markdown="1">
-<summary>Output file</summary>
+<summary>Output files</summary>
 
 - `summary_tables/`
   - `{assembler}.{orf_caller}.overall_stats.tsv.gz`: overall statistics from the pipeline, e.g. number of reads, number of called ORFs, number of reads mapping back to contigs/ORFs etc.
