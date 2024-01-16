@@ -337,7 +337,7 @@ workflow METATDENOVO {
             UNPIGZ_GFF(PROKKA_SUBSETS.out.gff.map { [ [id: "${params.orf_caller}.${it[0].id}"], it[1] ] })
             ch_versions      = ch_versions.mix(PROKKA_SUBSETS.out.versions)
             ch_gff           = UNPIGZ_GFF.out.unzipped
-            ch_protein            = PROKKA_SUBSETS.out.faa
+            ch_protein      = PROKKA_SUBSETS.out.faa
             ch_multiqc_files = ch_multiqc_files.mix(PROKKA_SUBSETS.out.prokka_log.collect{it[1]}.ifEmpty([]))
         }
 
