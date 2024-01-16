@@ -348,7 +348,7 @@ workflow METATDENOVO {
             PRODIGAL( ch_assembly_contigs.map { [ [id: "${params.assembler}.${params.orf_caller}"], it[1] ] } )
             UNPIGZ_GFF(PRODIGAL.out.gff.map { [ [id: "${it[0].id}.${params.orf_caller}"], it[1] ] })
             ch_gff          = UNPIGZ_GFF.out.unzipped
-            ch_protein           = PRODIGAL.out.faa
+            ch_protein      = PRODIGAL.out.faa
             ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
         }
 
