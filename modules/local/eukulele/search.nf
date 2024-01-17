@@ -45,7 +45,7 @@ process EUKULELE_SEARCH {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        eukulele: \$(echo \$(EUKulele --version 2>&1) | sed 's/Running EUKulele with command line arguments, as no valid configuration file was provided.//; s/The current EUKulele version is//g')
+        eukulele: \$(echo \$(EUKulele --version 2>&1) | sed '2!d' | sed 's/[^0-9.]*//g')
     END_VERSIONS
 
     if [ \$rc -le 1 ]; then
