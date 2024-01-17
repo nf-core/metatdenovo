@@ -32,10 +32,9 @@ process TRANSRATE {
     mv ${prefix}_transrate/assemblies.csv ${prefix}_assemblies_mqc.csv
 
     # transrate flashes a warning about a ruby gem being out of date, so call the version before it is being piped into the yaml
-    transrate --version > version.txt
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        transrate: \$(cat version.txt)
+        transrate: \$(echo \$(transrate --version))
     END_VERSIONS
     """
 }
