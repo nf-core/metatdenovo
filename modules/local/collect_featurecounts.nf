@@ -56,8 +56,15 @@ process COLLECT_FEATURECOUNTS {
         select(-f) %>%
         write_tsv("${prefix}.counts.tsv.gz")
 
-        writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")), paste0("    dplyr: ", packageVersion('dplyr')),
-            paste0("    dtplyr: ", packageVersion('dtplyr')), paste0("    data.table: ", packageVersion('data.table')) ), "versions.yml")
-
+        writeLines(
+            c(
+                "\\"${task.process}\\":",
+                paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")),
+                paste0("    dplyr: ", packageVersion('dplyr')),
+                paste0("    dtplyr: ", packageVersion('dtplyr')),
+                paste0("    data.table: ", packageVersion('data.table'))
+            ),
+            "versions.yml"
+        )
         """
 }

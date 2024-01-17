@@ -37,9 +37,20 @@ process MERGE_TABLES {
         pivot_wider(names_from = c(database,field), values_from = value) %>%
         write_tsv('${prefix}_merged_table.tsv.gz')
 
-    writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")), paste0("    dplyr: ", packageVersion('dplyr')),
-        paste0("    dtplyr: ", packageVersion('dtplyr')), paste0("    data.table: ", packageVersion('data.table')), paste0("    readr: ", packageVersion('readr')),
-        paste0("    purrr: ", packageVersion('purrr')), paste0("    tidyr: ", packageVersion('tidyr')), paste0("    stringr: ", packageVersion('stringr')) ),
-        "versions.yml")
+    writeLines(
+        c(
+            "\\"${task.process}\\":",
+            paste0("    R: ",
+            paste0(R.Version()[c("major","minor")], collapse = ".")),
+            paste0("    dplyr: ", packageVersion('dplyr')),
+            paste0("    dtplyr: ", packageVersion('dtplyr')),
+            paste0("    data.table: ", packageVersion('data.table')),
+            paste0("    readr: ", packageVersion('readr')),
+            paste0("    purrr: ", packageVersion('purrr')),
+            paste0("    tidyr: ", packageVersion('tidyr')),
+            paste0("    stringr: ", packageVersion('stringr'))
+        ),
+        "versions.yml"
+    )
     """
 }

@@ -313,7 +313,7 @@ workflow METATDENOVO {
             .map { [ [ id: 'megahit' ], it ] }
             .set { ch_assembly_contigs }
         ch_versions = ch_versions.mix(MEGAHIT_INTERLEAVED.out.versions)
-    } else { exit 1, 'Assembler not specified!' }
+    } else { error 'Assembler not specified!' }
 
     // If the user asked for length filtering, perform that with SEQTK_SEQ (the actual length parameter is used in modules.config)
     if ( params.min_contig_length > 0 ) {
@@ -362,9 +362,9 @@ workflow METATDENOVO {
             ch_versions = ch_versions.mix(TRANSDECODER.out.versions)
         }
     } else if ( ! params.protein_fasta ) {
-        exit 1, 'protein fasta file is missing!'
+        error 'protein fasta file is missing!'
     } else if ( ! params.gff ) {
-        exit 1, 'gff file is missing!'
+        error  'gff file is missing!'
     } else {
         Channel
             .value ( [ [ id: "${params.assembler}.user_orfs" ], file(params.gff) ] )

@@ -49,9 +49,18 @@ process EGGNOG_SUM {
         relocate(value, .after = last_col()) %>%
         write_tsv('${meta.id}.eggnog_summary.tsv.gz')
 
-    writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")), paste0("    dplyr: ", packageVersion('dplyr')),
-        paste0("    dtplyr: ", packageVersion('dtplyr')), paste0("    data.table: ", packageVersion('data.table')), paste0("    readr: ", packageVersion('readr')),
-        paste0("    purrr: ", packageVersion('purrr')), paste0("    tidyr: ", packageVersion('tidyr')), paste0("    stringr: ", packageVersion('stringr')) ),
+    writeLines(
+        c(
+            "\\"${task.process}\\":",
+            paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")),
+            paste0("    dplyr: ", packageVersion('dplyr')),
+            paste0("    dtplyr: ", packageVersion('dtplyr')),
+            paste0("    data.table: ", packageVersion('data.table')),
+            paste0("    readr: ", packageVersion('readr')),
+            paste0("    purrr: ", packageVersion('purrr')),
+            paste0("    tidyr: ", packageVersion('tidyr')),
+            paste0("    stringr: ", packageVersion('stringr'))
+        ),
         "versions.yml")
     """
 }
