@@ -26,14 +26,14 @@ workflow KOFAMSCAN {
     }
 
     if ( ! kolistfile.exists() ) {
-        KOFAMSCAN_DOWNLOAD ( Channel.fromPath(kofam_dir))
+        KOFAMSCAN_DOWNLOAD ( Channel.fromPath(kofam_dir, checkIfExists: true))
         ch_dbpath   = KOFAMSCAN_DOWNLOAD.out.ko_list
         ch_profiles = KOFAMSCAN_DOWNLOAD.out.koprofiles
 
         ch_versions = ch_versions.mix ( KOFAMSCAN_DOWNLOAD.out.versions )
     } else {
-        ch_dbpath   = Channel.fromPath(kolistfile)
-        ch_profiles = Channel.fromPath(kofam_dir + "/profiles")
+        ch_dbpath   = Channel.fromPath(kolistfile, checkIfExists: true)
+        ch_profiles = Channel.fromPath(kofam_dir + "/profiles", checkIfExists: true)
     }
 
     KOFAMSCAN_SCAN( kofamscan, ch_dbpath, ch_profiles )

@@ -26,7 +26,7 @@ ch_multiqc_files = Channel.empty()
 ch_hmmrs = Channel.empty()
 if ( params.hmmdir ) {
     Channel
-        .fromPath(params.hmmdir + params.hmmpattern)
+        .fromPath(params.hmmdir + params.hmmpattern, checkIfExists: true)
         .set { ch_hmmrs }
 } else if ( params.hmmfiles ) {
     Channel
@@ -44,7 +44,7 @@ if ( !params.skip_eukulele ) {
             .map { [ it, file(params.eukulele_dbpath) ] }
             .set { ch_eukulele_db }
     } else {
-        Channel.fromPath(params.eukulele_dbpath)
+        Channel.fromPath(params.eukulele_dbpath, checkIfExists: true)
             .map { [ [], it ] }
             .set { ch_eukulele_db }
     }
@@ -505,7 +505,7 @@ workflow METATDENOVO {
     if( !params.skip_eukulele){
         File directory = new File(params.eukulele_dbpath)
         if ( ! directory.exists() ) { directory.mkdir() }
-        ch_directory = Channel.fromPath( directory )
+        ch_directory = Channel.fromPath(directory, checkIfExists: true)
             ch_protein
                 .map {[ [ id:"${it[0].id}" ], it[1] ] }
                 .combine( ch_eukulele_db )
