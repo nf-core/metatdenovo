@@ -18,6 +18,13 @@ log.info logo + paramsSummaryLog(workflow) + citation
 
 WorkflowMetatdenovo.initialise(params, log)
 
+// Deal with user-supplied assembly to make sure output names are correct
+if ( params.assembly ) {
+    assembler = 'user_assembly'
+} else {
+    assembler = params.assembler
+}
+
 // Deal with params from user-supplied ORFs, and set orf_caller correctly
 if ( params.gff && params.protein_fasta ) {
     orf_caller = 'user_orfs'
@@ -209,7 +216,7 @@ workflow METATDENOVO {
     ch_versions = ch_versions.mix(FASTQC_TRIMGALORE.out.versions)
 
     FASTQC_TRIMGALORE.out.trim_log.collect { it[1] }
-    ch_collect_stats = ch_cat_fastq.collect { it[0].id }.map { [ [ id:"${params.assembler}.${orf_caller}" ], it ] }
+    ch_collect_stats = ch_cat_fastq.collect { it[0].id }.map { [ [ id:"${assembler}.${orf_caller}" ], it ] }
 
     if ( params.skip_trimming ) {
         ch_collect_stats
@@ -293,7 +300,7 @@ workflow METATDENOVO {
         Channel
             .value ( [ [ id: 'user_assembly' ], file(params.assembly) ] )
             .set { ch_assembly_contigs }
-    } else if ( params.assembler == 'rnaspades' ) {
+    } else if ( assembler == 'rnaspades' ) {
         // 1. Write a yaml file for Spades
         WRITESPADESYAML (
             ch_pe_reads_to_assembly.collect().ifEmpty([]),
@@ -315,7 +322,7 @@ workflow METATDENOVO {
         ch_versions = ch_versions.mix(SPADES.out.versions)
         FORMATSPADES( ch_assembly )
         ch_assembly_contigs = FORMATSPADES.out.assembly
-    } else if ( params.assembler == 'megahit' ) {
+    } else if ( assembler == 'megahit' ) {
         MEGAHIT_INTERLEAVED(
             ch_pe_reads_to_assembly.collect().ifEmpty([]),
             ch_se_reads_to_assembly.collect().ifEmpty([]),
@@ -355,7 +362,7 @@ workflow METATDENOVO {
     // MODULE: Run PRODIGAL on assembly output.
     //
     if ( orf_caller == 'prodigal' ) {
-        PRODIGAL( ch_assembly_contigs.map { [ [id: "${params.assembler}.${orf_caller}"], it[1] ] } )
+        PRODIGAL( ch_assembly_contigs.map { [ [id: "${assembler}.${orf_caller}"], it[1] ] } )
         UNPIGZ_GFF(PRODIGAL.out.gff.map { [ [id: "${it[0].id}.${orf_caller}"], it[1] ] })
         ch_gff          = UNPIGZ_GFF.out.unzipped
         ch_protein      = PRODIGAL.out.faa
@@ -375,10 +382,10 @@ workflow METATDENOVO {
     // Populate channels if the user provided the orfs
     if ( orf_caller == 'user_orfs' ) {
         Channel
-            .value ( [ [ id: "${params.assembler}.${orf_caller}" ], file(params.gff) ] )
+            .value ( [ [ id: "${assembler}.${orf_caller}" ], file(params.gff) ] )
             .set { ch_gff }
         Channel
-            .value ( [ [ id: "${params.assembler}.${orf_caller}" ], file(params.protein_fasta) ] )
+            .value ( [ [ id: "${assembler}.${orf_caller}" ], file(params.protein_fasta) ] )
             .set { ch_protein }
     }
 
@@ -399,7 +406,7 @@ workflow METATDENOVO {
     //
     ch_hmmrs
         .combine(ch_protein)
-        .map { [ [ id: "${params.assembler}.${orf_caller}" ], it[0], it[2] ] }
+        .map { [ [ id: "${assembler}.${orf_caller}" ], it[0], it[2] ] }
         .set { ch_hmmclassify }
     HMMCLASSIFY ( ch_hmmclassify )
     ch_versions = ch_versions.mix(HMMCLASSIFY.out.versions)
@@ -427,7 +434,7 @@ workflow METATDENOVO {
     //
     FEATURECOUNTS_CDS.out.counts
         .collect() { it[1] }
-        .map { [ [ id:"${params.assembler}.${orf_caller}" ], it ] }
+        .map { [ [ id:"${assembler}.${orf_caller}" ], it ] }
         .set { ch_collect_feature }
 
     COLLECT_FEATURECOUNTS ( ch_collect_feature )
