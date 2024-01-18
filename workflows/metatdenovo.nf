@@ -22,9 +22,9 @@ WorkflowMetatdenovo.initialise(params, log)
 if ( params.gff && params.protein_fasta ) {
     orf_caller = 'user_orfs'
 } else if ( params.gff && ! params.protein_fasta ) {
-    exit 1, 'When supplying ORFs, both --gff and --protein_fasta must be speciefied, --protein_fasta file is missing!'
+    exit 1, 'When supplying ORFs, both --gff and --protein_fasta must be specified, --protein_fasta file is missing!'
 } else if ( params.protein_fasta && ! params.gff ) {
-    exit 1, 'When supplying ORFs, both --gff and --protein_fasta must be speciefied, --gff file is missing!'
+    exit 1, 'When supplying ORFs, both --gff and --protein_fasta must be specified, --gff file is missing!'
 } else {
     orf_caller = params.orf_caller
 }
