@@ -332,33 +332,6 @@
                     "description": "EUKulele database folder.",
                     "help_text": "If this parameter is set, EUKulele will look for a database to use in this folder. If --eukulele_db also is set, the specified database will be searched for in this directory and if it is not present it will be downloaded. If a custom database (see EUKulele documentation) should be used, EUKulele will assume that it is present in this folder - N.B. only works with one custom database (if using a custom database, point to a directory that only contains that database).",
                     "fa_icon": "far fa-file-code"
-                },
-                "cat": {
-                    "type": "boolean",
-                    "description": "run cat taxonomy annotation",
-                    "fa_icon": "fab fa-github-alt"
-                },
-                "cat_db": {
-                    "type": "string",
-                    "description": "path to cat database",
-                    "help_text": "This parameter is mutually exclusive with \u00b4cat_db_generate\u00b4. You need to provide a version of CAT database that has the same DIAMOND version of the module (DIAMOND 2.0.8) otherwise you might encounter issues of incompatibility and the module will fail. We recommend to always use the database provided by CAT website: https://tbb.bio.uu.nl/bastiaan/CAT_prepare/",
-                    "fa_icon": "fas fa-database"
-                },
-                "cat_db_generate": {
-                    "type": "boolean",
-                    "description": "It will run a CAT command that will download the database",
-                    "help_text": "This parameter is mutual exclusive with `cat_db`. when activated, `cat_db_generate` will run a module in order to download and prepare a CAT database. ",
-                    "fa_icon": "fas fa-database"
-                },
-                "cat_official_taxonomy": {
-                    "type": "boolean",
-                    "description": "Use it if you want assign official taxonomy",
-                    "fa_icon": "fas fa-download"
-                },
-                "save_cat_db": {
-                    "type": "boolean",
-                    "description": "Use it if you want save the database",
-                    "fa_icon": "fas fa-database"
                 }
             },
             "fa_icon": "fas fa-address-card"
