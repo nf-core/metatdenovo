@@ -20,11 +20,8 @@ process EUKULELE_SEARCH {
     script:
     def args     = task.ext.args ?: ''
     def prefix   = task.ext.prefix ?: "${meta.id}"
-    def input    = fasta =~ /\.gz$/ ? fasta.name.take(fasta.name.lastIndexOf('.')) : fasta
-    // I have my doubts here: What happens if a non-gzipped input fasta file is specified and it's not in the contigs directory?
-    def gunzip   = fasta =~ /\.gz$/ ? "gunzip -c ${fasta} > ./contigs/${input}" : "mv ${fasta} contigs/."
+    def gunzip   = fasta =~ /\.gz$/ ? "gunzip -c ${fasta} > ./contigs/proteins.faa" : "mv ${fasta} contigs/proteins.faa"
     def database = dbname ? "--database ${dbname}" : ''
-    def db       = dbname ? "${dbname}" : 'default'
 
     """
     rc=0
@@ -33,6 +30,7 @@ process EUKULELE_SEARCH {
     EUKulele \\
         $args \\
         $database \\
+        --protein_extension .faa \\
         --reference_dir $eukdb \\
         -o ${prefix} \\
         --CPUs ${task.cpus} \\

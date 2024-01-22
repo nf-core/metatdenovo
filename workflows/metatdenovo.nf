@@ -18,6 +18,24 @@ log.info logo + paramsSummaryLog(workflow) + citation
 
 WorkflowMetatdenovo.initialise(params, log)
 
+// Deal with user-supplied assembly to make sure output names are correct
+if ( params.assembly ) {
+    assembler = 'user_assembly'
+} else {
+    assembler = params.assembler
+}
+
+// Deal with params from user-supplied ORFs, and set orf_caller correctly
+if ( params.gff && params.protein_fasta ) {
+    orf_caller = 'user_orfs'
+} else if ( params.gff && ! params.protein_fasta ) {
+    exit 1, 'When supplying ORFs, both --gff and --protein_fasta must be specified, --protein_fasta file is missing!'
+} else if ( params.protein_fasta && ! params.gff ) {
+    exit 1, 'When supplying ORFs, both --gff and --protein_fasta must be specified, --gff file is missing!'
+} else {
+    orf_caller = params.orf_caller
+}
+
 // set an empty multiqc channel
 ch_multiqc_files = Channel.empty()
 
@@ -26,7 +44,7 @@ ch_multiqc_files = Channel.empty()
 ch_hmmrs = Channel.empty()
 if ( params.hmmdir ) {
     Channel
-        .fromPath(params.hmmdir + params.hmmpattern)
+        .fromPath(params.hmmdir + params.hmmpattern, checkIfExists: true)
         .set { ch_hmmrs }
 } else if ( params.hmmfiles ) {
     Channel
@@ -44,7 +62,7 @@ if ( !params.skip_eukulele ) {
             .map { [ it, file(params.eukulele_dbpath) ] }
             .set { ch_eukulele_db }
     } else {
-        Channel.fromPath(params.eukulele_dbpath)
+        Channel.fromPath(params.eukulele_dbpath, checkIfExists: true)
             .map { [ [], it ] }
             .set { ch_eukulele_db }
     }
@@ -198,7 +216,8 @@ workflow METATDENOVO {
     ch_versions = ch_versions.mix(FASTQC_TRIMGALORE.out.versions)
 
     FASTQC_TRIMGALORE.out.trim_log.collect { it[1] }
-    ch_collect_stats = ch_cat_fastq.collect { it[0].id }.map { [ [ id:"${params.assembler}.${params.orf_caller}" ], it ] }
+    ch_collect_stats = ch_cat_fastq.collect { it[0].id }.map { [ [ id:"${assembler}.${orf_caller}" ], it ] }
+
     if ( params.skip_trimming ) {
         ch_collect_stats
             .map { [ it[0], it[1], [] ] }
@@ -281,7 +300,7 @@ workflow METATDENOVO {
         Channel
             .value ( [ [ id: 'user_assembly' ], file(params.assembly) ] )
             .set { ch_assembly_contigs }
-    } else if ( params.assembler == 'rnaspades' ) {
+    } else if ( assembler == 'rnaspades' ) {
         // 1. Write a yaml file for Spades
         WRITESPADESYAML (
             ch_pe_reads_to_assembly.collect().ifEmpty([]),
@@ -303,7 +322,7 @@ workflow METATDENOVO {
         ch_versions = ch_versions.mix(SPADES.out.versions)
         FORMATSPADES( ch_assembly )
         ch_assembly_contigs = FORMATSPADES.out.assembly
-    } else if ( params.assembler == 'megahit' ) {
+    } else if ( assembler == 'megahit' ) {
         MEGAHIT_INTERLEAVED(
             ch_pe_reads_to_assembly.collect().ifEmpty([]),
             ch_se_reads_to_assembly.collect().ifEmpty([]),
@@ -327,50 +346,46 @@ workflow METATDENOVO {
     ch_gff      = Channel.empty()
     ch_protein  = Channel.empty()
 
-    if ( ! params.protein_fasta & ! params.gff ) {
-
     //
     // SUBWORKFLOW: Run PROKKA_SUBSETS on assmebly output, but split the fasta file in chunks of 10 MB, then concatenate and compress output.
     //
-        if ( params.orf_caller == 'prokka' ) {
-            PROKKA_SUBSETS(ch_assembly_contigs, params.prokka_batchsize)
-            UNPIGZ_GFF(PROKKA_SUBSETS.out.gff.map { [ [id: "${params.orf_caller}.${it[0].id}"], it[1] ] })
-            ch_versions      = ch_versions.mix(PROKKA_SUBSETS.out.versions)
-            ch_gff           = UNPIGZ_GFF.out.unzipped
-            ch_protein       = PROKKA_SUBSETS.out.faa
-            ch_multiqc_files = ch_multiqc_files.mix(PROKKA_SUBSETS.out.prokka_log.collect{it[1]}.ifEmpty([]))
-        }
+    if ( params.orf_caller == 'prokka' ) {
+        PROKKA_SUBSETS(ch_assembly_contigs, params.prokka_batchsize)
+        UNPIGZ_GFF(PROKKA_SUBSETS.out.gff.map { [ [id: "${params.orf_caller}.${it[0].id}"], it[1] ] })
+        ch_versions      = ch_versions.mix(PROKKA_SUBSETS.out.versions)
+        ch_gff           = UNPIGZ_GFF.out.unzipped
+        ch_protein       = PROKKA_SUBSETS.out.faa
+        ch_multiqc_files = ch_multiqc_files.mix(PROKKA_SUBSETS.out.prokka_log.collect{it[1]}.ifEmpty([]))
+     }
 
     //
     // MODULE: Run PRODIGAL on assembly output.
     //
-        if ( params.orf_caller == 'prodigal' ) {
-            PRODIGAL( ch_assembly_contigs.map { [ [id: "${params.assembler}.${params.orf_caller}"], it[1] ] } )
-            UNPIGZ_GFF(PRODIGAL.out.gff.map { [ [id: "${it[0].id}.${params.orf_caller}"], it[1] ] })
-            ch_gff          = UNPIGZ_GFF.out.unzipped
-            ch_protein      = PRODIGAL.out.faa
-            ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
-        }
+    if ( orf_caller == 'prodigal' ) {
+        PRODIGAL( ch_assembly_contigs.map { [ [id: "${assembler}.${orf_caller}"], it[1] ] } )
+        UNPIGZ_GFF(PRODIGAL.out.gff.map { [ [id: "${it[0].id}.${orf_caller}"], it[1] ] })
+        ch_gff          = UNPIGZ_GFF.out.unzipped
+        ch_protein      = PRODIGAL.out.faa
+        ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
+    }
 
     //
     // SUBWORKFLOW: run TRANSDECODER. Orf caller alternative for eukaryotes.
     //
-        if ( params.orf_caller == 'transdecoder' ) {
-            TRANSDECODER ( ch_assembly_contigs.map { [ [id: "transdecoder.${it[0].id}" ], it[1] ] } )
-            ch_gff      = TRANSDECODER.out.gff
-            ch_protein  = TRANSDECODER.out.pep
-            ch_versions = ch_versions.mix(TRANSDECODER.out.versions)
-        }
-    } else if ( ! params.protein_fasta ) {
-        exit 1, 'protein fasta file is missing!'
-    } else if ( ! params.gff ) {
-        exit 1, 'gff file is missing!'
-    } else {
+    if ( orf_caller == 'transdecoder' ) {
+        TRANSDECODER ( ch_assembly_contigs.map { [ [id: "transdecoder.${it[0].id}" ], it[1] ] } )
+        ch_gff      = TRANSDECODER.out.gff
+        ch_protein  = TRANSDECODER.out.pep
+        ch_versions = ch_versions.mix(TRANSDECODER.out.versions)
+    }
+
+    // Populate channels if the user provided the orfs
+    if ( orf_caller == 'user_orfs' ) {
         Channel
-            .value ( [ [ id: "${params.assembler}.user_orfs" ], file(params.gff) ] )
+            .value ( [ [ id: "${assembler}.${orf_caller}" ], file(params.gff) ] )
             .set { ch_gff }
         Channel
-            .value ( [ [ id: "${params.assembler}.user_orfs" ], file(params.protein_fasta) ] )
+            .value ( [ [ id: "${assembler}.${orf_caller}" ], file(params.protein_fasta) ] )
             .set { ch_protein }
     }
 
@@ -391,7 +406,7 @@ workflow METATDENOVO {
     //
     ch_hmmrs
         .combine(ch_protein)
-        .map { [ [ id: "${params.assembler}.${params.orf_caller}" ], it[0], it[2] ] }
+        .map { [ [ id: "${assembler}.${orf_caller}" ], it[0], it[2] ] }
         .set { ch_hmmclassify }
     HMMCLASSIFY ( ch_hmmclassify )
     ch_versions = ch_versions.mix(HMMCLASSIFY.out.versions)
@@ -419,7 +434,7 @@ workflow METATDENOVO {
     //
     FEATURECOUNTS_CDS.out.counts
         .collect() { it[1] }
-        .map { [ [ id:"${params.assembler}.${params.orf_caller}" ], it ] }
+        .map { [ [ id:"${assembler}.${orf_caller}" ], it ] }
         .set { ch_collect_feature }
 
     COLLECT_FEATURECOUNTS ( ch_collect_feature )
@@ -503,7 +518,7 @@ workflow METATDENOVO {
     if( !params.skip_eukulele){
         File directory = new File(params.eukulele_dbpath)
         if ( ! directory.exists() ) { directory.mkdir() }
-        ch_directory = Channel.fromPath( directory )
+        ch_directory = Channel.fromPath(directory, checkIfExists: true)
             ch_protein
                 .map {[ [ id:"${it[0].id}" ], it[1] ] }
                 .combine( ch_eukulele_db )
