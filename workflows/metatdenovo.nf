@@ -53,14 +53,6 @@ if ( params.hmmdir ) {
         .set { ch_hmmrs }
 }
 
-// Create a channel for CAT that contains the path for the database
-if(params.cat_db){
-    ch_cat_db_file = Channel
-        .value(file( "${params.cat_db}" ))
-} else {
-    ch_cat_db_file = Channel.empty()
-}
-
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     CONFIG FILES
@@ -85,10 +77,6 @@ include { WRITESPADESYAML                  } from '../modules/local/writespadesy
 include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved'
 include { COLLECT_FEATURECOUNTS            } from '../modules/local/collect_featurecounts'
 include { COLLECT_STATS                    } from '../modules/local/collect_stats'
-include { CAT_DB                           } from '../modules/local/cat/cat_db'
-include { CAT_DB_GENERATE                  } from '../modules/local/cat/cat_db_generate'
-include { CAT_CONTIGS                      } from '../modules/local/cat/cat_contigs'
-include { CAT_SUMMARY                      } from "../modules/local/cat/cat_summary"
 include { FORMATSPADES                     } from '../modules/local/formatspades'
 include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz'
 include { UNPIGZ as UNPIGZ_GFF             } from '../modules/local/unpigz'
@@ -174,9 +162,6 @@ workflow METATDENOVO {
     }
     .set { ch_fastq }
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
-    // TODO: OPTIONAL, you can use nf-validation plugin to create an input channel from the samplesheet with Channel.fromSamplesheet("input")
-    // See the documentation https://nextflow-io.github.io/nf-validation/samplesheets/fromSamplesheet/
-    // ! There is currently no tooling to help you write a sample sheet schema
 
     //
     // MODULE: Concatenate FastQ files from same sample if required
@@ -467,29 +452,6 @@ workflow METATDENOVO {
     UNPIGZ_CONTIGS(ch_assembly_contigs)
     ch_unzipped_contigs = UNPIGZ_CONTIGS.out.unzipped
     ch_versions = ch_versions.mix(UNPIGZ_CONTIGS.out.versions)
-
-    //
-    // CAT: Bin Annotation Tool (BAT) are pipelines for the taxonomic classification of long DNA sequences and metagenome assembled genomes (MAGs/bins)
-    //
-    ch_cat_db = Channel.empty()
-    if (params.cat) {
-        if (params.cat_db){
-            CAT_DB ( ch_cat_db_file )
-            ch_cat_db = CAT_DB.out.db
-        } else if (params.cat_db_generate){
-            CAT_DB_GENERATE ()
-            ch_cat_db = CAT_DB_GENERATE.out.db
-        }
-        CAT_CONTIGS (
-            ch_unzipped_contigs,
-            ch_cat_db
-        )
-        CAT_SUMMARY(
-            CAT_CONTIGS.out.tax_classification.collect()
-        )
-        ch_versions = ch_versions.mix(CAT_CONTIGS.out.versions)
-        ch_versions = ch_versions.mix(CAT_SUMMARY.out.versions)
-    }
 
     //
     // MODULE: Use TransRate to judge assembly quality, piped into MultiQC
