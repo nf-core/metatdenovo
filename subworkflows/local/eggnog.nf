@@ -20,7 +20,6 @@ workflow EGGNOG {
     if ( ! eggnogfile.exists() ) {
         EGGNOG_DOWNLOAD()
         ch_dbpath = EGGNOG_DOWNLOAD.out.db
-
         ch_versions = ch_versions.mix ( EGGNOG_DOWNLOAD.out.versions )
     } else {
         ch_dbpath = Channel.fromPath(eggnog_dbpath, checkIfExists: true)
