@@ -19,7 +19,7 @@ process KOFAMSCAN_DOWNLOAD {
     def args = task.ext.args ?: ''
 
     """
-    curl https://www.genome.jp/ftp/db/kofam/ko_list.gz > ko_list.gz
+    wget https://www.genome.jp/ftp/db/kofam/ko_list.gz
     gunzip ko_list.gz
 
     wget https://www.genome.jp/ftp/db/kofam/profiles.tar.gz
