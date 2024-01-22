@@ -7,12 +7,9 @@ process KOFAMSCAN_DOWNLOAD {
         'https://depot.galaxyproject.org/singularity/curl:7.80.0':
         'quay.io/biocontainers/curl:7.80.0' }"
 
-    input:
-    path kofam_dir
-
     output:
-    path "${kofam_dir}/ko_list" , emit: ko_list
-    path "${kofam_dir}/profiles", emit: koprofiles
+    path "ko_list" , emit: ko_list
+    path "profiles", emit: koprofiles
     path "versions.yml"         , emit: versions
 
     when:
@@ -22,15 +19,11 @@ process KOFAMSCAN_DOWNLOAD {
     def args = task.ext.args ?: ''
 
     """
-    if [ ! -e ${kofam_dir}/ko_list ]; then
-        curl https://www.genome.jp/ftp/db/kofam/ko_list.gz > ko_list.gz
-        gunzip -c ko_list.gz > ${kofam_dir}/ko_list
-    fi
+    curl https://www.genome.jp/ftp/db/kofam/ko_list.gz > ko_list.gz
+    gunzip ko_list.gz
 
-    if [ ! -e ${kofam_dir}/profiles ]; then
-        wget -P ${kofam_dir} -c https://www.genome.jp/ftp/db/kofam/profiles.tar.gz
-        gunzip -c ${kofam_dir}/profiles.tar.gz | tar vxf - -C ${kofam_dir}/
-    fi
+    wget https://www.genome.jp/ftp/db/kofam/profiles.tar.gz
+    tar -zxf profiles.tar.gz
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
