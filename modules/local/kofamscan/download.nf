@@ -8,9 +8,9 @@ process KOFAMSCAN_DOWNLOAD {
         'quay.io/biocontainers/curl:7.80.0' }"
 
     output:
-    path "ko_list" , emit: ko_list
-    path "profiles", emit: koprofiles
-    path "versions.yml"         , emit: versions
+    path "ko_list"     , emit: ko_list
+    path "profiles"    , emit: koprofiles
+    path "versions.yml", emit: versions
 
     when:
     task.ext.when == null || task.ext.when
