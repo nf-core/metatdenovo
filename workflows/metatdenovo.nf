@@ -53,22 +53,6 @@ if ( params.hmmdir ) {
         .set { ch_hmmrs }
 }
 
-// Create a channel for EUKulele either with a named database or not. The latter means a user-provided database in a directory.
-// Change here
-ch_eukulele_db = Channel.empty()
-if ( !params.skip_eukulele ) {
-    if ( params.eukulele_db ) {
-        Channel
-            .of ( params.eukulele_db.split(',') )
-            .map { [ it, file(params.eukulele_dbpath) ] }
-            .set { ch_eukulele_db }
-    } else {
-        Channel.fromPath(params.eukulele_dbpath, checkIfExists: true)
-            .map { [ [], it ] }
-            .set { ch_eukulele_db }
-    }
-}
-
 // Create a channel for CAT that contains the path for the database
 if(params.cat_db){
     ch_cat_db_file = Channel
@@ -516,20 +500,29 @@ workflow METATDENOVO {
     //
     // SUBWORKFLOW: Eukulele
     //
+    ch_eukulele_db = Channel.empty()
     if( !params.skip_eukulele){
-        File directory = new File(params.eukulele_dbpath)
-        if ( ! directory.exists() ) { directory.mkdir() }
-        ch_directory = Channel.fromPath(directory, checkIfExists: true)
-            ch_protein
-                .map {[ [ id:"${it[0].id}" ], it[1] ] }
-                .combine( ch_eukulele_db )
-                .set { ch_eukulele }
-            SUB_EUKULELE( ch_eukulele, ch_fcs_for_summary )
-            ch_taxonomy_summary = SUB_EUKULELE.out.taxonomy_summary.collect().map { it[1] }
-            ch_versions = ch_versions.mix(SUB_EUKULELE.out.versions)
-            ch_merge_tables
-                .combine( ch_taxonomy_summary )
-                .set { ch_merge_tables }
+        // Create a channel for EUKulele either with a named database or not. The latter means a user-provided database in a directory.
+        if ( params.eukulele_db ) {
+            Channel
+                .of ( params.eukulele_db.split(',') )
+                .map { [ it, file(params.eukulele_dbpath) ] }
+                .set { ch_eukulele_db }
+        } else {
+            Channel.fromPath(params.eukulele_dbpath, checkIfExists: true)
+                .map { [ [], it ] }
+                .set { ch_eukulele_db }
+        }
+        ch_protein
+            .map {[ [ id:"${it[0].id}" ], it[1] ] }
+            .combine( ch_eukulele_db )
+            .set { ch_eukulele }
+        SUB_EUKULELE( ch_eukulele, ch_fcs_for_summary )
+        ch_taxonomy_summary = SUB_EUKULELE.out.taxonomy_summary.collect().map { it[1] }
+        ch_versions = ch_versions.mix(SUB_EUKULELE.out.versions)
+        ch_merge_tables
+            .combine( ch_taxonomy_summary )
+            .set { ch_merge_tables }
     } else {
         ch_merge_tables
             .map { [ it[0], it[1], it[2], [] ] }
