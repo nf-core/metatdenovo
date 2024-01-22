@@ -51,6 +51,13 @@ process FORMAT_TAX {
         ) %>%
         write_tsv("${prefix}.taxonomy_classification.tsv.gz")
 
-    writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")),paste0("    dplyr: ", packageVersion("dplyr")) ), "versions.yml")
+    writeLines(
+        c(
+            "\\"${task.process}\\":",
+            paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")),
+            paste0("    dplyr: ", packageVersion("dplyr"))
+        ),
+        "versions.yml"
+    )
     """
 }

@@ -28,7 +28,7 @@ process UNPIGZ {
         ${file} > $gunzip
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        pigz: \$( pigz --version )
+        pigz: \$( echo \$(pigz --version 2>&1) | sed 's/pigz //')
     END_VERSIONS
     """
 }

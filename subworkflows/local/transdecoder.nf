@@ -13,8 +13,9 @@ workflow TRANSDECODER {
     ch_versions  = Channel.empty()
 
     LONGORF (contigs)
-    PREDICT (contigs, LONGORF.out.folder)
     ch_versions = ch_versions.mix(LONGORF.out.versions)
+    PREDICT (contigs, LONGORF.out.folder)
+    ch_versions = ch_versions.mix(PREDICT.out.versions)
 
     emit:
     gff      = PREDICT.out.gff3

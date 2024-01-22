@@ -11,7 +11,7 @@ workflow HMMCLASSIFY {
 
     HMMER_HMMSEARCH ( 
         ch_hmmclassify
-            .map { [ [ id: "${it[0].id}.${it[1].baseName}" ], it[1], it[2], false, true, false ] }
+            .map { meta, hmm, seqdb -> [ [ id: "${meta.id}.${hmm.baseName}" ], hmm, seqdb, false, true, false ] }
     )
     ch_versions = ch_versions.mix(HMMER_HMMSEARCH.out.versions.first())
 

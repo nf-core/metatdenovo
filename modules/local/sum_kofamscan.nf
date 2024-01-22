@@ -49,9 +49,19 @@ process SUM_KOFAMSCAN {
         relocate(value, .after = last_col()) %>%
         write_tsv('${meta.id}.kofamscan_summary.tsv.gz')
 
-    writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")), paste0("    dplyr: ", packageVersion('dplyr')),
-        paste0("    dtplyr: ", packageVersion('dtplyr')), paste0("    data.table: ", packageVersion('data.table')), paste0("    readr: ", packageVersion('readr')),
-        paste0("    purrr: ", packageVersion('purrr')), paste0("    tidyr: ", packageVersion('tidyr')), paste0("    stringr: ", packageVersion('stringr')) ),
-        "versions.yml")
+    writeLines(
+        c(
+            "\\"${task.process}\\":",
+            paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")),
+            paste0("    dplyr: ", packageVersion('dplyr')),
+            paste0("    dtplyr: ", packageVersion('dtplyr')),
+            paste0("    data.table: ", packageVersion('data.table')),
+            paste0("    readr: ", packageVersion('readr')),
+            paste0("    purrr: ", packageVersion('purrr')),
+            paste0("    tidyr: ", packageVersion('tidyr')),
+            paste0("    stringr: ", packageVersion('stringr'))
+        ),
+        "versions.yml"
+    )
     """
 }

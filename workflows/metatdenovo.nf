@@ -203,7 +203,7 @@ workflow METATDENOVO {
     .mix(ch_fastq.single)
     .set { ch_cat_fastq }
 
-    ch_versions = ch_versions.mix(CAT_FASTQ.out.versions.first())
+    ch_versions = ch_versions.mix(CAT_FASTQ.out.versions.first().ifEmpty(null))
 
     //
     // SUBWORKFLOW: Read QC and trim adapters
@@ -349,14 +349,14 @@ workflow METATDENOVO {
     //
     // SUBWORKFLOW: Run PROKKA_SUBSETS on assmebly output, but split the fasta file in chunks of 10 MB, then concatenate and compress output.
     //
-    if ( orf_caller == 'prokka' ) {
+    if ( params.orf_caller == 'prokka' ) {
         PROKKA_SUBSETS(ch_assembly_contigs, params.prokka_batchsize)
-        UNPIGZ_GFF(PROKKA_SUBSETS.out.gff.map { [ [id: "${orf_caller}.${it[0].id}"], it[1] ] })
+        UNPIGZ_GFF(PROKKA_SUBSETS.out.gff.map { [ [id: "${params.orf_caller}.${it[0].id}"], it[1] ] })
         ch_versions      = ch_versions.mix(PROKKA_SUBSETS.out.versions)
         ch_gff           = UNPIGZ_GFF.out.unzipped
-        ch_protein      = PROKKA_SUBSETS.out.faa
+        ch_protein       = PROKKA_SUBSETS.out.faa
         ch_multiqc_files = ch_multiqc_files.mix(PROKKA_SUBSETS.out.prokka_log.collect{it[1]}.ifEmpty([]))
-    }
+     }
 
     //
     // MODULE: Run PRODIGAL on assembly output.
@@ -449,8 +449,6 @@ workflow METATDENOVO {
     // SUBWORKFLOW: run eggnog_mapper on the ORF-called amino acid sequences
     //
     if ( ! params.skip_eggnog ) {
-        File directory       = new File(params.eggnog_dbpath)
-        if ( ! directory.exists() ) { directory.mkdir() }
         EGGNOG(params.eggnog_dbpath, ch_protein, ch_fcs_for_summary )
         ch_versions = ch_versions.mix(EGGNOG.out.versions)
         ch_merge_tables = EGGNOG.out.sumtable
@@ -468,7 +466,7 @@ workflow METATDENOVO {
         ch_protein
             .map { [ it[0], it[1] ] }
             .set { ch_kofamscan }
-        KOFAMSCAN( ch_kofamscan, params.kofam_dir, ch_fcs_for_summary)
+        KOFAMSCAN( ch_kofamscan, ch_fcs_for_summary)
         ch_versions = ch_versions.mix(KOFAMSCAN.out.versions)
         ch_kofamscan_summary = KOFAMSCAN.out.kofamscan_summary.collect().map { it[1] }
         ch_merge_tables

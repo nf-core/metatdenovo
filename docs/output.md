@@ -11,7 +11,7 @@ All paths are relative to the top-level results directory.
 
 The pipeline is built using [Nextflow](https://www.nextflow.io/) and the results are organized as follow:
 
-- [Original output](#original-output)
+- [Module output](#module-output)
   - [Preprocessing](#preprocessing)
     - [FastQC](#fastqc) - Read quality control
     - [Trim galore!](#trim-galore) - Primer trimming
@@ -34,7 +34,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and the results
   - [Summary tables folder](#summary-tables) - Tab separated tables ready for further analysis in tools like R and Python
   - [Pipeline information](#pipeline-information) - Report metrics generated during the workflow execution
 
-## Original output
+## Module output
 
 ### Preprocessing
 
@@ -118,12 +118,12 @@ BBnorm is a BBmap tool.
 
 <details markdown="1">
 <summary>Output files</summary>
-  
+
 - `megahit/megahit_out/`
   - `*.log`: log file of Megahit run.
   - `megahit_assembly.contigs.fa.gz`: reference genome created by Megahit.
   - `intermediate_contigs`: folder that contains the intermediate steps of Megahit run.
-    
+
 </details>
 
 #### RNASpades
@@ -239,7 +239,7 @@ You can run [hmmsearch](https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch) on O
 <summary>Output files</summary>
 
 - `hmmer/`
-  - `*.tbl.gz`:
+  - `*.tbl.gz`: Table output gzipped as result of Hmmsearch run.
 
 </details>
 
