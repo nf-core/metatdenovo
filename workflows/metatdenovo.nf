@@ -54,6 +54,7 @@ if ( params.hmmdir ) {
 }
 
 // Create a channel for EUKulele either with a named database or not. The latter means a user-provided database in a directory.
+// Change here
 ch_eukulele_db = Channel.empty()
 if ( !params.skip_eukulele ) {
     if ( params.eukulele_db ) {
