@@ -70,7 +70,7 @@ First, prepare a samplesheet with your input data that looks as follows:
 | sample4  | ./a.fastq.gz              | ./b.fastq.gz              |
 ```
 
-Each row represents a fastq file (single-end) or a pair of fastq files (paired end).
+Each row represents a fastq file (single-end) or a pair of fastq files (paired-end).
 
 Now, you can run the pipeline using:
 
