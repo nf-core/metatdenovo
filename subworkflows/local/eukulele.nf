@@ -18,12 +18,12 @@ workflow SUB_EUKULELE {
     EUKULELE_SEARCH( eukulele )
     ch_versions = ch_versions.mix ( EUKULELE_SEARCH.out.versions )
 
-    FORMAT_TAX( EUKULELE_SEARCH.out.taxonomy_estimation.map { [ it[0], it[1] ] } )
+    FORMAT_TAX( EUKULELE_SEARCH.out.taxonomy_estimation.map { meta, taxonomy, dbname -> [ meta, taxonomy ] } )
     ch_versions = ch_versions.mix ( FORMAT_TAX.out.versions )
 
     FORMAT_TAX.out.tax
         .join(eukulele)
-        .map { [ it[0], it[3], it[1] ] }
+        .map { meta, taxonomy, protein, dbname, database -> [ meta, dbname, taxonomy ] }
         .set { ch_sum_taxonomy }
 
     SUM_TAXONOMY ( ch_sum_taxonomy, feature_counts )
