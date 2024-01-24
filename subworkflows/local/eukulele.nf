@@ -19,6 +19,7 @@ workflow SUB_EUKULELE {
     ch_versions = ch_versions.mix ( EUKULELE_SEARCH.out.versions )
 
     FORMAT_TAX( EUKULELE_SEARCH.out.taxonomy_estimation.map { [ it[0], it[1] ] } )
+    ch_versions = ch_versions.mix ( FORMAT_TAX.out.versions )
 
     FORMAT_TAX.out.tax
         .join(eukulele)
@@ -26,6 +27,7 @@ workflow SUB_EUKULELE {
         .set { ch_sum_taxonomy }
 
     SUM_TAXONOMY ( ch_sum_taxonomy, feature_counts )
+    ch_versions = ch_versions.mix ( SUM_TAXONOMY.out.versions )
 
     emit:
     taxonomy_summary    = SUM_TAXONOMY.out.taxonomy_summary
