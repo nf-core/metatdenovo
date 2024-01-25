@@ -184,21 +184,20 @@ workflow METATDENOVO {
         params.skip_trimming
     )
     ch_versions = ch_versions.mix(FASTQC_TRIMGALORE.out.versions)
-
-    ch_collect_stats = ch_cat_fastq.collect { it[0].id }.map { [ [ id:"${assembler}.${orf_caller}" ], it ] }
-
+    ch_collect_stats = ch_cat_fastq.collect { meta, fasta -> meta.id }.map { [ [ id:"${assembler}.${orf_caller}" ], it ] }
     if ( params.skip_trimming ) {
         ch_collect_stats
-            .map { [ it[0], it[1], [] ] }
+            .map { meta, samples -> [ meta, samples, [] ] }
             .set { ch_collect_stats }
+
     } else {
         if ( params.se_reads ) {
             ch_collect_stats
-                .combine(FASTQC_TRIMGALORE.out.trim_log.collect { it[1] }.map { [ it ] })
+                .combine(FASTQC_TRIMGALORE.out.trim_log.collect { meta, report -> report }.map { [ it ] })
                 .set { ch_collect_stats }
         } else {
             ch_collect_stats
-                .combine(FASTQC_TRIMGALORE.out.trim_log.collect { it[1][0] }.map { [ it ] })
+                .combine(FASTQC_TRIMGALORE.out.trim_log.collect { meta, report -> report[0] }.map { [ it ] })
                 .set { ch_collect_stats }
         }
     }
