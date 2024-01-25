@@ -185,7 +185,6 @@ workflow METATDENOVO {
     )
     ch_versions = ch_versions.mix(FASTQC_TRIMGALORE.out.versions)
 
-    FASTQC_TRIMGALORE.out.trim_log.collect { it[1] }
     ch_collect_stats = ch_cat_fastq.collect { it[0].id }.map { [ [ id:"${assembler}.${orf_caller}" ], it ] }
 
     if ( params.skip_trimming ) {
@@ -211,7 +210,7 @@ workflow METATDENOVO {
         BBMAP_BBDUK ( FASTQC_TRIMGALORE.out.reads, params.sequence_filter )
         ch_clean_reads  = BBMAP_BBDUK.out.reads
         ch_bbduk_logs = BBMAP_BBDUK.out.log.collect { it[1] }.map { [ it ] }
-        ch_versions   = ch_versions.mix(BBMAP_BBDUK.out.versions)
+        ch_versions   = ch_versions.mix(BBMAP_BBDUK.out.versions.first())
         ch_collect_stats
             .combine(ch_bbduk_logs)
             .set {ch_collect_stats}
@@ -248,6 +247,7 @@ workflow METATDENOVO {
                 BBMAP_BBNORM(ch_single_end.collect { meta, fastq -> fastq }.map {[ [id:'all_samples', single_end:true], it ] } )
                 ch_se_reads_to_assembly = BBMAP_BBNORM.out.fastq.map { it[1] }
                 ch_pe_reads_to_assembly = Channel.empty()
+                ch_versions    = ch_versions.mix(BBMAP_BBNORM.out.versions)
             } else {
                 ch_se_reads_to_assembly = ch_single_end.map { meta, fastq -> fastq }
                 ch_pe_reads_to_assembly = Channel.empty()
@@ -257,6 +257,7 @@ workflow METATDENOVO {
             BBMAP_BBNORM(ch_interleaved.collect { meta, fastq -> fastq }.map {[ [id:'all_samples', single_end:true], it ] } )
             ch_pe_reads_to_assembly = BBMAP_BBNORM.out.fastq.map { it[1] }
             ch_se_reads_to_assembly = Channel.empty()
+            ch_versions    = ch_versions.mix(BBMAP_BBNORM.out.versions)
         } else {
             ch_pe_reads_to_assembly = ch_interleaved.map { meta, fastq -> fastq }
             ch_se_reads_to_assembly = Channel.empty()
@@ -276,6 +277,7 @@ workflow METATDENOVO {
             ch_pe_reads_to_assembly.collect().ifEmpty([]),
             ch_se_reads_to_assembly.collect().ifEmpty([])
         )
+        ch_versions    = ch_versions.mix(WRITESPADESYAML.out.versions)
         // 2. Call the module with a channel with all fastq files plus the yaml
         Channel.empty()
             .mix(ch_pe_reads_to_assembly)
@@ -292,6 +294,7 @@ workflow METATDENOVO {
         ch_versions = ch_versions.mix(SPADES.out.versions)
         FORMATSPADES( ch_assembly )
         ch_assembly_contigs = FORMATSPADES.out.assembly
+        ch_versions    = ch_versions.mix(FORMATSPADES.out.versions)
     } else if ( assembler == 'megahit' ) {
         MEGAHIT_INTERLEAVED(
             ch_pe_reads_to_assembly.collect().ifEmpty([]),
@@ -308,6 +311,7 @@ workflow METATDENOVO {
     if ( params.min_contig_length > 0 ) {
         SEQTK_SEQ_CONTIG_FILTER ( ch_assembly_contigs )
         ch_assembly_contigs = SEQTK_SEQ_CONTIG_FILTER.out.fastx
+        ch_versions = ch_versions.mix(SEQTK_SEQ_CONTIG_FILTER.out.versions)
     }
 
     //
@@ -499,6 +503,7 @@ workflow METATDENOVO {
         ch_collect_stats
             .combine(MERGE_TABLES.out.merged_table.collect{ it[1]}.map { [ it ] })
             .set { ch_collect_stats }
+        ch_versions       = ch_versions.mix(MERGE_TABLES.out.versions)
     } else {
         ch_collect_stats
             .map { [ it[0], it[1], it[2], it[3], it[4], it[5], [] ] }
