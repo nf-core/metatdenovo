@@ -208,17 +208,17 @@ workflow METATDENOVO {
     if ( params.sequence_filter ) {
         BBMAP_BBDUK ( FASTQC_TRIMGALORE.out.reads, params.sequence_filter )
         ch_clean_reads  = BBMAP_BBDUK.out.reads
-        ch_bbduk_logs = BBMAP_BBDUK.out.log.collect { it[1] }.map { [ it ] }
+        ch_bbduk_logs = BBMAP_BBDUK.out.log.collect { meta, log ->  log }.map { [ it ] }
         ch_versions   = ch_versions.mix(BBMAP_BBDUK.out.versions.first())
         ch_collect_stats
             .combine(ch_bbduk_logs)
             .set {ch_collect_stats}
-        ch_multiqc_files = ch_multiqc_files.mix(BBMAP_BBDUK.out.log.collect{it[1]})
+        ch_multiqc_files = ch_multiqc_files.mix(BBMAP_BBDUK.out.log.collect{ meta, log -> log })
     } else {
         ch_clean_reads  = FASTQC_TRIMGALORE.out.reads
         ch_bbduk_logs = Channel.empty()
         ch_collect_stats
-            .map { [ it[0], it[1], it[2], [] ] }
+            .map { meta, samples, report -> [ meta, samples, report, [] ] }
             .set { ch_collect_stats }
     }
 
@@ -244,7 +244,7 @@ workflow METATDENOVO {
         if ( params.se_reads ) {
             if ( params.bbnorm ) {
                 BBMAP_BBNORM(ch_single_end.collect { meta, fastq -> fastq }.map {[ [id:'all_samples', single_end:true], it ] } )
-                ch_se_reads_to_assembly = BBMAP_BBNORM.out.fastq.map { it[1] }
+                ch_se_reads_to_assembly = BBMAP_BBNORM.out.fastq.map { meta, fasta -> fasta }
                 ch_pe_reads_to_assembly = Channel.empty()
                 ch_versions    = ch_versions.mix(BBMAP_BBNORM.out.versions)
             } else {
@@ -254,7 +254,7 @@ workflow METATDENOVO {
         }
         else if ( params.bbnorm ) {
             BBMAP_BBNORM(ch_interleaved.collect { meta, fastq -> fastq }.map {[ [id:'all_samples', single_end:true], it ] } )
-            ch_pe_reads_to_assembly = BBMAP_BBNORM.out.fastq.map { it[1] }
+            ch_pe_reads_to_assembly = BBMAP_BBNORM.out.fastq.map { meta, fasta -> fasta }
             ch_se_reads_to_assembly = Channel.empty()
             ch_versions    = ch_versions.mix(BBMAP_BBNORM.out.versions)
         } else {
@@ -324,11 +324,11 @@ workflow METATDENOVO {
     //
     if ( params.orf_caller == 'prokka' ) {
         PROKKA_SUBSETS(ch_assembly_contigs, params.prokka_batchsize)
-        UNPIGZ_GFF(PROKKA_SUBSETS.out.gff.map { [ [id: "${params.orf_caller}.${it[0].id}"], it[1] ] })
+        UNPIGZ_GFF(PROKKA_SUBSETS.out.gff.map { meta, gff -> [ [id: "${params.orf_caller}.${meta}"], gff ] })
         ch_versions      = ch_versions.mix(PROKKA_SUBSETS.out.versions)
         ch_gff           = UNPIGZ_GFF.out.unzipped
         ch_protein       = PROKKA_SUBSETS.out.faa
-        ch_multiqc_files = ch_multiqc_files.mix(PROKKA_SUBSETS.out.prokka_log.collect{it[1]})
+        ch_multiqc_files = ch_multiqc_files.mix(PROKKA_SUBSETS.out.prokka_log.collect{ meta, log -> log } )
      }
 
     //
