@@ -4,8 +4,8 @@ process KOFAMSCAN_DOWNLOAD {
 
     conda "bioconda::gnu-wget=1.18"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/curl:7.80.0':
-        'quay.io/biocontainers/curl:7.80.0' }"
+        'https://depot.galaxyproject.org/singularity/gnu-wget:1.18--h36e9172_9':
+        'quay.io/biocontainers/gnu-wget:1.18--h36e9172_9' }"
 
     output:
     path "ko_list"     , emit: ko_list
