@@ -18,9 +18,9 @@ workflow HMMCLASSIFY {
     
     HMMRANK (
         ch_hmmclassify
-            .map { it[0] }
+            .map { meta, hmm, seqdb -> meta }
             .distinct()
-            .combine ( HMMER_HMMSEARCH.out.target_summary.collect { it[1] } )
+            .combine ( HMMER_HMMSEARCH.out.target_summary.collect { meta, summary -> summary } )
             .map { [ it[0], it[1..-1] ] }
     )
     ch_versions = ch_versions.mix(HMMRANK.out.versions)

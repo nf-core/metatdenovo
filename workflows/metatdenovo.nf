@@ -335,7 +335,7 @@ workflow METATDENOVO {
     // MODULE: Run PRODIGAL on assembly output.
     //
     if ( orf_caller == 'prodigal' ) {
-        PRODIGAL( ch_assembly_contigs.map { meta, assembly -> [ [id: "${assembler}.${orf_caller}"], assembly  ] } )
+        PRODIGAL( ch_assembly_contigs.map { meta, contigs -> [ [id: "${assembler}.${orf_caller}"], contigs  ] } )
         UNPIGZ_GFF(PRODIGAL.out.gff.map { meta, gff -> [ [id: "${meta.id}.${orf_caller}"], gff ] })
         ch_gff          = UNPIGZ_GFF.out.unzipped
         ch_protein      = PRODIGAL.out.faa
@@ -346,7 +346,7 @@ workflow METATDENOVO {
     // SUBWORKFLOW: run TRANSDECODER. Orf caller alternative for eukaryotes.
     //
     if ( orf_caller == 'transdecoder' ) {
-        TRANSDECODER ( ch_assembly_contigs.map { meta, assembly -> [ [id: "transdecoder.${meta.id}" ], assembly ] } )
+        TRANSDECODER ( ch_assembly_contigs.map { meta, contigs -> [ [id: "transdecoder.${meta.id}" ], contigs ] } )
         ch_gff      = TRANSDECODER.out.gff
         ch_protein  = TRANSDECODER.out.pep
         ch_versions = ch_versions.mix(TRANSDECODER.out.versions)
@@ -365,7 +365,7 @@ workflow METATDENOVO {
     //
     // MODULE: Create a BBMap index
     //
-    BBMAP_INDEX(ch_assembly_contigs.map { meta, assembly -> assembly })
+    BBMAP_INDEX(ch_assembly_contigs.map { meta, contigs -> contigs })
     ch_versions   = ch_versions.mix(BBMAP_INDEX.out.versions)
 
     //
