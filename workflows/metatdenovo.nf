@@ -335,8 +335,8 @@ workflow METATDENOVO {
     // MODULE: Run PRODIGAL on assembly output.
     //
     if ( orf_caller == 'prodigal' ) {
-        PRODIGAL( ch_assembly_contigs.map { [ [id: "${assembler}.${orf_caller}"], it[1] ] } )
-        UNPIGZ_GFF(PRODIGAL.out.gff.map { [ [id: "${it[0].id}.${orf_caller}"], it[1] ] })
+        PRODIGAL( ch_assembly_contigs.map { meta, assembly -> [ [id: "${assembler}.${orf_caller}"], assembly  ] } )
+        UNPIGZ_GFF(PRODIGAL.out.gff.map { meta, gff -> [ [id: "${meta.id}.${orf_caller}"], gff ] })
         ch_gff          = UNPIGZ_GFF.out.unzipped
         ch_protein      = PRODIGAL.out.faa
         ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
@@ -346,7 +346,7 @@ workflow METATDENOVO {
     // SUBWORKFLOW: run TRANSDECODER. Orf caller alternative for eukaryotes.
     //
     if ( orf_caller == 'transdecoder' ) {
-        TRANSDECODER ( ch_assembly_contigs.map { [ [id: "transdecoder.${it[0].id}" ], it[1] ] } )
+        TRANSDECODER ( ch_assembly_contigs.map { meta, assembly -> [ [id: "transdecoder.${meta.id}" ], assembly ] } )
         ch_gff      = TRANSDECODER.out.gff
         ch_protein  = TRANSDECODER.out.pep
         ch_versions = ch_versions.mix(TRANSDECODER.out.versions)
@@ -365,7 +365,7 @@ workflow METATDENOVO {
     //
     // MODULE: Create a BBMap index
     //
-    BBMAP_INDEX(ch_assembly_contigs.map { it[1] })
+    BBMAP_INDEX(ch_assembly_contigs.map { meta, assembly -> assembly })
     ch_versions   = ch_versions.mix(BBMAP_INDEX.out.versions)
 
     //
@@ -379,7 +379,7 @@ workflow METATDENOVO {
     //
     ch_hmmrs
         .combine(ch_protein)
-        .map { [ [ id: "${assembler}.${orf_caller}" ], it[0], it[2] ] }
+        .map { hmm, meta, protein ->[ [ id: "${assembler}.${orf_caller}" ], hmm, protein ] }
         .set { ch_hmmclassify }
     HMMCLASSIFY ( ch_hmmclassify )
     ch_versions = ch_versions.mix(HMMCLASSIFY.out.versions)
@@ -392,11 +392,11 @@ workflow METATDENOVO {
     ch_versions = ch_versions.mix(BAM_SORT_STATS_SAMTOOLS.out.versions)
 
     BAM_SORT_STATS_SAMTOOLS.out.bam
-        .combine(ch_gff.map { it[1] } )
+        .combine(ch_gff.map { meta, bam -> bam } )
         .set { ch_featurecounts }
 
     ch_collect_stats
-        .combine(BAM_SORT_STATS_SAMTOOLS.out.idxstats.collect { it[1]}.map { [ it ] })
+        .combine(BAM_SORT_STATS_SAMTOOLS.out.idxstats.collect { meta, idxstats -> idxstats }.map { [ it ] } )
         .set { ch_collect_stats }
 
     FEATURECOUNTS_CDS ( ch_featurecounts)
@@ -406,14 +406,14 @@ workflow METATDENOVO {
     // MODULE: Collect featurecounts output counts in one table
     //
     FEATURECOUNTS_CDS.out.counts
-        .collect() { it[1] }
-        .map { [ [ id:"${assembler}.${orf_caller}" ], it ] }
+        .collect() { meta, featurecounts -> featurecounts }
+        .map { featurecounts -> [ [ id:"${assembler}.${orf_caller}" ], featurecounts ] }
         .set { ch_collect_feature }
 
     COLLECT_FEATURECOUNTS ( ch_collect_feature )
     ch_versions           = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
-    ch_fcs_for_stats      = COLLECT_FEATURECOUNTS.out.counts.collect { it[1]}.map { [ it ] }
-    ch_fcs_for_summary    = COLLECT_FEATURECOUNTS.out.counts.map { it[1]}
+    ch_fcs_for_stats      = COLLECT_FEATURECOUNTS.out.counts.collect { meta, tsv -> tsv }.map { [ it ] }
+    ch_fcs_for_summary    = COLLECT_FEATURECOUNTS.out.counts.map { meta, tsv -> tsv }
     ch_collect_stats
         .combine(ch_fcs_for_stats)
         .set { ch_collect_stats }
@@ -427,7 +427,7 @@ workflow METATDENOVO {
         ch_merge_tables = EGGNOG.out.sumtable
     } else {
         ch_protein
-            .map { [ it[0], [] ] }
+            .map { meta, protein -> [ meta, [] ] }
             .set { ch_merge_tables }
     }
 
@@ -437,17 +437,17 @@ workflow METATDENOVO {
     //
     if( !params.skip_kofamscan ) {
         ch_protein
-            .map { [ it[0], it[1] ] }
+            .map { meta, protein -> [ meta, protein ] }
             .set { ch_kofamscan }
         KOFAMSCAN( ch_kofamscan, ch_fcs_for_summary)
         ch_versions = ch_versions.mix(KOFAMSCAN.out.versions)
-        ch_kofamscan_summary = KOFAMSCAN.out.kofamscan_summary.collect().map { it[1] }
+        ch_kofamscan_summary = KOFAMSCAN.out.kofamscan_summary.collect().map { meta, tsv -> tsv }
         ch_merge_tables
             .combine( ch_kofamscan_summary )
             .set { ch_merge_tables }
     } else {
         ch_merge_tables
-            .map { [ it[0], it[1], [] ] }
+            .map { meta, tsv -> [ meta, tsv, [] ] }
             .set { ch_merge_tables }
     }
 
@@ -479,18 +479,18 @@ workflow METATDENOVO {
                 .set { ch_eukulele_db }
         }
         ch_protein
-            .map {[ [ id:"${it[0].id}" ], it[1] ] }
+            .map { meta, protein -> [ [ id:"${meta.id}" ], protein ] }
             .combine( ch_eukulele_db )
             .set { ch_eukulele }
         SUB_EUKULELE( ch_eukulele, ch_fcs_for_summary )
-        ch_taxonomy_summary = SUB_EUKULELE.out.taxonomy_summary.collect().map { it[1] }
+        ch_taxonomy_summary = SUB_EUKULELE.out.taxonomy_summary.collect().map { meta, tsv -> tsv }
         ch_versions = ch_versions.mix(SUB_EUKULELE.out.versions)
         ch_merge_tables
             .combine( ch_taxonomy_summary )
             .set { ch_merge_tables }
     } else {
         ch_merge_tables
-            .map { [ it[0], it[1], it[2], [] ] }
+            .map { meta, tsv1, tsv2 -> [ meta, tsv1, tsv2, [] ] }
             .set { ch_merge_tables }
     }
 
@@ -500,12 +500,12 @@ workflow METATDENOVO {
     if( !params.skip_eggnog  || !params.skip_eukulele || !params.skip_kofamscan) {
         MERGE_TABLES ( ch_merge_tables )
         ch_collect_stats
-            .combine(MERGE_TABLES.out.merged_table.collect{ it[1]}.map { [ it ] })
+            .combine(MERGE_TABLES.out.merged_table.collect{ meta, tblout -> tblout }.map { [ it ] })
             .set { ch_collect_stats }
         ch_versions       = ch_versions.mix(MERGE_TABLES.out.versions)
     } else {
         ch_collect_stats
-            .map { [ it[0], it[1], it[2], it[3], it[4], it[5], [] ] }
+            .map { meta, samples, report, tsv, idxstats, counts -> [ meta, samples, report, tsv, idxstats, counts, [] ] }
             .set { ch_collect_stats }
     }
 
@@ -526,10 +526,10 @@ workflow METATDENOVO {
     ch_methods_description = Channel.value(methods_description)
 
     ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
-    ch_multiqc_files = ch_multiqc_files.mix(FASTQC_TRIMGALORE.out.trim_zip.collect{it[1]})
-    ch_multiqc_files = ch_multiqc_files.mix(TRANSRATE.out.assembly_qc.collect{it[1]})
-    ch_multiqc_files = ch_multiqc_files.mix(BAM_SORT_STATS_SAMTOOLS.out.idxstats.collect{it[1]})
-    ch_multiqc_files = ch_multiqc_files.mix(FEATURECOUNTS_CDS.out.summary.collect{it[1]})
+    ch_multiqc_files = ch_multiqc_files.mix(FASTQC_TRIMGALORE.out.trim_zip.collect{ meta, zip -> zip })
+    ch_multiqc_files = ch_multiqc_files.mix(TRANSRATE.out.assembly_qc.collect{ meta, tbl -> tbl })
+    ch_multiqc_files = ch_multiqc_files.mix(BAM_SORT_STATS_SAMTOOLS.out.idxstats.collect{ meta, idxstats -> idxstats })
+    ch_multiqc_files = ch_multiqc_files.mix(FEATURECOUNTS_CDS.out.summary.collect{ meta, summary -> summary })
 
 
     MULTIQC (
