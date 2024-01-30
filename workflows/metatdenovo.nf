@@ -295,8 +295,8 @@ workflow METATDENOVO {
         ch_versions    = ch_versions.mix(FORMATSPADES.out.versions)
     } else if ( assembler == 'megahit' ) {
         MEGAHIT_INTERLEAVED(
-            ch_pe_reads_to_assembly.collect().ifEmpty([]),
-            ch_se_reads_to_assembly.collect().ifEmpty([]),
+            ch_pe_reads_to_assembly.toList(),
+            ch_se_reads_to_assembly.toList(),
             'megahit_assembly'
         )
         MEGAHIT_INTERLEAVED.out.contigs
