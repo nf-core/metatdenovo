@@ -278,8 +278,7 @@ workflow METATDENOVO {
         )
         ch_versions    = ch_versions.mix(WRITESPADESYAML.out.versions)
         // 2. Call the module with a channel with all fastq files plus the yaml
-        Channel.empty()
-            .mix(ch_pe_reads_to_assembly)
+        ch_pe_reads_to_assembly
             .mix(ch_se_reads_to_assembly)
             .collect()
             .map { [ [ id:'rnaspades' ], it, [], [] ] }
