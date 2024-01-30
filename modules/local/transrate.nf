@@ -33,7 +33,7 @@ process TRANSRATE {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        transrate: \$(echo \$(transrate --version))
+        transrate: \$(transrate --version)
     END_VERSIONS
     """
 }
