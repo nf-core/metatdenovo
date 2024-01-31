@@ -398,6 +398,8 @@ workflow METATDENOVO {
         .combine(BAM_SORT_STATS_SAMTOOLS.out.idxstats.collect { meta, idxstats -> idxstats }.map { [ it ] } )
         .set { ch_collect_stats }
 
+    //BAM_SORT_STATS_SAMTOOLS.out.idxstats.collect { meta, idxstats -> idxstats }.map { [ it ] }.view()
+    BAM_SORT_STATS_SAMTOOLS.out.idxstats.collect { meta, idxstats -> idxstats }.view()
     FEATURECOUNTS_CDS ( ch_featurecounts)
     ch_versions       = ch_versions.mix(FEATURECOUNTS_CDS.out.versions)
 
@@ -440,7 +442,7 @@ workflow METATDENOVO {
             .set { ch_kofamscan }
         KOFAMSCAN( ch_kofamscan, ch_fcs_for_summary)
         ch_versions = ch_versions.mix(KOFAMSCAN.out.versions)
-        ch_kofamscan_summary = KOFAMSCAN.out.kofamscan_summary.collect().map { meta, tsv -> tsv }
+        ch_kofamscan_summary = KOFAMSCAN.out.kofamscan_summary.collect{ meta, tsv -> tsv }
         ch_merge_tables
             .combine( ch_kofamscan_summary )
             .set { ch_merge_tables }
@@ -469,7 +471,7 @@ workflow METATDENOVO {
         // Create a channel for EUKulele either with a named database or not. The latter means a user-provided database in a directory.
         if ( params.eukulele_db ) {
             Channel
-                .of ( params.eukulele_db.split(',') )
+                .fromList ( params.eukulele_db.split(',') )
                 .map { [ it, file(params.eukulele_dbpath) ] }
                 .set { ch_eukulele_db }
         } else {
@@ -482,7 +484,7 @@ workflow METATDENOVO {
             .combine( ch_eukulele_db )
             .set { ch_eukulele }
         SUB_EUKULELE( ch_eukulele, ch_fcs_for_summary )
-        ch_taxonomy_summary = SUB_EUKULELE.out.taxonomy_summary.collect().map { meta, tsv -> tsv }
+        ch_taxonomy_summary = SUB_EUKULELE.out.taxonomy_summary.collect{ meta, tsv -> tsv }
         ch_versions = ch_versions.mix(SUB_EUKULELE.out.versions)
         ch_merge_tables
             .combine( ch_taxonomy_summary )
