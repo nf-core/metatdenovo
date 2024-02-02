@@ -9,7 +9,7 @@ process EGGNOG_DOWNLOAD {
 
 
     output:
-    path("eggnog")   , emit: db
+    path("eggnog")     , emit: db
     path "versions.yml", emit: versions
 
     script:
