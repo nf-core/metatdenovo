@@ -18,6 +18,38 @@ jobs:
 
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
+
+      - name: Install editorconfig-checker
+        run: npm install -g editorconfig-checker
+
+      - name: Run ECLint check
+        run: editorconfig-checker -exclude README.md $(find .* -type f | grep -v '.git\|.py\|.md\|json\|yml\|yaml\|html\|css\|work\|.nextflow\|build\|nf_core.egg-info\|log.txt\|Makefile')
+
+  Prettier:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+
+      - name: Install Prettier
+        run: npm install -g prettier
+
+      - name: Run Prettier --check
+        run: prettier --check ${GITHUB_WORKSPACE}
+
+  PythonBlack:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check code lints with Black
+        uses: psf/black@stable
+
+      # If the above check failed, post a comment on the PR explaining the failure
+      - name: Post PR comment
+        if: failure()
+        uses: mshick/add-pr-comment@v1
         with:
           python-version: 3.11
           cache: "pip"

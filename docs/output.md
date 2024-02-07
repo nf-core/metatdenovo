@@ -2,44 +2,71 @@
 
 ## Introduction
 
-This document describes the output produced by the pipeline. Most of the plots are taken from the MultiQC report, which summarises results at the end of the pipeline.
+This document describes the output produced by the pipeline.
 
-The directories listed below will be created in the results directory after the pipeline has finished. All paths are relative to the top-level results directory.
-
-<!-- TODO nf-core: Write this documentation describing your workflow's output -->
+The directories listed below will be created in the results directory after the pipeline has finished.
+All paths are relative to the top-level results directory.
 
 ## Pipeline overview
 
-The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes data using the following steps:
+The pipeline is built using [Nextflow](https://www.nextflow.io/) and the results are organized as follow:
 
-- [FastQC](#fastqc) - Raw read QC
-- [MultiQC](#multiqc) - Aggregate report describing results and QC from the whole pipeline
-- [Pipeline information](#pipeline-information) - Report metrics generated during the workflow execution
+- [Module output](#module-output)
+  - [Preprocessing](#preprocessing)
+    - [FastQC](#fastqc) - Read quality control
+    - [Trim galore!](#trim-galore) - Primer trimming
+    - [MultiQC](#multiqc) - Aggregate report describing results
+    - [BBduk](#bbduk) - Filter out sequences from samples that matches sequences in a user-provided fasta file (optional)
+    - [BBnorm](#bbnorm) - Normalize the reads in the samples to use less resources for assembly (optional)
+  - [Assembly step](#assembly-step) - Generate contigs with an assembler program
+    - [Megahit](#megahit) - Output from Megahit assembly (default)
+    - [RNASpades](#rnaspades) - Output from Spades assembly (optional)
+  - [ORF Caller step](#orf-caller-step) - Identify protein-coding genes (ORFs) with an ORF caller
+    - [Prodigal](#prodigal) - Output from Prodigal (default)
+    - [Prokka](#prokka) - Output from Prokka (optional)
+    - [TransDecoder](#transdecoder) - Output from transdecoder (optional)
+  - [Functional and taxonomical annotation](#functional-and-taxonomical-annotation) - Predict the function and the taxonomy of ORFs
+    - [EggNOG](#eggnog) - Output from EggNOG-mapper (default; optional)
+    - [KOfamSCAN](#kofamscan) - Output KOfamSCAN (optional)
+    - [EUKulele](#eukulele) - Output from EUKulele taxonomy annotation (default; optional)
+    - [Hmmsearch](#hmmsearch) - Output from HMMER run with user-supplied HMM profiles (optional)
+- [Custom metatdenovo output](#metatdenovo-output)
+  - [Summary tables folder](#summary-tables) - Tab separated tables ready for further analysis in tools like R and Python
+  - [Pipeline information](#pipeline-information) - Report metrics generated during the workflow execution
 
-### FastQC
+## Module output
+
+### Preprocessing
+
+#### FastQC
+
+[FastQC](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/) gives general quality metrics about your sequenced reads. It provides information about the quality score distribution across your reads, per base sequence content (%A/T/G/C), adapter contamination and overrepresented sequences. For further reading and documentation see the [FastQC help pages](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/). FastQC is run as part of Trim galore! therefore its output can be found in Trimgalore's folder.
 
 <details markdown="1">
 <summary>Output files</summary>
 
-- `fastqc/`
-  - `*_fastqc.html`: FastQC report containing quality metrics.
-  - `*_fastqc.zip`: Zip archive containing the FastQC report, tab-delimited data file and plot images.
+- `trimgalore/fastqc/`
+  - `*_fastqc.html`: FastQC report containing quality metrics for your untrimmed raw fastq files.
 
 </details>
 
-[FastQC](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/) gives general quality metrics about your sequenced reads. It provides information about the quality score distribution across your reads, per base sequence content (%A/T/G/C), adapter contamination and overrepresented sequences. For further reading and documentation see the [FastQC help pages](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/).
+#### Trim galore!
 
-![MultiQC - FastQC sequence counts plot](images/mqc_fastqc_counts.png)
+[Trimgalore](https://github.com/FelixKrueger/TrimGalore) is trimming primer sequences from sequencing reads. Primer sequences are non-biological sequences that often introduce point mutations that do not reflect sample sequences. This is especially true for degenerated PCR primers. If primer trimming would be omitted, artifactual amplicon sequence variants might be computed by the denoising tool or sequences might be lost due to become labelled as PCR chimera.
 
-![MultiQC - FastQC mean quality scores plot](images/mqc_fastqc_quality.png)
+<details markdown="1">
+<summary>Output files</summary>
 
-![MultiQC - FastQC adapter content plot](images/mqc_fastqc_adapter.png)
+- `trimgalore/`: directory containing log files with retained reads, trimming percentage, etc. for each sample.
+  - `*trimming_report.txt`: report of read numbers that pass trimgalore.
 
-:::note
-The FastQC plots displayed in the MultiQC report shows _untrimmed_ reads. They may contain adapter sequence and potentially regions with low quality.
-:::
+</details>
 
-### MultiQC
+#### MultiQC
+
+[MultiQC](http://multiqc.info) is a visualization tool that generates a single HTML report summarising all samples in your project. Most of the pipeline QC results are visualised in the report and further statistics are available in the report data directory.
+
+Results generated by MultiQC collate pipeline QC from supported tools e.g. FastQC. The pipeline has special steps which also allow the software versions to be reported in the MultiQC output for future traceability. For more information about how to use MultiQC reports, see <http://multiqc.info>.
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -51,9 +78,200 @@ The FastQC plots displayed in the MultiQC report shows _untrimmed_ reads. They m
 
 </details>
 
-[MultiQC](http://multiqc.info) is a visualization tool that generates a single HTML report summarising all samples in your project. Most of the pipeline QC results are visualised in the report and further statistics are available in the report data directory.
+:::note
+The FastQC plots displayed in the MultiQC report shows _untrimmed_ reads. They may contain adapter sequence and potentially regions with low quality.
+:::
 
-Results generated by MultiQC collate pipeline QC from supported tools e.g. FastQC. The pipeline has special steps which also allow the software versions to be reported in the MultiQC output for future traceability. For more information about how to use MultiQC reports, see <http://multiqc.info>.
+#### BBduk
+
+[BBduk](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbnorm-guide/) is a filtering tool that removes specific sequences from the samples using a reference fasta file.
+BBduk is built-in tool from BBmap.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `bbmap/`
+  - `*.bbduk.log`: a text file with the results from BBduk analysis. Number of filtered reads can be seen in this log.
+
+</details>
+
+#### BBnorm
+
+[BBnorm](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbduk-guide/) is a tool from BBmap that allows to reduce the coverage of highly abundant sequence kmers and remove sequences representing kmers that are below a threshold.
+It can be useful if the data set is too large to assemble but also potentially improve an assembly.
+N.B. the digital normalization is done only for the assembly and the non-normalized sequences will be used for quantification.
+BBnorm is a BBmap tool.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `bbmap/bbnorm/logs/`
+  - `*.logs`: it is a log file of the bbnorm run.
+
+</details>
+
+### Assembly step
+
+#### Megahit
+
+[Megahit](https://github.com/voutcn/megahit) is used to assemble the cleaned and trimmed FastQ reads into contigs.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `megahit/megahit_out/`
+  - `*.log`: log file of Megahit run.
+  - `megahit_assembly.contigs.fa.gz`: reference genome created by Megahit.
+  - `intermediate_contigs`: folder that contains the intermediate steps of Megahit run.
+
+</details>
+
+#### RNASpades
+
+Optionally, you can use [RNASpades](https://cab.spbu.ru/software/rnaspades/) to assemble reads into contigs.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `rnaspades/`
+  - `rnaspades.assembly.gfa.gz`: gfa file output from rnaspades
+  - `rnaspades.spades.log`: log file output from rnaspades run
+  - `rnaspades.transcripts.fa.gz`: reference genome created by RNASpades
+
+</details>
+
+### ORF caller step
+
+#### Prodigal
+
+As default, [Prodigal](https://github.com/hyattpd/Prodigal) is used to identify ORFs in the assembly.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `prodigal/`
+  - `*.fna.gz`: nucleotides fasta file output
+  - `*.faa.gz`: amino acids fasta file output
+  - `*.gff.gz`: genome feature file output
+
+</details>
+
+#### Prokka
+
+As one alternative, you can use [Prokka](https://github.com/tseemann/prokka) to identify ORFs in the assembly.
+In addition to calling ORFs (done with Prodigal) Prokka will filter ORFs to only retain quality ORFs and will functionally annotate the ORFs.
+NB: Prodigal or Prokka are recomended for prokaryotic samples
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `prokka/`
+  - `*.ffn.gz`: nucleotides fasta file output
+  - `*.faa.gz`: amino acids fasta file output
+  - `*.gff.gz`: genome feature file output
+
+</details>
+
+#### TransDecoder
+
+Another alternative is [TransDecoder](https://github.com/sghignone/TransDecoder) to find ORFs in the assembly.
+N.B. TransDecoder is recomended for eukaryotic samples
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `transdecoder/`
+  - `*.cds`: nucleotides fasta file output
+  - `*.pep`: amino acids fasta file output
+  - `*.gff3`: genome feature file output
+
+</details>
+
+### Functional and taxonomical annotation
+
+#### EggNOG
+
+[EggNOG-mapper](https://github.com/eggnogdb/eggnog-mapper) will perform an analysis to assign functions to the ORFs.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `eggnog/`
+  - `*.emapper.annotations.gz`: a file with the results from the annotation phase, see the [EggNOG-mapper documentation](https://github.com/eggnogdb/eggnog-mapper/wiki/).
+  - `*.emapper.hits.gz`: a file with the results from the search phase, from HMMER, Diamond or MMseqs2.
+  - `*.emapper.seed_orthologs.gz`: a file with the results from parsing the hits. Each row links a query with a seed ortholog. This file has the same format independently of which searcher was used, except that it can be in short format (4 fields), or full.
+
+</details>
+
+#### KOfamScan
+
+[KOfamScan](https://github.com/takaram/kofam_scan) will perform an analysis to assign KEGG orthologs to ORFs.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `kofamscan/`
+  - `*.kofamscan_output.tsv.gz`: kofamscan output.
+
+</details>
+
+#### EUKulele
+
+[EUKulele](https://github.com/AlexanderLabWHOI/EUKulele) will perform an analysis to assign taxonomy to the ORFs.
+A number of databases are supported: MMETSP, PhyloDB and GTDB.
+GTDB currently only works as a user provided database, i.e. data must be downloaded before running nf-core/metatdenovo.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `eukulele/assembler.orfcaller/mets_full/diamond/`
+  - `*.diamond.out.gz`: Diamond output
+- `eukulele/assembler.orfcaller/taxonomy_estimation/`
+  - `*-estimated-taxonomy.out.gz`: EUKulele output
+
+</details>
+
+#### Hmmsearch
+
+You can run [hmmsearch](https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch) on ORFs using a set of HMM profiles provided to the pipeline (see the `--hmmdir`, `--hmmpatern` and `--hmmfiles` parameters).
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `hmmer/`
+  - `*.tbl.gz`: Table output gzipped as result of Hmmsearch run.
+
+</details>
+
+After the search, hits for each ORF and HMM will be summarised and ranked based on scores for the hits (see also output in [summary tables](#summary-tables)).
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `hmmrank/`
+  - `*.tsv.gz`: tab separeted file with the ranked ORFs for each HMM profile.
+
+</details>
+
+## Metatdenovo output
+
+### Summary tables
+
+Consistently named and formated output tables in tsv format ready for further analysis.
+Filenames start with assembly program and ORF caller, to allow reruns of the pipeline with different parameter settings without overwriting output files.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `summary_tables/`
+  - `{assembler}.{orf_caller}.overall_stats.tsv.gz`: overall statistics from the pipeline, e.g. number of reads, number of called ORFs, number of reads mapping back to contigs/ORFs etc.
+  - `{assembler}.{orf_caller}.counts.tsv.gz`: read counts per ORF and sample.
+  - `{assembler}.{orf_caller}.emapper.tsv.gz`: reformatted output from EggNOG-mapper.
+  - `{assembler}.{orf_caller}.{db}_eukulele.tsv.gz`: taxonomic annotation per ORF for specific database.
+  - `{assembler}.{orf_caller}.prokka-annotations.tsv.gz`: reformatted annotation output from Prokka.
+  - `{assembler}.{orf_caller}.hmmrank.tsv.gz`: ranked summary table from HMMER results.
+
+</details>
 
 ### Pipeline information
 
@@ -61,11 +279,9 @@ Results generated by MultiQC collate pipeline QC from supported tools e.g. FastQ
 <summary>Output files</summary>
 
 - `pipeline_info/`
-  - Reports generated by Nextflow: `execution_report.html`, `execution_timeline.html`, `execution_trace.txt` and `pipeline_dag.dot`/`pipeline_dag.svg`.
-  - Reports generated by the pipeline: `pipeline_report.html`, `pipeline_report.txt` and `software_versions.yml`. The `pipeline_report*` files will only be present if the `--email` / `--email_on_fail` parameter's are used when running the pipeline.
-  - Reformatted samplesheet files used as input to the pipeline: `samplesheet.valid.csv`.
-  - Parameters used by the pipeline run: `params.json`.
+  - reports generated by Nextflow: `execution_report.html`, `execution_timeline.html`, `execution_trace.txt` and `pipeline_dag.dot`/`pipeline_dag.svg`.
+  - reports generated by the pipeline: `pipeline_report.html`, `pipeline_report.txt` and `software_versions.yml`. The `pipeline_report*` files will only be present if the `--email` / `--email_on_fail` parameter's are used when running the pipeline.
+  - reformatted samplesheet files used as input to the pipeline: `samplesheet.valid.csv`.
+  - parameters used by the pipeline run: `params.json`.
 
 </details>
-
-[Nextflow](https://www.nextflow.io/docs/latest/tracing.html) provides excellent functionality for generating various reports relevant to the running and execution of the pipeline. This will allow you to troubleshoot errors with the running of the pipeline, and also provide you with other information such as launch commands, run times and resource usage.
