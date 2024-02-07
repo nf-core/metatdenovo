@@ -328,7 +328,7 @@ workflow METATDENOVO {
         ch_gff           = UNPIGZ_GFF.out.unzipped
         ch_protein       = PROKKA_SUBSETS.out.faa
         ch_multiqc_files = ch_multiqc_files.mix(PROKKA_SUBSETS.out.prokka_log.collect{ meta, log -> log } )
-     }
+    }
 
     //
     // MODULE: Run PRODIGAL on assembly output.
