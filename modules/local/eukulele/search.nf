@@ -11,11 +11,11 @@ process EUKULELE_SEARCH {
     tuple val(meta), path(fasta), val(dbname), path(eukdb)
 
     output:
-    tuple val(meta), path("*/taxonomy_estimation/*.out.gz"), val("${db}") , emit: taxonomy_estimation
-    tuple val(meta), path("*/taxonomy_counts/*.csv.gz")                   , emit: taxonomy_counts
-    tuple val(meta), path("*/mets_full/diamond/*")                        , emit: diamond
+    tuple val(meta), path("*/taxonomy_estimation/*.out.gz"), val("${dbname}") , emit: taxonomy_estimation
+    tuple val(meta), path("*/taxonomy_counts/*.csv.gz")                       , emit: taxonomy_counts
+    tuple val(meta), path("*/mets_full/diamond/*")                            , emit: diamond
 
-    path "versions.yml"                                                   , emit: versions
+    path "versions.yml"                                                       , emit: versions
 
     script:
     def args     = task.ext.args ?: ''
