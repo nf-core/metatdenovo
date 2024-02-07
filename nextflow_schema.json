@@ -222,8 +222,7 @@
                 "gff": {
                     "type": "string",
                     "fa_icon": "fas fa-file-code",
-                    "description": "Path to a gff file",
-                    "help_text": ""
+                    "description": "Path to a gff file"
                 },
                 "orf_caller": {
                     "type": "string",
@@ -261,9 +260,14 @@
                 },
                 "eggnog_dbpath": {
                     "type": "string",
-                    "default": "./eggnog/",
                     "description": "Specify EGGNOG database path",
-                    "fa_icon": "far fa-file-code"
+                    "fa_icon": "far fa-file-code",
+                    "help_text": "Use this parameter if you already have the EGGNOG database."
+                },
+                "create_eggnog_db": {
+                    "type": "string",
+                    "description": "create an EGGNOG database",
+                    "help_text": "Use this parameter if you want to download the EGGNOG database."
                 },
                 "skip_kofamscan": {
                     "type": "boolean",
