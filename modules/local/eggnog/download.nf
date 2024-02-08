@@ -11,21 +11,19 @@ process EGGNOG_DOWNLOAD {
     //path "eggnog_dbpath"
 
     output:
-    //path("eggnog_db")  , emit: db
-    path('./.'), emit: db
-    path('*'), emit: files
+    path("eggnog_db")  , emit: db
     path "versions.yml", emit: versions
 
     script:
     def args = task.ext.args ?: ''
-    """
 
-    #mkdir eggnog_db
+    """
+    mkdir eggnog_db
 
     download_eggnog_data.py \\
         $args \\
         -y \\
-        --data_dir .
+        --data_dir eggnog_db
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

@@ -17,6 +17,7 @@ workflow EGGNOG {
     ch_versions = Channel.empty()
 
     if ( createdb ) {
+        // Not allowed, or?
         if ( ! file(dbpath).exists() ) {
             file(dbpath).mkdir()
         }
