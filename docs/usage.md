@@ -128,6 +128,37 @@ to the root directory of the EUKulele databases.
 
 > Please, check the [EUKulele documentation](https://eukulele.readthedocs.io/en/latest/#) for more information about the databases.
 
+> :warning: There is currently a bug in the EUKulele program so that some databases properly do not download properly, check [EUKulele issue](https://github.com/AlexanderLabWHOI/EUKulele/issues/60). Until the developers have fixed this bug, we reccomend to download the database manually. To do so, follow these steps:
+
+- Create conda environment:
+
+```bash
+conda create -n  -c akrinos -c bioconda -c conda-forge EUKulele EUKulele
+conda activate EUKulele
+```
+
+- Download the database you need:
+
+```bash
+mkdir eukulele
+cd eukulele
+EUKulele download --database mmetsp (you can use the name of the database you would like to download)
+```
+
+- Fix the problematic database tables:
+
+```bash
+cd mmetsp
+mv reference.pep.fa reference.pep.fa.gz
+gunzip reference.pep.fa.gz
+create_protein_table.py --infile_peptide reference.pep.fa \
+    --infile_taxonomy taxonomy-table.txt --outfile_json prot-map.json \
+    --output tax-table.txt --delim "/" --col_source_id Source_ID \
+    --taxonomy_col_id taxonomy --column SOURCE_ID
+```
+
+> :warning:
+
 <!-- I commented out the CAT documentation as we're not certain that we want to support this. -->
 <!-- An alternative to EUKulele is the CAT program. In contrast to EUKulele that annotates open reading frames (ORFs), CAT annotates the contigs from the assembly.
 
