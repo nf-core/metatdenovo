@@ -9,13 +9,12 @@ workflow HMMCLASSIFY {
     main:
     ch_versions = Channel.empty()
 
-    HMMER_HMMSEARCH ( 
+    HMMER_HMMSEARCH (
         ch_hmmclassify
             .map { meta, hmm, seqdb -> [ [ id: "${meta.id}.${hmm.baseName}" ], hmm, seqdb, false, true, false ] }
     )
     ch_versions = ch_versions.mix(HMMER_HMMSEARCH.out.versions.first())
 
-    
     HMMRANK (
         ch_hmmclassify
             .map { meta, hmm, seqdb -> meta }
