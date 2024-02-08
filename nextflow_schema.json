@@ -255,22 +255,27 @@
             "properties": {
                 "skip_eggnog": {
                     "type": "boolean",
+                    "default": false,
                     "description": "Skip EGGNOG functional annotation",
                     "fa_icon": "fas fa-forward"
                 },
                 "eggnog_dbpath": {
                     "type": "string",
+                    "default": "eggnog",
                     "description": "Specify EGGNOG database path",
                     "fa_icon": "far fa-file-code",
-                    "help_text": "Use this parameter if you already have the EGGNOG database."
+                    "help_text": "This parameter specifies where you have an EGGNOG database, or, where it will be created using the --create_eggnog_db parameter."
                 },
-                "create_eggnog_db": {
-                    "type": "string",
+                "create_eggnogdb": {
+                    "type": "boolean",
+                    "default": false,
+                    "fa_icon": "fas fa-forward",
                     "description": "create an EGGNOG database",
                     "help_text": "Use this parameter if you want to download the EGGNOG database."
                 },
                 "skip_kofamscan": {
                     "type": "boolean",
+                    "default": false,
                     "description": "skip kofamscan run",
                     "fa_icon": "fas fa-forward"
                 },
@@ -313,6 +318,7 @@
             "properties": {
                 "skip_eukulele": {
                     "type": "boolean",
+                    "default": false,
                     "description": "skip eukulele run",
                     "fa_icon": "fas fa-forward"
                 },

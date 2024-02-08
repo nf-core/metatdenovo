@@ -1,5 +1,5 @@
 process EGGNOG_DOWNLOAD {
-    tag '$meta.id'
+    tag 'EggNOG'
     label 'process_low'
 
     conda "bioconda::eggnog-mapper=2.1.9"
@@ -8,22 +8,24 @@ process EGGNOG_DOWNLOAD {
         'biocontainers/eggnog-mapper:2.1.9--pyhdfd78af_0' }"
 
     input:
-    path "eggnog_dbpath"
+    //path "eggnog_dbpath"
 
     output:
-    path("./eggnog_db"), emit: db
+    //path("eggnog_db")  , emit: db
+    path('./.'), emit: db
+    path('*'), emit: files
     path "versions.yml", emit: versions
 
     script:
     def args = task.ext.args ?: ''
     """
 
-    mkdir eggnog_db
+    #mkdir eggnog_db
 
     download_eggnog_data.py \\
         $args \\
         -y \\
-        --data_dir eggnog_db
+        --data_dir .
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

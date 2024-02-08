@@ -420,8 +420,11 @@ workflow METATDENOVO {
     //
     // SUBWORKFLOW: run eggnog_mapper on the ORF-called amino acid sequences
     //
+    //ch_eggnog_dbpath   = Channel.fromPath(params.eggnog_dbpath, checkIfExists: true)
+    //ch_create_eggnogdb = Channel.of(params.create_eggnogdb)
     if ( ! params.skip_eggnog ) {
-        EGGNOG(ch_protein, ch_fcs_for_summary )
+        //EGGNOG(ch_protein, ch_fcs_for_summary, ch_eggnog_dbpath, ch_create_eggnogdb )
+        EGGNOG(ch_protein, ch_fcs_for_summary, params.eggnog_dbpath, params.create_eggnogdb )
         ch_versions = ch_versions.mix(EGGNOG.out.versions)
         ch_merge_tables = EGGNOG.out.sumtable
     } else {
