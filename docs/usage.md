@@ -139,12 +139,14 @@ conda install -c akrinos -c bioconda -c conda-forge EUKulele
 
 - Download the database you need:
 ```bash
+mkdir eukulele
+cd eukulele
 EUKulele download --database phylodb (you can use the name of the database you would like to download)
 ```
 
 - Create the database tables:
 ```bash
-cd eukulele/phylodb
+cd phylodb
 mv reference.pep.fa reference.pep.fa.gz
 gunzip reference.pep.fa.gz
 create_protein_table.py --infile_peptide reference.pep.fa \
@@ -153,6 +155,7 @@ create_protein_table.py --infile_peptide reference.pep.fa \
     --taxonomy_col_id taxonomy --column SOURCE_ID
 ```
 > :warning:
+
 <!-- I commented out the CAT documentation as we're not certain that we want to support this. -->
 <!-- An alternative to EUKulele is the CAT program. In contrast to EUKulele that annotates open reading frames (ORFs), CAT annotates the contigs from the assembly.
 
