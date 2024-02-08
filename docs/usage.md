@@ -145,7 +145,7 @@ cd eukulele
 EUKulele download --database phylodb (you can use the name of the database you would like to download)
 ```
 
-- Create the database tables:
+- Fix the problematic database tables:
 
 ```bash
 cd phylodb
