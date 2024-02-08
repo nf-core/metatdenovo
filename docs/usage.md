@@ -142,13 +142,13 @@ conda activate EUKulele
 ```bash
 mkdir eukulele
 cd eukulele
-EUKulele download --database phylodb (you can use the name of the database you would like to download)
+EUKulele download --database mmetsp (you can use the name of the database you would like to download)
 ```
 
 - Fix the problematic database tables:
 
 ```bash
-cd phylodb
+cd mmetsp
 mv reference.pep.fa reference.pep.fa.gz
 gunzip reference.pep.fa.gz
 create_protein_table.py --infile_peptide reference.pep.fa \
