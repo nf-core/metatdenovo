@@ -133,9 +133,8 @@ to the root directory of the EUKulele databases.
 - Create conda environment:
 
 ```bash
-conda create -n EUKulele
+conda create -n  -c akrinos -c bioconda -c conda-forge EUKulele EUKulele
 conda activate EUKulele
-conda install -c akrinos -c bioconda -c conda-forge EUKulele
 ```
 
 - Download the database you need:
