@@ -8,17 +8,14 @@ include { EGGNOG_SUM      } from '../../modules/local/eggnog/sum'
 
 workflow EGGNOG {
     take:
-    eggnog_dbpath
     faa
     collect_fcs
 
     main:
     ch_versions = Channel.empty()
-    String eggnogDB      = eggnog_dbpath + "/eggnog.db"
-    File eggnogfile      = new File(eggnogDB)
 
-    if ( ! eggnogfile.exists() ) {
-        EGGNOG_DOWNLOAD()
+    if ( ! params.eggnog_dbpath ) {
+        EGGNOG_DOWNLOAD( params.create_eggnog_db )
         ch_dbpath = EGGNOG_DOWNLOAD.out.db
         ch_versions = ch_versions.mix ( EGGNOG_DOWNLOAD.out.versions )
     } else {

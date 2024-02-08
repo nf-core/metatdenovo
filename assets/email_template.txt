@@ -4,7 +4,7 @@
   |\\ | |__  __ /  ` /  \\ |__) |__         }  {
   | \\| |       \\__, \\__/ |  \\ |___     \\`-._,-`-,
                                         `._,._,'
-  nf-core/metatdenovo v${version}
+  nf-core/metatdenovo ${version}
 ----------------------------------------------------
 Run Name: $runName
 
