@@ -328,7 +328,7 @@ workflow METATDENOVO {
         ch_gff           = UNPIGZ_GFF.out.unzipped
         ch_protein       = PROKKA_SUBSETS.out.faa
         ch_multiqc_files = ch_multiqc_files.mix(PROKKA_SUBSETS.out.prokka_log.collect{ meta, log -> log } )
-     }
+    }
 
     //
     // MODULE: Run PRODIGAL on assembly output.
@@ -557,6 +557,13 @@ workflow.onComplete {
     NfcoreTemplate.summary(workflow, params, log)
     if (params.hook_url) {
         NfcoreTemplate.IM_notification(workflow, params, summary_params, projectDir, log)
+    }
+}
+
+workflow.onError {
+    if (workflow.errorReport.contains("Process requirement exceeds available memory")) {
+        println("🛑 Default resources exceed availability 🛑 ")
+        println("💡 See here on how to configure pipeline: https://nf-co.re/docs/usage/configuration#tuning-workflow-resources 💡")
     }
 }
 
