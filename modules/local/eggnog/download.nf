@@ -21,8 +21,6 @@ process EGGNOG_DOWNLOAD {
     def args = task.ext.args ?: ''
 
     """
-    #mkdir eggnog_db
-
     download_eggnog_data.py \\
         $args \\
         -y \\
