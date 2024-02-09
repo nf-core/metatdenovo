@@ -10,6 +10,7 @@ process EGGNOG_MAPPER {
     input:
     tuple val(meta), path(fasta)
     path(db)
+    path(eggnog_db) // Marker purpose only; to make execution wait for the download process to finish
 
     output:
     tuple val(meta), path("*.emapper.hits.gz")                , emit: hits

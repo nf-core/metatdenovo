@@ -11,24 +11,16 @@ workflow EGGNOG {
     faa
     collect_fcs
     dbpath
-    createdb
 
     main:
     ch_versions = Channel.empty()
 
-    if ( createdb ) {
-        // Not allowed, or?
-        if ( ! file(dbpath).exists() ) {
-            file(dbpath).mkdir()
-        }
-        EGGNOG_DOWNLOAD( )
-        ch_dbpath = EGGNOG_DOWNLOAD.out.db
-        ch_versions = ch_versions.mix ( EGGNOG_DOWNLOAD.out.versions )
-    } else {
-        ch_dbpath = Channel.fromPath(dbpath, checkIfExists: true)
-    }
+    ch_dbpath = Channel.fromPath(dbpath, checkIfExists: true)
 
-    EGGNOG_MAPPER ( faa, ch_dbpath )
+    EGGNOG_DOWNLOAD()
+    ch_versions = ch_versions.mix ( EGGNOG_DOWNLOAD.out.versions )
+
+    EGGNOG_MAPPER ( faa, ch_dbpath, EGGNOG_DOWNLOAD.out.eggnog_db )
     ch_versions = ch_versions.mix ( EGGNOG_MAPPER.out.versions )
 
     EGGNOG_SUM ( EGGNOG_MAPPER.out.emappertsv, collect_fcs )

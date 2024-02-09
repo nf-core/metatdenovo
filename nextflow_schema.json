@@ -264,14 +264,7 @@
                     "default": "eggnog",
                     "description": "Specify EGGNOG database path",
                     "fa_icon": "far fa-file-code",
-                    "help_text": "This parameter specifies where you have an EGGNOG database, or, where it will be created using the --create_eggnog_db parameter."
-                },
-                "create_eggnogdb": {
-                    "type": "boolean",
-                    "default": false,
-                    "fa_icon": "fas fa-forward",
-                    "description": "create an EGGNOG database",
-                    "help_text": "Use this parameter if you want to download the EGGNOG database."
+                    "help_text": "This parameter specifies where you have an EGGNOG database, or, where it will be created using the --create_eggnog_db parameter. The directory must exist."
                 },
                 "skip_kofamscan": {
                     "type": "boolean",
