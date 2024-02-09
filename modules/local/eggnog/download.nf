@@ -1,5 +1,5 @@
 process EGGNOG_DOWNLOAD {
-    tag '$meta.id'
+    tag 'EggNOG'
     label 'process_low'
 
     conda "bioconda::eggnog-mapper=2.1.9"
@@ -8,22 +8,23 @@ process EGGNOG_DOWNLOAD {
         'biocontainers/eggnog-mapper:2.1.9--pyhdfd78af_0' }"
 
     input:
-    path "eggnog_dbpath"
 
     output:
-    path("./eggnog_db"), emit: db
-    path "versions.yml", emit: versions
+    path "eggnog.db"                  , emit: eggnog_db
+    path "eggnog_proteins.dmnd"       , emit: dmnd
+    path "eggnog.taxa.db"             , emit: taxa_db
+    path "eggnog.taxa.db.traverse.pkl", emit: pkl
+    path "*"                          , emit: all
+    path "versions.yml"               , emit: versions, optional: true // Optional to allow skipping if this is the only file that's missing
 
     script:
     def args = task.ext.args ?: ''
+
     """
-
-    mkdir eggnog_db
-
     download_eggnog_data.py \\
         $args \\
         -y \\
-        --data_dir eggnog_db
+        --data_dir .
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

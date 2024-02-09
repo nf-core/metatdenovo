@@ -10,19 +10,17 @@ workflow EGGNOG {
     take:
     faa
     collect_fcs
+    dbpath
 
     main:
     ch_versions = Channel.empty()
 
-    if ( ! params.eggnog_dbpath ) {
-        EGGNOG_DOWNLOAD( params.create_eggnog_db )
-        ch_dbpath = EGGNOG_DOWNLOAD.out.db
-        ch_versions = ch_versions.mix ( EGGNOG_DOWNLOAD.out.versions )
-    } else {
-        ch_dbpath = Channel.fromPath(eggnog_dbpath, checkIfExists: true)
-    }
+    ch_dbpath = Channel.fromPath(dbpath, checkIfExists: true)
 
-    EGGNOG_MAPPER ( faa, ch_dbpath)
+    EGGNOG_DOWNLOAD()
+    ch_versions = ch_versions.mix ( EGGNOG_DOWNLOAD.out.versions )
+
+    EGGNOG_MAPPER ( faa, ch_dbpath, EGGNOG_DOWNLOAD.out.eggnog_db )
     ch_versions = ch_versions.mix ( EGGNOG_MAPPER.out.versions )
 
     EGGNOG_SUM ( EGGNOG_MAPPER.out.emappertsv, collect_fcs )
@@ -31,7 +29,7 @@ workflow EGGNOG {
     emit:
     hits       = EGGNOG_MAPPER.out.hits
     emappertsv = EGGNOG_MAPPER.out.emappertsv
-    versions   = ch_versions
     sumtable   = EGGNOG_SUM.out.eggnog_summary
+    versions   = ch_versions
 
 }
