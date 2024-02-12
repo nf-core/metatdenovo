@@ -18,8 +18,7 @@ workflow PROKKA_SUBSETS {
 
     PROKKA ( contigs.map{ meta, contigs -> contigs }.splitFasta(size: batchsize, file: true).map { contigs -> [ [ id: contigs.getBaseName() ], contigs] }, [], []  )
     ch_versions = ch_versions.mix(PROKKA.out.versions)
-    ch_log  = PROKKA.out.txt.collect()
-
+    ch_log  = PROKKA.out.txt.map { meta, log -> log }.collect()
     contigs.map{ meta, contigs -> [ id:"${meta.id}.prokka" ] }
         .combine(PROKKA.out.gff.collect { meta, gff -> gff }.map { [ it ] })
         .set { ch_gff }
