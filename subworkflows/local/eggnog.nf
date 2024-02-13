@@ -17,7 +17,13 @@ workflow EGGNOG {
     EGGNOG_DOWNLOAD()
     ch_versions = ch_versions.mix ( EGGNOG_DOWNLOAD.out.versions )
 
-    EGGNOG_MAPPER ( faa, EGGNOG_DOWNLOAD.out.all )
+    EGGNOG_DOWNLOAD.out.eggnog_db
+        .combine(EGGNOG_DOWNLOAD.out.dmnd)
+        .combine(EGGNOG_DOWNLOAD.out.taxa_db)
+        .combine(EGGNOG_DOWNLOAD.out.pkl)
+        .set{ ch_eggnog_database }
+
+    EGGNOG_MAPPER ( faa, ch_eggnog_database )
     ch_versions = ch_versions.mix ( EGGNOG_MAPPER.out.versions )
 
     EGGNOG_SUM ( EGGNOG_MAPPER.out.emappertsv, collect_fcs )

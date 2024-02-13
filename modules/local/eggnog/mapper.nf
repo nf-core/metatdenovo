@@ -9,7 +9,7 @@ process EGGNOG_MAPPER {
 
     input:
     tuple val(meta), path(fasta)
-    path(eggnog_db), stageAs: 'eggnog/*'
+    path(eggnog_files), stageAs: 'eggnog/*'
 
     output:
     tuple val(meta), path("*.emapper.hits.gz")                , emit: hits
