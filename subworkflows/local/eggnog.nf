@@ -10,17 +10,14 @@ workflow EGGNOG {
     take:
     faa
     collect_fcs
-    dbpath
 
     main:
     ch_versions = Channel.empty()
 
-    ch_dbpath = Channel.fromPath(dbpath, checkIfExists: true)
-
     EGGNOG_DOWNLOAD()
     ch_versions = ch_versions.mix ( EGGNOG_DOWNLOAD.out.versions )
 
-    EGGNOG_MAPPER ( faa, ch_dbpath, EGGNOG_DOWNLOAD.out.eggnog_db )
+    EGGNOG_MAPPER ( faa, EGGNOG_DOWNLOAD.out.all )
     ch_versions = ch_versions.mix ( EGGNOG_MAPPER.out.versions )
 
     EGGNOG_SUM ( EGGNOG_MAPPER.out.emappertsv, collect_fcs )
