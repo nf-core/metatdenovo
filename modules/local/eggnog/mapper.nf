@@ -9,8 +9,7 @@ process EGGNOG_MAPPER {
 
     input:
     tuple val(meta), path(fasta)
-    path(db)
-    path(eggnog_db) // Marker purpose only; to make execution wait for the download process to finish
+    path(eggnog_files), stageAs: 'eggnog/*'
 
     output:
     tuple val(meta), path("*.emapper.hits.gz")                , emit: hits
@@ -37,7 +36,7 @@ process EGGNOG_MAPPER {
     emapper.py \\
         $args \\
         --cpu $task.cpus \\
-        --data_dir $db \\
+        --data_dir eggnog \\
         --output $prefix \\
         -i $input
 
