@@ -1,10 +1,15 @@
 {
+<<<<<<< HEAD
     "multiqc_versions_single": {
+=======
+    "versions": {
+>>>>>>> TEMPLATE
         "content": [
             [
                 "versions.yml:md5,14e9a2661241abd828f4f06a7b5c222d"
             ]
         ],
+<<<<<<< HEAD
         "meta": {
             "nf-test": "0.8.4",
             "nextflow": "23.10.1"
@@ -12,6 +17,11 @@
         "timestamp": "2024-01-31T17:43:40.529579"
     },
     "multiqc_stub": {
+=======
+        "timestamp": "2024-01-09T23:02:49.911994"
+    },
+    "sarscov2 single-end [fastqc] - stub": {
+>>>>>>> TEMPLATE
         "content": [
             [
                 "multiqc_report.html",
@@ -20,6 +30,7 @@
                 "versions.yml:md5,14e9a2661241abd828f4f06a7b5c222d"
             ]
         ],
+<<<<<<< HEAD
         "meta": {
             "nf-test": "0.8.4",
             "nextflow": "23.10.1"
@@ -37,5 +48,8 @@
             "nextflow": "23.10.1"
         },
         "timestamp": "2024-01-31T17:44:53.535994"
+=======
+        "timestamp": "2024-01-09T23:03:14.524346"
+>>>>>>> TEMPLATE
     }
 }

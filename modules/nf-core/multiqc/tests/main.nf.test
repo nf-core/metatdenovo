@@ -3,7 +3,6 @@ nextflow_process {
     name "Test Process MULTIQC"
     script "../main.nf"
     process "MULTIQC"
-
     tag "modules"
     tag "modules_nfcore"
     tag "multiqc"
@@ -13,7 +12,7 @@ nextflow_process {
         when {
             process {
                 """
-                input[0] = Channel.of(file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastqc/test_fastqc.zip', checkIfExists: true))
+                input[0] = Channel.of([file(params.test_data['sarscov2']['illumina']['test_1_fastq_gz_fastqc_zip'], checkIfExists: true)])
                 input[1] = []
                 input[2] = []
                 input[3] = []
@@ -26,7 +25,7 @@ nextflow_process {
                 { assert process.success },
                 { assert process.out.report[0] ==~ ".*/multiqc_report.html" },
                 { assert process.out.data[0] ==~ ".*/multiqc_data" },
-                { assert snapshot(process.out.versions).match("multiqc_versions_single") }
+                { assert snapshot(process.out.versions).match("versions") }
             )
         }
 
@@ -37,7 +36,7 @@ nextflow_process {
         when {
             process {
                 """
-                input[0] = Channel.of(file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastqc/test_fastqc.zip', checkIfExists: true))
+                input[0] = Channel.of([file(params.test_data['sarscov2']['illumina']['test_1_fastq_gz_fastqc_zip'], checkIfExists: true)])
                 input[1] = Channel.of(file("https://github.com/nf-core/tools/raw/dev/nf_core/pipeline-template/assets/multiqc_config.yml", checkIfExists: true))
                 input[2] = []
                 input[3] = []
@@ -50,7 +49,7 @@ nextflow_process {
                 { assert process.success },
                 { assert process.out.report[0] ==~ ".*/multiqc_report.html" },
                 { assert process.out.data[0] ==~ ".*/multiqc_data" },
-                { assert snapshot(process.out.versions).match("multiqc_versions_config") }
+                { assert snapshot(process.out.versions).match("versions") }
             )
         }
     }
@@ -62,7 +61,7 @@ nextflow_process {
         when {
             process {
                 """
-                input[0] = Channel.of(file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastqc/test_fastqc.zip', checkIfExists: true))
+                input[0] = Channel.of([file(params.test_data['sarscov2']['illumina']['test_1_fastq_gz_fastqc_zip'], checkIfExists: true)])
                 input[1] = []
                 input[2] = []
                 input[3] = []
@@ -76,7 +75,7 @@ nextflow_process {
                 { assert snapshot(process.out.report.collect { file(it).getName() } +
                                 process.out.data.collect { file(it).getName() } +
                                 process.out.plots.collect { file(it).getName() } +
-                                process.out.versions ).match("multiqc_stub") }
+                                process.out.versions ).match() }
             )
         }
 
