@@ -48,7 +48,7 @@ if ( params.hmmdir ) {
         .set { ch_hmmrs }
 } else if ( params.hmmfiles ) {
     Channel
-        .of( params.hmmfiles.split(',') )
+        .fromList( params.hmmfiles.tokenize(',') )
         .map { [ file(it) ] }
         .set { ch_hmmrs }
 }
