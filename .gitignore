@@ -6,3 +6,9 @@ results/
 testing/
 testing*
 *.pyc
+.*.sw?
+.screenrc
+eggnog
+kofam
+kofamscan
+eukulele

@@ -10,25 +10,29 @@
             "type": "object",
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
-            "required": [
-                "input"
-            ],
+            "required": ["input", "outdir"],
             "properties": {
                 "input": {
                     "type": "string",
                     "format": "file-path",
+                    "exists": true,
                     "mimetype": "text/csv",
                     "pattern": "^\\S+\\.csv$",
-                    "schema": "assets/schema_input.json",
                     "description": "Path to comma-separated file containing information about the samples in the experiment.",
-                    "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row. See [usage docs](https://nf-co.re/metatdenovo/usage#samplesheet-input).",
+                    "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row.",
                     "fa_icon": "fas fa-file-csv"
+                },
+                "se_reads": {
+                    "type": "boolean",
+                    "description": "activate when using single end reads input",
+                    "fa_icon": "fas fa-long-arrow-alt-right"
                 },
                 "outdir": {
                     "type": "string",
-                    "description": "Path to the output directory where the results will be saved.",
-                    "default": "./results",
-                    "fa_icon": "fas fa-folder-open"
+                    "format": "directory-path",
+                    "description": "The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.",
+                    "fa_icon": "fas fa-folder-open",
+                    "default": "./results"
                 },
                 "email": {
                     "type": "string",
@@ -44,43 +48,296 @@
                 }
             }
         },
-        "reference_genome_options": {
-            "title": "Reference genome options",
+        "quality_control_options": {
+            "title": "Quality control options",
             "type": "object",
-            "fa_icon": "fas fa-dna",
-            "description": "Reference genome related files and options required for the workflow.",
+            "description": "Option for QC steps",
+            "default": "",
+            "fa_icon": "fas fa-check",
             "properties": {
-                "genome": {
-                    "type": "string",
-                    "description": "Name of iGenomes reference.",
-                    "fa_icon": "fas fa-book",
-                    "help_text": "If using a reference genome configured in the pipeline using iGenomes, use this parameter to give the ID for the reference. This is then used to build the full paths for all required reference genome files e.g. `--genome GRCh38`. \n\nSee the [nf-core website docs](https://nf-co.re/usage/reference_genomes) for more details."
-                },
-                "fasta": {
-                    "type": "string",
-                    "format": "file-path",
-                    "mimetype": "text/plain",
-                    "pattern": "^\\S+\\.fn?a(sta)?(\\.gz)?$",
-                    "description": "Path to FASTA genome file.",
-                    "help_text": "This parameter is *mandatory* if `--genome` is not specified. If you don't have a BWA index available this will be generated for you automatically. Combine with `--save_reference` to save BWA index for future runs.",
-                    "fa_icon": "far fa-file-code"
-                },
-                "igenomes_base": {
-                    "type": "string",
-                    "format": "directory-path",
-                    "description": "Directory / URL base for iGenomes references.",
-                    "default": "s3://ngi-igenomes/igenomes",
-                    "fa_icon": "fas fa-cloud-download-alt",
-                    "hidden": true
-                },
-                "igenomes_ignore": {
+                "skip_qc": {
                     "type": "boolean",
-                    "description": "Do not load the iGenomes reference config.",
-                    "fa_icon": "fas fa-ban",
-                    "hidden": true,
-                    "help_text": "Do not load `igenomes.config` when running the pipeline. You may choose this option if you observe clashes between custom parameters and those supplied in `igenomes.config`."
+                    "description": "Skip all QC steps except for MultiQC.",
+                    "fa_icon": "fas fa-forward"
+                },
+                "skip_fastqc": {
+                    "type": "boolean",
+                    "description": "Skip FastQC.",
+                    "fa_icon": "fas fa-forward"
                 }
             }
+        },
+        "trimming_options": {
+            "title": "trimming options",
+            "type": "object",
+            "fa_icon": "fas fa-cut",
+            "properties": {
+                "clip_r1": {
+                    "type": "string",
+                    "description": "Instructs Trim Galore to remove bp from the 5' end of read 1 (or single-end reads).",
+                    "fa_icon": "fas fa-cut"
+                },
+                "clip_r2": {
+                    "type": "string",
+                    "description": "Instructs Trim Galore to remove bp from the 5' end of read 2 (paired-end reads only).",
+                    "fa_icon": "fas fa-cut"
+                },
+                "three_prime_clip_r1": {
+                    "type": "string",
+                    "description": "Instructs Trim Galore to remove bp from the 3' end of read 1 AFTER adapter/quality trimming has been performed.",
+                    "fa_icon": "fas fa-cut"
+                },
+                "three_prime_clip_r2": {
+                    "type": "string",
+                    "description": "Instructs Trim Galore to remove bp from the 3' end of read 2 AFTER adapter/quality trimming has been performed.",
+                    "fa_icon": "fas fa-cut"
+                },
+                "save_trimmed": {
+                    "type": "boolean",
+                    "description": "Save the trimmed FastQ files in the results directory.",
+                    "help_text": "By default, trimmed FastQ files will not be saved to the results directory. Specify this flag (or set to true in your config file) to copy these files to the results directory when complete.",
+                    "fa_icon": "fas fa-cut"
+                },
+                "trim_nextseq": {
+                    "type": "string",
+                    "description": "Instructs Trim Galore to apply the --nextseq=X option, to trim based on quality after removing poly-G tails.",
+                    "help_text": "This enables the option Cutadapt `--nextseq-trim=3'CUTOFF` option via Trim Galore, which will set a quality cutoff (that is normally given with -q instead), but qualities of G bases are ignored. This trimming is in common for the NextSeq- and NovaSeq-platforms, where basecalls without any signal are called as high-quality G bases.",
+                    "fa_icon": "fas fa-cut"
+                },
+                "skip_trimming": {
+                    "type": "boolean",
+                    "description": "Skip the adapter trimming step.",
+                    "help_text": "Use this if your input FastQ files have already been trimmed outside of the workflow or if you're very confident that there is no adapter contamination in your data.",
+                    "fa_icon": "fas fa-forward"
+                }
+            },
+            "description": "all the trim option are listed below"
+        },
+        "bbnorm_options": {
+            "title": "Filtering options",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "sequence_filter": {
+                    "type": "string",
+                    "description": "Fasta file with sequences to filter away before running assembly etc..",
+                    "help_text": "Read sequences matching this file will be filtered out from samples with BBDuk before mapping. If no file is specified, BBDuk will not be run.",
+                    "fa_icon": "fas fa-filter"
+                }
+            },
+            "fa_icon": "fas fa-filter"
+        },
+        "digital_normalization_options": {
+            "title": "Digital normalization options",
+            "type": "object",
+            "description": "Use these option if you need to normalize the reads before the assembly",
+            "default": "",
+            "fa_icon": "fas fa-align-justify",
+            "properties": {
+                "bbnorm": {
+                    "type": "boolean",
+                    "description": "Perform normalization to reduce sequencing depth.",
+                    "help_text": "Normalization is performed following the example in https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbnorm-guide/",
+                    "fa_icon": "fas fa-align-justify"
+                },
+                "bbnorm_target": {
+                    "type": "integer",
+                    "default": 100,
+                    "description": "Reduce the number of reads for assembly average coverage of this number.",
+                    "fa_icon": "fas fa-align-justify"
+                },
+                "bbnorm_min": {
+                    "type": "integer",
+                    "default": 5,
+                    "description": "Reads with an apparent depth of under nx will be presumed to be errors and discarded",
+                    "fa_icon": "fas fa-align-justify"
+                },
+                "save_bbnorm_fastq": {
+                    "type": "boolean",
+                    "description": "save the resulting fastq files from normalization",
+                    "fa_icon": "fas fa-align-center"
+                }
+            }
+        },
+        "assembler_options": {
+            "title": "Assembler options",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "assembler": {
+                    "type": "string",
+                    "default": "megahit",
+                    "enum": ["megahit", "rnaspades"],
+                    "description": "Specify which assembler you would like to run, possible alternatives: megahit, rnaspades. default: megahit",
+                    "fa_icon": "fas fa-bezier-curve"
+                },
+                "assembly": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "mimetype": "text/plain",
+                    "description": "Path to a fasta file with a finished assembly. Assembly will be skipped by the pipeline.",
+                    "fa_icon": "far fa-file-code"
+                },
+                "min_contig_length": {
+                    "type": "integer",
+                    "default": 0,
+                    "description": "Filter out contigs shorter than this.",
+                    "fa_icon": "fas fa-align-justify"
+                }
+            },
+            "fa_icon": "fas fa-bezier-curve"
+        },
+        "mapping_options": {
+            "title": "Mapping options",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "save_bam": {
+                    "type": "boolean",
+                    "description": "Save the bam files from mapping",
+                    "fa_icon": "fas fa-align-center"
+                },
+                "save_samtools": {
+                    "type": "boolean",
+                    "description": "Save the output from samtools"
+                }
+            },
+            "fa_icon": "fas fa-filter"
+        },
+        "orf_caller_options": {
+            "title": "Orf Caller options",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "protein_fasta": {
+                    "type": "string",
+                    "fa_icon": "fas fa-file-code",
+                    "description": "Path to a protein fasta file"
+                },
+                "gff": {
+                    "type": "string",
+                    "fa_icon": "fas fa-file-code",
+                    "description": "Path to a gff file"
+                },
+                "orf_caller": {
+                    "type": "string",
+                    "default": "prodigal",
+                    "enum": ["prodigal", "prokka", "transdecoder"],
+                    "description": "Specify which ORF caller you would like to run, possible alternatives: prodigal, prokka, transdecoder, default: prodigal.",
+                    "fa_icon": "fas fa-phone-volume"
+                },
+                "prodigal_trainingfile": {
+                    "type": "string",
+                    "description": "Specify a training file for prodigal. By default prodigal will learn from the input sequences",
+                    "fa_icon": "fas fa-phone-volume"
+                },
+                "prokka_batchsize": {
+                    "type": "string",
+                    "description": "Size of individual files annotated by Prokka in one batch.",
+                    "default": "10 MB",
+                    "pattern": "^\\d+(\\.\\d+)?\\.?\\s*(K|M|G|T)?B$",
+                    "hidden": true,
+                    "help_text": "Prokka usually fails on very large input files. This parameter controls the size of smaller batches for which Prokka will be called. Should be a string in the format integer-unit e.g. `--prokka_batchsize '8.MB'`"
+                }
+            },
+            "fa_icon": "fas fa-phone-volume"
+        },
+        "functional_annotation_options": {
+            "title": "Functional annotation options",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "skip_eggnog": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Skip EGGNOG functional annotation",
+                    "fa_icon": "fas fa-forward"
+                },
+                "eggnog_dbpath": {
+                    "type": "string",
+                    "default": "eggnog",
+                    "description": "Specify EGGNOG database path",
+                    "fa_icon": "far fa-file-code",
+                    "help_text": "This parameter specifies where you have an EGGNOG database, or, where it will be created using the --create_eggnog_db parameter. The directory must exist."
+                },
+                "skip_kofamscan": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "skip kofamscan run",
+                    "fa_icon": "fas fa-forward"
+                },
+                "kofam_dir": {
+                    "type": "string",
+                    "default": "./kofam/",
+                    "description": "Path to a directory with KOfam files. Will be created if it doesn't exist.",
+                    "help_text": "If a `ko_list` file and/or `profiles` does not exist, they will be downloaded.",
+                    "fa_icon": "fas fa-folder-open"
+                },
+                "hmmdir": {
+                    "type": "string",
+                    "description": "Directory with hmm files which will be searched for among ORFs",
+                    "pattern": "^\\S+",
+                    "format": "directory-path",
+                    "fa_icon": "fas fa-folder-open"
+                },
+                "hmmfiles": {
+                    "type": "string",
+                    "description": "Comma-separated list of hmm files which will be searched for among ORFs",
+                    "pattern": "\\S+hmm(\\.gz)?",
+                    "format": "file-path",
+                    "mimetype": "text/plain",
+                    "fa_icon": "far fa-file-code"
+                },
+                "hmmpattern": {
+                    "type": "string",
+                    "default": "*.hmm",
+                    "description": "specify which pattern hmm files end with",
+                    "fa_icon": "fas fa-barcode"
+                }
+            },
+            "fa_icon": "fas fa-clipboard"
+        },
+        "taxonomy_annotation_options": {
+            "title": "Taxonomy annotation options",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "skip_eukulele": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "skip eukulele run",
+                    "fa_icon": "fas fa-forward"
+                },
+                "eukulele_method": {
+                    "type": "string",
+                    "default": "mets",
+                    "description": "Specify which method to use for EUKulele. the alternatives are: mets (metatranscriptomics) or  mags (Metagenome Assembled Genomes). default: mets",
+                    "enum": ["mets", "mags"],
+                    "fa_icon": "fas fa-bezier-curve"
+                },
+                "eukulele_db": {
+                    "type": "string",
+                    "enum": ["gtdb", "phylodb", "marmmetsp", "mmetsp", "eukprot"],
+                    "description": "EUKulele database.",
+                    "help_text": "This option allows the user to specify which database (or set of databases, separated by comma) to use with EUKulele. Databases that are provided with EUKulele will be downloaded if not already present inside the database directory (see --eukulele_dbpath). Possible alternatives: phylodb, mmetsp, marmmetsp, eukprot. NB: you can't use this option with a custom database as eukulele will not recognize the name and it will start to download phylodb by default. If you want to use a custom database, please skip this option and specify only --eukulele_dbpath.",
+                    "fa_icon": "far fa-file-code"
+                },
+                "eukulele_dbpath": {
+                    "type": "string",
+                    "default": "./eukulele/",
+                    "description": "EUKulele database folder.",
+                    "help_text": "If this parameter is set, EUKulele will look for a database to use in this folder. If --eukulele_db also is set, the specified database will be searched for in this directory and if it is not present it will be downloaded. If a custom database (see EUKulele documentation) should be used, EUKulele will assume that it is present in this folder - N.B. only works with one custom database (if using a custom database, point to a directory that only contains that database).",
+                    "fa_icon": "far fa-file-code"
+                }
+            },
+            "fa_icon": "fas fa-address-card"
         },
         "institutional_config_options": {
             "title": "Institutional config options",
@@ -102,12 +359,6 @@
                     "default": "https://raw.githubusercontent.com/nf-core/configs/master",
                     "hidden": true,
                     "help_text": "If you're running offline, Nextflow will not be able to fetch the institutional config files from the internet. If you don't need them, then this is not a problem. If you do need them, you should download the files from the repo and tell Nextflow where to find them with this parameter.",
-                    "fa_icon": "fas fa-users-cog"
-                },
-                "hostnames": {
-                    "type": "string",
-                    "description": "Institutional configs hostname.",
-                    "hidden": true,
                     "fa_icon": "fas fa-users-cog"
                 },
                 "config_profile_name": {
@@ -139,7 +390,7 @@
         "max_job_request_options": {
             "title": "Max job request options",
             "type": "object",
-            "fa_icon": "fab fa-acquisitions-incorporated",
+            "fa_icon": "fas fa-microchip",
             "description": "Set the top limit for requested resources for any single job.",
             "help_text": "If you are running on a smaller system, a pipeline step requesting more resources than are available may cause the Nextflow to stop the run with an error. These options allow you to cap the maximum resources requested by any single job so that the pipeline will run on your system.\n\nNote that you can not _increase_ the resources requested by any job using these options. For that you will need your own configuration file. See [the nf-core website](https://nf-co.re/usage/configuration) for details.",
             "properties": {
@@ -165,7 +416,7 @@
                     "description": "Maximum amount of time that can be requested for any single job.",
                     "default": "240.h",
                     "fa_icon": "far fa-clock",
-                    "pattern": "^(\\d+\\.?\\s*(s|m|h|day)\\s*)+$",
+                    "pattern": "^(\\d+\\.?\\s*(s|m|h|d|day)\\s*)+$",
                     "hidden": true,
                     "help_text": "Use to set an upper-limit for the time requirement for each process. Should be a string in the format integer-unit e.g. `--max_time '2.h'`"
                 }
@@ -184,20 +435,19 @@
                     "fa_icon": "fas fa-question-circle",
                     "hidden": true
                 },
+                "version": {
+                    "type": "boolean",
+                    "description": "Display version and exit.",
+                    "fa_icon": "fas fa-question-circle",
+                    "hidden": true
+                },
                 "publish_dir_mode": {
                     "type": "string",
                     "default": "copy",
                     "description": "Method used to save pipeline results to output directory.",
                     "help_text": "The Nextflow `publishDir` option specifies which intermediate files should be saved to the output directory. This option tells the pipeline what method should be used to move these files. See [Nextflow docs](https://www.nextflow.io/docs/latest/process.html#publishdir) for details.",
                     "fa_icon": "fas fa-copy",
-                    "enum": [
-                        "symlink",
-                        "rellink",
-                        "link",
-                        "copy",
-                        "copyNoFollow",
-                        "move"
-                    ],
+                    "enum": ["symlink", "rellink", "link", "copy", "copyNoFollow", "move"],
                     "hidden": true
                 },
                 "email_on_fail": {
@@ -228,45 +478,57 @@
                     "fa_icon": "fas fa-palette",
                     "hidden": true
                 },
+                "hook_url": {
+                    "type": "string",
+                    "description": "Incoming hook URL for messaging service",
+                    "fa_icon": "fas fa-people-group",
+                    "help_text": "Incoming hook URL for messaging service. Currently, MS Teams and Slack are supported.",
+                    "hidden": true
+                },
                 "multiqc_config": {
                     "type": "string",
+                    "format": "file-path",
                     "description": "Custom config file to supply to MultiQC.",
                     "fa_icon": "fas fa-cog",
                     "hidden": true
                 },
-                "tracedir": {
+                "multiqc_logo": {
                     "type": "string",
-                    "description": "Directory to keep pipeline Nextflow logs and reports.",
-                    "default": "${params.outdir}/pipeline_info",
-                    "fa_icon": "fas fa-cogs",
+                    "description": "Custom logo file to supply to MultiQC. File name must also be set in the MultiQC config file",
+                    "fa_icon": "fas fa-image",
                     "hidden": true
+                },
+                "multiqc_methods_description": {
+                    "type": "string",
+                    "description": "Custom MultiQC yaml file containing HTML including a methods description.",
+                    "fa_icon": "fas fa-cog"
                 },
                 "validate_params": {
                     "type": "boolean",
                     "description": "Boolean whether to validate parameters against the schema at runtime",
-                    "default": true,
                     "fa_icon": "fas fa-check-square",
                     "hidden": true
                 },
-                "show_hidden_params": {
+                "validationShowHiddenParams": {
                     "type": "boolean",
                     "fa_icon": "far fa-eye-slash",
                     "description": "Show all params when using `--help`",
                     "hidden": true,
                     "help_text": "By default, parameters set as _hidden_ in the schema are not shown on the command line when a user runs with `--help`. Specifying this option will tell the pipeline to show all parameters."
                 },
-                "enable_conda": {
+                "validationFailUnrecognisedParams": {
                     "type": "boolean",
-                    "description": "Run this workflow with Conda. You can also use '-profile conda' instead of providing this parameter.",
+                    "fa_icon": "far fa-check-circle",
+                    "description": "Validation of parameters fails when an unrecognised parameter is found.",
                     "hidden": true,
-                    "fa_icon": "fas fa-bacon"
+                    "help_text": "By default, when an unrecognised parameter is found, it returns a warinig."
                 },
-                "singularity_pull_docker_container": {
+                "validationLenientMode": {
                     "type": "boolean",
-                    "description": "Instead of directly downloading Singularity images for use with Singularity, force the workflow to pull and convert Docker containers instead.",
+                    "fa_icon": "far fa-check-circle",
+                    "description": "Validation of parameters in lenient more.",
                     "hidden": true,
-                    "fa_icon": "fas fa-toolbox",
-                    "help_text": "This may be useful for example if you are unable to directly pull Singularity containers to run the pipeline due to http/https proxy issues."
+                    "help_text": "Allows string values that are parseable as numbers or booleans. For further information see [JSONSchema docs](https://github.com/everit-org/json-schema#lenient-mode)."
                 }
             }
         }
@@ -276,7 +538,31 @@
             "$ref": "#/definitions/input_output_options"
         },
         {
-            "$ref": "#/definitions/reference_genome_options"
+            "$ref": "#/definitions/quality_control_options"
+        },
+        {
+            "$ref": "#/definitions/trimming_options"
+        },
+        {
+            "$ref": "#/definitions/bbnorm_options"
+        },
+        {
+            "$ref": "#/definitions/digital_normalization_options"
+        },
+        {
+            "$ref": "#/definitions/assembler_options"
+        },
+        {
+            "$ref": "#/definitions/mapping_options"
+        },
+        {
+            "$ref": "#/definitions/orf_caller_options"
+        },
+        {
+            "$ref": "#/definitions/functional_annotation_options"
+        },
+        {
+            "$ref": "#/definitions/taxonomy_annotation_options"
         },
         {
             "$ref": "#/definitions/institutional_config_options"
