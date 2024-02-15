@@ -133,7 +133,7 @@ to the root directory of the EUKulele databases.
 - Create conda environment:
 
 ```bash
-conda create -n  -c akrinos -c bioconda -c conda-forge EUKulele EUKulele
+conda create -n eukulele -c akrinos -c bioconda -c conda-forge EUKulele
 conda activate EUKulele
 ```
 

@@ -323,11 +323,13 @@ workflow METATDENOVO {
     //
     if ( params.orf_caller == 'prokka' ) {
         PROKKA_SUBSETS(ch_assembly_contigs, params.prokka_batchsize)
-        UNPIGZ_GFF(PROKKA_SUBSETS.out.gff.map { meta, gff -> [ [id: "${params.orf_caller}.${meta}"], gff ] })
         ch_versions      = ch_versions.mix(PROKKA_SUBSETS.out.versions)
-        ch_gff           = UNPIGZ_GFF.out.unzipped
         ch_protein       = PROKKA_SUBSETS.out.faa
         ch_multiqc_files = ch_multiqc_files.mix(PROKKA_SUBSETS.out.prokka_log)
+
+        UNPIGZ_GFF(PROKKA_SUBSETS.out.gff.map { meta, gff -> [ [id: "${params.orf_caller}.${meta}"], gff ] })
+        ch_gff           = UNPIGZ_GFF.out.unzipped
+        ch_versions      = ch_versions.mix(UNPIGZ_GFF.out.versions)
     }
 
     //
@@ -335,10 +337,12 @@ workflow METATDENOVO {
     //
     if ( orf_caller == 'prodigal' ) {
         PRODIGAL( ch_assembly_contigs.map { meta, contigs -> [ [id: "${assembler}.${orf_caller}"], contigs  ] } )
-        UNPIGZ_GFF(PRODIGAL.out.gff.map { meta, gff -> [ [id: "${meta.id}.${orf_caller}"], gff ] })
-        ch_gff          = UNPIGZ_GFF.out.unzipped
         ch_protein      = PRODIGAL.out.faa
         ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
+
+        UNPIGZ_GFF(PRODIGAL.out.gff.map { meta, gff -> [ [id: "${meta.id}.${orf_caller}"], gff ] })
+        ch_gff          = UNPIGZ_GFF.out.unzipped
+        ch_versions     = ch_versions.mix(UNPIGZ_GFF.out.versions)
     }
 
     //
