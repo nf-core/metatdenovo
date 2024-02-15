@@ -128,7 +128,7 @@ to the root directory of the EUKulele databases.
 
 > Please, check the [EUKulele documentation](https://eukulele.readthedocs.io/en/latest/#) for more information about the databases.
 
-> :warning: There is currently a bug in the EUKulele program so that some databases properly do not download properly, check [EUKulele issue](https://github.com/AlexanderLabWHOI/EUKulele/issues/60). Until the developers have fixed this bug, we reccomend to download the database manually. To do so, follow these steps:
+> :warning: There is currently a bug in the EUKulele program so that some databases properly do not download properly, check [EUKulele issue](https://github.com/AlexanderLabWHOI/EUKulele/issues/60). Until the developers have fixed this bug, we recommend downloading the database manually. To do so, follow these steps:
 
 - Create conda environment:
 
