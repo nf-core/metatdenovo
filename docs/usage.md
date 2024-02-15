@@ -148,6 +148,7 @@ EUKulele download --database mmetsp (you can use the name of the database you wo
 - Fix the problematic database tables:
 
 ```bash
+mkdir mmetsp
 cd mmetsp
 mv reference.pep.fa reference.pep.fa.gz
 gunzip reference.pep.fa.gz
