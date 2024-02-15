@@ -176,7 +176,7 @@ in the workflow: the [eggNOG-mapper](http://eggnog-mapper.embl.de/) and [KofamSc
 Both are suitable for both prokaryotic and eukaryotic genes and both are run by default, but can be skipped using the `--skip_eggnog` and
 `--skip_kofamscan` options respectivelly.
 The tools use large databases which are downloaded automatically but paths can be provided by the user through the `--eggnog_dbpath directory`
-`--kofam_dir dir` parameters respectively.
+and `--kofam_dir dir` parameters respectively.
 
 A more targeted annotation option offered by the workflow is the possibility for the user to provide a set of
 [HMMER HMM profiles](http://eddylab.org/software/hmmer/Userguide.pdf) through the `--hmmdir dir` or `hmmfiles file0.hmm,file1.hmm,...,filen.hmm` parameters.
