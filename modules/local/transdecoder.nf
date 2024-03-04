@@ -11,10 +11,10 @@ process TRANSDECODER {
     tuple val(meta), path(fasta)
 
     output:
-    tuple val(meta), path("*/*.pep") , emit: pep
-    tuple val(meta), path("*/*.gff3"), emit: gff
-    tuple val(meta), path("*/*.cds") , emit: cds
-    tuple val(meta), path("*/*.dat") , emit: dat
+    tuple val(meta), path("*.pep") , emit: pep
+    tuple val(meta), path("*.gff3"), emit: gff
+    tuple val(meta), path("*.cds") , emit: cds
+    tuple val(meta), path("*.bed") , emit: bed
     path "versions.yml"              , emit: versions
 
     when:
