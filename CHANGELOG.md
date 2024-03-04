@@ -3,7 +3,17 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v1.0.1 - [4-03-2024]
+## v1.0.1 - [2024-03-04]
+
+### `Changed`
+
+- [#268]([https://github.com/nf-core/ampliseq/pull/681](https://github.com/nf-core/metatdenovo/pull/268)) - Don't save so many intermediate Megahit files by default
+
+### `Fixed`
+
+- [#269]([https://github.com/nf-core/ampliseq/pull/681](https://github.com/nf-core/metatdenovo/pull/269)) - Make Transdecoder work better with `-resume`
+
+## v1.0.0 - [2024-02-15]
 
 Initial release of nf-core/metatdenovo, created with the [nf-core](https://nf-co.re/) template.
 
