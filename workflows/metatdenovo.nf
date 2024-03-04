@@ -82,6 +82,7 @@ include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz'
 include { UNPIGZ as UNPIGZ_GFF             } from '../modules/local/unpigz'
 include { MERGE_TABLES                     } from '../modules/local/merge_summary_tables'
 include { TRANSRATE                        } from '../modules/local/transrate'
+include { TRANSDECODER                     } from '../modules/local/transdecoder'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -95,7 +96,6 @@ include { EGGNOG            } from '../subworkflows/local/eggnog'
 include { SUB_EUKULELE      } from '../subworkflows/local/eukulele'
 include { HMMCLASSIFY       } from '../subworkflows/local/hmmclassify'
 include { PROKKA_SUBSETS    } from '../subworkflows/local/prokka_subsets'
-include { TRANSDECODER      } from '../subworkflows/local/transdecoder'
 include { FASTQC_TRIMGALORE } from '../subworkflows/local/fastqc_trimgalore'
 include { PRODIGAL          } from '../subworkflows/local/prodigal'
 include { KOFAMSCAN         } from '../subworkflows/local/kofamscan'
