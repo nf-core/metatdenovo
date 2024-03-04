@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v1.0.1 - [2024-03-04]
 
+### `Added`
+
 ### `Changed`
 
 - [#268]([https://github.com/nf-core/ampliseq/pull/681](https://github.com/nf-core/metatdenovo/pull/268)) - Don't save so many intermediate Megahit files by default
@@ -13,14 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#269]([https://github.com/nf-core/ampliseq/pull/681](https://github.com/nf-core/metatdenovo/pull/269)) - Make Transdecoder work better with `-resume`
 
-## v1.0.0 - [2024-02-15]
-
-Initial release of nf-core/metatdenovo, created with the [nf-core](https://nf-co.re/) template.
-
-### `Added`
-
-### `Fixed`
-Trandecoder subworkflow didn't cache properly. We made a local module that fixed the issue.
 ### `Dependencies`
 
 ### `Deprecated`
+
+## v1.0.0 - [2024-02-15]
+
+Initial release of nf-core/metatdenovo, created with the [nf-core](https://nf-co.re/) template.
