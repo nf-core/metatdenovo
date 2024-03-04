@@ -1,4 +1,4 @@
-process TRANSDECODER_LONGORF {
+process TRANSDECODER {
     tag "$meta.id"
     label 'process_medium'
 
@@ -11,12 +11,11 @@ process TRANSDECODER_LONGORF {
     tuple val(meta), path(fasta)
 
     output:
-    tuple val(meta), path("${meta.id}/*.pep") , emit: pep
-    tuple val(meta), path("${meta.id}/*.gff3"), emit: gff3
-    tuple val(meta), path("${meta.id}/*.cds") , emit: cds
-    tuple val(meta), path("${meta.id}/*.dat") , emit: dat
-    path("${meta.id}/")                       , emit: folder
-    path "versions.yml"                       , emit: versions
+    tuple val(meta), path("*/*.pep") , emit: pep
+    tuple val(meta), path("*/*.gff3"), emit: gff
+    tuple val(meta), path("*/*.cds") , emit: cds
+    tuple val(meta), path("*/*.dat") , emit: dat
+    path "versions.yml"              , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -27,6 +26,12 @@ process TRANSDECODER_LONGORF {
 
     """
     TransDecoder.LongOrfs \\
+        $args \\
+        -O $prefix \\
+        -t \\
+        $fasta
+
+    TransDecoder.Predict \\
         $args \\
         -O $prefix \\
         -t \\
