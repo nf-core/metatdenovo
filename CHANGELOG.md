@@ -3,14 +3,14 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v1.0.0 - [date]
+## v1.0.1 - [4-03-2024]
 
 Initial release of nf-core/metatdenovo, created with the [nf-core](https://nf-co.re/) template.
 
 ### `Added`
 
 ### `Fixed`
-
+Trandecoder subworkflow didn't cache properly. We made a local module that fixed the issue.
 ### `Dependencies`
 
 ### `Deprecated`
