@@ -186,6 +186,12 @@
                     "default": 0,
                     "description": "Filter out contigs shorter than this.",
                     "fa_icon": "fas fa-align-justify"
+                },
+                "spades_flavor": {
+                    "type": "string",
+                    "default": "rna",
+                    "description": "Select which type of assembly you want to make. Default: rna",
+                    "help_text": "This option allows you to run an assembly for different scope. with '--rna' you will get an assembly for metatrancriptomic samples while for example '--viralrna' for Metatranscriptomics virome. "
                 }
             },
             "fa_icon": "fas fa-bezier-curve"
@@ -255,7 +261,6 @@
             "properties": {
                 "skip_eggnog": {
                     "type": "boolean",
-                    "default": false,
                     "description": "Skip EGGNOG functional annotation",
                     "fa_icon": "fas fa-forward"
                 },
@@ -268,7 +273,6 @@
                 },
                 "skip_kofamscan": {
                     "type": "boolean",
-                    "default": false,
                     "description": "skip kofamscan run",
                     "fa_icon": "fas fa-forward"
                 },
@@ -311,7 +315,6 @@
             "properties": {
                 "skip_eukulele": {
                     "type": "boolean",
-                    "default": false,
                     "description": "skip eukulele run",
                     "fa_icon": "fas fa-forward"
                 },
