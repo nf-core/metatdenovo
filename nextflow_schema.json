@@ -191,7 +191,7 @@
                     "type": "string",
                     "default": "rna",
                     "description": "Select which type of assembly you want to make. Default: rna",
-                    "help_text": "This option allows you to run an assembly for different scope. with '--rna' you will get an assembly for metatrancriptomic samples while for example '--viralrna' for Metatranscriptomics virome. "
+                    "help_text": "This option allows you to run an assembly for a different scope. For instance, with '--spades_flavor rna' you will get an assembly for prokaryotic metatrancriptomes, `--spades_flavor rnaviral' for viral metatranscriptomes or `--spades_flavor metaviral` for viral metagenomes. The argument to the parameter will be passed as a parameter to Spades; e.g. `--spades_flavor rna` will be passed as `--rna` to Spades."
                 }
             },
             "fa_icon": "fas fa-bezier-curve"
