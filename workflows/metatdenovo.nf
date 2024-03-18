@@ -264,13 +264,13 @@ workflow METATDENOVO {
     }
 
     //
-    // MODULE: Run Megahit or RNAspades on all interleaved fastq files
+    // MODULE: Run Megahit or Spades on all interleaved fastq files
     //
     if ( params.assembly ) {
         Channel
             .value ( [ [ id: 'user_assembly' ], file(params.assembly) ] )
             .set { ch_assembly_contigs }
-    } else if ( assembler == 'rnaspades' ) {
+    } else if ( assembler == 'spades' ) {
         // 1. Write a yaml file for Spades
         WRITESPADESYAML (
             ch_pe_reads_to_assembly.toList(),
@@ -281,7 +281,7 @@ workflow METATDENOVO {
         ch_pe_reads_to_assembly
             .mix(ch_se_reads_to_assembly)
             .collect()
-            .map { [ [ id:'rnaspades' ], it, [], [] ] }
+            .map { [ [ id:'spades' ], it, [], [] ] }
             .set { ch_spades }
         SPADES (
             ch_spades,

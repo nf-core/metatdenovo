@@ -169,8 +169,8 @@
                 "assembler": {
                     "type": "string",
                     "default": "megahit",
-                    "enum": ["megahit", "rnaspades"],
-                    "description": "Specify which assembler you would like to run, possible alternatives: megahit, rnaspades. default: megahit",
+                    "enum": ["megahit", "spades"],
+                    "description": "Specify which assembler you would like to run, possible alternatives: megahit, spades. default: megahit",
                     "fa_icon": "fas fa-bezier-curve"
                 },
                 "assembly": {
