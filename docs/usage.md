@@ -94,7 +94,7 @@ To turn on digital normalization, use the `--bbnorm` parameter and, if required,
 By default, the pipeline uses Megahit (`--assembler megahit`) to assemble the cleaned and trimmed reads to create the reference contigs.
 Megahit is fast and it does not require a lot of memory to run, making it ideal for large sets of samples.
 The workflow also supports RNAspades, (`--assembler rnaspades` ) as an alternative.
-If you work with virus you can specify it into SPADES by using the option `--spades_flavor rnaviral`
+If you work with viruses you can specify optimized settings for Spades by using the option `--spades_flavor rnaviral` or `--spades_flavor metaviral`.
 
 You can also choose to input contigs from an assembly that you made outside the pipeline using the `--assembly file.fna` (where `file.fna` is the name of a fasta file with contigs) option.
 
