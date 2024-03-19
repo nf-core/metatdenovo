@@ -93,7 +93,8 @@ To turn on digital normalization, use the `--bbnorm` parameter and, if required,
 
 By default, the pipeline uses Megahit (`--assembler megahit`) to assemble the cleaned and trimmed reads to create the reference contigs.
 Megahit is fast and it does not require a lot of memory to run, making it ideal for large sets of samples.
-The workflow also supports RNAspades, (`--assembler rnaspades` ) as an alternative.
+The workflow also supports Spades, (`--assembler spades` ) as an alternative.
+If you work with virus you can specify it into SPADES by using the option `--spades_flavor rnaviral`
 
 You can also choose to input contigs from an assembly that you made outside the pipeline using the `--assembly file.fna` (where `file.fna` is the name of a fasta file with contigs) option.
 
@@ -187,10 +188,10 @@ ORF-HMM combination will be ranked according to score and E-value.
 ## Example pipeline command with some common features
 
 ```bash
-nextflow run nf-core/metatdenovo -profile docker --input samplesheet.csv --assembler rnaspades --orf_caller prokka --eggnog --eukulele_db gtdb
+nextflow run nf-core/metatdenovo -profile docker --input samplesheet.csv --assembler spades --orf_caller prokka --eggnog --eukulele_db gtdb
 ```
 
-In this example, we are running metatdenovo with `rnaspades` as assembler, `prokka` as ORF caller, `eggnog` for functional annotation and EUKulele with the GTDB database for taxonomic annotation.
+In this example, we are running metatdenovo with `spades` as assembler, `prokka` as ORF caller, `eggnog` for functional annotation and EUKulele with the GTDB database for taxonomic annotation.
 
 Note that the pipeline will create the following files in your working directory:
 
@@ -219,7 +220,7 @@ with `params.yaml` containing:
 
 ```yaml
 input: 'samplesheet.csv'
-assembler: 'rnaspades'
+assembler: 'spades'
 orf_caller: 'prokka'
 eggnog: true
 eukulele_db: 'gtdb'

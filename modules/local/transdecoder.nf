@@ -15,7 +15,7 @@ process TRANSDECODER {
     tuple val(meta), path("*.gff3"), emit: gff
     tuple val(meta), path("*.cds") , emit: cds
     tuple val(meta), path("*.bed") , emit: bed
-    path "versions.yml"              , emit: versions
+    path "versions.yml"            , emit: versions
 
     when:
     task.ext.when == null || task.ext.when

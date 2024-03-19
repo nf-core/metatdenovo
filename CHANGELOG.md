@@ -6,14 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## v1.0.1 - [date]
 
 ### `Added`
+- [#271](<[https://github.com/nf-core/metatdenovo/issues/271](https://github.com/nf-core/metatdenovo/issues/271)>) - Added flavor to SPADES modules
 
 ### `Changed`
 
-- [#268]([https://github.com/nf-core/ampliseq/pull/681](https://github.com/nf-core/metatdenovo/pull/268)) - Don't save so many intermediate Megahit files by default
+- [#268](<[https://github.com/nf-core/ampliseq/pull/681](https://github.com/nf-core/metatdenovo/pull/268)>) - Don't save so many intermediate Megahit files by default
 
 ### `Fixed`
 
-- [#269]([https://github.com/nf-core/ampliseq/pull/681](https://github.com/nf-core/metatdenovo/pull/269)) - Make Transdecoder work better with `-resume`
+- [#269](<[https://github.com/nf-core/ampliseq/pull/681](https://github.com/nf-core/metatdenovo/pull/269)>) - Make Transdecoder work better with `-resume`
 
 ### `Dependencies`
 
