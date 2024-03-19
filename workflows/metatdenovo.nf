@@ -288,13 +288,14 @@ workflow METATDENOVO {
             WRITESPADESYAML.out.yaml,
             []
         )
-        if ( params.spades_flavor == 'rnaviral') {
-            ch_assembly = SPADES.out.contigs
-        } else {
-        ch_assembly = SPADES.out.transcripts
-        }
+
+        SPADES.out.transcripts
+            .ifEmpty{ [] }
+            .combine(SPADES.out.contigs.ifEmpty{ [] } )
+            .set { ch_assembly }
         ch_versions = ch_versions.mix(SPADES.out.versions)
-        FORMATSPADES( ch_assembly )
+
+        FORMATSPADES( ch_assembly.first() )
         ch_assembly_contigs = FORMATSPADES.out.assembly
         ch_versions    = ch_versions.mix(FORMATSPADES.out.versions)
     } else if ( assembler == 'megahit' ) {
