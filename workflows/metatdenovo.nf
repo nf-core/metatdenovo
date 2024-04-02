@@ -4,6 +4,8 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
+System.out.println "param: '${params.eukulele_db}', split: ${params.eukulele_db.split(',')}"
+
 include { paramsSummaryLog; paramsSummaryMap } from 'plugin/nf-validation'
 
 def logo = NfcoreTemplate.logo(workflow, params.monochrome_logs)
@@ -469,11 +471,11 @@ workflow METATDENOVO {
     // SUBWORKFLOW: Eukulele
     //
     ch_eukulele_db = Channel.empty()
-    if( !params.skip_eukulele){
+    if( ! params.skip_eukulele ) {
         // Create a channel for EUKulele either with a named database or not. The latter means a user-provided database in a directory.
         if ( params.eukulele_db ) {
             Channel
-                .fromList ( params.eukulele_db.split(',') )
+                .of ( params.eukulele_db )
                 .map { [ it, file(params.eukulele_dbpath) ] }
                 .set { ch_eukulele_db }
         } else {
