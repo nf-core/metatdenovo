@@ -99,6 +99,10 @@ include { PROKKA_SUBSETS    } from '../subworkflows/local/prokka_subsets'
 include { FASTQC_TRIMGALORE } from '../subworkflows/local/fastqc_trimgalore'
 include { PRODIGAL          } from '../subworkflows/local/prodigal'
 include { KOFAMSCAN         } from '../subworkflows/local/kofamscan'
+include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_rnaseq_pipeline'
+include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_rnaseq_pipeline'
+include { getGenomeAttribute      } from './subworkflows/local/utils_nfcore_rnaseq_pipeline'
+include { checkMaxContigSize      } from './subworkflows/local/utils_nfcore_rnaseq_pipeline'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
