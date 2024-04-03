@@ -27,17 +27,12 @@
                     },
                     "cat/cat": {
                         "branch": "master",
-                        "git_sha": "81f27e75847087865299cc46605deb3b09b4e0a2",
+                        "git_sha": "9437e6053dccf4aafa022bfd6e7e9de67e625af8",
                         "installed_by": ["modules"]
                     },
                     "cat/fastq": {
                         "branch": "master",
-                        "git_sha": "02fd5bd7275abad27aad32d5c852e0a9b1b98882",
-                        "installed_by": ["modules"]
-                    },
-                    "custom/dumpsoftwareversions": {
-                        "branch": "master",
-                        "git_sha": "8ec825f465b9c17f9d83000022995b4f7de6fe93",
+                        "git_sha": "0997b47c93c06b49aa7b3fefda87e728312cf2ca",
                         "installed_by": ["modules"]
                     },
                     "fastqc": {
@@ -47,12 +42,12 @@
                     },
                     "hmmer/hmmsearch": {
                         "branch": "master",
-                        "git_sha": "3f5420aa22e00bd030a2556dfdffc9e164ec0ec5",
+                        "git_sha": "b046a286c8240ebe3412ddf8ae901d47008d1ca7",
                         "installed_by": ["modules"]
                     },
                     "multiqc": {
                         "branch": "master",
-                        "git_sha": "9e71d8519dfbfc328c078bba14d4bd4c99e39a94",
+                        "git_sha": "b7ebe95761cd389603f9cc0e0dc384c0f663815a",
                         "installed_by": ["modules"]
                     },
                     "pigz/compress": {
@@ -62,7 +57,7 @@
                     },
                     "prodigal": {
                         "branch": "master",
-                        "git_sha": "3f5420aa22e00bd030a2556dfdffc9e164ec0ec5",
+                        "git_sha": "2a196d6bfea8b6b5f49fc1885e39fae5f50bc2a0",
                         "installed_by": ["modules"]
                     },
                     "prokka": {
@@ -87,7 +82,7 @@
                     },
                     "samtools/sort": {
                         "branch": "master",
-                        "git_sha": "f4596fe0bdc096cf53ec4497e83defdb3a94ff62",
+                        "git_sha": "4352dbdb09ec40db71e9b172b97a01dcf5622c26",
                         "installed_by": ["bam_sort_stats_samtools"]
                     },
                     "samtools/stats": {
@@ -97,12 +92,12 @@
                     },
                     "seqtk/mergepe": {
                         "branch": "master",
-                        "git_sha": "3f5420aa22e00bd030a2556dfdffc9e164ec0ec5",
+                        "git_sha": "7f88aae93c69586c0789322b77743ee0ef469502",
                         "installed_by": ["modules"]
                     },
                     "seqtk/seq": {
                         "branch": "master",
-                        "git_sha": "3f5420aa22e00bd030a2556dfdffc9e164ec0ec5",
+                        "git_sha": "7f88aae93c69586c0789322b77743ee0ef469502",
                         "installed_by": ["modules"]
                     },
                     "spades": {
@@ -112,27 +107,32 @@
                     },
                     "subread/featurecounts": {
                         "branch": "master",
-                        "git_sha": "f6bba1a67cdbb605f24d7a4e8dd383b0eec45b52",
+                        "git_sha": "e5265c217dcfbff7731c40623aaf07538fdd3e1c",
                         "installed_by": ["modules"]
                     },
                     "trimgalore": {
                         "branch": "master",
-                        "git_sha": "2e6c468e0ad43b23df71d7a7f130d5c0e0aa89e3",
+                        "git_sha": "a98418419ae6c9df3cf6cf108d1e1aba71037d5a",
                         "installed_by": ["modules"]
                     }
                 }
             },
             "subworkflows": {
                 "nf-core": {
-                    "bam_sort_stats_samtools": {
+                    "utils_nextflow_pipeline": {
                         "branch": "master",
-                        "git_sha": "f4596fe0bdc096cf53ec4497e83defdb3a94ff62",
+                        "git_sha": "5caf7640a9ef1d18d765d55339be751bb0969dfa",
                         "installed_by": ["subworkflows"]
                     },
-                    "bam_stats_samtools": {
+                    "utils_nfcore_pipeline": {
                         "branch": "master",
-                        "git_sha": "f4596fe0bdc096cf53ec4497e83defdb3a94ff62",
-                        "installed_by": ["bam_sort_stats_samtools"]
+                        "git_sha": "5caf7640a9ef1d18d765d55339be751bb0969dfa",
+                        "installed_by": ["subworkflows"]
+                    },
+                    "utils_nfvalidation_plugin": {
+                        "branch": "master",
+                        "git_sha": "5caf7640a9ef1d18d765d55339be751bb0969dfa",
+                        "installed_by": ["subworkflows"]
                     }
                 }
             }
