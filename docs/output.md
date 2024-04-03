@@ -20,7 +20,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and the results
     - [BBnorm](#bbnorm) - Normalize the reads in the samples to use less resources for assembly (optional)
   - [Assembly step](#assembly-step) - Generate contigs with an assembler program
     - [Megahit](#megahit) - Output from Megahit assembly (default)
-    - [RNASpades](#rnaspades) - Output from Spades assembly (optional)
+    - [Spades](#spades) - Output from Spades assembly (optional)
   - [ORF Caller step](#orf-caller-step) - Identify protein-coding genes (ORFs) with an ORF caller
     - [Prodigal](#prodigal) - Output from Prodigal (default)
     - [Prokka](#prokka) - Output from Prokka (optional)
@@ -126,17 +126,17 @@ BBnorm is a BBmap tool.
 
 </details>
 
-#### RNASpades
+#### Spades
 
-Optionally, you can use [RNASpades](https://cab.spbu.ru/software/rnaspades/) to assemble reads into contigs.
+Optionally, you can use [Spades](https://github.com/ablab/spades) to assemble reads into contigs.
 
 <details markdown="1">
 <summary>Output files</summary>
 
-- `rnaspades/`
-  - `rnaspades.assembly.gfa.gz`: gfa file output from rnaspades
-  - `rnaspades.spades.log`: log file output from rnaspades run
-  - `rnaspades.transcripts.fa.gz`: reference genome created by RNASpades
+- `spades/`
+  - `spades.assembly.gfa.gz`: gfa file output from spades
+  - `spades.spades.log`: log file output from spades run
+  - `spades.transcripts.fa.gz`: reference genome created by Spades
 
 </details>
 

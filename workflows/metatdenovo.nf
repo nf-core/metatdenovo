@@ -82,6 +82,7 @@ include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz'
 include { UNPIGZ as UNPIGZ_GFF             } from '../modules/local/unpigz'
 include { MERGE_TABLES                     } from '../modules/local/merge_summary_tables'
 include { TRANSRATE                        } from '../modules/local/transrate'
+include { TRANSDECODER                     } from '../modules/local/transdecoder'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -95,7 +96,6 @@ include { EGGNOG            } from '../subworkflows/local/eggnog'
 include { SUB_EUKULELE      } from '../subworkflows/local/eukulele'
 include { HMMCLASSIFY       } from '../subworkflows/local/hmmclassify'
 include { PROKKA_SUBSETS    } from '../subworkflows/local/prokka_subsets'
-include { TRANSDECODER      } from '../subworkflows/local/transdecoder'
 include { FASTQC_TRIMGALORE } from '../subworkflows/local/fastqc_trimgalore'
 include { PRODIGAL          } from '../subworkflows/local/prodigal'
 include { KOFAMSCAN         } from '../subworkflows/local/kofamscan'
@@ -265,7 +265,7 @@ workflow METATDENOVO {
     }
 
     //
-    // MODULE: Run Megahit or RNAspades on all interleaved fastq files
+    // MODULE: Run Megahit or Spades on all interleaved fastq files
     //
     if ( params.assembly ) {
         // If the input assembly is not gzipped, do that since all downstream calls assume this
@@ -277,7 +277,7 @@ workflow METATDENOVO {
                 .value ( [ [ id: 'user_assembly' ], file(params.assembly) ] )
                 .set { ch_assembly_contigs }
         }
-    } else if ( assembler == 'rnaspades' ) {
+    } else if ( assembler == 'spades' ) {
         // 1. Write a yaml file for Spades
         WRITESPADESYAML (
             ch_pe_reads_to_assembly.toList(),
@@ -288,16 +288,21 @@ workflow METATDENOVO {
         ch_pe_reads_to_assembly
             .mix(ch_se_reads_to_assembly)
             .collect()
-            .map { [ [ id:'rnaspades' ], it, [], [] ] }
+            .map { [ [ id:'spades' ], it, [], [] ] }
             .set { ch_spades }
         SPADES (
             ch_spades,
             WRITESPADESYAML.out.yaml,
             []
         )
-        ch_assembly = SPADES.out.transcripts
+
+        SPADES.out.transcripts
+            .ifEmpty{ [] }
+            .combine(SPADES.out.contigs.ifEmpty{ [] } )
+            .set { ch_assembly }
         ch_versions = ch_versions.mix(SPADES.out.versions)
-        FORMATSPADES( ch_assembly )
+
+        FORMATSPADES( ch_assembly.first() )
         ch_assembly_contigs = FORMATSPADES.out.assembly
         ch_versions    = ch_versions.mix(FORMATSPADES.out.versions)
     } else if ( assembler == 'megahit' ) {
