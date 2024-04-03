@@ -5,7 +5,7 @@ process TRANSDECODER {
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
     'https://depot.galaxyproject.org/singularity/transdecoder:5.5.0--pl5262hdfd78af_4' :
-    'quay.io/comp-bio-aging/transdecoder:5.5.0--pl5262hdfd78af_4' }"
+    'quay.io/comp-bio-aging/transdecoder' }"
 
     input:
     tuple val(meta), path(fasta)
