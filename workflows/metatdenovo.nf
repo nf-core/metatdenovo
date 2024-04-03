@@ -121,6 +121,7 @@ include { CAT_FASTQ            	                     } from '../modules/nf-core/
 include { FASTQC                                     } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                                    } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS                } from '../modules/nf-core/custom/dumpsoftwareversions/main'
+include { PIGZ_COMPRESS as PIGZ_ASSEMBLY             } from '../modules/nf-core/pigz/compress/main'
 
 //
 // SUBWORKFLOWS: Installed directly from nf-core/modules
@@ -267,9 +268,15 @@ workflow METATDENOVO {
     // MODULE: Run Megahit or RNAspades on all interleaved fastq files
     //
     if ( params.assembly ) {
-        Channel
-            .value ( [ [ id: 'user_assembly' ], file(params.assembly) ] )
-            .set { ch_assembly_contigs }
+        // If the input assembly is not gzipped, do that since all downstream calls assume this
+        if ( ! params.assembly.endsWith('.gz') ) {
+            PIGZ_ASSEMBLY(Channel.fromPath(params.assembly).map { [ [ id:params.assembly ], it ] } )
+            PIGZ_ASSEMBLY.out.archive.first().set { ch_assembly_contigs }
+        } else {
+            Channel
+                .value ( [ [ id: 'user_assembly' ], file(params.assembly) ] )
+                .set { ch_assembly_contigs }
+        }
     } else if ( assembler == 'rnaspades' ) {
         // 1. Write a yaml file for Spades
         WRITESPADESYAML (
@@ -303,7 +310,9 @@ workflow METATDENOVO {
             .map { [ [ id: 'megahit' ], it ] }
             .set { ch_assembly_contigs }
         ch_versions = ch_versions.mix(MEGAHIT_INTERLEAVED.out.versions)
-    } else { error 'Assembler not specified!' }
+    } else { 
+        error 'Assembler not specified!' 
+    }
 
     // If the user asked for length filtering, perform that with SEQTK_SEQ (the actual length parameter is used in modules.config)
     if ( params.min_contig_length > 0 ) {
@@ -469,11 +478,11 @@ workflow METATDENOVO {
     // SUBWORKFLOW: Eukulele
     //
     ch_eukulele_db = Channel.empty()
-    if( !params.skip_eukulele){
+    if( ! params.skip_eukulele ) {
         // Create a channel for EUKulele either with a named database or not. The latter means a user-provided database in a directory.
         if ( params.eukulele_db ) {
             Channel
-                .fromList ( params.eukulele_db.split(',') )
+                .of ( params.eukulele_db )
                 .map { [ it, file(params.eukulele_dbpath) ] }
                 .set { ch_eukulele_db }
         } else {

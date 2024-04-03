@@ -55,6 +55,11 @@
                         "git_sha": "9e71d8519dfbfc328c078bba14d4bd4c99e39a94",
                         "installed_by": ["modules"]
                     },
+                    "pigz/compress": {
+                        "branch": "master",
+                        "git_sha": "0eab94fc1e48703c1b0a8704bd665f554905c39d",
+                        "installed_by": ["modules"]
+                    },
                     "prodigal": {
                         "branch": "master",
                         "git_sha": "3f5420aa22e00bd030a2556dfdffc9e164ec0ec5",
