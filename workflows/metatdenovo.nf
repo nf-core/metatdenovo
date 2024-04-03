@@ -91,7 +91,6 @@ include { SEQTK_SEQ as SEQTK_SEQ_CONTIG_FILTER       } from '../modules/nf-core/
 include { CAT_FASTQ            	                     } from '../modules/nf-core/cat/fastq/main'
 include { FASTQC                                     } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                                    } from '../modules/nf-core/multiqc/main'
-include { CUSTOM_DUMPSOFTWAREVERSIONS                } from '../modules/nf-core/custom/dumpsoftwareversions/main'
 
 //
 // SUBWORKFLOWS: Installed directly from nf-core/modules
@@ -508,7 +507,7 @@ workflow METATDENOVO {
     // Collate and save software versions
     //
     softwareVersionsToYAML(ch_versions)
-        .collectFile(storeDir: "${params.outdir}/pipeline_info", name: 'nf_core_rnaseq_software_mqc_versions.yml', sort: true, newLine: true)
+        .collectFile(storeDir: "${params.outdir}/pipeline_info", name: 'nf_core_metatdenovo_software_mqc_versions.yml', sort: true, newLine: true)
         .set { ch_collated_versions }
 
     //

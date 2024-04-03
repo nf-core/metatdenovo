@@ -1,7 +1,6 @@
 //
-// Subworkflow with functionality specific to the nf-core/rnaseq pipeline
+// Subworkflow with functionality specific to the nf-core/metatdenovo pipeline
 //
-
 import groovy.json.JsonSlurper
 
 /*
@@ -12,6 +11,7 @@ import groovy.json.JsonSlurper
 
 include { UTILS_NFVALIDATION_PLUGIN } from '../../nf-core/utils_nfvalidation_plugin'
 include { paramsSummaryMap          } from 'plugin/nf-validation'
+include { fromSamplesheet           } from 'plugin/nf-validation'
 include { UTILS_NEXTFLOW_PIPELINE   } from '../../nf-core/utils_nextflow_pipeline'
 include { completionEmail           } from '../../nf-core/utils_nfcore_pipeline'
 include { completionSummary         } from '../../nf-core/utils_nfcore_pipeline'
@@ -39,6 +39,8 @@ workflow PIPELINE_INITIALISATION {
 
     main:
 
+    ch_versions = Channel.empty()
+
     //
     // Print version and exit if required and dump pipeline parameters to JSON file
     //
@@ -54,7 +56,8 @@ workflow PIPELINE_INITIALISATION {
     //
     pre_help_text = nfCoreLogo(monochrome_logs)
     post_help_text = '\n' + workflowCitation() + '\n' + dashedLine(monochrome_logs)
-    def String workflow_command = "nextflow run ${workflow.manifest.name} -profile <docker/singularity/.../institute> --input samplesheet.csv --genome GRCh37 --outdir <OUTDIR>"
+    def String workflow_command = "nextflow run ${workflow.manifest.name} -profile <docker/singularity/.../institute> --input samplesheet.csv --outdir <OUTDIR>"
+
     UTILS_NFVALIDATION_PLUGIN (
         help,
         workflow_command,
@@ -112,6 +115,7 @@ workflow PIPELINE_COMPLETION {
     workflow.onError {
         log.error "Pipeline failed. Please refer to troubleshooting docs: https://nf-co.re/docs/usage/troubleshooting"
     }
+
 }
 
 /*
