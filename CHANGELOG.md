@@ -3,11 +3,11 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v1.1.0 - [2024-04-09]
+## v1.1.0dev - [date]
 
 ### `Added`
 
-- [#280](<[https://github.com/nf-core/metatdenovo/issues/280](https://github.com/nf-core/metatdenovo/issues/280)>) - Added minid option to bbmap_align module
+- [#280](<[https://github.com/nf-core/metatdenovo/issues/280](https://github.com/nf-core/metatdenovo/issues/280)>) - Added minid option to bbmap_align module: now the threshold for assing a read is an identity 90%. the previous version of nf-core/metatdenovo was a default of 76%. The user will be always able to change this parameter
 - [#271](<[https://github.com/nf-core/metatdenovo/issues/271](https://github.com/nf-core/metatdenovo/issues/271)>) - Added flavor to SPADES modules
 
 ### `Changed`
