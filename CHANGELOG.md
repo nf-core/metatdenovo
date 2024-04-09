@@ -3,10 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v1.1.0 - [date]
+## v1.1.0 - [2024-04-09]
 
 ### `Added`
-
+- [#280](<[https://github.com/nf-core/metatdenovo/issues/280](https://github.com/nf-core/metatdenovo/issues/280)>) - Added minid option to bbmap_align module
 - [#271](<[https://github.com/nf-core/metatdenovo/issues/271](https://github.com/nf-core/metatdenovo/issues/271)>) - Added flavor to SPADES modules
 
 ### `Changed`
