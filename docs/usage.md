@@ -173,7 +173,7 @@ A more targeted annotation option offered by the workflow is the possibility for
 Each HMM file will be used to search the amino acid sequences of the ORF set and the results will be summarized in a tab separated file in which each
 ORF-HMM combination will be ranked according to score and E-value.
 
-#### How to download manually the databases for functional annotation
+#### How to manually download the databases for functional annotation
 
 There are some cases (e.g. offline run) where you prefer to download the databases before running the pipeline. Currently, `eggnog-mapper` and `kofamscan` use databases that can be downloaded.
 
