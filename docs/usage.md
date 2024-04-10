@@ -182,6 +182,7 @@ There are some cases (e.g. offline run) where you prefer to download the databas
 For `eggnog-mapper` the easiest way is to use `download_eggnog_data.py` provided when you install locally eggnog-mapper (documentation [here](https://github.com/eggnogdb/eggnog-mapper/wiki/eggNOG-mapper-v2.1.5-to-v2.1.12#user-content-Installation)).
 
 First, install eggnog-mapper:
+
 ```bash
 conda install -c bioconda -c conda-forge eggnog-mapper
 ```
