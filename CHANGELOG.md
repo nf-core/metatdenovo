@@ -12,7 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Changed`
 
-- [#268](<[https://github.com/nf-core/ampliseq/pull/681](https://github.com/nf-core/metatdenovo/pull/268)>) - Don't save so many intermediate Megahit files by default
+- [#283](<[https://github.com/nf-core/metatdenovo/pull/283](https://github.com/nf-core/metatdenovo/pull/283)>) - Updated documentation about download databases manually
+- [#268](<[https://github.com/nf-core/metatdenovo/pull/268](https://github.com/nf-core/metatdenovo/pull/268)>) - Don't save so many intermediate Megahit files by default
 
 ### `Fixed`
 

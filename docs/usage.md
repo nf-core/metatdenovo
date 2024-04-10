@@ -6,9 +6,9 @@
 
 ## Introduction
 
-Metatdenovo is a workflow primarily designed for annotation of metatranscriptomes for which reference genomes are not available.
+Metatdenovo is a workflow primarily designed for annotation of metatranscriptomes and metagenomics for which reference genomes are not available.
 The approach is to first create an assembly, then call genes and finally quantify and annotate the genes.
-Since the workflow includes gene callers and annotation tools and databases both for prokaryotes and eukaryotes, the workflow should be suitable for both
+Since the workflow includes gene callers and annotation tools and databases for prokaryotes, eukaryotes and viruses, the workflow should be suitable for all
 organism groups and mixed communities can be handled by trying different gene callers and comparing the results.
 
 While the rationale for writing the workflow was metatranscriptomes, there is nothing in the workflow that precludes use for single organisms rather than
@@ -146,7 +146,7 @@ cd eukulele
 EUKulele download --database mmetsp (you can use the name of the database you would like to download)
 ```
 
-- Fix the problematic database tables:
+- There are some cases when even after the download, EUKulele doesn't produce the correct files. In these cases you will end up with the `reference.pep.fa`file only. To fix the problematic database tables follow this instruction (this example is made with mmetsp but you can check EUKulele documentation for other databases since it can be slightly different!):
 
 ```bash
 mkdir mmetsp
@@ -158,18 +158,6 @@ create_protein_table.py --infile_peptide reference.pep.fa \
     --output tax-table.txt --delim "/" --col_source_id Source_ID \
     --taxonomy_col_id taxonomy --column SOURCE_ID
 ```
-
-> :warning:
-
-<!-- I commented out the CAT documentation as we're not certain that we want to support this. -->
-<!-- An alternative to EUKulele is the CAT program. In contrast to EUKulele that annotates open reading frames (ORFs), CAT annotates the contigs from the assembly.
-
-CAT is uses Prodigal to call ORFs and DIAMOND for the alignment to a reference database. Subsequently, DIAMOND hits for individual ORFs are translated by CAT into contig annotations.
-
-The database can be generated with the option `--cat_db_generate` or you can provide a prepared database that you downloaded from [CAT website](https://tbb.bio.uu.nl/bastiaan/CAT_prepare/).
-Check the also the [options]() documentation to learn how to configure CATproperly.
-
-> Please, check the `CAT` documentation for more information about the database cited [HERE](https://github.com/dutilh/CAT) -->
 
 ### Functional annotation options
 
@@ -184,6 +172,40 @@ A more targeted annotation option offered by the workflow is the possibility for
 [HMMER HMM profiles](http://eddylab.org/software/hmmer/Userguide.pdf) through the `--hmmdir dir` or `hmmfiles file0.hmm,file1.hmm,...,filen.hmm` parameters.
 Each HMM file will be used to search the amino acid sequences of the ORF set and the results will be summarized in a tab separated file in which each
 ORF-HMM combination will be ranked according to score and E-value.
+
+#### How to manually download the databases for functional annotation
+
+There are some cases (e.g. offline run) where you prefer to download the databases before running the pipeline. Currently, `eggnog-mapper` and `kofamscan` use databases that can be downloaded.
+
+##### Eggnog databases
+
+For `eggnog-mapper` the easiest way is to use `download_eggnog_data.py` provided when you install locally eggnog-mapper (documentation [here](https://github.com/eggnogdb/eggnog-mapper/wiki/eggNOG-mapper-v2.1.5-to-v2.1.12#user-content-Installation)).
+
+First, install eggnog-mapper:
+
+```bash
+conda install -c bioconda -c conda-forge eggnog-mapper
+```
+
+Then, you can download all databases available
+
+```bash
+ download_eggnog_data.py
+```
+
+You can select which database you want to download (read eggnog-mapper docs) but you need to be sure you will store them in a directory that will be called with the option `--eggnog_dbpath`
+
+##### Kofamscan databases
+
+No need installation. You can use `wget` to download the file in a new directory that will be used with `--kofamscan_dbpath`
+
+```bash
+wget https://www.genome.jp/ftp/db/kofam/ko_list.gz
+gunzip ko_list.gz
+
+wget https://www.genome.jp/ftp/db/kofam/profiles.tar.gz
+tar -zxf profiles.tar.gz
+```
 
 ## Example pipeline command with some common features
 
