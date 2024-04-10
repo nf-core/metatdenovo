@@ -212,6 +212,13 @@
                 "save_samtools": {
                     "type": "boolean",
                     "description": "Save the output from samtools"
+                },
+                "bbmap_minid": {
+                    "type": "number",
+                    "default": 0.9,
+                    "fa_icon": "fas fa-address-card",
+                    "description": "Minimum identity needed to assign read to a contig",
+                    "help_text": ""
                 }
             },
             "fa_icon": "fas fa-filter"
