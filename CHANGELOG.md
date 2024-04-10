@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Added`
 
-- [#280](<[https://github.com/nf-core/metatdenovo/issues/280](https://github.com/nf-core/metatdenovo/issues/280)>) - Added minid option to bbmap_align module: now the threshold for assing a read is an identity 90%. the previous version of nf-core/metatdenovo was a default of 76%. The user will be always able to change this parameter
+- [#280](<[https://github.com/nf-core/metatdenovo/issues/280](https://github.com/nf-core/metatdenovo/issues/280)>) - Added minid option to bbmap_align module. Now the threshold for mapping a read to a contig is an identity of 0.9. The previous version of nf-core/metatdenovo used the default for BBMap, 0.76. This version might hence give slightly different results than the previous.
 - [#271](<[https://github.com/nf-core/metatdenovo/issues/271](https://github.com/nf-core/metatdenovo/issues/271)>) - Added flavor to SPADES modules
 
 ### `Changed`
