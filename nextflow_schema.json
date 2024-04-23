@@ -193,7 +193,13 @@
                     "default": "rna",
                     "enum": ["rna", "isolate", "sc", "meta", "plasmid", "metaplasmid", "metaviral", "rnaviral"],
                     "description": "Select which type of assembly you want to make. Default: rna",
-                    "help_text": "This option allows you to run an assembly for a different scope. For instance, with '--spades_flavor rna' you will get an assembly for prokaryotic metatrancriptomes, `--spades_flavor rnaviral' for viral metatranscriptomes or `--spades_flavor metaviral` for viral metagenomes. The argument to the parameter will be passed as a parameter to Spades; e.g. `--spades_flavor rna` will be passed as `--rna` to Spades."
+                    "help_text": "This option allows you to run an assembly for a different scope. For instance, with '--spades_flavor rna' you will get an assembly for prokaryotic metatrancriptomes, `--spades_flavor rnaviral' for viral metatranscriptomes or `--spades_flavor metaviral` for viral metagenomes. The argument to the parameter will be passed as a parameter to Spades; e.g. `--spades_flavor rna` will be passed as `--rna` to Spades.",
+                    "fa_icon": "fas fa-pepper-hot"
+                },
+                "save_formatspades": {
+                    "type": "boolean",
+                    "description": "Save the formatted spades fasta file",
+                    "fa_icon": "fas fa-download"
                 }
             },
             "fa_icon": "fas fa-bezier-curve"
@@ -211,14 +217,14 @@
                 },
                 "save_samtools": {
                     "type": "boolean",
-                    "description": "Save the output from samtools"
+                    "description": "Save the output from samtools",
+                    "fa_icon": "fas fa-download"
                 },
                 "bbmap_minid": {
                     "type": "number",
                     "default": 0.9,
                     "fa_icon": "fas fa-address-card",
-                    "description": "Minimum identity needed to assign read to a contig",
-                    "help_text": ""
+                    "description": "Minimum identity needed to assign read to a contig"
                 }
             },
             "fa_icon": "fas fa-filter"
@@ -257,7 +263,8 @@
                     "default": "10 MB",
                     "pattern": "^\\d+(\\.\\d+)?\\.?\\s*(K|M|G|T)?B$",
                     "hidden": true,
-                    "help_text": "Prokka usually fails on very large input files. This parameter controls the size of smaller batches for which Prokka will be called. Should be a string in the format integer-unit e.g. `--prokka_batchsize '8.MB'`"
+                    "help_text": "Prokka usually fails on very large input files. This parameter controls the size of smaller batches for which Prokka will be called. Should be a string in the format integer-unit e.g. `--prokka_batchsize '8.MB'`",
+                    "fa_icon": "fas fa-expand-alt"
                 }
             },
             "fa_icon": "fas fa-phone-volume"
