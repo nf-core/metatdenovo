@@ -12,3 +12,6 @@ eggnog
 kofam
 kofamscan
 eukulele
+.nf-test.log
+nf-test
+.nf-test*
