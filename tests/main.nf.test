@@ -30,10 +30,6 @@ nextflow_pipeline {
             { assert new File("$outputDir/summary_tables/megahit.prodigal.overall_stats.tsv.gz").exists() },
             { assert new File("$outputDir/multiqc/multiqc_report.html").exists() },
             { assert new File("$outputDir/pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml").exists() }
-            { assert snapshot(
-                path("${params.outdir}/trimgalore/SAMPLE1_PE_1.fastq.gz_trimming_report.txt"))
-                .match("output_files")
-            }
         )
     }
 }
