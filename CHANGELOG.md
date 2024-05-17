@@ -16,6 +16,7 @@ Initial release of nf-core/metatdenovo, created with the [nf-core](https://nf-co
 
 ### `Changed`
 
+- [#290](<[https://github.com/nf-core/metatdenovo/pull/290](https://github.com/nf-core/metatdenovo/pull/290)>) - Template update to v2.14.1
 - [#283](<[https://github.com/nf-core/metatdenovo/pull/283](https://github.com/nf-core/metatdenovo/pull/283)>) - Updated documentation about download databases manually
 - [#268](<[https://github.com/nf-core/metatdenovo/pull/268](https://github.com/nf-core/metatdenovo/pull/268)>) - Don't save so many intermediate Megahit files by default
 
