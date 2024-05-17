@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v1.1.0dev - [date]
 
+Initial release of nf-core/metatdenovo, created with the [nf-core](https://nf-co.re/) template.
+
 ### `Added`
 
 - [#286](<[https://github.com/nf-core/metatdenovo/pull/286](https://github.com/nf-core/metatdenovo/pull/286)>) added an option to save the fasta file output from formatspades.nf module
