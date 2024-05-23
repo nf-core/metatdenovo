@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v1.1.0dev - [date]
 
+Initial release of nf-core/metatdenovo, created with the [nf-core](https://nf-co.re/) template.
+
 ### `Added`
 
 - [#286](<[https://github.com/nf-core/metatdenovo/pull/286](https://github.com/nf-core/metatdenovo/pull/286)>) added an option to save the fasta file output from formatspades.nf module
@@ -14,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Changed`
 
+- [#290](<[https://github.com/nf-core/metatdenovo/pull/290](https://github.com/nf-core/metatdenovo/pull/290)>) - Template update to v2.14.1
 - [#283](<[https://github.com/nf-core/metatdenovo/pull/283](https://github.com/nf-core/metatdenovo/pull/283)>) - Updated documentation about download databases manually
 - [#268](<[https://github.com/nf-core/metatdenovo/pull/268](https://github.com/nf-core/metatdenovo/pull/268)>) - Don't save so many intermediate Megahit files by default
 
