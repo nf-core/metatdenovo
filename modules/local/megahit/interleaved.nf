@@ -33,6 +33,7 @@ process MEGAHIT_INTERLEAVED {
         $pair_ends \\
         ${single_ends} \\
         -t $task.cpus \\
+        -m ${task.memory.toBytes()} \\
         $args \\
         --out-prefix $assembly
 
