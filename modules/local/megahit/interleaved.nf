@@ -33,13 +33,13 @@ process MEGAHIT_INTERLEAVED {
         $pair_ends \\
         ${single_ends} \\
         -t $task.cpus \\
+        -m ${task.memory.toBytes()} \\
         $args \\
         --out-prefix $assembly
 
     pigz \\
         --no-name \\
         -p $task.cpus \\
-        -m ${task.memory.toBytes()} \\
         $args2 \\
         megahit_out/*.fa \\
         megahit_out/intermediate_contigs/*.fa
