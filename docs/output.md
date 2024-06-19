@@ -52,7 +52,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and the results
 
 #### Trim galore!
 
-[Trimgalore](https://github.com/FelixKrueger/TrimGalore) is trimming primer sequences from sequencing reads. Primer sequences are non-biological sequences that often introduce point mutations that do not reflect sample sequences. This is especially true for degenerated PCR primers. If primer trimming would be omitted, artifactual amplicon sequence variants might be computed by the denoising tool or sequences might be lost due to become labelled as PCR chimera.
+[Trimgalore](https://github.com/FelixKrueger/TrimGalore) is a fastq preprocessor for read/adapter trimming and quality control. It is used in this pipeline for trimming adapter sequences and discard low-quality reads. Its output is in the results folder and part of the MultiQC report.
 
 <details markdown="1">
 <summary>Output files</summary>
