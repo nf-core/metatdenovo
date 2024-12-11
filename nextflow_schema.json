@@ -1,5 +1,5 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema",
+    "$schema": "https://json-schema.org/draft-07/schema",
     "$id": "https://raw.githubusercontent.com/nf-core/metatdenovo/master/nextflow_schema.json",
     "title": "nf-core/metatdenovo pipeline parameters",
     "description": "Assembly and annotation of metatranscriptomic data, both prokaryotic and eukaryotic",
