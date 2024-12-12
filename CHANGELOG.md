@@ -24,7 +24,7 @@ Initial release of nf-core/metatdenovo, created with the [nf-core](https://nf-co
 
 ### `Fixed`
 
-- [#304](<[https://github.com/nf-core/ampliseq/pull/681](https://github.com/nf-core/metatdenovo/pull/304)>) - Make EUKulele counts output optional as it's not always created
+- [#305](<[https://github.com/nf-core/ampliseq/pull/681](https://github.com/nf-core/metatdenovo/pull/305)>) - Make EUKulele counts output optional as it's not always created
 - [#269](<[https://github.com/nf-core/ampliseq/pull/681](https://github.com/nf-core/metatdenovo/pull/269)>) - Make Transdecoder work better with `-resume`
 
 ### `Dependencies`
