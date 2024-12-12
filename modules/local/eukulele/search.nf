@@ -38,7 +38,7 @@ process EUKULELE_SEARCH {
         contigs || rc=\$?
 
     gzip ${prefix}/mets_full/diamond/*.out
-    find ${prefix}/taxonomy_counts/ -name "*.csv" | xargs gzip
+    find ${prefix}/ -name "*.csv" | xargs gzip
     gzip ${prefix}/taxonomy_estimation/*.out
 
     cat <<-END_VERSIONS > versions.yml
