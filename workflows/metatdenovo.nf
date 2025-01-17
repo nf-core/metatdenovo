@@ -156,7 +156,7 @@ workflow METATDENOVO {
     .mix(ch_fastq.single)
     .set { ch_cat_fastq }
 
-    // ch_versions = ch_versions.mix(CAT_FASTQ.out.versions.first())
+    ch_versions = ch_versions.mix(CAT_FASTQ.out.versions.first())
 
     //
     // SUBWORKFLOW: Read QC and trim adapters
