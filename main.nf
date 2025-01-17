@@ -1,4 +1,3 @@
-#!/usr/bin/env nextflow
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     nf-core/metatdenovo
@@ -9,7 +8,16 @@
 ----------------------------------------------------------------------------------------
 */
 
-nextflow.enable.dsl = 2
+/*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    IMPORT FUNCTIONS / MODULES / SUBWORKFLOWS / WORKFLOWS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*/
+
+include { METATDENOVO  } from './workflows/metatdenovo'
+include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_metatdenovo_pipeline'
+include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_metatdenovo_pipeline'
+include { getGenomeAttribute      } from './subworkflows/local/utils_nfcore_metatdenovo_pipeline'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -17,10 +25,10 @@ nextflow.enable.dsl = 2
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { METATDENOVO             } from './workflows/metatdenovo'
-include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_metatdenovo_pipeline'
-include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_metatdenovo_pipeline'
-
+// TODO nf-core: Remove this line if you don't need a FASTA file
+//   This is an example of how to use getGenomeAttribute() to fetch parameters
+//   from igenomes.config using `--genome`
+params.fasta = getGenomeAttribute('fasta')
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -32,24 +40,20 @@ include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_meta
 //
 workflow NFCORE_METATDENOVO {
 
+    take:
+    samplesheet // channel: samplesheet read in from --input
+
     main:
 
-    ch_versions = Channel.empty()
-
     //
-    // WORKFLOW: Run nf-core/metatdenovo workflow
+    // WORKFLOW: Run pipeline
     //
-    ch_samplesheet = Channel.value(file(params.input, checkIfExists: true))
     METATDENOVO (
-        ch_samplesheet,
-        ch_versions
+        samplesheet
     )
-
     emit:
     multiqc_report = METATDENOVO.out.multiqc_report // channel: /path/to/multiqc_report.html
-    versions       = ch_versions                    // channel: [version1, version2, ...]
 }
-
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN MAIN WORKFLOW
@@ -59,24 +63,24 @@ workflow NFCORE_METATDENOVO {
 workflow {
 
     main:
-
     //
     // SUBWORKFLOW: Run initialisation tasks
     //
     PIPELINE_INITIALISATION (
         params.version,
-        params.help,
         params.validate_params,
         params.monochrome_logs,
         args,
-        params.outdir
+        params.outdir,
+        params.input
     )
 
     //
     // WORKFLOW: Run main workflow
     //
-    NFCORE_METATDENOVO ()
-
+    NFCORE_METATDENOVO (
+        PIPELINE_INITIALISATION.out.samplesheet
+    )
     //
     // SUBWORKFLOW: Run completion tasks
     //
