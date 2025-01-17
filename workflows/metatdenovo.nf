@@ -102,7 +102,6 @@ include { softwareVersionsToYAML                     } from '../subworkflows/nf-
 include { BAM_SORT_STATS_SAMTOOLS                    } from '../subworkflows/nf-core/bam_sort_stats_samtools/main'
 include { UTILS_NEXTFLOW_PIPELINE                    } from '../subworkflows/nf-core/utils_nextflow_pipeline/main'
 include { UTILS_NFCORE_PIPELINE                      } from '../subworkflows/nf-core/utils_nfcore_pipeline/main'
-include { UTILS_NFVALIDATION_PLUGIN                  } from '../subworkflows/nf-core/utils_nfvalidation_plugin/main'
 include { methodsDescriptionText                     } from '../subworkflows/local/utils_nfcore_metatdenovo_pipeline'
 
 /*
@@ -552,7 +551,7 @@ workflow METATDENOVO {
             name: 'methods_description_mqc.yaml',
             sort: true
         )
-    ) 
+    )
 
     MULTIQC (
         ch_multiqc_files.collect(),
