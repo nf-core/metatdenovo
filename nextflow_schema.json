@@ -200,14 +200,6 @@
                     "type": "boolean",
                     "description": "Save the formatted spades fasta file",
                     "fa_icon": "fas fa-download"
-                },
-                "igenomes_base": {
-                    "type": "string",
-                    "format": "directory-path",
-                    "description": "The base path to the igenomes reference files",
-                    "fa_icon": "fas fa-ban",
-                    "hidden": true,
-                    "default": "s3://ngi-igenomes/igenomes/"
                 }
             },
             "fa_icon": "fas fa-bezier-curve"
@@ -493,7 +485,8 @@
                     "type": "boolean",
                     "description": "Boolean whether to validate parameters against the schema at runtime",
                     "fa_icon": "fas fa-check-square",
-                    "hidden": true
+                    "hidden": true,
+                    "default": true
                 },
                 "pipelines_testdata_base_path": {
                     "type": "string",
@@ -548,5 +541,16 @@
         {
             "$ref": "#/$defs/generic_options"
         }
-    ]
+    ],
+    "properties": {
+        "validationSkipDuplicateCheck": {
+            "type": "boolean"
+        },
+        "validationS3PathCheck": {
+            "type": "boolean"
+        },
+        "fasta": {
+            "type": "string"
+        }
+    }
 }
