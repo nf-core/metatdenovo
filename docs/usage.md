@@ -239,12 +239,19 @@ nextflow run nf-core/metatdenovo -profile docker -params-file params.yaml
 
 with:
 
+<<<<<<< HEAD
 ```yaml
 input: 'samplesheet.csv'
 assembler: 'spades'
 orf_caller: 'prokka'
 eggnog: true
 eukulele_db: 'gtdb'
+=======
+```yaml title="params.yaml"
+input: './samplesheet.csv'
+outdir: './results/'
+genome: 'GRCh37'
+>>>>>>> TEMPLATE
 <...>
 ```
 
