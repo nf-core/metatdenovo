@@ -1,0 +1,12 @@
+nf_core_version: 3.1.2
+repository_type: pipeline
+template:
+  author: Danilo Di Leo, Emelie Nilsson & Daniel Lundin
+  description: Assembly and annotation of metatranscriptomic data, both prokaryotic
+    and eukaryotic
+  force: false
+  is_nfcore: true
+  name: metatdenovo
+  org: nf-core
+  outdir: .
+  version: "1.1"
