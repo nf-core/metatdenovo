@@ -114,9 +114,11 @@ workflow METATDENOVO {
 
     take:
     ch_samplesheet // channel: samplesheet read in from --input
+    ch_diamond_dbs // channel: paths to Diamond taxonomy databases, read from --diamond_dbs
 
     main:
 
+    ch_diamond_dbs.view()
     ch_versions = Channel.empty()
     ch_multiqc_files = Channel.empty()
 

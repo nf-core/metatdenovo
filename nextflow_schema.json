@@ -329,6 +329,17 @@
             "description": "",
             "default": "",
             "properties": {
+                "diamond_dbs": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "schema": "assets/schema_diamond_dbs.json",
+                    "mimetype": "text/csv",
+                    "pattern": "^\\S+\\.csv$",
+                    "description": "Path to comma-separated file containing information about Diamond database files you want to use for taxonomy assignment.",
+                    "help_text": "This has to be a comma-separated file with 2 columns, and a header row: db, dmnd_path.",
+                    "fa_icon": "fas fa-file-csv"
+                },
                 "skip_eukulele": {
                     "type": "boolean",
                     "description": "skip eukulele run",

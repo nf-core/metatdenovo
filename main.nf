@@ -14,21 +14,15 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { METATDENOVO  } from './workflows/metatdenovo'
+include { METATDENOVO             } from './workflows/metatdenovo'
 include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_metatdenovo_pipeline'
 include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_metatdenovo_pipeline'
-include { getGenomeAttribute      } from './subworkflows/local/utils_nfcore_metatdenovo_pipeline'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     IMPORT FUNCTIONS / MODULES / SUBWORKFLOWS / WORKFLOWS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-
-// TODO nf-core: Remove this line if you don't need a FASTA file
-//   This is an example of how to use getGenomeAttribute() to fetch parameters
-//   from igenomes.config using `--genome`
-params.fasta = getGenomeAttribute('fasta')
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -42,6 +36,7 @@ workflow NFCORE_METATDENOVO {
 
     take:
     samplesheet // channel: samplesheet read in from --input
+    diamond_dbs // channel: paths to Diamond taxonomy databases, read from --diamond_dbs
 
     main:
 
@@ -49,7 +44,8 @@ workflow NFCORE_METATDENOVO {
     // WORKFLOW: Run pipeline
     //
     METATDENOVO (
-        samplesheet
+        samplesheet,
+        diamond_dbs
     )
     emit:
     multiqc_report = METATDENOVO.out.multiqc_report // channel: /path/to/multiqc_report.html
@@ -72,15 +68,18 @@ workflow {
         params.monochrome_logs,
         args,
         params.outdir,
-        params.input
+        params.input,
+        params.diamond_dbs
     )
 
     //
     // WORKFLOW: Run main workflow
     //
     NFCORE_METATDENOVO (
-        PIPELINE_INITIALISATION.out.samplesheet
+        PIPELINE_INITIALISATION.out.samplesheet,
+        PIPELINE_INITIALISATION.out.diamond_paths
     )
+
     //
     // SUBWORKFLOW: Run completion tasks
     //
