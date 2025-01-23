@@ -53,6 +53,7 @@ include { MERGE_TABLES                     } from '../modules/local/merge_summar
 include { TRANSRATE                        } from '../modules/local/transrate'
 include { TRANSDECODER                     } from '../modules/local/transdecoder'
 
+include { DIAMOND_BLASTP as DIAMOND_TAXONOMY         } from '../modules/local/diamond/blastp'
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
@@ -80,18 +81,19 @@ include { PIPELINE_COMPLETION     } from '../subworkflows/local/utils_nfcore_met
 //
 // MODULE: Installed directly from nf-core/modules
 //
-include { BBMAP_BBDUK                                } from '../modules/nf-core/bbmap/bbduk/main'
-include { BBMAP_INDEX                                } from '../modules/nf-core/bbmap/index/main'
 include { BBMAP_ALIGN                                } from '../modules/nf-core/bbmap/align/main'
+include { BBMAP_BBDUK                                } from '../modules/nf-core/bbmap/bbduk/main'
 include { BBMAP_BBNORM                               } from '../modules/nf-core/bbmap/bbnorm/main'
-include { SEQTK_MERGEPE                              } from '../modules/nf-core/seqtk/mergepe/main'
-include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS_CDS } from '../modules/nf-core/subread/featurecounts/main'
-include { SPADES                                     } from '../modules/nf-core/spades/main'
-include { SEQTK_SEQ as SEQTK_SEQ_CONTIG_FILTER       } from '../modules/nf-core/seqtk/seq/main'
+include { BBMAP_INDEX                                } from '../modules/nf-core/bbmap/index/main'
 include { CAT_FASTQ            	                     } from '../modules/nf-core/cat/fastq/main'
+//include { DIAMOND_BLASTP as DIAMOND_TAXONOMY         } from '../modules/nf-core/diamond/blastp/main'
 include { FASTQC                                     } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                                    } from '../modules/nf-core/multiqc/main'
 include { PIGZ_COMPRESS as PIGZ_ASSEMBLY             } from '../modules/nf-core/pigz/compress/main'
+include { SEQTK_MERGEPE                              } from '../modules/nf-core/seqtk/mergepe/main'
+include { SEQTK_SEQ as SEQTK_SEQ_CONTIG_FILTER       } from '../modules/nf-core/seqtk/seq/main'
+include { SPADES                                     } from '../modules/nf-core/spades/main'
+include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS_CDS } from '../modules/nf-core/subread/featurecounts/main'
 
 //
 // SUBWORKFLOWS: Installed directly from nf-core/modules
@@ -118,7 +120,6 @@ workflow METATDENOVO {
 
     main:
 
-    ch_diamond_dbs.view()
     ch_versions = Channel.empty()
     ch_multiqc_files = Channel.empty()
 
@@ -494,6 +495,16 @@ workflow METATDENOVO {
             .map { meta, tsv1, tsv2 -> [ meta, tsv1, tsv2, [] ] }
             .set { ch_merge_tables }
     }
+
+    //
+    // Call Diamond for taxonomy with amino acid sequences
+    //
+    DIAMOND_TAXONOMY(
+        ch_protein,
+        ch_diamond_dbs,
+        102,
+        []
+    )
 
     //
     // MODULE: Collect statistics from mapping analysis
