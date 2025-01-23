@@ -239,7 +239,7 @@ nextflow run nf-core/metatdenovo -profile docker -params-file params.yaml
 
 with:
 
-```yaml
+```yaml title="params.yaml"
 input: 'samplesheet.csv'
 assembler: 'spades'
 orf_caller: 'prokka'

@@ -32,7 +32,7 @@
                     },
                     "cat/fastq": {
                         "branch": "master",
-                        "git_sha": "4fc983ad0b30e6e32696fa7d980c76c7bfe1c03e",
+                        "git_sha": "0e9cb409c32d3ec4f0d3804588e4778971c09b7e",
                         "installed_by": ["modules"]
                     },
                     "fastqc": {
