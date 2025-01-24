@@ -16,6 +16,7 @@ Initial release of nf-core/metatdenovo, created with the [nf-core](https://nf-co
 
 ### `Changed`
 
+- [#311](<[https://github.com/nf-core/metatdenovo/pull/311](https://github.com/nf-core/metatdenovo/pull/311)>) - update modules and subworkflows
 - [#295](<[https://github.com/nf-core/metatdenovo/pull/295](https://github.com/nf-core/metatdenovo/pull/295)>) - Update documentation
 - [#292](<[https://github.com/nf-core/metatdenovo/pull/292](https://github.com/nf-core/metatdenovo/pull/292)>) - Specify memory to Megahit process
 - [#290](<[https://github.com/nf-core/metatdenovo/pull/290](https://github.com/nf-core/metatdenovo/pull/290)>) - Template update to v2.14.1
