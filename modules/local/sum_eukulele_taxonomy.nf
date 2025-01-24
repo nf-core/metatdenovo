@@ -1,4 +1,4 @@
-process SUM_TAXONOMY {
+process SUM_EUKULELE_TAXONOMY {
     tag "$meta.id"
     label 'process_low'
 
