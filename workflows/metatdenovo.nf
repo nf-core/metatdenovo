@@ -532,9 +532,9 @@ workflow METATDENOVO {
     PARSE_DIAMOND_TAXONOMY(
         PIGZ_DIAMOND_LINEAGE.out.archive
             .map { it -> [ [ id: it[0].db ], it[0], it[1] ] }
-            .join(ch_diamond_dbs.filter { it -> it[3] })
+            //.join(ch_diamond_dbs.filter { it -> it[3] })
+            .join(ch_diamond_dbs)
             .map { it -> [ [ id: it[1].id - ".lineage" + ".diamond" ], it[2], it[5] ] }
-            .view()
     )
     ch_versions     = ch_versions.mix(PARSE_DIAMOND_TAXONOMY.out.versions)
 

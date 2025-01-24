@@ -20,14 +20,19 @@ process PARSE_DIAMOND_TAXONOMY {
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
-    def rankstring = "c(\"${ranks.tokenize(';').join('\",\"')}\")"
+    
+    // Call separate if we have a list of ranks
+    def sep = ""
+    if ( ranks ) {
+        sep = "separate(taxonomy, c(\"${ranks.tokenize(';').join('\",\"')}\"), remove = FALSE, extra = \"merge\", fill = \"right\", sep = \";\") %>%"
+    }
     """
     #!/usr/bin/env Rscript
 
     library(tidyverse)
 
     read_tsv("${taxfile}", col_names = c("orf", "taxid", "evalue", "taxonomy")) %>%
-        separate(taxonomy, ${rankstring}, remove = FALSE, extra = "merge", fill = "right", sep = ";") %>%
+        ${sep}
         write_tsv("${prefix}.taxonomy.tsv.gz")
 
     writeLines(
