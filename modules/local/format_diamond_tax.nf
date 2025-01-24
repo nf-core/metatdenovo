@@ -20,7 +20,7 @@ process FORMAT_DIAMOND_TAX {
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
-    
+
     // Call separate if we have a list of ranks
     def sep = ""
     if ( ranks ) {
