@@ -26,6 +26,11 @@
                 "exists": true,
                 "pattern": "^\\S+",
                 "errorMessage": "A directory with taxon dump files (names.dmp and nodes.dmp) must be provided."
+            },
+            "ranks": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9;]+$",
+                "errorMessage": "Provide a semicolon-separated list of ranks. Letters, numbers and semicolons only."
             }
         },
         "required": ["db", "dmnd_path", "taxdump_dir"]

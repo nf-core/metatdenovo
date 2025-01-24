@@ -42,16 +42,17 @@ if ( params.hmmdir ) {
 //
 // MODULE: local
 //
-include { WRITESPADESYAML                  } from '../modules/local/writespadesyaml'
-include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved'
 include { COLLECT_FEATURECOUNTS            } from '../modules/local/collect_featurecounts'
 include { COLLECT_STATS                    } from '../modules/local/collect_stats'
 include { FORMATSPADES                     } from '../modules/local/formatspades'
+include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved'
+include { MERGE_TABLES                     } from '../modules/local/merge_summary_tables'
+include { PARSE_DIAMOND_TAXONOMY           } from '../modules/local/parse_diamond_taxonomy'
+include { TRANSDECODER                     } from '../modules/local/transdecoder'
+include { TRANSRATE                        } from '../modules/local/transrate'
 include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz'
 include { UNPIGZ as UNPIGZ_GFF             } from '../modules/local/unpigz'
-include { MERGE_TABLES                     } from '../modules/local/merge_summary_tables'
-include { TRANSRATE                        } from '../modules/local/transrate'
-include { TRANSDECODER                     } from '../modules/local/transdecoder'
+include { WRITESPADESYAML                  } from '../modules/local/writespadesyaml'
 
 include { DIAMOND_BLASTP as DIAMOND_TAXONOMY         } from '../modules/local/diamond/blastp'
 //
@@ -512,14 +513,14 @@ workflow METATDENOVO {
     // Create a unified channel of the output from Diamond together with the diamond db info to
     // make sure the channels are synchronized before calling TAXONKIT_LINEAGE
     ch_taxonkit_lineage = DIAMOND_TAXONOMY.out.tsv
-        .map { it -> [ [ id: it[0].db ], [ id: "${it[0].id}.${it[0].db}.lineage" ], it[1] ] }
-        .merge(ch_diamond_dbs)
+        .map { it -> [ [ id: it[0].db ], [ id: "${it[0].id}.${it[0].db}.lineage", db: it[0].db ], it[1] ] }
+        .join(ch_diamond_dbs)
 
     TAXONKIT_LINEAGE(
         ch_taxonkit_lineage
             .map { it -> [ it[1], [], it[2] ] },
         ch_taxonkit_lineage
-            .map { it -> it[5] }
+            .map { it -> it[4] }
     )
     ch_versions     = ch_versions.mix(TAXONKIT_LINEAGE.out.versions)
 
@@ -527,6 +528,17 @@ workflow METATDENOVO {
         TAXONKIT_LINEAGE.out.tsv
     )
     ch_versions     = ch_versions.mix(PIGZ_DIAMOND_LINEAGE.out.versions)
+
+    PARSE_DIAMOND_TAXONOMY(
+        PIGZ_DIAMOND_LINEAGE.out.archive
+            .map { it -> [ [ id: it[0].db ], it[0], it[1] ] }
+            .join(ch_diamond_dbs.filter { it -> it[3] })
+            .map { it -> [ [ id: it[1].id - ".lineage" + ".diamond" ], it[2], it[5] ] }
+            .view()
+    )
+    ch_versions     = ch_versions.mix(PARSE_DIAMOND_TAXONOMY.out.versions)
+
+    // tuple val(meta), path(taxfile), val(ranks)
 
     //
     // MODULE: Collect statistics from mapping analysis

@@ -1,0 +1,42 @@
+process PARSE_DIAMOND_TAXONOMY {
+    tag "$meta.id"
+    label 'process_single'
+
+    conda "conda-forge::r-tidyverse=2.0.0 conda-forge::r-dtplyr=1.3.1 conda-forge::r-data.table=1.14.8"
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'https://depot.galaxyproject.org/singularity/mulled-v2-b2ec1fea5791d428eebb8c8ea7409c350d31dada:a447f6b7a6afde38352b24c30ae9cd6e39df95c4-1' :
+        'biocontainers/mulled-v2-b2ec1fea5791d428eebb8c8ea7409c350d31dada:a447f6b7a6afde38352b24c30ae9cd6e39df95c4-1' }"
+
+    input:
+    tuple val(meta), path(taxfile), val(ranks)
+
+    output:
+    tuple val(meta), path("*.taxonomy.tsv.gz"), emit: taxonomy
+    path "versions.yml"                       , emit: versions
+
+    when:
+    task.ext.when == null || task.ext.when
+
+    script:
+    def args = task.ext.args ?: ''
+    def prefix = task.ext.prefix ?: "${meta.id}"
+    def rankstring = "c(\"${ranks.tokenize(';').join('\",\"')}\")"
+    """
+    #!/usr/bin/env Rscript
+
+    library(tidyverse)
+
+    read_tsv("${taxfile}", col_names = c("orf", "taxid", "evalue", "taxonomy")) %>%
+        separate(taxonomy, ${rankstring}, remove = FALSE, extra = "merge", fill = "right", sep = ";") %>%
+        write_tsv("${prefix}.taxonomy.tsv.gz")
+
+    writeLines(
+        c(
+            "\\"${task.process}\\":",
+            paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")),
+            paste0("    tidyverse: ", packageVersion('tidyverse'))
+        ),
+        "versions.yml"
+    )
+    """
+}
