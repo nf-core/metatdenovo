@@ -565,9 +565,6 @@
         },
         "validationS3PathCheck": {
             "type": "boolean"
-        },
-        "fasta": {
-            "type": "string"
         }
     }
 }
