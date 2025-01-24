@@ -337,7 +337,7 @@
                     "mimetype": "text/csv",
                     "pattern": "^\\S+\\.csv$",
                     "description": "Path to comma-separated file containing information about Diamond database files you want to use for taxonomy assignment.",
-                    "help_text": "This has to be a comma-separated file with 2 columns, and a header row: db, dmnd_path.",
+                    "help_text": "This has to be a comma-separated file with four columns, and a header row: db, dmnd_path, taxid2lineage_path, taxdump_dir",
                     "fa_icon": "fas fa-file-csv"
                 },
                 "diamond_top": {

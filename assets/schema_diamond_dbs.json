@@ -19,8 +19,15 @@
                 "exists": true,
                 "pattern": "^\\S+\\.dmnd",
                 "errorMessage": "Diamond dmnd file must be provided."
+            },
+            "taxdump_dir": {
+                "type": "string",
+                "format": "path",
+                "exists": true,
+                "pattern": "^\\S+",
+                "errorMessage": "A directory with taxon dump files (names.dmp and nodes.dmp) must be provided."
             }
         },
-        "required": ["db", "dmnd_path"]
+        "required": ["db", "dmnd_path", "taxdump_dir"]
     }
 }

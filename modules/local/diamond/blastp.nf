@@ -14,19 +14,21 @@ process DIAMOND_BLASTP {
     val blast_columns
 
     output:
-    tuple val(meta), path('*.blast*'), optional: true, emit: blast
-    tuple val(meta), path('*.xml*')  , optional: true, emit: xml
-    tuple val(meta), path('*.txt*')  , optional: true, emit: txt
-    tuple val(meta), path('*.daa')   , optional: true, emit: daa
-    tuple val(meta), path('*.sam*')  , optional: true, emit: sam
-    tuple val(meta), path('*.tsv*')  , optional: true, emit: tsv
-    tuple val(meta), path('*.paf*')  , optional: true, emit: paf
+    tuple val(outmeta), path('*.blast*'), optional: true, emit: blast
+    tuple val(outmeta), path('*.xml*')  , optional: true, emit: xml
+    tuple val(outmeta), path('*.txt*')  , optional: true, emit: txt
+    tuple val(outmeta), path('*.daa')   , optional: true, emit: daa
+    tuple val(outmeta), path('*.sam*')  , optional: true, emit: sam
+    tuple val(outmeta), path('*.tsv*')  , optional: true, emit: tsv
+    tuple val(outmeta), path('*.paf*')  , optional: true, emit: paf
     path "versions.yml"              , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
 
     script:
+    outmeta = meta + [ db: meta2.id ]
+
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}.${meta2.id}"
     def columns = blast_columns ? "${blast_columns}" : ''

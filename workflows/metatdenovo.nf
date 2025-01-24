@@ -94,6 +94,7 @@ include { SEQTK_MERGEPE                              } from '../modules/nf-core/
 include { SEQTK_SEQ as SEQTK_SEQ_CONTIG_FILTER       } from '../modules/nf-core/seqtk/seq/main'
 include { SPADES                                     } from '../modules/nf-core/spades/main'
 include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS_CDS } from '../modules/nf-core/subread/featurecounts/main'
+include { TAXONKIT_LINEAGE                           } from '../modules/nf-core/taxonkit/lineage/main'
 
 //
 // SUBWORKFLOWS: Installed directly from nf-core/modules
@@ -501,10 +502,25 @@ workflow METATDENOVO {
     //
     DIAMOND_TAXONOMY(
         ch_protein,
-        ch_diamond_dbs,
+        ch_diamond_dbs.map { [ it[0], it[1] ] },
         102,
         []
     )
+    ch_versions     = ch_versions.mix(DIAMOND_TAXONOMY.out.versions)
+
+    // Create a unified channel of the output from Diamond together with the diamond db info to
+    // make sure the channels are synchronized before calling TAXONKIT_LINEAGE
+    ch_taxonkit_lineage = DIAMOND_TAXONOMY.out.tsv
+        .map { it -> [ [ id: it[0].db ], [ id: "${it[0].id}.${it[0].db}" ], it[1] ] }
+        .merge(ch_diamond_dbs)
+
+    TAXONKIT_LINEAGE(
+        ch_taxonkit_lineage
+            .map { it -> [ it[1], [], it[2] ] },
+        ch_taxonkit_lineage
+            .map { it -> it[5] }
+    )
+    ch_versions     = ch_versions.mix(TAXONKIT_LINEAGE.out.versions)
 
     //
     // MODULE: Collect statistics from mapping analysis
