@@ -3,7 +3,7 @@
 //
 
 include { EUKULELE_SEARCH       } from '../../modules/local/eukulele/search'
-include { FORMAT_TAX            } from '../../modules/local/format_tax'
+include { FORMAT_EUKULELE_TAX   } from '../../modules/local/format_eukulele_tax'
 include { SUM_EUKULELE_TAXONOMY } from '../../modules/local/sum_eukulele_taxonomy'
 
 workflow SUB_EUKULELE {
@@ -18,10 +18,10 @@ workflow SUB_EUKULELE {
     EUKULELE_SEARCH( eukulele )
     ch_versions = ch_versions.mix ( EUKULELE_SEARCH.out.versions )
 
-    FORMAT_TAX( EUKULELE_SEARCH.out.taxonomy_estimation.map { meta, taxonomy, dbname -> [ meta, taxonomy ] } )
-    ch_versions = ch_versions.mix ( FORMAT_TAX.out.versions )
+    FORMAT_EUKULELE_TAX( EUKULELE_SEARCH.out.taxonomy_estimation.map { meta, taxonomy, dbname -> [ meta, taxonomy ] } )
+    ch_versions = ch_versions.mix ( FORMAT_EUKULELE_TAX.out.versions )
 
-    FORMAT_TAX.out.tax
+    FORMAT_EUKULELE_TAX.out.tax
         .join(eukulele)
         .map { meta, taxonomy, protein, dbname, database -> [ meta, dbname, taxonomy ] }
         .set { ch_sum_taxonomy }

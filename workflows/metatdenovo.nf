@@ -47,7 +47,7 @@ include { COLLECT_STATS                    } from '../modules/local/collect_stat
 include { FORMATSPADES                     } from '../modules/local/formatspades'
 include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved'
 include { MERGE_TABLES                     } from '../modules/local/merge_summary_tables'
-include { PARSE_DIAMOND_TAXONOMY           } from '../modules/local/parse_diamond_taxonomy'
+include { FORMAT_DIAMOND_TAX               } from '../modules/local/format_diamond_tax'
 include { TRANSDECODER                     } from '../modules/local/transdecoder'
 include { TRANSRATE                        } from '../modules/local/transrate'
 include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz'
@@ -529,14 +529,14 @@ workflow METATDENOVO {
     )
     ch_versions     = ch_versions.mix(PIGZ_DIAMOND_LINEAGE.out.versions)
 
-    PARSE_DIAMOND_TAXONOMY(
+    FORMAT_DIAMOND_TAX(
         PIGZ_DIAMOND_LINEAGE.out.archive
             .map { it -> [ [ id: it[0].db ], it[0], it[1] ] }
             //.join(ch_diamond_dbs.filter { it -> it[3] })
             .join(ch_diamond_dbs)
             .map { it -> [ [ id: it[1].id - ".lineage" + ".diamond" ], it[2], it[5] ] }
     )
-    ch_versions     = ch_versions.mix(PARSE_DIAMOND_TAXONOMY.out.versions)
+    ch_versions     = ch_versions.mix(FORMAT_DIAMOND_TAX.out.versions)
 
     // tuple val(meta), path(taxfile), val(ranks)
 

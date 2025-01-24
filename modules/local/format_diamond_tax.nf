@@ -1,4 +1,4 @@
-process PARSE_DIAMOND_TAXONOMY {
+process FORMAT_DIAMOND_TAX {
     tag "$meta.id"
     label 'process_single'
 
