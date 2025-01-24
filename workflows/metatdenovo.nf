@@ -90,6 +90,7 @@ include { CAT_FASTQ            	                     } from '../modules/nf-core/
 include { FASTQC                                     } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                                    } from '../modules/nf-core/multiqc/main'
 include { PIGZ_COMPRESS as PIGZ_ASSEMBLY             } from '../modules/nf-core/pigz/compress/main'
+include { PIGZ_COMPRESS as PIGZ_DIAMOND_LINEAGE      } from '../modules/nf-core/pigz/compress/main'
 include { SEQTK_MERGEPE                              } from '../modules/nf-core/seqtk/mergepe/main'
 include { SEQTK_SEQ as SEQTK_SEQ_CONTIG_FILTER       } from '../modules/nf-core/seqtk/seq/main'
 include { SPADES                                     } from '../modules/nf-core/spades/main'
@@ -511,7 +512,7 @@ workflow METATDENOVO {
     // Create a unified channel of the output from Diamond together with the diamond db info to
     // make sure the channels are synchronized before calling TAXONKIT_LINEAGE
     ch_taxonkit_lineage = DIAMOND_TAXONOMY.out.tsv
-        .map { it -> [ [ id: it[0].db ], [ id: "${it[0].id}.${it[0].db}" ], it[1] ] }
+        .map { it -> [ [ id: it[0].db ], [ id: "${it[0].id}.${it[0].db}.lineage" ], it[1] ] }
         .merge(ch_diamond_dbs)
 
     TAXONKIT_LINEAGE(
@@ -521,6 +522,11 @@ workflow METATDENOVO {
             .map { it -> it[5] }
     )
     ch_versions     = ch_versions.mix(TAXONKIT_LINEAGE.out.versions)
+
+    PIGZ_DIAMOND_LINEAGE(
+        TAXONKIT_LINEAGE.out.tsv
+    )
+    ch_versions     = ch_versions.mix(PIGZ_DIAMOND_LINEAGE.out.versions)
 
     //
     // MODULE: Collect statistics from mapping analysis
