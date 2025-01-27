@@ -31,7 +31,7 @@ process COLLECT_FEATURECOUNTS {
 
     setDTthreads($task.cpus)
 
-    tibble(f = Sys.glob('*.featureCounts.txt')) %>%
+    tibble(f = Sys.glob('*.featureCounts.tsv')) %>%
         mutate(
             d = purrr::map(
                 f,
