@@ -47,7 +47,7 @@
                     },
                     "multiqc": {
                         "branch": "master",
-                        "git_sha": "f80914f78fb7fa1c00b14cfeb29575ee12240d9c",
+                        "git_sha": "f0719ae309075ae4a291533883847c3f7c441dad",
                         "installed_by": ["modules"]
                     },
                     "pigz/compress": {
@@ -92,22 +92,22 @@
                     },
                     "seqtk/mergepe": {
                         "branch": "master",
-                        "git_sha": "7f88aae93c69586c0789322b77743ee0ef469502",
+                        "git_sha": "666652151335353eef2fcd58880bcef5bc2928e1",
                         "installed_by": ["modules"]
                     },
                     "seqtk/seq": {
                         "branch": "master",
-                        "git_sha": "7f88aae93c69586c0789322b77743ee0ef469502",
+                        "git_sha": "666652151335353eef2fcd58880bcef5bc2928e1",
                         "installed_by": ["modules"]
                     },
                     "spades": {
                         "branch": "master",
-                        "git_sha": "3f5420aa22e00bd030a2556dfdffc9e164ec0ec5",
+                        "git_sha": "666652151335353eef2fcd58880bcef5bc2928e1",
                         "installed_by": ["modules"]
                     },
                     "subread/featurecounts": {
                         "branch": "master",
-                        "git_sha": "e5265c217dcfbff7731c40623aaf07538fdd3e1c",
+                        "git_sha": "9508616bf800acc767de4678d6b86cfcb27b9aeb",
                         "installed_by": ["modules"]
                     },
                     "taxonkit/lineage": {
@@ -117,7 +117,7 @@
                     },
                     "trimgalore": {
                         "branch": "master",
-                        "git_sha": "a98418419ae6c9df3cf6cf108d1e1aba71037d5a",
+                        "git_sha": "8d3e71002c5008e3f68a691ad8cd32c346356258",
                         "installed_by": ["modules"]
                     }
                 }
