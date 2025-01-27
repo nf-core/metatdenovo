@@ -1,0 +1,38 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/nf-core/metatdenovo/master/assets/schema_diamond_dbs.json",
+    "title": "nf-core/metatdenovo pipeline - params.diamond_dbs schema",
+    "description": "Schema for the file provided with params.diamond_dbs",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "db": {
+                "type": "string",
+                "pattern": "^\\S+$",
+                "errorMessage": "Database name must be provided and cannot contain spaces",
+                "meta": ["id"]
+            },
+            "dmnd_path": {
+                "type": "string",
+                "format": "file-path",
+                "exists": true,
+                "pattern": "^\\S+\\.dmnd",
+                "errorMessage": "Diamond dmnd file must be provided."
+            },
+            "taxdump_dir": {
+                "type": "string",
+                "format": "path",
+                "exists": true,
+                "pattern": "^\\S+",
+                "errorMessage": "A directory with taxon dump files (names.dmp and nodes.dmp) must be provided."
+            },
+            "ranks": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9;]+$",
+                "errorMessage": "Provide a semicolon-separated list of ranks. Letters, numbers and semicolons only."
+            }
+        },
+        "required": ["db", "dmnd_path", "taxdump_dir"]
+    }
+}

@@ -42,17 +42,19 @@ if ( params.hmmdir ) {
 //
 // MODULE: local
 //
-include { WRITESPADESYAML                  } from '../modules/local/writespadesyaml'
-include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved'
 include { COLLECT_FEATURECOUNTS            } from '../modules/local/collect_featurecounts'
 include { COLLECT_STATS                    } from '../modules/local/collect_stats'
 include { FORMATSPADES                     } from '../modules/local/formatspades'
+include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved'
+include { MERGE_TABLES                     } from '../modules/local/merge_summary_tables'
+include { FORMAT_DIAMOND_TAX               } from '../modules/local/format_diamond_tax'
+include { TRANSDECODER                     } from '../modules/local/transdecoder'
+include { TRANSRATE                        } from '../modules/local/transrate'
 include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz'
 include { UNPIGZ as UNPIGZ_GFF             } from '../modules/local/unpigz'
-include { MERGE_TABLES                     } from '../modules/local/merge_summary_tables'
-include { TRANSRATE                        } from '../modules/local/transrate'
-include { TRANSDECODER                     } from '../modules/local/transdecoder'
+include { WRITESPADESYAML                  } from '../modules/local/writespadesyaml'
 
+include { DIAMOND_BLASTP as DIAMOND_TAXONOMY         } from '../modules/local/diamond/blastp'
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
@@ -80,18 +82,21 @@ include { PIPELINE_COMPLETION     } from '../subworkflows/local/utils_nfcore_met
 //
 // MODULE: Installed directly from nf-core/modules
 //
-include { BBMAP_BBDUK                                } from '../modules/nf-core/bbmap/bbduk/main'
-include { BBMAP_INDEX                                } from '../modules/nf-core/bbmap/index/main'
 include { BBMAP_ALIGN                                } from '../modules/nf-core/bbmap/align/main'
+include { BBMAP_BBDUK                                } from '../modules/nf-core/bbmap/bbduk/main'
 include { BBMAP_BBNORM                               } from '../modules/nf-core/bbmap/bbnorm/main'
-include { SEQTK_MERGEPE                              } from '../modules/nf-core/seqtk/mergepe/main'
-include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS_CDS } from '../modules/nf-core/subread/featurecounts/main'
-include { SPADES                                     } from '../modules/nf-core/spades/main'
-include { SEQTK_SEQ as SEQTK_SEQ_CONTIG_FILTER       } from '../modules/nf-core/seqtk/seq/main'
+include { BBMAP_INDEX                                } from '../modules/nf-core/bbmap/index/main'
 include { CAT_FASTQ            	                     } from '../modules/nf-core/cat/fastq/main'
+//include { DIAMOND_BLASTP as DIAMOND_TAXONOMY         } from '../modules/nf-core/diamond/blastp/main'
 include { FASTQC                                     } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                                    } from '../modules/nf-core/multiqc/main'
 include { PIGZ_COMPRESS as PIGZ_ASSEMBLY             } from '../modules/nf-core/pigz/compress/main'
+include { PIGZ_COMPRESS as PIGZ_DIAMOND_LINEAGE      } from '../modules/nf-core/pigz/compress/main'
+include { SEQTK_MERGEPE                              } from '../modules/nf-core/seqtk/mergepe/main'
+include { SEQTK_SEQ as SEQTK_SEQ_CONTIG_FILTER       } from '../modules/nf-core/seqtk/seq/main'
+include { SPADES                                     } from '../modules/nf-core/spades/main'
+include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS_CDS } from '../modules/nf-core/subread/featurecounts/main'
+include { TAXONKIT_LINEAGE                           } from '../modules/nf-core/taxonkit/lineage/main'
 
 //
 // SUBWORKFLOWS: Installed directly from nf-core/modules
@@ -114,6 +119,8 @@ workflow METATDENOVO {
 
     take:
     ch_samplesheet // channel: samplesheet read in from --input
+    ch_diamond_dbs // channel: paths to Diamond taxonomy databases, read from --diamond_dbs
+
     main:
 
     ch_versions = Channel.empty()
@@ -491,6 +498,47 @@ workflow METATDENOVO {
             .map { meta, tsv1, tsv2 -> [ meta, tsv1, tsv2, [] ] }
             .set { ch_merge_tables }
     }
+
+    //
+    // Call Diamond for taxonomy with amino acid sequences
+    //
+    DIAMOND_TAXONOMY(
+        ch_protein,
+        ch_diamond_dbs.map { [ it[0], it[1] ] },
+        102,
+        []
+    )
+    ch_versions     = ch_versions.mix(DIAMOND_TAXONOMY.out.versions)
+
+    // Create a unified channel of the output from Diamond together with the diamond db info to
+    // make sure the channels are synchronized before calling TAXONKIT_LINEAGE
+    ch_taxonkit_lineage = DIAMOND_TAXONOMY.out.tsv
+        .map { it -> [ [ id: it[0].db ], [ id: "${it[0].id}.${it[0].db}.lineage", db: it[0].db ], it[1] ] }
+        .join(ch_diamond_dbs)
+
+    TAXONKIT_LINEAGE(
+        ch_taxonkit_lineage
+            .map { it -> [ it[1], [], it[2] ] },
+        ch_taxonkit_lineage
+            .map { it -> it[4] }
+    )
+    ch_versions     = ch_versions.mix(TAXONKIT_LINEAGE.out.versions)
+
+    PIGZ_DIAMOND_LINEAGE(
+        TAXONKIT_LINEAGE.out.tsv
+    )
+    ch_versions     = ch_versions.mix(PIGZ_DIAMOND_LINEAGE.out.versions)
+
+    FORMAT_DIAMOND_TAX(
+        PIGZ_DIAMOND_LINEAGE.out.archive
+            .map { it -> [ [ id: it[0].db ], it[0], it[1] ] }
+            //.join(ch_diamond_dbs.filter { it -> it[3] })
+            .join(ch_diamond_dbs)
+            .map { it -> [ [ id: it[1].id - ".lineage" + ".diamond" ], it[2], it[5] ] }
+    )
+    ch_versions     = ch_versions.mix(FORMAT_DIAMOND_TAX.out.versions)
+
+    // tuple val(meta), path(taxfile), val(ranks)
 
     //
     // MODULE: Collect statistics from mapping analysis

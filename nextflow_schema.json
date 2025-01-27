@@ -329,6 +329,23 @@
             "description": "",
             "default": "",
             "properties": {
+                "diamond_dbs": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "schema": "assets/schema_diamond_dbs.json",
+                    "mimetype": "text/csv",
+                    "pattern": "^\\S+\\.csv$",
+                    "description": "Path to comma-separated file containing information about Diamond database files you want to use for taxonomy assignment.",
+                    "help_text": "This has to be a comma-separated file with four columns, and a header row: db, dmnd_path, taxid2lineage_path, taxdump_dir",
+                    "fa_icon": "fas fa-file-csv"
+                },
+                "diamond_top": {
+                    "type": "integer",
+                    "default": 10,
+                    "description": "Argument to Diamond'd --top that controls the percentage of hits to include in the LCA.",
+                    "fa_icon": "fas fa-align-justify"
+                },
                 "skip_eukulele": {
                     "type": "boolean",
                     "description": "skip eukulele run",
@@ -548,9 +565,6 @@
         },
         "validationS3PathCheck": {
             "type": "boolean"
-        },
-        "fasta": {
-            "type": "string"
         }
     }
 }

@@ -72,22 +72,22 @@
                     },
                     "samtools/idxstats": {
                         "branch": "master",
-                        "git_sha": "f4596fe0bdc096cf53ec4497e83defdb3a94ff62",
+                        "git_sha": "2d20463181b1c38981a02e90d3084b5f9fa8d540",
                         "installed_by": ["bam_stats_samtools"]
                     },
                     "samtools/index": {
                         "branch": "master",
-                        "git_sha": "f4596fe0bdc096cf53ec4497e83defdb3a94ff62",
+                        "git_sha": "b13f07be4c508d6ff6312d354d09f2493243e208",
                         "installed_by": ["bam_sort_stats_samtools"]
                     },
                     "samtools/sort": {
                         "branch": "master",
-                        "git_sha": "4352dbdb09ec40db71e9b172b97a01dcf5622c26",
+                        "git_sha": "b7800db9b069ed505db3f9d91b8c72faea9be17b",
                         "installed_by": ["bam_sort_stats_samtools"]
                     },
                     "samtools/stats": {
                         "branch": "master",
-                        "git_sha": "f4596fe0bdc096cf53ec4497e83defdb3a94ff62",
+                        "git_sha": "2d20463181b1c38981a02e90d3084b5f9fa8d540",
                         "installed_by": ["bam_stats_samtools"]
                     },
                     "seqtk/mergepe": {
@@ -110,6 +110,11 @@
                         "git_sha": "e5265c217dcfbff7731c40623aaf07538fdd3e1c",
                         "installed_by": ["modules"]
                     },
+                    "taxonkit/lineage": {
+                        "branch": "master",
+                        "git_sha": "90c5156bfa6326edadbeff4a1ca196c6d10fd2ec",
+                        "installed_by": ["modules"]
+                    },
                     "trimgalore": {
                         "branch": "master",
                         "git_sha": "a98418419ae6c9df3cf6cf108d1e1aba71037d5a",
@@ -119,6 +124,16 @@
             },
             "subworkflows": {
                 "nf-core": {
+                    "bam_sort_stats_samtools": {
+                        "branch": "master",
+                        "git_sha": "763d4b5c05ffda3ac1ac969dc67f7458cfb2eb1d",
+                        "installed_by": ["subworkflows"]
+                    },
+                    "bam_stats_samtools": {
+                        "branch": "master",
+                        "git_sha": "763d4b5c05ffda3ac1ac969dc67f7458cfb2eb1d",
+                        "installed_by": ["bam_sort_stats_samtools"]
+                    },
                     "utils_nextflow_pipeline": {
                         "branch": "master",
                         "git_sha": "c2b22d85f30a706a3073387f30380704fcae013b",

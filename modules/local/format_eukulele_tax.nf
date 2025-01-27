@@ -1,4 +1,4 @@
-process FORMAT_TAX {
+process FORMAT_EUKULELE_TAX {
     tag "$meta.id"
     label 'process_low'
 

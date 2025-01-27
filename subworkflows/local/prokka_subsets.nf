@@ -41,9 +41,9 @@ workflow PROKKA_SUBSETS {
     ch_versions = ch_versions.mix(PROKKAGFF2TSV.out.versions)
 
     emit:
-    gff        = GFF_CAT.out.file_out
-    faa        = FAA_CAT.out.file_out
-    ffn        = FFN_CAT.out.file_out
+    gff        = GFF_CAT.out.file_out.first()
+    faa        = FAA_CAT.out.file_out.first()
+    ffn        = FFN_CAT.out.file_out.first()
     gfftsv     = PROKKAGFF2TSV.out.tsv
     prokka_log = ch_log
     versions   = ch_versions
