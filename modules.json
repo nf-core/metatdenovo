@@ -124,16 +124,6 @@
             },
             "subworkflows": {
                 "nf-core": {
-                    "bam_sort_stats_samtools": {
-                        "branch": "master",
-                        "git_sha": "763d4b5c05ffda3ac1ac969dc67f7458cfb2eb1d",
-                        "installed_by": ["subworkflows"]
-                    },
-                    "bam_stats_samtools": {
-                        "branch": "master",
-                        "git_sha": "763d4b5c05ffda3ac1ac969dc67f7458cfb2eb1d",
-                        "installed_by": ["bam_sort_stats_samtools"]
-                    },
                     "utils_nextflow_pipeline": {
                         "branch": "master",
                         "git_sha": "c2b22d85f30a706a3073387f30380704fcae013b",
