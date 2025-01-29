@@ -20,19 +20,26 @@
                 "pattern": "^\\S+\\.dmnd",
                 "errorMessage": "Diamond dmnd file must be provided."
             },
-            "taxdump_dir": {
+            "taxdump_names": {
                 "type": "string",
                 "format": "path",
                 "exists": true,
                 "pattern": "^\\S+",
-                "errorMessage": "A directory with taxon dump files (names.dmp and nodes.dmp) must be provided."
+                "errorMessage": "A path to a names.dmp must be provided."
+            },
+            "taxdump_nodes": {
+                "type": "string",
+                "format": "path",
+                "exists": true,
+                "pattern": "^\\S+",
+                "errorMessage": "A path to a nodes.dmp must be provided."
             },
             "ranks": {
                 "type": "string",
-                "pattern": "^[A-Za-z0-9;]+$",
-                "errorMessage": "Provide a semicolon-separated list of ranks. Letters, numbers and semicolons only."
+                "pattern": "^[A-Za-z0-9_;]+$",
+                "errorMessage": "Provide a semicolon-separated list of ranks. Letters, numbers, underscores and semicolons only."
             }
         },
-        "required": ["db", "dmnd_path", "taxdump_dir"]
+        "required": ["db", "dmnd_path", "taxdump_names", "taxdump_nodes"]
     }
 }
