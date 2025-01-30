@@ -240,7 +240,7 @@ At the time of writing, users of the pipeline need to craft their own databases,
 
 <details markdown="1">
 <summary>Output files</summary>
-  
+
 - `diamond_taxonomy/`
   - `*.tsv.gz`: Output directly from the Diamond aligner
   - `*.lineage.tsv.gz`: Output after `taxonkit lineage` added the full taxonomic lineage to the above
