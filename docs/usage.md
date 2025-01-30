@@ -215,6 +215,11 @@ The pipeline will run three or four processes:
 
 Output from the first two steps will be saved in `results/diamond_taxonomy` whereas the second two goes to `results/summary_tables`.
 
+_Note_ that some databases, e.g. NCBI's, output different numbers of taxa in their taxonomy strings.
+These cannot be parsed by enumerating the ranks in `ranks`.
+The only option is to set `parse_with_taxdump` to true.
+This process is a bit unstable though.
+
 ### Functional annotation options
 
 Besides the functional annotation that the gene caller Prokka gives (see above) there are two general purpose functional annotation programs available
