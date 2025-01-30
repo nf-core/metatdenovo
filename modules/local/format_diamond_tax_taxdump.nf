@@ -1,4 +1,4 @@
-process FORMAT_DIAMOND_TAX_DYNAMIC {
+process FORMAT_DIAMOND_TAX_TAXDUMP {
     tag "$meta.id"
     label 'process_medium'
 

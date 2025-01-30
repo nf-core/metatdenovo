@@ -1,4 +1,4 @@
-process FORMAT_DIAMOND_TAX {
+process FORMAT_DIAMOND_TAX_RANKLIST {
     tag "$meta.id"
     label 'process_single'
 
