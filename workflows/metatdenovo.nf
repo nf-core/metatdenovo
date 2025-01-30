@@ -517,10 +517,10 @@ workflow METATDENOVO {
         .join(ch_diamond_dbs)
 
     TAXONKIT_LINEAGE(
-        ch_taxonkit_lineage
-            .map { it -> [ it[1], [], it[2] ] },
-        ch_taxonkit_lineage
-            .map { it -> it[4] }
+        ch_taxonkit_lineage.map { it -> [ it[1], [], it[2] ] },
+        [],
+        ch_taxonkit_lineage.map { it -> it[4] },
+        ch_taxonkit_lineage.map { it -> it[5] }
     )
     ch_versions     = ch_versions.mix(TAXONKIT_LINEAGE.out.versions)
 
@@ -532,9 +532,8 @@ workflow METATDENOVO {
     FORMAT_DIAMOND_TAX(
         PIGZ_DIAMOND_LINEAGE.out.archive
             .map { it -> [ [ id: it[0].db ], it[0], it[1] ] }
-            //.join(ch_diamond_dbs.filter { it -> it[3] })
             .join(ch_diamond_dbs)
-            .map { it -> [ [ id: it[1].id - ".lineage" + ".diamond" ], it[2], it[5] ] }
+            .map { it -> [ [ id: it[1].id - ".lineage" + ".diamond" ], it[2], it[6] ] }
     )
     ch_versions     = ch_versions.mix(FORMAT_DIAMOND_TAX.out.versions)
 
