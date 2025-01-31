@@ -196,7 +196,7 @@ workflow METATDENOVO {
     // MODULE: Run BBDuk to clean out whatever sequences the user supplied via params.sequence_filter
     //
     if ( params.sequence_filter ) {
-        BBMAP_BBDUK ( FASTQC_TRIMGALORE.out.reads, params.sequence_filter )
+        BBMAP_BBDUK ( FASTQC_TRIMGALORE.out.reads, Channel.fromPath(params.sequence_filter) )
         ch_clean_reads  = BBMAP_BBDUK.out.reads
         ch_bbduk_logs = BBMAP_BBDUK.out.log.collect { meta, log ->  log }.map { [ it ] }
         ch_versions   = ch_versions.mix(BBMAP_BBDUK.out.versions.first())
