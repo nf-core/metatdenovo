@@ -169,18 +169,23 @@
             "properties": {
                 "assembler": {
                     "type": "string",
-                    "default": "megahit",
                     "enum": ["megahit", "spades"],
                     "description": "Specify which assembler you would like to run, possible alternatives: megahit, spades. default: megahit",
                     "fa_icon": "fas fa-bezier-curve"
                 },
-                "assembly": {
+                "user_assembly": {
                     "type": "string",
                     "format": "file-path",
                     "exists": true,
                     "mimetype": "text/plain",
                     "description": "Path to a fasta file with a finished assembly. Assembly will be skipped by the pipeline.",
                     "fa_icon": "far fa-file-code"
+                },
+                "user_assembly_name": {
+                    "type": "string",
+                    "default": "user_assembly",
+                    "description": "Name to give to the user-provided assembly.",
+                    "fa_icon": "fas fa-bezier-curve"
                 },
                 "min_contig_length": {
                     "type": "integer",
@@ -235,22 +240,33 @@
             "description": "",
             "default": "",
             "properties": {
-                "protein_fasta": {
-                    "type": "string",
-                    "fa_icon": "fas fa-file-code",
-                    "description": "Path to a protein fasta file"
-                },
-                "gff": {
-                    "type": "string",
-                    "fa_icon": "fas fa-file-code",
-                    "description": "Path to a gff file"
-                },
                 "orf_caller": {
                     "type": "string",
-                    "default": "prodigal",
                     "enum": ["prodigal", "prokka", "transdecoder"],
                     "description": "Specify which ORF caller you would like to run, possible alternatives: prodigal, prokka, transdecoder, default: prodigal.",
                     "fa_icon": "fas fa-phone-volume"
+                },
+                "user_orfs_faa": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "mimetype": "text/plain",
+                    "description": "Path to a protein fasta file for user-provided ORFs",
+                    "fa_icon": "far fa-file-code"
+                },
+                "user_orfs_gff": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "mimetype": "text/plain",
+                    "description": "Path to a gff file for user-provided ORFs",
+                    "fa_icon": "far fa-file-code"
+                },
+                "user_orfs_name": {
+                    "type": "string",
+                    "default": "user_orfs",
+                    "description": "Name to give to user-provided ORFs.",
+                    "fa_icon": "fas fa-bezier-curve"
                 },
                 "prodigal_trainingfile": {
                     "type": "string",
