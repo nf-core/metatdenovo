@@ -181,7 +181,7 @@ Here's the whole procedure for the NCBI NR example (worked for us in January 202
 wget ftp://ftp.ncbi.nih.gov/blast/db/FASTA/nr.gz
 
 # Download and untar the taxonomy dump
-ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz
+wget ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz
 tar xfz taxdump.tar.gz
 
 # Download all the individual mapping files and concatenate them (also takes long)
