@@ -38,6 +38,11 @@
                 "type": "string",
                 "pattern": "^[A-Za-z0-9_;]+$",
                 "errorMessage": "Provide a semicolon-separated list of ranks. Letters, numbers, underscores and semicolons only."
+            },
+            "parse_with_taxdump": {
+                "type": "boolean",
+                "default": false,
+                "errorMessage": "Set to `true` if you want to parse the taxonomy string with information from the names and nodes in the taxdump columns."
             }
         },
         "required": ["db", "dmnd_path", "taxdump_names", "taxdump_nodes"]

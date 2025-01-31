@@ -9,6 +9,7 @@ Initial release of nf-core/metatdenovo, created with the [nf-core](https://nf-co
 
 ### `Added`
 
+- [#320](<[https://github.com/nf-core/metatdenovo/pull/320](https://github.com/nf-core/metatdenovo/pull/320)>) improvments to Diamond taxonomy plus documentation
 - [#312](<[https://github.com/nf-core/metatdenovo/pull/312](https://github.com/nf-core/metatdenovo/pull/312)>) added taxonomy directly with Diamond, see `--diamond_dbs`
 - [#286](<[https://github.com/nf-core/metatdenovo/pull/286](https://github.com/nf-core/metatdenovo/pull/286)>) added an option to save the fasta file output from formatspades.nf module
 - [#285](<[https://github.com/nf-core/metatdenovo/pull/285](https://github.com/nf-core/metatdenovo/pull/285)>) added nf-test for default settings.

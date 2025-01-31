@@ -47,7 +47,8 @@ include { COLLECT_STATS                    } from '../modules/local/collect_stat
 include { FORMATSPADES                     } from '../modules/local/formatspades'
 include { MEGAHIT_INTERLEAVED              } from '../modules/local/megahit/interleaved'
 include { MERGE_TABLES                     } from '../modules/local/merge_summary_tables'
-include { FORMAT_DIAMOND_TAX               } from '../modules/local/format_diamond_tax'
+include { FORMAT_DIAMOND_TAX_RANKLIST      } from '../modules/local/format_diamond_tax_ranklist'
+include { FORMAT_DIAMOND_TAX_TAXDUMP       } from '../modules/local/format_diamond_tax_taxdump'
 include { TRANSDECODER                     } from '../modules/local/transdecoder'
 include { TRANSRATE                        } from '../modules/local/transrate'
 include { UNPIGZ as UNPIGZ_CONTIGS         } from '../modules/local/unpigz'
@@ -195,7 +196,7 @@ workflow METATDENOVO {
     // MODULE: Run BBDuk to clean out whatever sequences the user supplied via params.sequence_filter
     //
     if ( params.sequence_filter ) {
-        BBMAP_BBDUK ( FASTQC_TRIMGALORE.out.reads, params.sequence_filter )
+        BBMAP_BBDUK ( FASTQC_TRIMGALORE.out.reads, Channel.fromPath(params.sequence_filter) )
         ch_clean_reads  = BBMAP_BBDUK.out.reads
         ch_bbduk_logs = BBMAP_BBDUK.out.log.collect { meta, log ->  log }.map { [ it ] }
         ch_versions   = ch_versions.mix(BBMAP_BBDUK.out.versions.first())
@@ -529,13 +530,21 @@ workflow METATDENOVO {
     )
     ch_versions     = ch_versions.mix(PIGZ_DIAMOND_LINEAGE.out.versions)
 
-    FORMAT_DIAMOND_TAX(
+    FORMAT_DIAMOND_TAX_RANKLIST(
         PIGZ_DIAMOND_LINEAGE.out.archive
             .map { it -> [ [ id: it[0].db ], it[0], it[1] ] }
             .join(ch_diamond_dbs)
             .map { it -> [ [ id: it[1].id - ".lineage" + ".diamond" ], it[2], it[6] ] }
     )
-    ch_versions     = ch_versions.mix(FORMAT_DIAMOND_TAX.out.versions)
+    ch_versions     = ch_versions.mix(FORMAT_DIAMOND_TAX_RANKLIST.out.versions)
+
+    FORMAT_DIAMOND_TAX_TAXDUMP(
+        PIGZ_DIAMOND_LINEAGE.out.archive
+            .map { it -> [ [ id: it[0].db ], it[0], it[1] ] }
+            .join(ch_diamond_dbs.filter { it -> it[5] })
+            .map { it -> [ [ id: it[1].id - ".lineage" + ".diamond" ], it[2], it[4], it[5], it[6] ] }
+    )
+    ch_versions     = ch_versions.mix(FORMAT_DIAMOND_TAX_TAXDUMP.out.versions)
 
     // tuple val(meta), path(taxfile), val(ranks)
 

@@ -109,7 +109,10 @@ For eukaryotic genes, we recommend users to use Transdecoder (`--orf_caller tran
 
 ### Taxonomic annotation options
 
-Metatdenovo uses EUKulele as the main program for taxonomy annotation.
+Metatdenovo uses two different programs for taxonomy annotation: EUKulele and Diamond.
+
+#### Taxonomic annotation with EUKulele
+
 EUKulele can be run with different reference datasets.
 The default dataset is PhyloDB (`--eukulele_db phylodb` ) which works for mixed communities of prokaryotes and eukaryotes.
 Other database options for running the pipeline are MMETSP (`--eukulele_db mmetsp`; for marine protists) and GTDB (`--eukulele_db gtdb`; for prokarytes
@@ -158,6 +161,64 @@ create_protein_table.py --infile_peptide reference.pep.fa \
     --output tax-table.txt --delim "/" --col_source_id Source_ID \
     --taxonomy_col_id taxonomy --column SOURCE_ID
 ```
+
+#### Taxonomic annotation with Diamond
+
+The Diamond taxonomy-annotation process uses Diamond database files (`.dmnd` files) that have been prepared with taxonomy information.
+Currently we are not supplying any standard databases, but we hope to be able to do so soon.
+To make a database, you will need to collect four files: a protein fasta file, the `names.dmp` and `nodes.dmp` files from an NCBI-style taxon dump plus
+a mapping file in which protein accessions are translated into taxon ids.
+As an example, you can download the [NCBI NR database in fasta format](ftp://ftp.ncbi.nih.gov/blast/db/FASTA/nr.gz), the
+[taxonomy dump](ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz) and the [mapping file](ftp://ftp.ncbi.nih.gov/pub/taxonomy/accession2taxid/).
+(_Note_ that the mapping file is actually several files that need to be first downloaded, the concatenated into one.)
+After this, you can run `diamond makedb` with the proper parameters (see example below) to create your database.
+Here's the whole procedure for the NCBI NR example (worked for us in January 2025; things might change):
+
+```bash
+# Make sure you have Diamond and wget installed
+
+# Download the protein NR fasta file (takes a looong time)
+wget ftp://ftp.ncbi.nih.gov/blast/db/FASTA/nr.gz
+
+# Download and untar the taxonomy dump
+ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz
+tar xfz taxdump.tar.gz
+
+# Download all the individual mapping files and concatenate them (also takes long)
+wget -A "prot.accession2taxid.FULL*.gz" --mirror ftp://ftp.ncbi.nih.gov/pub/taxonomy/accession2taxid/
+cat ftp.ncbi.nih.gov/pub/taxonomy/accession2taxid/*.gz > prot.accession2taxid.FULL.gz
+
+# Create the Diamond database
+gunzip -c nr.gz | sed '/^>/s/ .*//' | diamond makedb --taxonmap prot.accession2taxid.FULL.gz --taxonnames names.dmp --taxonnodes nodes.dmp --db ncbi-nr.taxonomy.dmnd
+```
+
+In the near future, we hope to provide files to make it possible to create a GTDB database with the nf-core/createtaxdb pipeline.
+
+After creating one or more databases, you can provide them to the pipeline by filling out a file looking like the below and providing that to the pipeline
+with `--diamond_dbs diamond_dbs.csv` (see the parameter documentation).
+(The example is a `.csv`, but `.tsv`, `.json` and `.yml` are also supported.)
+
+```csv title="diamond_dbs.csv"
+db,dmnd_path,taxdump_names,taxdump_nodes,ranks,parse_with_taxdump
+gtdb,diamond-taxonomy/gtdb_r220_repr.dmnd,diamond-taxonomy/gtdb_taxdump/names.dmp,diamond-taxonomy/gtdb_taxdump/nodes.dmp,domain;phylum;class;order;genus;species;strain,
+refseq,diamond-taxonomy/refseq_protein.taxonomy.dmnd,diamond-taxonomy/ncbi_taxdump/names.dmp,diamond-taxonomy/ncbi_taxdump/nodes.dmp,,true
+```
+
+The `db`, `dmnd_path`, `taxdump_names` and `taxdump_nodes` fields are all required, while the remaining two are optional.
+
+The pipeline will run three or four processes:
+
+1. Align protein sequences of ORFs to the database with `diamond blastp`.
+2. Add taxonomic lineage information with `taxonkit lineage`.
+3. Format the output nicely and, if given a list of ranks in the `ranks` field of the db file, parse the taxonomy string into individual taxa.
+4. If the `parse_with_taxdump` field is set to `true`, try to parse the taxonomy string using the `taxdump_names` and `taxdump_nodes` files.
+
+Output from the first two steps will be saved in `results/diamond_taxonomy` whereas the second two goes to `results/summary_tables`.
+
+_Note_ that some databases, e.g. NCBI's, output different numbers of taxa in their taxonomy strings.
+These cannot be parsed by enumerating the ranks in `ranks`.
+The only option is to set `parse_with_taxdump` to true.
+This process is a bit unstable though.
 
 ### Functional annotation options
 

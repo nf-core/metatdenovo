@@ -70,6 +70,14 @@
 
 - [EUKulele](https://github.com/AlexanderLabWHOI/EUKulele)
 
+- [Diamond](https://github.com/bbuchfink/diamond)
+
+  > Buchfink, Benjamin, Chao Xie, and Daniel H Huson. 2015. “Fast and Sensitive Protein Alignment Using DIAMOND.” Nature Methods 12 (1): 59–60. https://doi.org/10.1038/nmeth.3176.
+
+- [TaxonKit](https://bioinf.shenwei.me/taxonkit/)
+
+  > Shen, Wei, and Hong Ren. 2021. “TaxonKit: A Practical and Efficient NCBI Taxonomy Toolkit.” Journal of Genetics and Genomics, Special issue on Microbiome, 48 (9): 844–50. https://doi.org/10.1016/j.jgg.2021.03.006.
+
 - [CAT](https://github.com/dutilh/CAT)
 
   > von Meijenfeldt FAB, Arkhipova K, Cambuy DD, Coutinho FH, Dutilh BE. Robust taxonomic classification of uncharted microbial sequences and bins with CAT and BAT. Genome Biology. 2019;20:217.

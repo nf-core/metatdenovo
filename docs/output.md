@@ -25,10 +25,11 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and the results
     - [Prodigal](#prodigal) - Output from Prodigal (default)
     - [Prokka](#prokka) - Output from Prokka (optional)
     - [TransDecoder](#transdecoder) - Output from transdecoder (optional)
-  - [Functional and taxonomical annotation](#functional-and-taxonomical-annotation) - Predict the function and the taxonomy of ORFs
+  - [Functional and taxonomic annotation](#functional-and-taxonomic-annotation) - Predict the function and the taxonomy of ORFs
     - [EggNOG](#eggnog) - Output from EggNOG-mapper (default; optional)
     - [KOfamSCAN](#kofamscan) - Output KOfamSCAN (optional)
     - [EUKulele](#eukulele) - Output from EUKulele taxonomy annotation (default; optional)
+    - [Diamond taxonomy](#diamond-taxonomy) - Output from the Diamond-based taxonomy processing (optional)
     - [Hmmsearch](#hmmsearch) - Output from HMMER run with user-supplied HMM profiles (optional)
 - [Custom metatdenovo output](#metatdenovo-output)
   - [Summary tables folder](#summary-tables) - Tab separated tables ready for further analysis in tools like R and Python
@@ -228,6 +229,24 @@ GTDB currently only works as a user provided database, i.e. data must be downloa
   - `*.diamond.out.gz`: Diamond output
 - `eukulele/assembler.orfcaller/taxonomy_estimation/`
   - `*-estimated-taxonomy.out.gz`: EUKulele output
+
+</details>
+
+#### Diamond taxonomy
+
+[Diamond](https://github.com/bbuchfink/diamond) is a fast protein sequence aligner that can also assign taxonomy based on a "Last Common Ancestor" (LCA)
+algorithm.
+At the time of writing, users of the pipeline need to craft their own databases, see the usage documentation.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `diamond_taxonomy/`
+  - `*.tsv.gz`: Output directly from the Diamond aligner
+  - `*.lineage.tsv.gz`: Output after `taxonkit lineage` added the full taxonomic lineage to the above
+- `summary_tables/`
+  - `*.taxonomy.tsv.gz`: Cleaned up output, including addition of a header row and, if a list of ranks was given, the taxonomy parsed into individual taxa
+  - `*.taxonomy-taxdump.tsv.gz`: Only if `parse_with_taxdump` was set in the input file; like the above, but with the taxonomy parsed using the taxonomy dump files
 
 </details>
 
