@@ -20,7 +20,7 @@ if ( params.assembler && ( params.user_orfs_gff || params.user_orfs_faa ) ) {
 }
 
 // Deal with user-supplied assembly to make sure output names are correct
-assembler     = params.assembler 
+assembler     = params.assembler
 assembly_name = params.assembler ?: params.user_assembly_name
 
 // Deal with params from user-supplied ORFs, and set orf_caller correctly
