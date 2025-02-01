@@ -61,11 +61,13 @@ include { MEGAHIT_INTERLEAVED                } from '../modules/local/megahit/in
 include { MERGE_TABLES                       } from '../modules/local/merge_summary_tables'
 include { FORMAT_DIAMOND_TAX_RANKLIST        } from '../modules/local/format_diamond_tax_ranklist'
 include { FORMAT_DIAMOND_TAX_TAXDUMP         } from '../modules/local/format_diamond_tax_taxdump'
+include { SUMTAXONOMY as SUM_DIAMONDTAX      } from '../modules/local/sumtaxonomy'
 include { TRANSDECODER                       } from '../modules/local/transdecoder'
 include { TRANSRATE                          } from '../modules/local/transrate'
 include { UNPIGZ as UNPIGZ_CONTIGS           } from '../modules/local/unpigz'
 include { UNPIGZ as UNPIGZ_GFF               } from '../modules/local/unpigz'
 include { WRITESPADESYAML                    } from '../modules/local/writespadesyaml'
+
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -435,17 +437,14 @@ workflow METATDENOVO {
         .combine(ch_fcs_for_stats)
         .set { ch_collect_stats }
 
+    ch_merge_tables = Channel.empty()
     //
     // SUBWORKFLOW: run eggnog_mapper on the ORF-called amino acid sequences
     //
     if ( ! params.skip_eggnog ) {
         EGGNOG(ch_protein, ch_fcs_for_summary)
         ch_versions = ch_versions.mix(EGGNOG.out.versions)
-        ch_merge_tables = EGGNOG.out.sumtable
-    } else {
-        ch_protein
-            .map { meta, protein -> [ meta, [] ] }
-            .set { ch_merge_tables }
+        ch_merge_tables = ch_merge_tables.mix ( EGGNOG.out.sumtable.map { meta, tsv -> tsv } )
     }
 
 
@@ -458,14 +457,7 @@ workflow METATDENOVO {
             .set { ch_kofamscan }
         KOFAMSCAN( ch_kofamscan, ch_fcs_for_summary)
         ch_versions = ch_versions.mix(KOFAMSCAN.out.versions)
-        ch_kofamscan_summary = KOFAMSCAN.out.kofamscan_summary.collect{ meta, tsv -> tsv }
-        ch_merge_tables
-            .combine( ch_kofamscan_summary )
-            .set { ch_merge_tables }
-    } else {
-        ch_merge_tables
-            .map { meta, tsv -> [ meta, tsv, [] ] }
-            .set { ch_merge_tables }
+        ch_merge_tables = ch_merge_tables.mix ( KOFAMSCAN.out.kofamscan_summary.map { meta, tsv -> tsv } )
     }
 
     // set up contig channel to use in CAT and TransRate
@@ -500,15 +492,8 @@ workflow METATDENOVO {
             .combine( ch_eukulele_db )
             .set { ch_eukulele }
         SUB_EUKULELE( ch_eukulele, ch_fcs_for_summary )
-        ch_taxonomy_summary = SUB_EUKULELE.out.taxonomy_summary.collect{ meta, tsv -> tsv }
         ch_versions = ch_versions.mix(SUB_EUKULELE.out.versions)
-        ch_merge_tables
-            .combine( ch_taxonomy_summary )
-            .set { ch_merge_tables }
-    } else {
-        ch_merge_tables
-            .map { meta, tsv1, tsv2 -> [ meta, tsv1, tsv2, [] ] }
-            .set { ch_merge_tables }
+        ch_merge_tables = ch_merge_tables.mix ( SUB_EUKULELE.out.taxonomy_summary.map { meta, tsv -> tsv } )
     }
 
     //
@@ -545,7 +530,7 @@ workflow METATDENOVO {
         PIGZ_DIAMOND_LINEAGE.out.archive
             .map { it -> [ [ id: it[0].db ], it[0], it[1] ] }
             .join(ch_diamond_dbs)
-            .map { it -> [ [ id: it[1].id - ".lineage" + ".diamond" ], it[2], it[6] ] }
+            .map { it -> [ [ id: it[1].id - ".lineage" + ".diamond", db: it[1].db ], it[2], it[6] ] }
     )
     ch_versions     = ch_versions.mix(FORMAT_DIAMOND_TAX_RANKLIST.out.versions)
 
@@ -553,17 +538,29 @@ workflow METATDENOVO {
         PIGZ_DIAMOND_LINEAGE.out.archive
             .map { it -> [ [ id: it[0].db ], it[0], it[1] ] }
             .join(ch_diamond_dbs.filter { it -> it[5] })
-            .map { it -> [ [ id: it[1].id - ".lineage" + ".diamond" ], it[2], it[4], it[5], it[6] ] }
+            .map { it -> [ [ id: it[1].id - ".lineage" + ".diamond", db: it[1].db ], it[2], it[4], it[5], it[6] ] }
     )
     ch_versions     = ch_versions.mix(FORMAT_DIAMOND_TAX_TAXDUMP.out.versions)
 
-    // tuple val(meta), path(taxfile), val(ranks)
+    SUM_DIAMONDTAX(
+        FORMAT_DIAMOND_TAX_RANKLIST.out.taxonomy
+            .map { it -> [ it[0], it[0].db, it[1] ] },
+        ch_fcs_for_summary,
+        'diamondtax'
+    )
+    ch_versions     = ch_versions.mix(SUM_DIAMONDTAX.out.versions)
+
+    ch_merge_tables = ch_merge_tables.mix ( SUM_DIAMONDTAX.out.taxonomy_summary.map { meta, tsv -> tsv } )
 
     //
     // MODULE: Collect statistics from mapping analysis
     //
     if( !params.skip_eggnog  || !params.skip_eukulele || !params.skip_kofamscan) {
-        MERGE_TABLES ( ch_merge_tables )
+        MERGE_TABLES ( 
+            ch_merge_tables
+                .collect() 
+                .map { it -> [ [ id: "${assembly_name}.${orfs_name}" ], it ] }
+        )
         ch_collect_stats
             .combine(MERGE_TABLES.out.merged_table.collect{ meta, tblout -> tblout }.map { [ it ] })
             .set { ch_collect_stats }
@@ -573,6 +570,7 @@ workflow METATDENOVO {
             .map { meta, samples, report, tsv, idxstats, counts -> [ meta, samples, report, tsv, idxstats, counts, [] ] }
             .set { ch_collect_stats }
     }
+    //ch_collect_stats.view { it -> "ch_collect_stats: ${it}" }
 
     COLLECT_STATS(ch_collect_stats)
     ch_versions     = ch_versions.mix(COLLECT_STATS.out.versions)
