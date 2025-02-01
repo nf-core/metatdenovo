@@ -297,8 +297,8 @@ workflow METATDENOVO {
         )
 
         SPADES.out.transcripts
-            .ifEmpty{ [] }
-            .combine(SPADES.out.contigs.ifEmpty{ [] } )
+            .ifEmpty { [] }
+            .combine(SPADES.out.contigs.ifEmpty { [] } )
             .set { ch_assembly }
         ch_versions = ch_versions.mix(SPADES.out.versions)
 
@@ -555,22 +555,25 @@ workflow METATDENOVO {
     //
     // MODULE: Collect statistics from mapping analysis
     //
-    if( !params.skip_eggnog  || !params.skip_eukulele || !params.skip_kofamscan) {
-        MERGE_TABLES ( 
-            ch_merge_tables
-                .collect() 
-                .map { it -> [ [ id: "${assembly_name}.${orfs_name}" ], it ] }
+    MERGE_TABLES ( 
+        ch_merge_tables
+            .collect() 
+            .map { it -> [ [ id: "${assembly_name}.${orfs_name}" ], it ] }
+    )
+    MERGE_TABLES.out.merged_table
+        //.view { "merged0: ${it}" }
+        //.collect { meta, tblout -> tblout }
+        //.view { "merged1: ${it}" }
+        //.map { meta, tblout -> [ tblout ] }
+        //.view { "merged2: ${it}" }
+    ch_collect_stats = ch_collect_stats
+        .combine(
+            Channel.empty()
+                .mix ( MERGE_TABLES.out.merged_table.map { meta, tblout -> [ tblout ] } )
+                .ifEmpty { [ [] ] }
+                //.map { [ it ] }
         )
-        ch_collect_stats
-            .combine(MERGE_TABLES.out.merged_table.collect{ meta, tblout -> tblout }.map { [ it ] })
-            .set { ch_collect_stats }
-        ch_versions       = ch_versions.mix(MERGE_TABLES.out.versions)
-    } else {
-        ch_collect_stats
-            .map { meta, samples, report, tsv, idxstats, counts -> [ meta, samples, report, tsv, idxstats, counts, [] ] }
-            .set { ch_collect_stats }
-    }
-    //ch_collect_stats.view { it -> "ch_collect_stats: ${it}" }
+    ch_versions     = ch_versions.mix(MERGE_TABLES.out.versions)
 
     COLLECT_STATS(ch_collect_stats)
     ch_versions     = ch_versions.mix(COLLECT_STATS.out.versions)

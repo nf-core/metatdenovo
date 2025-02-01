@@ -40,7 +40,7 @@ process COLLECT_STATS {
         """
     }
 
-    if (mergetab) {
+    if ( mergetab ) {
         read_mergetab = """
         mergetab <- read_tsv("${mergetab}", show_col_types = FALSE)
         """
@@ -58,8 +58,6 @@ process COLLECT_STATS {
     library(purrr)
     library(tidyr)
     library(stringr)
-
-    #TYPE_ORDER = c('n_trimmed', 'n_non_contaminated', 'idxs_n_mapped', 'idxs_n_unmapped', 'n_feature_count')
 
     start    <- tibble(sample = c("${samples.join('", "')}"))
 

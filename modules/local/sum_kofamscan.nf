@@ -45,7 +45,7 @@ process SUM_KOFAMSCAN {
         inner_join(kofams, by = 'orf') %>%
         group_by(sample) %>%
         summarise(value = sum(count), .groups = 'drop') %>%
-        add_column(database = "kofamscan", field = "kofamscan_n_counts") %>%
+        add_column(database = "kofamscan", field = "n") %>%
         relocate(value, .after = last_col()) %>%
         write_tsv('${meta.id}.kofamscan_summary.tsv.gz')
 

@@ -33,7 +33,8 @@ process MERGE_TABLES {
     Sys.glob('*.tsv.gz') %>%
         read_tsv() %>%
         mutate(sample = as.character(sample)) %>%
-        pivot_wider(names_from = c(database,field), values_from = value) %>%
+        arrange(field, database) %>%
+        pivot_wider(names_from = c(field,database), values_from = value) %>%
         write_tsv('${prefix}_merged_table.tsv.gz')
 
     writeLines(
