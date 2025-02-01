@@ -42,9 +42,7 @@ process COLLECT_STATS {
 
     if (mergetab) {
         read_mergetab = """
-
-        mergetab <- read_tsv("${mergetab}, show_col_types = FALSE)
-
+        mergetab <- read_tsv("${mergetab}", show_col_types = FALSE)
         """
     } else {
         read_mergetab = """
