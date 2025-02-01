@@ -555,9 +555,9 @@ workflow METATDENOVO {
     //
     // MODULE: Collect statistics from mapping analysis
     //
-    MERGE_TABLES ( 
+    MERGE_TABLES (
         ch_merge_tables
-            .collect() 
+            .collect()
             .map { it -> [ [ id: "${assembly_name}.${orfs_name}" ], it ] }
     )
     MERGE_TABLES.out.merged_table
