@@ -8,8 +8,7 @@ process MERGE_TABLES {
         'biocontainers/mulled-v2-b2ec1fea5791d428eebb8c8ea7409c350d31dada:a447f6b7a6afde38352b24c30ae9cd6e39df95c4-1' }"
 
     input:
-
-    tuple val(meta), path(eggtab), path(taxtab), path(kofamscan)
+    tuple val(meta), path(tables)
 
     output:
     tuple val(meta), path("${meta.id}_merged_table.tsv.gz") , emit: merged_table
@@ -34,7 +33,8 @@ process MERGE_TABLES {
     Sys.glob('*.tsv.gz') %>%
         read_tsv() %>%
         mutate(sample = as.character(sample)) %>%
-        pivot_wider(names_from = c(database,field), values_from = value) %>%
+        arrange(field, database) %>%
+        pivot_wider(names_from = c(field,database), values_from = value) %>%
         write_tsv('${prefix}_merged_table.tsv.gz')
 
     writeLines(

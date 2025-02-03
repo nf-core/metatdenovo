@@ -9,7 +9,7 @@ Initial release of nf-core/metatdenovo, created with the [nf-core](https://nf-co
 
 ### `Added`
 
-- [#320](<[https://github.com/nf-core/metatdenovo/pull/320](https://github.com/nf-core/metatdenovo/pull/320)>) improvments to Diamond taxonomy plus documentation
+- [#320](<[https://github.com/nf-core/metatdenovo/pull/320](https://github.com/nf-core/metatdenovo/pull/320)>) added taxonomy directly with Diamond, part 2
 - [#312](<[https://github.com/nf-core/metatdenovo/pull/312](https://github.com/nf-core/metatdenovo/pull/312)>) added taxonomy directly with Diamond, see `--diamond_dbs`
 - [#286](<[https://github.com/nf-core/metatdenovo/pull/286](https://github.com/nf-core/metatdenovo/pull/286)>) added an option to save the fasta file output from formatspades.nf module
 - [#285](<[https://github.com/nf-core/metatdenovo/pull/285](https://github.com/nf-core/metatdenovo/pull/285)>) added nf-test for default settings.
@@ -18,6 +18,7 @@ Initial release of nf-core/metatdenovo, created with the [nf-core](https://nf-co
 
 ### `Changed`
 
+- [#326](<[https://github.com/nf-core/metatdenovo/pull/326](https://github.com/nf-core/metatdenovo/pull/326)>) - Clean up overall stats table
 - [#323](<[https://github.com/nf-core/metatdenovo/pull/323](https://github.com/nf-core/metatdenovo/pull/323)>) - Modified param names for input of assembly and ORFs; added name params for output file naming
 - [#323](<[https://github.com/nf-core/metatdenovo/pull/323](https://github.com/nf-core/metatdenovo/pull/323)>) - Removed default for `assembler` and `orf_caller` parameters
 - [#311](<[https://github.com/nf-core/metatdenovo/pull/311](https://github.com/nf-core/metatdenovo/pull/311)>) - Update modules and subworkflows
@@ -29,8 +30,10 @@ Initial release of nf-core/metatdenovo, created with the [nf-core](https://nf-co
 
 ### `Fixed`
 
-- [#305](<[https://github.com/nf-core/ampliseq/pull/681](https://github.com/nf-core/metatdenovo/pull/305)>) - Make EUKulele counts output optional as it's not always created
-- [#269](<[https://github.com/nf-core/ampliseq/pull/681](https://github.com/nf-core/metatdenovo/pull/269)>) - Make Transdecoder work better with `-resume`
+- [#326](<[https://github.com/nf-core/metatdenovo/pull/326](https://github.com/nf-core/metatdenovo/pull/326)>) - Fix resources for test cases
+- [#326](<[https://github.com/nf-core/metatdenovo/pull/326](https://github.com/nf-core/metatdenovo/pull/326)>) - Fix output file names for Eukulele and Kofamscan
+- [#305](<[https://github.com/nf-core/metatdenovo/pull/305](https://github.com/nf-core/metatdenovo/pull/305)>) - Make EUKulele counts output optional as it's not always created
+- [#269](<[https://github.com/nf-core/metatdenovo/pull/269](https://github.com/nf-core/metatdenovo/pull/269)>) - Make Transdecoder work better with `-resume`
 
 ### `Dependencies`
 

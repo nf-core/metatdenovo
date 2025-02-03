@@ -27,101 +27,88 @@ process COLLECT_STATS {
             d = map(
                 sample,
                 function(s) {
-                    fread(cmd = sprintf("grep 'Reads written (passing filters)' %s*trimming_report.txt | sed 's/.*: *//' | sed 's/ .*//' | sed 's/,//g'", s)) %>%
-                        as_tibble()
+                    read_tsv(
+                        pipe(sprintf("grep 'Reads written (passing filters)' %s*trimming_report.txt | sed 's/.*: *//' | sed 's/ .*//' | sed 's/,//g'", s)),
+                        col_names = c('n_trimmed'),
+                        col_types = 'i'
+                    ) %>%
+                        mutate(n_trimmed = n_trimmed * 2)
                 }
             )
         ) %>%
-        unnest(d) %>%
-        rename(n_trimmed = V1) %>%
-        mutate(n_trimmed = n_trimmed*2) %>%
+        unnest(d)
         """
-    } else {
-        read_trimlogs = "%>%"
     }
 
-    if (mergetab) {
+    if ( mergetab ) {
         read_mergetab = """
-
-        mergetab <- list.files(pattern = "*_merged_table.tsv.gz" ) %>%
-            map_df(~read_tsv(.,  show_col_types  = FALSE)) %>%
-            mutate(sample = as.character(sample))
-
+        mergetab <- read_tsv("${mergetab}", show_col_types = FALSE)
         """
     } else {
         read_mergetab = """
-        mergetab <- data.frame(sample = character(), stringsAsFactors = FALSE)
+        mergetab <- tibble(sample = character())
         """
     }
 
     """
     #!/usr/bin/env Rscript
 
-    library(data.table)
-    library(dtplyr)
     library(dplyr)
     library(readr)
     library(purrr)
     library(tidyr)
     library(stringr)
 
-    TYPE_ORDER = c('n_trimmed', 'n_non_contaminated', 'idxs_n_mapped', 'idxs_n_unmapped', 'n_feature_count')
+    start    <- tibble(sample = c("${samples.join('", "')}"))
 
-    # Collect stats for each sample, create a table in long format that can be appended to
-    t <- tibble(sample = c("${samples.join('", "')}")) ${read_trimlogs}
-        # add samtools idxstats output
-        mutate(
-            i = map(
-                sample,
-                function(s) {
-                    fread(cmd = sprintf("grep -v '^*' %s*idxstats", s), sep = '\\t', col.names = c('chr', 'length', 'idxs_n_mapped', 'idxs_n_unmapped')) %>%
-                        lazy_dt() %>%
-                        summarise(idxs_n_mapped = sum(idxs_n_mapped), idxs_n_unmapped = sum(idxs_n_unmapped)) %>%
-                        as_tibble()
-                }
-            )
-        ) %>%
-        unnest(i) %>%
-        pivot_longer(2:ncol(.), names_to = 'm', values_to = 'v') %>%
-        union(
-            # Total observation after featureCounts
-            tibble(file = Sys.glob('*.counts.tsv.gz')) %>%
-                mutate(d = map(file, function(f) fread(cmd = sprintf("gunzip -c %s", f), sep = '\\t'))) %>%
-                as_tibble() %>%
-                unnest(d) %>%
-                mutate(sample = as.character(sample)) %>%
-                group_by(sample) %>% summarise(n_feature_count = sum(count), .groups = 'drop') %>%
-                pivot_longer(2:ncol(.), names_to = 'm', values_to = 'v')
-        )
+    trimming <- tibble(sample = c("${samples.join('", "')}")) ${read_trimlogs}
 
-    # Add in stats from BBDuk, if present
+    idxs <- read_tsv(
+        pipe("grep -Hv '^*' *.idxstats"),
+        col_names = c('c', 'length', 'idxs_n_mapped', 'idxs_n_unmapped'),
+        col_types = 'ciii'
+    ) %>%
+        separate(c, c('sample', 'chr'), sep = ':') %>%
+        transmute(sample = str_remove(sample, '.idxstats'), idxs_n_mapped, idxs_n_unmapped) %>%
+        group_by(sample) %>% summarise(idxs_n_mapped = sum(idxs_n_mapped), idxs_n_unmapped = sum(idxs_n_unmapped))
+
+    counts <- read_tsv("${fcs}", col_types = 'cciicicid') %>%
+        group_by(sample) %>% summarise(n_feature_count = sum(count))
+
+
+    bbduk <- tibble(sample = character(), n_non_contaminated = integer())
     for ( f in Sys.glob('*.bbduk.log') ) {
         s = str_remove(f, '.bbduk.log')
-        t <- t %>% union(
-            fread(cmd = sprintf("grep 'Result:' %s | sed 's/Result:[ \\t]*//; s/ reads.*//'", f), col.names = c('v')) %>%
-                as_tibble() %>%
-                mutate(sample = s, m = 'n_non_contaminated')
-        )
+        bbduk <- bbduk %>%
+            union(
+                read_tsv(
+                    pipe(sprintf("grep 'Result:' %s | sed 's/Result:[ \t]*//; s/ reads.*//' | sed 's/:/\t/'", f)),
+                    col_names = c('n_non_contaminated'),
+                    col_types = 'i'
+                ) %>%
+                    mutate(sample = s)
+            )
     }
+    if ( nrow(bbduk) == 0 ) bbduk <- bbduk %>% select(sample)
 
     # Add in stats from taxonomy and function
     ${read_mergetab}
 
-    # Write the table in wide format
-    t %>%
-        mutate(m = parse_factor(m, levels = TYPE_ORDER, ordered = TRUE)) %>%
-        arrange(sample, m) %>%
-        pivot_wider(names_from = m, values_from = v) %>%
-        left_join(mergetab, by = 'sample') %>%
-        write_tsv('${prefix}.overall_stats.tsv.gz')
+    # Write output
+    start %>%
+        left_join(trimming, by = join_by(sample)) %>%
+        left_join(bbduk, by = join_by(sample)) %>%
+        left_join(idxs, by = join_by(sample)) %>%
+        left_join(counts, by = join_by(sample)) %>%
+        left_join(mergetab, by = join_by(sample)) %>%
+        arrange(sample) %>%
+        write_tsv("${meta.id}.overall_stats.tsv.gz")
 
     writeLines(
         c(
             "\\"${task.process}\\":",
             paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")),
             paste0("    dplyr: ", packageVersion('dplyr')),
-            paste0("    dtplyr: ", packageVersion('dtplyr')),
-            paste0("    data.table: ", packageVersion('data.table')),
             paste0("    readr: ", packageVersion('readr')),
             paste0("    purrr: ", packageVersion('purrr')),
             paste0("    tidyr: ", packageVersion('tidyr')),

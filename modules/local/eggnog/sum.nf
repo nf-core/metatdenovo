@@ -45,7 +45,7 @@ process EGGNOG_SUM {
         group_by(sample) %>%
         drop_na() %>%
         summarise( value = sum(count), .groups = 'drop') %>%
-        add_column(database = "eggnog", field = "eggnog_n_counts") %>%
+        add_column(database = "eggnog", field = "n") %>%
         relocate(value, .after = last_col()) %>%
         write_tsv('${meta.id}.eggnog_summary.tsv.gz')
 

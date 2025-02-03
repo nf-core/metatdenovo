@@ -1,0 +1,55 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "sumtaxonomy"
+description: Small module to summarise taxonomy tables
+keywords:
+  - taxonomy
+  - summarise
+tools:
+  - "sumtaxonomy":
+      description: "R script that summarises taxonomy tables"
+
+input:
+  # Only when we have meta
+  - - meta:
+        type: map
+        description: |
+          Groovy Map containing sample information
+          e.g. `[ id:'sample1', single_end:false ]`
+    - db:
+        type: string
+        description: Name of database, e.g. gtdb
+    - taxonomy:
+        type: file
+        description: Taxonomy in tsv format
+        pattern: "*.tsv(.gz)?"
+
+  - - feature_counts:
+        type: file
+        description: File with gene counts
+
+  - - taxname:
+        type: string
+        description: Name of taxonomy, e.g. eukulele
+
+output:
+  - taxonomy_summary:
+      - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. `[ id:'sample1', single_end:false ]`
+      - "*_summary.tsv.gz":
+          type: file
+          pattern: "*._summary.tsv.gz"
+
+  - versions:
+      - "versions.yml":
+          type: file
+          description: File containing software versions
+          pattern: "versions.yml"
+
+authors:
+  - "@erikrikarddaniel"
+maintainers:
+  - "@erikrikarddaniel"

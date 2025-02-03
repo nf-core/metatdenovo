@@ -2,9 +2,9 @@
 // Run EUKULELE on protein fasta from orf_caller output
 //
 
-include { EUKULELE_SEARCH       } from '../../modules/local/eukulele/search'
-include { FORMAT_EUKULELE_TAX   } from '../../modules/local/format_eukulele_tax'
-include { SUM_EUKULELE_TAXONOMY } from '../../modules/local/sum_eukulele_taxonomy'
+include { EUKULELE_SEARCH                      } from '../../modules/local/eukulele/search'
+include { FORMAT_EUKULELE_TAX                  } from '../../modules/local/format_eukulele_tax'
+include { SUMTAXONOMY as SUM_EUKULELE_TAXONOMY } from '../../modules/local/sumtaxonomy'
 
 workflow SUB_EUKULELE {
 
@@ -26,7 +26,7 @@ workflow SUB_EUKULELE {
         .map { meta, taxonomy, protein, dbname, database -> [ meta, dbname, taxonomy ] }
         .set { ch_sum_taxonomy }
 
-    SUM_EUKULELE_TAXONOMY ( ch_sum_taxonomy, feature_counts )
+    SUM_EUKULELE_TAXONOMY ( ch_sum_taxonomy, feature_counts, 'eukulele' )
     ch_versions = ch_versions.mix ( SUM_EUKULELE_TAXONOMY.out.versions )
 
     emit:
