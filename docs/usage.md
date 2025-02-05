@@ -185,8 +185,7 @@ wget ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz
 tar xfz taxdump.tar.gz
 
 # Download all the individual mapping files and concatenate them (also takes long)
-wget -A "prot.accession2taxid.FULL*.gz" --mirror ftp://ftp.ncbi.nih.gov/pub/taxonomy/accession2taxid/
-cat ftp.ncbi.nih.gov/pub/taxonomy/accession2taxid/*.gz > prot.accession2taxid.FULL.gz
+wget ftp://ftp.ncbi.nih.gov/pub/taxonomy/accession2taxid/prot.accession2taxid.FULL.gz
 
 # Create the Diamond database
 gunzip -c nr.gz | sed '/^>/s/ .*//' | diamond makedb --taxonmap prot.accession2taxid.FULL.gz --taxonnames names.dmp --taxonnodes nodes.dmp --db ncbi-nr.taxonomy.dmnd
