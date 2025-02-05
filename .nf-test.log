@@ -1,0 +1,11 @@
+Feb-05 19:41:28.407 [main] INFO  com.askimed.nf.test.App - nf-test 0.9.0
+Feb-05 19:41:28.437 [main] INFO  com.askimed.nf.test.App - Arguments: [test, --profile, test_prokka,singularity, ./tests/test_prokka.nf.test]
+Feb-05 19:41:30.617 [main] INFO  com.askimed.nf.test.App - Nextflow Version: 24.10.4
+Feb-05 19:41:30.620 [main] INFO  com.askimed.nf.test.commands.RunTestsCommand - Load config from file /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/nf-test.config...
+Feb-05 19:41:36.397 [main] INFO  com.askimed.nf.test.lang.dependencies.DependencyResolver - Loaded 136 files from directory /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo in 5.007 sec
+Feb-05 19:41:36.402 [main] INFO  com.askimed.nf.test.lang.dependencies.DependencyResolver - Found 1 tests.
+Feb-05 19:41:36.403 [main] DEBUG com.askimed.nf.test.lang.dependencies.DependencyResolver - Found tests: [/cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/tests/test_prokka.nf.test]
+Feb-05 19:41:36.403 [main] INFO  com.askimed.nf.test.commands.RunTestsCommand - Detected 1 test files.
+Feb-05 19:41:36.819 [main] INFO  com.askimed.nf.test.core.TestExecutionEngine - Started test plan
+Feb-05 19:41:36.820 [main] INFO  com.askimed.nf.test.core.TestExecutionEngine - Running testsuite 'Test pipeline' from file '/cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/tests/test_prokka.nf.test'.
+Feb-05 19:41:36.820 [main] INFO  com.askimed.nf.test.core.TestExecutionEngine - Run test '8086833a: Run with profile test_prokka'. type: com.askimed.nf.test.lang.pipeline.PipelineTest

@@ -1,0 +1,1301 @@
+{
+    "report_data_sources": {
+        "BBDuk": {
+            "all_sections": {
+                "SAMPLE2_PE_1_val_1": "/cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/ca/a216a59ed29488519cd3ab34528a81/3/SAMPLE2_PE.bbduk.log",
+                "SAMPLE1_PE_1_val_1": "/cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/ca/a216a59ed29488519cd3ab34528a81/4/SAMPLE1_PE.bbduk.log"
+            }
+        }
+    },
+    "report_general_stats_data": [
+        {
+            "SAMPLE2_PE_1_val_1": {
+                "Input reads": 49986,
+                "Input bases": 7517346,
+                "Total Removed reads": 152,
+                "Total Removed reads percent": 0.3,
+                "Total Removed bases": 22857,
+                "Total Removed bases percent": 0.3,
+                "Result reads": 49834,
+                "Result reads percent": 99.7,
+                "Result bases": 7494489,
+                "Result bases percent": 99.7
+            },
+            "SAMPLE1_PE_1_val_1": {
+                "Input reads": 99990,
+                "Input bases": 12528494,
+                "Total Removed reads": 112,
+                "Total Removed reads percent": 0.11,
+                "Total Removed bases": 14032,
+                "Total Removed bases percent": 0.11,
+                "Result reads": 99878,
+                "Result reads percent": 99.89,
+                "Result bases": 12514462,
+                "Result bases percent": 99.89
+            }
+        }
+    ],
+    "report_general_stats_headers": [
+        {
+            "Total Removed bases percent": {
+                "title": "Bases Removed (%)",
+                "description": "Percentage of bases removed after filtering",
+                "scale": "YlOrBr",
+                "max": 100,
+                "namespace": "BBDuk",
+                "rid": "bbduk-Total_Removed_bases_percent",
+                "min": null,
+                "placement": 1000
+            },
+            "Total Removed bases": {
+                "title": "Bases Removed (Mb)",
+                "description": "Total Bases removed (millions)",
+                "scale": "Reds",
+                "shared_key": "base_count",
+                "modify": null,
+                "hidden": true,
+                "namespace": "BBDuk",
+                "rid": "bbduk-Total_Removed_bases",
+                "min": 0,
+                "suffix": " Mb",
+                "placement": 1000
+            },
+            "Total Removed reads percent": {
+                "title": "Reads Removed (%)",
+                "description": "Percentage of reads removed after filtering",
+                "scale": "OrRd",
+                "max": 100,
+                "namespace": "BBDuk",
+                "rid": "bbduk-Total_Removed_reads_percent",
+                "min": null,
+                "placement": 1000
+            },
+            "Total Removed reads": {
+                "title": "Reads Removed (M)",
+                "description": "Total Reads removed (millions)",
+                "scale": "Reds",
+                "shared_key": "read_count",
+                "modify": null,
+                "hidden": true,
+                "namespace": "BBDuk",
+                "rid": "bbduk-Total_Removed_reads",
+                "min": 0,
+                "suffix": " M",
+                "placement": 1000
+            },
+            "Input reads": {
+                "title": "Total Input Reads (M)",
+                "description": "Total number of input reads to BBDuk (millions)",
+                "scale": "Greens",
+                "shared_key": "read_count",
+                "modify": null,
+                "hidden": true,
+                "namespace": "BBDuk",
+                "rid": "bbduk-Input_reads",
+                "min": 0,
+                "suffix": " M",
+                "placement": 1000
+            }
+        }
+    ],
+    "report_multiqc_command": "/usr/local/bin/multiqc --force --config multiqc_config.yml .",
+    "report_plot_data": {
+        "bbduk-filtered-barplot": {
+            "id": "bbduk-filtered-barplot",
+            "anchor": "bbduk-filtered-barplot",
+            "plot_type": "bar plot",
+            "layout": {
+                "autosize": true,
+                "colorway": [
+                    "#7cb5ec",
+                    "#434348",
+                    "#90ed7d",
+                    "#f7a35c",
+                    "#8085e9",
+                    "#f15c80",
+                    "#e4d354",
+                    "#2b908f",
+                    "#f45b5b",
+                    "#91e8e1"
+                ],
+                "font": {
+                    "family": "'Lucida Grande', 'Open Sans', verdana, arial, sans-serif"
+                },
+                "height": 300,
+                "hoverlabel": {
+                    "namelength": -1,
+                    "bgcolor": "rgba(255, 255, 255, 0.8)",
+                    "font": {
+                        "color": "black"
+                    }
+                },
+                "margin": {
+                    "b": 65,
+                    "l": 60,
+                    "pad": 5,
+                    "r": 15,
+                    "t": 50
+                },
+                "modebar": {
+                    "activecolor": "rgba(0, 0, 0, 1)",
+                    "bgcolor": "rgba(0, 0, 0, 0)",
+                    "color": "rgba(0, 0, 0, 0.5)"
+                },
+                "paper_bgcolor": "white",
+                "plot_bgcolor": "white",
+                "showlegend": true,
+                "title": {
+                    "font": {
+                        "size": 20
+                    },
+                    "text": "BBDuk: Filtered reads",
+                    "x": 0.5,
+                    "xanchor": "center"
+                },
+                "xaxis": {
+                    "automargin": true,
+                    "color": "rgba(0,0,0,0.3)",
+                    "gridcolor": "rgba(0,0,0,0.05)",
+                    "tickfont": {
+                        "color": "rgba(0,0,0,1)",
+                        "size": 10
+                    },
+                    "zerolinecolor": "rgba(0,0,0,0.05)"
+                },
+                "yaxis": {
+                    "automargin": true,
+                    "color": "rgba(0,0,0,0.3)",
+                    "gridcolor": "rgba(0,0,0,0.05)",
+                    "tickfont": {
+                        "color": "rgba(0,0,0,1)",
+                        "size": 10
+                    },
+                    "zerolinecolor": "rgba(0,0,0,0.05)",
+                    "showgrid": false,
+                    "categoryorder": "trace",
+                    "type": "category"
+                },
+                "barmode": "relative",
+                "bargroupgap": 0,
+                "bargap": 0.2,
+                "legend": {
+                    "tracegroupgap": 0,
+                    "traceorder": "normal"
+                },
+                "hovermode": "y unified"
+            },
+            "datasets": [
+                {
+                    "plot_id": "bbduk-filtered-barplot",
+                    "label": "Reads",
+                    "uid": "bbduk-filtered-barplot_Reads",
+                    "dconfig": {
+                        "name": "Reads",
+                        "ylab": "Number of Reads",
+                        "title": "BBDuk: Filtered reads<br><sup>Reads, 2 samples</sup>"
+                    },
+                    "layout": {
+                        "title": {
+                            "text": "BBDuk: Filtered reads<br><sup>Reads, 2 samples</sup>"
+                        },
+                        "xaxis": {
+                            "title": {
+                                "text": "Number of Reads"
+                            },
+                            "hoverformat": ",.2f",
+                            "ticksuffix": "",
+                            "autorangeoptions": {
+                                "minallowed": 0,
+                                "maxallowed": 99878.0
+                            }
+                        },
+                        "yaxis": {
+                            "title": null,
+                            "hoverformat": null,
+                            "ticksuffix": ""
+                        },
+                        "showlegend": false
+                    },
+                    "trace_params": {
+                        "hovertemplate": "<b></b>%{meta}: <b>%{x}</b><extra></extra>",
+                        "orientation": "h",
+                        "marker": {
+                            "line": {
+                                "width": 0
+                            }
+                        },
+                        "textposition": "inside",
+                        "insidetextanchor": "start"
+                    },
+                    "pct_range": {
+                        "xaxis": {
+                            "min": 0,
+                            "max": 100
+                        },
+                        "yaxis": {
+                            "min": 0,
+                            "max": 100
+                        }
+                    },
+                    "n_samples": 2,
+                    "cats": [
+                        {
+                            "name": "Result reads",
+                            "color": "124,181,236",
+                            "data": [
+                                49834.0,
+                                99878.0
+                            ],
+                            "data_pct": [
+                                100.0,
+                                100.0
+                            ]
+                        }
+                    ],
+                    "samples": [
+                        "SAMPLE2_PE_1_val_1",
+                        "SAMPLE1_PE_1_val_1"
+                    ]
+                },
+                {
+                    "plot_id": "bbduk-filtered-barplot",
+                    "label": "Bases",
+                    "uid": "bbduk-filtered-barplot_Bases",
+                    "dconfig": {
+                        "name": "Bases",
+                        "ylab": "Number of Base Pairs",
+                        "title": "BBDuk: Filtered reads<br><sup>Bases, 2 samples</sup>"
+                    },
+                    "layout": {
+                        "title": {
+                            "text": "BBDuk: Filtered reads<br><sup>Bases, 2 samples</sup>"
+                        },
+                        "xaxis": {
+                            "title": {
+                                "text": "Number of Base Pairs"
+                            },
+                            "hoverformat": ",.2f",
+                            "ticksuffix": "",
+                            "autorangeoptions": {
+                                "minallowed": 0,
+                                "maxallowed": 12514462.0
+                            }
+                        },
+                        "yaxis": {
+                            "title": null,
+                            "hoverformat": null,
+                            "ticksuffix": ""
+                        },
+                        "showlegend": false
+                    },
+                    "trace_params": {
+                        "hovertemplate": "<b></b>%{meta}: <b>%{x}</b><extra></extra>",
+                        "orientation": "h",
+                        "marker": {
+                            "line": {
+                                "width": 0
+                            }
+                        },
+                        "textposition": "inside",
+                        "insidetextanchor": "start"
+                    },
+                    "pct_range": {
+                        "xaxis": {
+                            "min": 0,
+                            "max": 100
+                        },
+                        "yaxis": {
+                            "min": 0,
+                            "max": 100
+                        }
+                    },
+                    "n_samples": 2,
+                    "cats": [
+                        {
+                            "name": "Result bases",
+                            "color": "124,181,236",
+                            "data": [
+                                7494489.0,
+                                12514462.0
+                            ],
+                            "data_pct": [
+                                100.0,
+                                100.0
+                            ]
+                        }
+                    ],
+                    "samples": [
+                        "SAMPLE2_PE_1_val_1",
+                        "SAMPLE1_PE_1_val_1"
+                    ]
+                }
+            ],
+            "pconfig": {
+                "id": "bbduk-filtered-barplot",
+                "title": "BBDuk: Filtered reads",
+                "anchor": null,
+                "table_title": null,
+                "height": null,
+                "width": null,
+                "square": false,
+                "logswitch": false,
+                "logswitch_active": false,
+                "logswitch_label": "Log10",
+                "cpswitch": true,
+                "cpswitch_c_active": true,
+                "cpswitch_counts_label": "Counts",
+                "cpswitch_percent_label": "Percentages",
+                "xLog": null,
+                "yLog": null,
+                "xlog": false,
+                "ylog": false,
+                "data_labels": [
+                    {
+                        "name": "Reads",
+                        "ylab": "Number of Reads",
+                        "title": "BBDuk: Filtered reads<br><sup>Reads, 2 samples</sup>"
+                    },
+                    {
+                        "name": "Bases",
+                        "ylab": "Number of Base Pairs",
+                        "title": "BBDuk: Filtered reads<br><sup>Bases, 2 samples</sup>"
+                    }
+                ],
+                "xTitle": null,
+                "yTitle": null,
+                "xlab": null,
+                "ylab": "Number of Reads",
+                "xsuffix": null,
+                "ysuffix": null,
+                "tt_suffix": null,
+                "xLabFormat": null,
+                "yLabFormat": null,
+                "xLabelFormat": null,
+                "yLabelFormat": null,
+                "xlab_format": null,
+                "ylab_format": null,
+                "tt_label": null,
+                "xDecimals": null,
+                "yDecimals": null,
+                "decimalPlaces": null,
+                "x_decimals": null,
+                "y_decimals": null,
+                "tt_decimals": null,
+                "xmin": null,
+                "xmax": null,
+                "ymin": null,
+                "ymax": null,
+                "xFloor": null,
+                "xCeiling": null,
+                "yFloor": null,
+                "yCeiling": null,
+                "x_clipmin": null,
+                "x_clipmax": null,
+                "y_clipmin": null,
+                "y_clipmax": null,
+                "save_data_file": true,
+                "showlegend": null,
+                "xMinRange": null,
+                "yMinRange": null,
+                "x_minrange": null,
+                "y_minrange": null,
+                "xPlotBands": null,
+                "yPlotBands": null,
+                "xPlotLines": null,
+                "yPlotLines": null,
+                "x_bands": null,
+                "y_bands": null,
+                "x_lines": null,
+                "y_lines": null,
+                "stacking": "relative",
+                "hide_zero_cats": true,
+                "sort_samples": true,
+                "use_legend": true,
+                "suffix": null,
+                "lab_format": null
+            },
+            "add_log_tab": false,
+            "add_pct_tab": true,
+            "l_active": false,
+            "p_active": false,
+            "pct_axis_update": {
+                "ticksuffix": "%",
+                "hoverformat": ".1f"
+            },
+            "axis_controlled_by_switches": [
+                "xaxis"
+            ],
+            "square": false,
+            "flat": false,
+            "defer_render": false,
+            "section_anchor": null,
+            "module_anchor": null
+        },
+        "general_stats_table": {
+            "id": "general_stats_table",
+            "anchor": "general_stats_table",
+            "plot_type": "violin plot",
+            "layout": {
+                "autosize": true,
+                "colorway": [
+                    "#7cb5ec",
+                    "#434348",
+                    "#90ed7d",
+                    "#f7a35c",
+                    "#8085e9",
+                    "#f15c80",
+                    "#e4d354",
+                    "#2b908f",
+                    "#f45b5b",
+                    "#91e8e1"
+                ],
+                "font": {
+                    "family": "'Lucida Grande', 'Open Sans', verdana, arial, sans-serif"
+                },
+                "height": 500,
+                "hoverlabel": {
+                    "namelength": -1
+                },
+                "margin": {
+                    "b": 40,
+                    "l": 60,
+                    "pad": 0,
+                    "r": 15,
+                    "t": 50
+                },
+                "modebar": {
+                    "activecolor": "rgba(0, 0, 0, 1)",
+                    "bgcolor": "rgba(0, 0, 0, 0)",
+                    "color": "rgba(0, 0, 0, 0.5)"
+                },
+                "paper_bgcolor": "white",
+                "plot_bgcolor": "white",
+                "showlegend": false,
+                "title": {
+                    "font": {
+                        "size": 20
+                    },
+                    "text": "General Statistics",
+                    "x": 0.5,
+                    "xanchor": "center"
+                },
+                "xaxis": {
+                    "automargin": false,
+                    "color": "rgba(0,0,0,0.3)",
+                    "gridcolor": "rgba(0,0,0,0.1)",
+                    "tickfont": {
+                        "color": "rgba(0,0,0,0.5)",
+                        "size": 9
+                    },
+                    "zerolinecolor": "rgba(0,0,0,0.1)"
+                },
+                "yaxis": {
+                    "automargin": true,
+                    "color": "rgba(0,0,0,0.3)",
+                    "gridcolor": "rgba(0,0,0,0.1)",
+                    "tickfont": {
+                        "color": "rgba(0,0,0,0.5)",
+                        "size": 9
+                    },
+                    "zerolinecolor": "rgba(0,0,0,0.1)"
+                },
+                "violingap": 0,
+                "grid": {
+                    "columns": 1,
+                    "roworder": "top to bottom",
+                    "ygap": 0.4
+                }
+            },
+            "datasets": [
+                {
+                    "plot_id": "general_stats_table",
+                    "label": "1",
+                    "uid": "general_stats_table",
+                    "dconfig": {
+                        "ylab": "",
+                        "title": "General Statistics<br><sup>2 samples</sup>"
+                    },
+                    "layout": {
+                        "title": {
+                            "text": "General Statistics<br><sup>2 samples</sup>"
+                        },
+                        "xaxis": {
+                            "hoverformat": null,
+                            "ticksuffix": "",
+                            "title": {
+                                "text": null
+                            },
+                            "rangemode": "normal",
+                            "autorangeoptions": {
+                                "clipmin": null,
+                                "clipmax": null,
+                                "minallowed": null,
+                                "maxallowed": null
+                            }
+                        },
+                        "yaxis": {
+                            "hoverformat": null,
+                            "ticksuffix": "",
+                            "title": {
+                                "text": ""
+                            },
+                            "rangemode": "normal",
+                            "autorangeoptions": {
+                                "clipmin": null,
+                                "clipmax": null,
+                                "minallowed": null,
+                                "maxallowed": null
+                            }
+                        }
+                    },
+                    "trace_params": {
+                        "hovertemplate": "<b>%{text}</b>: %{x}<extra></extra>",
+                        "orientation": "h",
+                        "box": {
+                            "visible": true
+                        },
+                        "meanline": {
+                            "visible": true
+                        },
+                        "fillcolor": "#b5b5b5",
+                        "line": {
+                            "width": 2,
+                            "color": "#b5b5b5"
+                        },
+                        "opacity": 0.5,
+                        "points": false,
+                        "hoveron": "points"
+                    },
+                    "pct_range": {
+                        "xaxis": {
+                            "min": 0,
+                            "max": 100
+                        },
+                        "yaxis": {
+                            "min": 0,
+                            "max": 100
+                        }
+                    },
+                    "n_samples": 2,
+                    "metrics": [
+                        "bbduk-Total_Removed_bases_percent",
+                        "bbduk-Total_Removed_bases",
+                        "bbduk-Total_Removed_reads_percent",
+                        "bbduk-Total_Removed_reads",
+                        "bbduk-Input_reads"
+                    ],
+                    "header_by_metric": {
+                        "bbduk-Total_Removed_bases_percent": {
+                            "title": "Bases Removed (%)",
+                            "description": "Percentage of bases removed after filtering",
+                            "suffix": "",
+                            "dmin": 0,
+                            "dmax": 100.0,
+                            "hidden": false,
+                            "xaxis": {
+                                "ticksuffix": null,
+                                "tickvals": null,
+                                "range": [
+                                    -0.5,
+                                    100.5025
+                                ]
+                            },
+                            "show_only_outliers": false,
+                            "show_points": true,
+                            "namespace": "BBDuk",
+                            "color": null,
+                            "hoverformat": ".2f"
+                        },
+                        "bbduk-Total_Removed_bases": {
+                            "title": "Bases Removed (Mb)",
+                            "description": "Total Bases removed (millions)",
+                            "suffix": " Mb",
+                            "dmin": 0.0,
+                            "dmax": 0.022857,
+                            "hidden": true,
+                            "xaxis": {
+                                "ticksuffix": " Mb",
+                                "tickvals": null,
+                                "range": [
+                                    -0.000114285,
+                                    0.022971856425
+                                ]
+                            },
+                            "show_only_outliers": false,
+                            "show_points": true,
+                            "namespace": "BBDuk",
+                            "color": null,
+                            "hoverformat": ".2f"
+                        },
+                        "bbduk-Total_Removed_reads_percent": {
+                            "title": "Reads Removed (%)",
+                            "description": "Percentage of reads removed after filtering",
+                            "suffix": "",
+                            "dmin": 0,
+                            "dmax": 100.0,
+                            "hidden": false,
+                            "xaxis": {
+                                "ticksuffix": null,
+                                "tickvals": null,
+                                "range": [
+                                    -0.5,
+                                    100.5025
+                                ]
+                            },
+                            "show_only_outliers": false,
+                            "show_points": true,
+                            "namespace": "BBDuk",
+                            "color": null,
+                            "hoverformat": ".2f"
+                        },
+                        "bbduk-Total_Removed_reads": {
+                            "title": "Reads Removed (M)",
+                            "description": "Total Reads removed (millions)",
+                            "suffix": " M",
+                            "dmin": 0.0,
+                            "dmax": 0.09999,
+                            "hidden": true,
+                            "xaxis": {
+                                "ticksuffix": " M",
+                                "tickvals": null,
+                                "range": [
+                                    -0.00049995,
+                                    0.10049244974999999
+                                ]
+                            },
+                            "show_only_outliers": false,
+                            "show_points": true,
+                            "namespace": "BBDuk",
+                            "color": null,
+                            "hoverformat": ".2f"
+                        },
+                        "bbduk-Input_reads": {
+                            "title": "Total Input Reads (M)",
+                            "description": "Total number of input reads to BBDuk (millions)",
+                            "suffix": " M",
+                            "dmin": 0.0,
+                            "dmax": 0.09999,
+                            "hidden": true,
+                            "xaxis": {
+                                "ticksuffix": " M",
+                                "tickvals": null,
+                                "range": [
+                                    -0.00049995,
+                                    0.10049244974999999
+                                ]
+                            },
+                            "show_only_outliers": false,
+                            "show_points": true,
+                            "namespace": "BBDuk",
+                            "color": null,
+                            "hoverformat": ".2f"
+                        }
+                    },
+                    "violin_value_by_sample_by_metric": {
+                        "bbduk-Total_Removed_bases_percent": {
+                            "SAMPLE2_PE_1_val_1": 0.3,
+                            "SAMPLE1_PE_1_val_1": 0.11
+                        },
+                        "bbduk-Total_Removed_bases": {
+                            "SAMPLE2_PE_1_val_1": 0.022857,
+                            "SAMPLE1_PE_1_val_1": 0.014032
+                        },
+                        "bbduk-Total_Removed_reads_percent": {
+                            "SAMPLE2_PE_1_val_1": 0.3,
+                            "SAMPLE1_PE_1_val_1": 0.11
+                        },
+                        "bbduk-Total_Removed_reads": {
+                            "SAMPLE2_PE_1_val_1": 0.00015199999999999998,
+                            "SAMPLE1_PE_1_val_1": 0.000112
+                        },
+                        "bbduk-Input_reads": {
+                            "SAMPLE2_PE_1_val_1": 0.049985999999999996,
+                            "SAMPLE1_PE_1_val_1": 0.09999
+                        }
+                    },
+                    "scatter_value_by_sample_by_metric": {
+                        "bbduk-Total_Removed_bases_percent": {},
+                        "bbduk-Total_Removed_bases": {},
+                        "bbduk-Total_Removed_reads_percent": {},
+                        "bbduk-Total_Removed_reads": {},
+                        "bbduk-Input_reads": {}
+                    },
+                    "all_samples": [
+                        "SAMPLE1_PE_1_val_1",
+                        "SAMPLE2_PE_1_val_1"
+                    ],
+                    "scatter_trace_params": {
+                        "mode": "markers",
+                        "marker": {
+                            "size": 4,
+                            "color": "#0b79e6"
+                        },
+                        "showlegend": false,
+                        "hovertemplate": "<b>%{text}</b>: %{x}<extra></extra>",
+                        "hoverlabel": {
+                            "bgcolor": "white"
+                        }
+                    },
+                    "dt": {
+                        "id": "general_stats_table",
+                        "anchor": "general_stats_table_table",
+                        "pconfig": {
+                            "id": "general_stats_table",
+                            "title": "General Statistics",
+                            "anchor": null,
+                            "table_title": null,
+                            "height": null,
+                            "width": null,
+                            "square": false,
+                            "logswitch": false,
+                            "logswitch_active": false,
+                            "logswitch_label": "Log10",
+                            "cpswitch": true,
+                            "cpswitch_c_active": true,
+                            "cpswitch_counts_label": "Counts",
+                            "cpswitch_percent_label": "Percentages",
+                            "xLog": null,
+                            "yLog": null,
+                            "xlog": false,
+                            "ylog": false,
+                            "data_labels": [],
+                            "xTitle": null,
+                            "yTitle": null,
+                            "xlab": null,
+                            "ylab": null,
+                            "xsuffix": null,
+                            "ysuffix": null,
+                            "tt_suffix": null,
+                            "xLabFormat": null,
+                            "yLabFormat": null,
+                            "xLabelFormat": null,
+                            "yLabelFormat": null,
+                            "xlab_format": null,
+                            "ylab_format": null,
+                            "tt_label": null,
+                            "xDecimals": null,
+                            "yDecimals": null,
+                            "decimalPlaces": null,
+                            "x_decimals": null,
+                            "y_decimals": null,
+                            "tt_decimals": null,
+                            "xmin": null,
+                            "xmax": null,
+                            "ymin": null,
+                            "ymax": null,
+                            "xFloor": null,
+                            "xCeiling": null,
+                            "yFloor": null,
+                            "yCeiling": null,
+                            "x_clipmin": null,
+                            "x_clipmax": null,
+                            "y_clipmin": null,
+                            "y_clipmax": null,
+                            "save_data_file": true,
+                            "showlegend": null,
+                            "xMinRange": null,
+                            "yMinRange": null,
+                            "x_minrange": null,
+                            "y_minrange": null,
+                            "xPlotBands": null,
+                            "yPlotBands": null,
+                            "xPlotLines": null,
+                            "yPlotLines": null,
+                            "x_bands": null,
+                            "y_bands": null,
+                            "x_lines": null,
+                            "y_lines": null,
+                            "namespace": "",
+                            "save_file": true,
+                            "raw_data_fn": "multiqc_general_stats",
+                            "defaultsort": null,
+                            "sortRows": true,
+                            "sort_rows": true,
+                            "only_defined_headers": true,
+                            "col1_header": "Sample Name",
+                            "no_beeswarm": false,
+                            "no_violin": false,
+                            "scale": "GnBu",
+                            "min": null,
+                            "parse_numeric": true
+                        },
+                        "sections": [
+                            {
+                                "column_by_key": {
+                                    "Total Removed bases percent": {
+                                        "rid": "bbduk-Total_Removed_bases_percent",
+                                        "title": "Bases Removed (%)",
+                                        "description": "Percentage of bases removed after filtering",
+                                        "scale": "YlOrBr",
+                                        "hidden": false,
+                                        "placement": 1000.0,
+                                        "namespace": "BBDuk",
+                                        "colour": null,
+                                        "color": null,
+                                        "max": 100.0,
+                                        "dmax": 100.0,
+                                        "min": null,
+                                        "dmin": 0,
+                                        "ceiling": null,
+                                        "floor": null,
+                                        "minRange": null,
+                                        "minrange": null,
+                                        "shared_key": null,
+                                        "tt_decimals": null,
+                                        "suffix": null,
+                                        "cond_formatting_colours": [
+                                            {
+                                                "blue": "#337ab7"
+                                            },
+                                            {
+                                                "lbue": "#5bc0de"
+                                            },
+                                            {
+                                                "pass": "#5cb85c"
+                                            },
+                                            {
+                                                "warn": "#f0ad4e"
+                                            },
+                                            {
+                                                "fail": "#d9534f"
+                                            },
+                                            {
+                                                "male": "#5bc0de"
+                                            },
+                                            {
+                                                "female": "#d9534f"
+                                            }
+                                        ],
+                                        "cond_formatting_rules": {},
+                                        "bgcols": {},
+                                        "bars_zero_centrepoint": false
+                                    },
+                                    "Total Removed bases": {
+                                        "rid": "bbduk-Total_Removed_bases",
+                                        "title": "Bases Removed (Mb)",
+                                        "description": "Total Bases removed (millions)",
+                                        "scale": "Reds",
+                                        "hidden": true,
+                                        "placement": 1000.0,
+                                        "namespace": "BBDuk",
+                                        "colour": null,
+                                        "color": null,
+                                        "max": null,
+                                        "dmax": 0.022857,
+                                        "min": 0.0,
+                                        "dmin": 0.0,
+                                        "ceiling": null,
+                                        "floor": null,
+                                        "minRange": null,
+                                        "minrange": null,
+                                        "shared_key": "base_count",
+                                        "tt_decimals": null,
+                                        "suffix": " Mb",
+                                        "cond_formatting_colours": [
+                                            {
+                                                "blue": "#337ab7"
+                                            },
+                                            {
+                                                "lbue": "#5bc0de"
+                                            },
+                                            {
+                                                "pass": "#5cb85c"
+                                            },
+                                            {
+                                                "warn": "#f0ad4e"
+                                            },
+                                            {
+                                                "fail": "#d9534f"
+                                            },
+                                            {
+                                                "male": "#5bc0de"
+                                            },
+                                            {
+                                                "female": "#d9534f"
+                                            }
+                                        ],
+                                        "cond_formatting_rules": {},
+                                        "bgcols": {},
+                                        "bars_zero_centrepoint": false
+                                    },
+                                    "Total Removed reads percent": {
+                                        "rid": "bbduk-Total_Removed_reads_percent",
+                                        "title": "Reads Removed (%)",
+                                        "description": "Percentage of reads removed after filtering",
+                                        "scale": "OrRd",
+                                        "hidden": false,
+                                        "placement": 1000.0,
+                                        "namespace": "BBDuk",
+                                        "colour": null,
+                                        "color": null,
+                                        "max": 100.0,
+                                        "dmax": 100.0,
+                                        "min": null,
+                                        "dmin": 0,
+                                        "ceiling": null,
+                                        "floor": null,
+                                        "minRange": null,
+                                        "minrange": null,
+                                        "shared_key": null,
+                                        "tt_decimals": null,
+                                        "suffix": null,
+                                        "cond_formatting_colours": [
+                                            {
+                                                "blue": "#337ab7"
+                                            },
+                                            {
+                                                "lbue": "#5bc0de"
+                                            },
+                                            {
+                                                "pass": "#5cb85c"
+                                            },
+                                            {
+                                                "warn": "#f0ad4e"
+                                            },
+                                            {
+                                                "fail": "#d9534f"
+                                            },
+                                            {
+                                                "male": "#5bc0de"
+                                            },
+                                            {
+                                                "female": "#d9534f"
+                                            }
+                                        ],
+                                        "cond_formatting_rules": {},
+                                        "bgcols": {},
+                                        "bars_zero_centrepoint": false
+                                    },
+                                    "Total Removed reads": {
+                                        "rid": "bbduk-Total_Removed_reads",
+                                        "title": "Reads Removed (M)",
+                                        "description": "Total Reads removed (millions)",
+                                        "scale": "Reds",
+                                        "hidden": true,
+                                        "placement": 1000.0,
+                                        "namespace": "BBDuk",
+                                        "colour": null,
+                                        "color": null,
+                                        "max": null,
+                                        "dmax": 0.09999,
+                                        "min": 0.0,
+                                        "dmin": 0.0,
+                                        "ceiling": null,
+                                        "floor": null,
+                                        "minRange": null,
+                                        "minrange": null,
+                                        "shared_key": "read_count",
+                                        "tt_decimals": null,
+                                        "suffix": " M",
+                                        "cond_formatting_colours": [
+                                            {
+                                                "blue": "#337ab7"
+                                            },
+                                            {
+                                                "lbue": "#5bc0de"
+                                            },
+                                            {
+                                                "pass": "#5cb85c"
+                                            },
+                                            {
+                                                "warn": "#f0ad4e"
+                                            },
+                                            {
+                                                "fail": "#d9534f"
+                                            },
+                                            {
+                                                "male": "#5bc0de"
+                                            },
+                                            {
+                                                "female": "#d9534f"
+                                            }
+                                        ],
+                                        "cond_formatting_rules": {},
+                                        "bgcols": {},
+                                        "bars_zero_centrepoint": false
+                                    },
+                                    "Input reads": {
+                                        "rid": "bbduk-Input_reads",
+                                        "title": "Total Input Reads (M)",
+                                        "description": "Total number of input reads to BBDuk (millions)",
+                                        "scale": "Greens",
+                                        "hidden": true,
+                                        "placement": 1000.0,
+                                        "namespace": "BBDuk",
+                                        "colour": null,
+                                        "color": null,
+                                        "max": null,
+                                        "dmax": 0.09999,
+                                        "min": 0.0,
+                                        "dmin": 0.0,
+                                        "ceiling": null,
+                                        "floor": null,
+                                        "minRange": null,
+                                        "minrange": null,
+                                        "shared_key": "read_count",
+                                        "tt_decimals": null,
+                                        "suffix": " M",
+                                        "cond_formatting_colours": [
+                                            {
+                                                "blue": "#337ab7"
+                                            },
+                                            {
+                                                "lbue": "#5bc0de"
+                                            },
+                                            {
+                                                "pass": "#5cb85c"
+                                            },
+                                            {
+                                                "warn": "#f0ad4e"
+                                            },
+                                            {
+                                                "fail": "#d9534f"
+                                            },
+                                            {
+                                                "male": "#5bc0de"
+                                            },
+                                            {
+                                                "female": "#d9534f"
+                                            }
+                                        ],
+                                        "cond_formatting_rules": {},
+                                        "bgcols": {},
+                                        "bars_zero_centrepoint": false
+                                    }
+                                },
+                                "rows_by_sgroup": {
+                                    "SAMPLE2_PE_1_val_1": [
+                                        {
+                                            "sample": "SAMPLE2_PE_1_val_1",
+                                            "raw_data": {
+                                                "Input reads": 0.049985999999999996,
+                                                "Total Removed reads": 0.00015199999999999998,
+                                                "Total Removed reads percent": 0.3,
+                                                "Total Removed bases": 0.022857,
+                                                "Total Removed bases percent": 0.3
+                                            },
+                                            "formatted_data": {
+                                                "Input reads": "0.0",
+                                                "Total Removed reads": "0.0",
+                                                "Total Removed reads percent": "0.3",
+                                                "Total Removed bases": "0.0",
+                                                "Total Removed bases percent": "0.3"
+                                            }
+                                        }
+                                    ],
+                                    "SAMPLE1_PE_1_val_1": [
+                                        {
+                                            "sample": "SAMPLE1_PE_1_val_1",
+                                            "raw_data": {
+                                                "Input reads": 0.09999,
+                                                "Total Removed reads": 0.000112,
+                                                "Total Removed reads percent": 0.11,
+                                                "Total Removed bases": 0.014032,
+                                                "Total Removed bases percent": 0.11
+                                            },
+                                            "formatted_data": {
+                                                "Input reads": "0.1",
+                                                "Total Removed reads": "0.0",
+                                                "Total Removed reads percent": "0.1",
+                                                "Total Removed bases": "0.0",
+                                                "Total Removed bases percent": "0.1"
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ],
+                        "headers_in_order": {
+                            "1000.0": [
+                                [
+                                    0,
+                                    "Total Removed bases percent"
+                                ],
+                                [
+                                    0,
+                                    "Total Removed bases"
+                                ],
+                                [
+                                    0,
+                                    "Total Removed reads percent"
+                                ],
+                                [
+                                    0,
+                                    "Total Removed reads"
+                                ],
+                                [
+                                    0,
+                                    "Input reads"
+                                ]
+                            ]
+                        }
+                    },
+                    "show_table_by_default": true,
+                    "is_downsampled": false
+                }
+            ],
+            "pconfig": {
+                "id": "general_stats_table",
+                "title": "General Statistics",
+                "anchor": null,
+                "table_title": null,
+                "height": null,
+                "width": null,
+                "square": false,
+                "logswitch": false,
+                "logswitch_active": false,
+                "logswitch_label": "Log10",
+                "cpswitch": true,
+                "cpswitch_c_active": true,
+                "cpswitch_counts_label": "Counts",
+                "cpswitch_percent_label": "Percentages",
+                "xLog": null,
+                "yLog": null,
+                "xlog": false,
+                "ylog": false,
+                "data_labels": [],
+                "xTitle": null,
+                "yTitle": null,
+                "xlab": null,
+                "ylab": null,
+                "xsuffix": null,
+                "ysuffix": null,
+                "tt_suffix": null,
+                "xLabFormat": null,
+                "yLabFormat": null,
+                "xLabelFormat": null,
+                "yLabelFormat": null,
+                "xlab_format": null,
+                "ylab_format": null,
+                "tt_label": null,
+                "xDecimals": null,
+                "yDecimals": null,
+                "decimalPlaces": null,
+                "x_decimals": null,
+                "y_decimals": null,
+                "tt_decimals": null,
+                "xmin": null,
+                "xmax": null,
+                "ymin": null,
+                "ymax": null,
+                "xFloor": null,
+                "xCeiling": null,
+                "yFloor": null,
+                "yCeiling": null,
+                "x_clipmin": null,
+                "x_clipmax": null,
+                "y_clipmin": null,
+                "y_clipmax": null,
+                "save_data_file": true,
+                "showlegend": null,
+                "xMinRange": null,
+                "yMinRange": null,
+                "x_minrange": null,
+                "y_minrange": null,
+                "xPlotBands": null,
+                "yPlotBands": null,
+                "xPlotLines": null,
+                "yPlotLines": null,
+                "x_bands": null,
+                "y_bands": null,
+                "x_lines": null,
+                "y_lines": null,
+                "namespace": "",
+                "save_file": true,
+                "raw_data_fn": "multiqc_general_stats",
+                "defaultsort": null,
+                "sortRows": true,
+                "sort_rows": true,
+                "only_defined_headers": true,
+                "col1_header": "Sample Name",
+                "no_beeswarm": false,
+                "no_violin": false,
+                "scale": "GnBu",
+                "min": null,
+                "parse_numeric": true
+            },
+            "add_log_tab": false,
+            "add_pct_tab": false,
+            "l_active": false,
+            "p_active": false,
+            "pct_axis_update": {
+                "ticksuffix": "%",
+                "hoverformat": ".1f"
+            },
+            "axis_controlled_by_switches": [],
+            "square": false,
+            "flat": false,
+            "defer_render": false,
+            "section_anchor": null,
+            "module_anchor": null,
+            "violin_height": 70,
+            "extra_height": 63,
+            "no_violin": false,
+            "show_table": true,
+            "show_table_by_default": true,
+            "n_samples": 2,
+            "table_anchor": "general_stats_table_table"
+        }
+    },
+    "report_creation_date": "2025-02-05, 17:42 CET",
+    "config_analysis_dir": [
+        "."
+    ],
+    "config_git_hash": null,
+    "config_intro_text": null,
+    "config_report_comment": "This report has been generated by the <a href=\"https://github.com/nf-core/metatdenovo/tree/dev\" target=\"_blank\">nf-core/metatdenovo</a> analysis pipeline. For information about how to interpret these results, please see the <a href=\"https://nf-co.re/metatdenovo/dev/docs/output\" target=\"_blank\">documentation</a>.\n",
+    "config_report_header_info": null,
+    "config_script_path": "/usr/local/lib/python3.13/site-packages/multiqc",
+    "config_short_version": "1.27",
+    "config_subtitle": null,
+    "config_title": null,
+    "config_version": "1.27",
+    "config_output_dir": "/cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/ca/a216a59ed29488519cd3ab34528a81",
+    "config_analysis_dir_abs": [
+        "/cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/ca/a216a59ed29488519cd3ab34528a81"
+    ],
+    "report_saved_raw_data": {
+        "bbduk": {
+            "SAMPLE2_PE_1_val_1": {
+                "Input reads": 49986,
+                "Input bases": 7517346,
+                "Total Removed reads": 152,
+                "Total Removed reads percent": 0.3,
+                "Total Removed bases": 22857,
+                "Total Removed bases percent": 0.3,
+                "Result reads": 49834,
+                "Result reads percent": 99.7,
+                "Result bases": 7494489,
+                "Result bases percent": 99.7
+            },
+            "SAMPLE1_PE_1_val_1": {
+                "Input reads": 99990,
+                "Input bases": 12528494,
+                "Total Removed reads": 112,
+                "Total Removed reads percent": 0.11,
+                "Total Removed bases": 14032,
+                "Total Removed bases percent": 0.11,
+                "Result reads": 99878,
+                "Result reads percent": 99.89,
+                "Result bases": 12514462,
+                "Result bases percent": 99.89
+            }
+        },
+        "multiqc_general_stats": {
+            "SAMPLE2_PE_1_val_1": {
+                "bbduk-Total_Removed_bases_percent": 0.3,
+                "bbduk-Total_Removed_bases": 0.022857,
+                "bbduk-Total_Removed_reads_percent": 0.3,
+                "bbduk-Total_Removed_reads": 0.00015199999999999998,
+                "bbduk-Input_reads": 0.049985999999999996
+            },
+            "SAMPLE1_PE_1_val_1": {
+                "bbduk-Total_Removed_bases_percent": 0.11,
+                "bbduk-Total_Removed_bases": 0.014032,
+                "bbduk-Total_Removed_reads_percent": 0.11,
+                "bbduk-Total_Removed_reads": 0.000112,
+                "bbduk-Input_reads": 0.09999
+            }
+        }
+    }
+}

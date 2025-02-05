@@ -1,0 +1,671 @@
+Feb-05 17:37:42.651 [main] DEBUG nextflow.cli.Launcher - $> nextflow -quiet -log /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/meta/nextflow.log run /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/tests/../main.nf -c /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/nextflow.config -c /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/tests/nextflow.config -params-file /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/meta/params.json -ansi-log false -profile test_filter,singularity -with-trace /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/meta/trace.csv -w /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work
+Feb-05 17:37:42.766 [main] INFO  nextflow.cli.CmdRun - N E X T F L O W  ~  version 24.10.4
+Feb-05 17:37:42.802 [main] DEBUG nextflow.plugin.PluginsFacade - Setting up plugin manager > mode=prod; embedded=false; plugins-dir=/cfs/klemming/home/d/ddl/.nextflow/plugins; core-plugins: nf-amazon@2.9.2,nf-azure@1.10.2,nf-cloudcache@0.4.2,nf-codecommit@0.2.2,nf-console@1.1.4,nf-google@1.15.3,nf-tower@1.9.3,nf-wave@1.7.4
+Feb-05 17:37:42.830 [main] INFO  o.pf4j.DefaultPluginStatusProvider - Enabled plugins: []
+Feb-05 17:37:42.832 [main] INFO  o.pf4j.DefaultPluginStatusProvider - Disabled plugins: []
+Feb-05 17:37:42.837 [main] INFO  org.pf4j.DefaultPluginManager - PF4J version 3.12.0 in 'deployment' mode
+Feb-05 17:37:42.858 [main] INFO  org.pf4j.AbstractPluginManager - No plugins
+Feb-05 17:37:42.900 [main] DEBUG nextflow.config.ConfigBuilder - Found config base: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/nextflow.config
+Feb-05 17:37:42.908 [main] DEBUG nextflow.config.ConfigBuilder - User config file: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/nextflow.config
+Feb-05 17:37:42.909 [main] DEBUG nextflow.config.ConfigBuilder - User config file: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/tests/nextflow.config
+Feb-05 17:37:42.912 [main] DEBUG nextflow.config.ConfigBuilder - Parsing config file: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/nextflow.config
+Feb-05 17:37:42.913 [main] DEBUG nextflow.config.ConfigBuilder - Parsing config file: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/nextflow.config
+Feb-05 17:37:42.913 [main] DEBUG nextflow.config.ConfigBuilder - Parsing config file: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/tests/nextflow.config
+Feb-05 17:37:42.958 [main] DEBUG n.secret.LocalSecretsProvider - Secrets store: /cfs/klemming/home/d/ddl/.nextflow/secrets/store.json
+Feb-05 17:37:42.963 [main] DEBUG nextflow.secret.SecretsLoader - Discovered secrets providers: [nextflow.secret.LocalSecretsProvider@52b6319f] - activable => nextflow.secret.LocalSecretsProvider@52b6319f
+Feb-05 17:37:42.997 [main] DEBUG nextflow.config.ConfigBuilder - Applying config profile: `test_filter,singularity`
+Feb-05 17:37:46.061 [main] DEBUG nextflow.config.ConfigBuilder - Applying config profile: `test_filter,singularity`
+Feb-05 17:37:46.629 [main] DEBUG nextflow.config.ConfigBuilder - Applying config profile: `test_filter,singularity`
+Feb-05 17:37:46.690 [main] DEBUG nextflow.config.ConfigBuilder - Available config profiles: [bih, cfc_dev, uzl_omics, ifb_core, embl_hd, denbi_qbic, alice, mjolnir_globe, uppmax, giga, incliva, ilifu, ki_luria, uge, rosalind_uge, lugh, mccleary, test_filter, unibe_ibu, vai, czbiohub_aws, jax, roslin, ccga_med, tes, scw, unc_longleaf, tigem, tubingen_apg, google, apollo, ipop_up, vsc_calcua, pdc_kth, googlels, ceci_nic5, stjude, daisybio, eddie, medair, biowulf, apptainer, bi, bigpurple, adcra, cedars, pawsey_setonix, vsc_kul_uhasselt, pawsey_nimbus, ucl_myriad, utd_ganymede, charliecloud, icr_davros, ceres, arm, test_spades, munin, rosalind, hasta, cfc, uzh, shu_bmrc, ebi_codon_slurm, ebc, ccga_dx, crick, ku_sund_danhead, marvin, shifter, biohpc_gen, mana, mamba, york_viking, unc_lccc, wehi, awsbatch, wustl_htcf, arcc, ceci_dragon2, imperial, maestro, software_license, genotoul, nci_gadi, abims, janelia, nu_genomics, googlebatch, oist, sahmri, kaust, mpcdf, leicester, vsc_ugent, create, sage, cambridge, jex, podman, ebi_codon, cheaha, xanadu, nyu_hpc, test, marjorie, test_kofamscan, computerome, ucd_sonic, seg_globe, sanger, dkfz, bluebear, pasteur, einstein, ethz_euler, m3c, test_full, imb, ucl_cscluster, tuos_stanage, azurebatch, hki, crukmi, csiro_petrichor, qmul_apocrita, wave, docker, engaging, gis, hypatia, psmn, eva, unity, nygc, fgcz, conda, crg, singularity, mpcdf_viper, pe2, self_hosted_runner, tufts, uw_hyak_pedslabs, debug, genouest, cbe, test_eggnog, unsw_katana, test_prokka, gitpod, phoenix, seawulf, test_transdecoder, uod_hpc, fub_curta, uct_hpc, test_eukulele, aws_tower, binac]
+Feb-05 17:37:46.760 [main] DEBUG nextflow.cli.CmdRun - Applied DSL=2 by global default
+Feb-05 17:37:46.785 [main] INFO  nextflow.cli.CmdRun - Launching `/cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/tests/../main.nf` [kickass_heisenberg] DSL2 - revision: 62ad2be208
+Feb-05 17:37:46.786 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins declared=[nf-schema@2.3.0]
+Feb-05 17:37:46.787 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins default=[]
+Feb-05 17:37:46.787 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins resolved requirement=[nf-schema@2.3.0]
+Feb-05 17:37:46.788 [main] DEBUG nextflow.plugin.PluginUpdater - Installing plugin nf-schema version: 2.3.0
+Feb-05 17:37:46.808 [main] INFO  org.pf4j.AbstractPluginManager - Plugin 'nf-schema@2.3.0' resolved
+Feb-05 17:37:46.809 [main] INFO  org.pf4j.AbstractPluginManager - Start plugin 'nf-schema@2.3.0'
+Feb-05 17:37:46.822 [main] DEBUG nextflow.plugin.BasePlugin - Plugin started nf-schema@2.3.0
+Feb-05 17:37:46.909 [main] DEBUG nextflow.Session - Session UUID: a2a3c3c2-d97e-48aa-ba0b-e64241eb930b
+Feb-05 17:37:46.909 [main] DEBUG nextflow.Session - Run name: kickass_heisenberg
+Feb-05 17:37:46.910 [main] DEBUG nextflow.Session - Executor pool size: 256
+Feb-05 17:37:46.923 [main] DEBUG nextflow.file.FilePorter - File porter settings maxRetries=3; maxTransfers=50; pollTimeout=null
+Feb-05 17:37:46.930 [main] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'FileTransfer' minSize=10; maxSize=768; workQueue=LinkedBlockingQueue[10000]; allowCoreThreadTimeout=false
+Feb-05 17:37:46.971 [main] DEBUG nextflow.cli.CmdRun - 
+  Version: 24.10.4 build 5934
+  Created: 20-01-2025 16:47 UTC (17:47 CEST)
+  System: Linux 5.14.21-150500.55.31_13.0.53-cray_shasta_c
+  Runtime: Groovy 4.0.23 on OpenJDK 64-Bit Server VM 11.0.13+7-b1751.21
+  Encoding: UTF-8 (UTF-8)
+  Process: 1882825@login1 [10.253.0.5]
+  CPUs: 256 - Mem: 503.5 GB (57.4 GB) - Swap: 0 (0)
+Feb-05 17:37:47.039 [main] DEBUG nextflow.Session - Work-dir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work [lustre]
+Feb-05 17:37:47.040 [main] DEBUG nextflow.Session - Script base path does not exist or is not a directory: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/bin
+Feb-05 17:37:47.061 [main] DEBUG nextflow.executor.ExecutorFactory - Extension executors providers=[]
+Feb-05 17:37:47.080 [main] DEBUG nextflow.Session - Observer factory: DefaultObserverFactory
+Feb-05 17:37:47.090 [main] DEBUG nextflow.Session - Observer factory: ValidationObserverFactory
+Feb-05 17:37:47.172 [main] DEBUG nextflow.cache.CacheFactory - Using Nextflow cache factory: nextflow.cache.DefaultCacheFactory
+Feb-05 17:37:47.189 [main] DEBUG nextflow.util.CustomThreadPool - Creating default thread pool > poolSize: 257; maxThreads: 1000
+Feb-05 17:37:47.307 [main] DEBUG nextflow.Session - Session start
+Feb-05 17:37:47.310 [main] DEBUG nextflow.trace.TraceFileObserver - Workflow started -- trace file: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/meta/trace.csv
+Feb-05 17:37:47.330 [main] DEBUG nextflow.Session - Using default localLib path: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/lib
+Feb-05 17:37:47.334 [main] DEBUG nextflow.Session - Adding to the classpath library: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/lib
+Feb-05 17:37:47.571 [main] DEBUG nextflow.script.ScriptRunner - > Launching execution
+Feb-05 17:37:50.119 [main] DEBUG nextflow.script.IncludeDef - Loading included plugin extensions with names: [paramsSummaryLog:paramsSummaryLog]; plugin Id: nf-schema
+Feb-05 17:37:50.135 [main] DEBUG nextflow.script.IncludeDef - Loading included plugin extensions with names: [validateParameters:validateParameters]; plugin Id: nf-schema
+Feb-05 17:37:50.160 [main] DEBUG nextflow.script.IncludeDef - Loading included plugin extensions with names: [paramsSummaryMap:paramsSummaryMap]; plugin Id: nf-schema
+Feb-05 17:37:50.161 [main] DEBUG nextflow.script.IncludeDef - Loading included plugin extensions with names: [samplesheetToList:samplesheetToList]; plugin Id: nf-schema
+Feb-05 17:37:54.553 [main] DEBUG nextflow.script.IncludeDef - Loading included plugin extensions with names: [paramsSummaryMap:paramsSummaryMap]; plugin Id: nf-schema
+Feb-05 17:37:55.224 [main] DEBUG nextflow.script.IncludeDef - Loading included plugin extensions with names: [paramsSummaryLog:paramsSummaryLog]; plugin Id: nf-schema
+Feb-05 17:37:55.226 [main] DEBUG nextflow.script.IncludeDef - Loading included plugin extensions with names: [validateParameters:validateParameters]; plugin Id: nf-schema
+Feb-05 17:37:55.227 [main] DEBUG nextflow.script.IncludeDef - Loading included plugin extensions with names: [paramsSummaryMap:paramsSummaryMap]; plugin Id: nf-schema
+Feb-05 17:37:55.228 [main] DEBUG nextflow.script.IncludeDef - Loading included plugin extensions with names: [samplesheetToList:samplesheetToList]; plugin Id: nf-schema
+Feb-05 17:37:55.528 [main] INFO  nextflow.Nextflow - 
+-[2m----------------------------------------------------[0m-
+                                        [0;32m,--.[0;30m/[0;32m,-.[0m
+[0;34m        ___     __   __   __   ___     [0;32m/,-._.--~'[0m
+[0;34m  |\ | |__  __ /  ` /  \ |__) |__         [0;33m}  {[0m
+[0;34m  | \| |       \__, \__/ |  \ |___     [0;32m\`-._,-`-,[0m
+                                        [0;32m`._,._,'[0m
+[0;35m  nf-core/metatdenovo 1.1dev[0m
+-[2m----------------------------------------------------[0m-
+[1mInput/output options[0m
+  [0;34minput                       : [0;32mhttps://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/samplesheet/samplesheet.csv[0m
+  [0;34moutdir                      : [0;32m/cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/output[0m
+
+[1mFiltering options[0m
+  [0;34msequence_filter             : [0;32mhttps://github.com/nf-core/test-datasets/raw/metatdenovo/test_data/rrna.fna.gz[0m
+
+[1mAssembler options[0m
+  [0;34massembler                   : [0;32mmegahit[0m
+
+[1mOrf Caller options[0m
+  [0;34morf_caller                  : [0;32mprodigal[0m
+
+[1mFunctional annotation options[0m
+  [0;34mskip_eggnog                 : [0;32mtrue[0m
+  [0;34mskip_kofamscan              : [0;32mtrue[0m
+
+[1mTaxonomy annotation options[0m
+  [0;34mskip_eukulele               : [0;32mtrue[0m
+
+[1mInstitutional config options[0m
+  [0;34mconfig_profile_name         : [0;32mTest profile[0m
+  [0;34mconfig_profile_description  : [0;32mMinimal test dataset to check pipeline function, including removal of contaminating sequences (e.g. rRNA)[0m
+
+[1mGeneric options[0m
+  [0;34mpipelines_testdata_base_path: [0;32ms3://ngi-igenomes/testdata/nf-core/pipelines/rnaseq/3.15/[0m
+  [0;34mtrace_report_suffix         : [0;32m2025-02-05_17-37-46[0m
+
+[1mCore Nextflow options[0m
+  [0;34mrunName                     : [0;32mkickass_heisenberg[0m
+  [0;34mcontainerEngine             : [0;32msingularity[0m
+  [0;34mlaunchDir                   : [0;32m/cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491[0m
+  [0;34mworkDir                     : [0;32m/cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work[0m
+  [0;34mprojectDir                  : [0;32m/cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo[0m
+  [0;34muserName                    : [0;32mddl[0m
+  [0;34mprofile                     : [0;32mtest_filter,singularity[0m
+  [0;34mconfigFiles                 : [0;32m/cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/nextflow.config, /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/nextflow.config, /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/tests/nextflow.config[0m
+
+!! Only displaying parameters that differ from the pipeline defaults !!
+-[2m----------------------------------------------------[0m-
+* The nf-core framework
+    https://doi.org/10.1038/s41587-020-0439-x
+
+* Software dependencies
+    https://github.com/nf-core/metatdenovo/blob/master/CITATIONS.md
+
+Feb-05 17:37:55.529 [main] DEBUG n.validation.ValidationExtension - Starting parameters validation
+Feb-05 17:37:55.566 [main] WARN  n.validation.ValidationExtension - The following invalid input values have been detected:
+
+* --modules_testdata_base_path: s3://ngi-igenomes/testdata/nf-core/modules/
+
+
+Feb-05 17:37:55.915 [main] DEBUG nextflow.validation.SchemaEvaluator - Started validating /nf-core/test-datasets/metatdenovo/samplesheet/samplesheet.csv
+Feb-05 17:37:56.596 [main] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/mag/test_data/test_minigut_R2.fastq.gz
+Feb-05 17:37:56.767 [main] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/mag/test_data/test_minigut_R2.fastq.gz
+Feb-05 17:37:56.795 [main] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/mag/test_data/test_minigut_R2.fastq.gz
+Feb-05 17:37:56.820 [main] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/mag/test_data/test_minigut_R2.fastq.gz
+Feb-05 17:37:57.321 [main] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/test_data/test_minigut_R1.fastq.gz
+Feb-05 17:37:57.613 [main] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/test_data/test_minigut_R1.fastq.gz
+Feb-05 17:37:57.637 [main] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/test_data/test_minigut_R1.fastq.gz
+Feb-05 17:37:57.659 [main] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/test_data/test_minigut_R1.fastq.gz
+Feb-05 17:37:58.042 [main] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/mag/test_data/test_minigut_sample2_R2.fastq.gz
+Feb-05 17:37:58.240 [main] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/mag/test_data/test_minigut_sample2_R2.fastq.gz
+Feb-05 17:37:58.281 [main] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/mag/test_data/test_minigut_sample2_R2.fastq.gz
+Feb-05 17:37:58.333 [main] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/mag/test_data/test_minigut_sample2_R2.fastq.gz
+Feb-05 17:37:58.707 [main] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/test_data/test_minigut_sample2_R1.fastq.gz
+Feb-05 17:37:58.890 [main] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/test_data/test_minigut_sample2_R1.fastq.gz
+Feb-05 17:37:58.912 [main] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/test_data/test_minigut_sample2_R1.fastq.gz
+Feb-05 17:37:58.931 [main] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/test_data/test_minigut_sample2_R1.fastq.gz
+Feb-05 17:38:00.331 [main] DEBUG nextflow.validation.SchemaEvaluator - Validation of file 'https://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/samplesheet/samplesheet.csv' passed!
+Feb-05 17:38:00.411 [main] DEBUG n.validation.ValidationExtension - Finishing parameters validation
+Feb-05 17:38:00.494 [main] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/mag/test_data/test_minigut_R2.fastq.gz
+Feb-05 17:38:00.506 [main] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/mag/test_data/test_minigut_R2.fastq.gz
+Feb-05 17:38:00.526 [main] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/mag/test_data/test_minigut_R2.fastq.gz
+Feb-05 17:38:00.545 [main] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/mag/test_data/test_minigut_R2.fastq.gz
+Feb-05 17:38:00.567 [main] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/test_data/test_minigut_R1.fastq.gz
+Feb-05 17:38:00.586 [main] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/test_data/test_minigut_R1.fastq.gz
+Feb-05 17:38:00.605 [main] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/test_data/test_minigut_R1.fastq.gz
+Feb-05 17:38:00.624 [main] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/test_data/test_minigut_R1.fastq.gz
+Feb-05 17:38:00.647 [main] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/mag/test_data/test_minigut_sample2_R2.fastq.gz
+Feb-05 17:38:00.666 [main] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/mag/test_data/test_minigut_sample2_R2.fastq.gz
+Feb-05 17:38:00.687 [main] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/mag/test_data/test_minigut_sample2_R2.fastq.gz
+Feb-05 17:38:00.705 [main] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/mag/test_data/test_minigut_sample2_R2.fastq.gz
+Feb-05 17:38:00.723 [main] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/test_data/test_minigut_sample2_R1.fastq.gz
+Feb-05 17:38:00.744 [main] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/test_data/test_minigut_sample2_R1.fastq.gz
+Feb-05 17:38:00.763 [main] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/test_data/test_minigut_sample2_R1.fastq.gz
+Feb-05 17:38:00.782 [main] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/test_data/test_minigut_sample2_R1.fastq.gz
+Feb-05 17:38:01.504 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_single` matches labels `process_single` for process with name NFCORE_METATDENOVO:METATDENOVO:CAT_FASTQ
+Feb-05 17:38:01.517 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:CAT_FASTQ
+Feb-05 17:38:01.519 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:CAT_FASTQ
+Feb-05 17:38:01.540 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Feb-05 17:38:01.540 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Feb-05 17:38:01.552 [main] DEBUG nextflow.executor.Executor - [warm up] executor > local
+Feb-05 17:38:01.575 [main] DEBUG n.processor.LocalPollingMonitor - Creating local task monitor for executor 'local' > cpus=256; memory=503.5 GB; capacity=256; pollInterval=100ms; dumpInterval=5m
+Feb-05 17:38:01.581 [main] DEBUG n.processor.TaskPollingMonitor - >>> barrier register (monitor: local)
+Feb-05 17:38:02.006 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_medium` matches labels `process_medium` for process with name NFCORE_METATDENOVO:METATDENOVO:FASTQC_TRIMGALORE:FASTQC
+Feb-05 17:38:02.008 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:FASTQC` matches process NFCORE_METATDENOVO:METATDENOVO:FASTQC_TRIMGALORE:FASTQC
+Feb-05 17:38:02.010 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:FASTQC_TRIMGALORE:FASTQC
+Feb-05 17:38:02.013 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:FASTQC_TRIMGALORE:FASTQC
+Feb-05 17:38:02.016 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Feb-05 17:38:02.016 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Feb-05 17:38:02.044 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_high` matches labels `process_high` for process with name NFCORE_METATDENOVO:METATDENOVO:FASTQC_TRIMGALORE:TRIMGALORE
+Feb-05 17:38:02.046 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:TRIMGALORE` matches process NFCORE_METATDENOVO:METATDENOVO:FASTQC_TRIMGALORE:TRIMGALORE
+Feb-05 17:38:02.048 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:FASTQC_TRIMGALORE:TRIMGALORE
+Feb-05 17:38:02.050 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:FASTQC_TRIMGALORE:TRIMGALORE
+Feb-05 17:38:02.056 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Feb-05 17:38:02.057 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Feb-05 17:38:02.180 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_medium` matches labels `process_medium` for process with name NFCORE_METATDENOVO:METATDENOVO:BBMAP_BBDUK
+Feb-05 17:38:02.181 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:BBMAP_BBDUK` matches process NFCORE_METATDENOVO:METATDENOVO:BBMAP_BBDUK
+Feb-05 17:38:02.182 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:BBMAP_BBDUK
+Feb-05 17:38:02.184 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:BBMAP_BBDUK
+Feb-05 17:38:02.187 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Feb-05 17:38:02.188 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Feb-05 17:38:02.226 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_single` matches labels `process_single` for process with name NFCORE_METATDENOVO:METATDENOVO:SEQTK_MERGEPE
+Feb-05 17:38:02.227 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:SEQTK_MERGEPE` matches process NFCORE_METATDENOVO:METATDENOVO:SEQTK_MERGEPE
+Feb-05 17:38:02.229 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:SEQTK_MERGEPE
+Feb-05 17:38:02.230 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:SEQTK_MERGEPE
+Feb-05 17:38:02.234 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Feb-05 17:38:02.234 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Feb-05 17:38:02.302 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_high` matches labels `process_high` for process with name NFCORE_METATDENOVO:METATDENOVO:MEGAHIT_INTERLEAVED
+Feb-05 17:38:02.304 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:MEGAHIT_INTERLEAVED` matches process NFCORE_METATDENOVO:METATDENOVO:MEGAHIT_INTERLEAVED
+Feb-05 17:38:02.305 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:MEGAHIT_INTERLEAVED
+Feb-05 17:38:02.307 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:MEGAHIT_INTERLEAVED
+Feb-05 17:38:02.310 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Feb-05 17:38:02.310 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Feb-05 17:38:02.342 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_single` matches labels `process_single` for process with name NFCORE_METATDENOVO:METATDENOVO:PRODIGAL:PRODIGAL_MODULE
+Feb-05 17:38:02.343 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:PRODIGAL` matches process NFCORE_METATDENOVO:METATDENOVO:PRODIGAL:PRODIGAL_MODULE
+Feb-05 17:38:02.344 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:PRODIGAL:PRODIGAL_MODULE
+Feb-05 17:38:02.346 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:PRODIGAL:PRODIGAL_MODULE
+Feb-05 17:38:02.348 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:PRODIGAL:PRODIGAL_MODULE
+Feb-05 17:38:02.352 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Feb-05 17:38:02.352 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Feb-05 17:38:02.372 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_low` matches labels `process_low` for process with name NFCORE_METATDENOVO:METATDENOVO:PRODIGAL:FORMAT_PRODIGAL_GFF
+Feb-05 17:38:02.373 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:FORMAT_PRODIGAL_GFF` matches process NFCORE_METATDENOVO:METATDENOVO:PRODIGAL:FORMAT_PRODIGAL_GFF
+Feb-05 17:38:02.374 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:PRODIGAL:FORMAT_PRODIGAL_GFF
+Feb-05 17:38:02.375 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:PRODIGAL:FORMAT_PRODIGAL_GFF
+Feb-05 17:38:02.377 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Feb-05 17:38:02.377 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Feb-05 17:38:02.396 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_low` matches labels `process_low` for process with name NFCORE_METATDENOVO:METATDENOVO:UNPIGZ_GFF
+Feb-05 17:38:02.397 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:UNPIGZ_GFF
+Feb-05 17:38:02.398 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:UNPIGZ_GFF
+Feb-05 17:38:02.399 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:UNPIGZ_GFF
+Feb-05 17:38:02.401 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Feb-05 17:38:02.402 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Feb-05 17:38:02.419 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_long` matches labels `process_long` for process with name NFCORE_METATDENOVO:METATDENOVO:BBMAP_INDEX
+Feb-05 17:38:02.420 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:BBMAP_INDEX
+Feb-05 17:38:02.421 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:BBMAP_INDEX
+Feb-05 17:38:02.423 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Feb-05 17:38:02.423 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Feb-05 17:38:02.439 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_medium` matches labels `process_medium` for process with name NFCORE_METATDENOVO:METATDENOVO:BBMAP_ALIGN
+Feb-05 17:38:02.439 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:BBMAP_ALIGN` matches process NFCORE_METATDENOVO:METATDENOVO:BBMAP_ALIGN
+Feb-05 17:38:02.440 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:BBMAP_ALIGN
+Feb-05 17:38:02.441 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:BBMAP_ALIGN
+Feb-05 17:38:02.444 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Feb-05 17:38:02.444 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Feb-05 17:38:02.478 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_medium` matches labels `process_medium` for process with name NFCORE_METATDENOVO:METATDENOVO:HMMCLASSIFY:HMMER_HMMSEARCH
+Feb-05 17:38:02.479 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:HMMCLASSIFY:HMMER_HMMSEARCH
+Feb-05 17:38:02.480 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:HMMCLASSIFY:HMMER_HMMSEARCH
+Feb-05 17:38:02.483 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Feb-05 17:38:02.483 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Feb-05 17:38:02.517 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_low` matches labels `process_low` for process with name NFCORE_METATDENOVO:METATDENOVO:HMMCLASSIFY:HMMRANK
+Feb-05 17:38:02.518 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:HMMRANK` matches process NFCORE_METATDENOVO:METATDENOVO:HMMCLASSIFY:HMMRANK
+Feb-05 17:38:02.518 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:HMMCLASSIFY:HMMRANK
+Feb-05 17:38:02.521 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:HMMCLASSIFY:HMMRANK
+Feb-05 17:38:02.523 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Feb-05 17:38:02.524 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Feb-05 17:38:02.547 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_medium` matches labels `process_medium` for process with name NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_SORT
+Feb-05 17:38:02.549 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:SAMTOOLS_SORT` matches process NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_SORT
+Feb-05 17:38:02.549 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*SAMTOOLS.*` matches process NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_SORT
+Feb-05 17:38:02.550 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_SORT
+Feb-05 17:38:02.551 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*SAMTOOLS.*` matches process NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_SORT
+Feb-05 17:38:02.552 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_SORT
+Feb-05 17:38:02.555 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Feb-05 17:38:02.555 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Feb-05 17:38:02.573 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_low` matches labels `process_low` for process with name NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_INDEX
+Feb-05 17:38:02.574 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*SAMTOOLS.*` matches process NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_INDEX
+Feb-05 17:38:02.575 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_INDEX
+Feb-05 17:38:02.576 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*SAMTOOLS.*` matches process NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_INDEX
+Feb-05 17:38:02.576 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_INDEX
+Feb-05 17:38:02.580 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Feb-05 17:38:02.580 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Feb-05 17:38:02.663 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_single` matches labels `process_single` for process with name NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:BAM_STATS_SAMTOOLS:SAMTOOLS_STATS
+Feb-05 17:38:02.667 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*SAMTOOLS.*` matches process NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:BAM_STATS_SAMTOOLS:SAMTOOLS_STATS
+Feb-05 17:38:02.668 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:BAM_STATS_SAMTOOLS:SAMTOOLS_STATS
+Feb-05 17:38:02.668 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*SAMTOOLS.*` matches process NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:BAM_STATS_SAMTOOLS:SAMTOOLS_STATS
+Feb-05 17:38:02.669 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:BAM_STATS_SAMTOOLS:SAMTOOLS_STATS
+Feb-05 17:38:02.673 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Feb-05 17:38:02.673 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Feb-05 17:38:02.688 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_single` matches labels `process_single` for process with name NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:BAM_STATS_SAMTOOLS:SAMTOOLS_FLAGSTAT
+Feb-05 17:38:02.689 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*SAMTOOLS.*` matches process NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:BAM_STATS_SAMTOOLS:SAMTOOLS_FLAGSTAT
+Feb-05 17:38:02.689 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:BAM_STATS_SAMTOOLS:SAMTOOLS_FLAGSTAT
+Feb-05 17:38:02.690 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*SAMTOOLS.*` matches process NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:BAM_STATS_SAMTOOLS:SAMTOOLS_FLAGSTAT
+Feb-05 17:38:02.690 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:BAM_STATS_SAMTOOLS:SAMTOOLS_FLAGSTAT
+Feb-05 17:38:02.693 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Feb-05 17:38:02.693 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Feb-05 17:38:02.706 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_single` matches labels `process_single` for process with name NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:BAM_STATS_SAMTOOLS:SAMTOOLS_IDXSTATS
+Feb-05 17:38:02.707 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*SAMTOOLS.*` matches process NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:BAM_STATS_SAMTOOLS:SAMTOOLS_IDXSTATS
+Feb-05 17:38:02.707 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:BAM_STATS_SAMTOOLS:SAMTOOLS_IDXSTATS
+Feb-05 17:38:02.708 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*SAMTOOLS.*` matches process NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:BAM_STATS_SAMTOOLS:SAMTOOLS_IDXSTATS
+Feb-05 17:38:02.709 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:BAM_STATS_SAMTOOLS:SAMTOOLS_IDXSTATS
+Feb-05 17:38:02.710 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Feb-05 17:38:02.710 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Feb-05 17:38:02.742 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_medium` matches labels `process_medium` for process with name NFCORE_METATDENOVO:METATDENOVO:FEATURECOUNTS_CDS
+Feb-05 17:38:02.743 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:FEATURECOUNTS_CDS
+Feb-05 17:38:02.744 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:FEATURECOUNTS_CDS
+Feb-05 17:38:02.745 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*:FEATURECOUNTS_CDS` matches process NFCORE_METATDENOVO:METATDENOVO:FEATURECOUNTS_CDS
+Feb-05 17:38:02.746 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:FEATURECOUNTS_CDS
+Feb-05 17:38:02.748 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Feb-05 17:38:02.749 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Feb-05 17:38:02.770 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_high` matches labels `process_high` for process with name NFCORE_METATDENOVO:METATDENOVO:COLLECT_FEATURECOUNTS
+Feb-05 17:38:02.771 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:COLLECT_FEATURECOUNTS` matches process NFCORE_METATDENOVO:METATDENOVO:COLLECT_FEATURECOUNTS
+Feb-05 17:38:02.772 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:COLLECT_FEATURECOUNTS
+Feb-05 17:38:02.773 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:COLLECT_FEATURECOUNTS
+Feb-05 17:38:02.775 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Feb-05 17:38:02.775 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Feb-05 17:38:02.794 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_low` matches labels `process_low` for process with name NFCORE_METATDENOVO:METATDENOVO:UNPIGZ_CONTIGS
+Feb-05 17:38:02.796 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:UNPIGZ_CONTIGS
+Feb-05 17:38:02.796 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:UNPIGZ_CONTIGS
+Feb-05 17:38:02.797 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:UNPIGZ_CONTIGS
+Feb-05 17:38:02.799 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Feb-05 17:38:02.799 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Feb-05 17:38:02.812 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_low` matches labels `process_low` for process with name NFCORE_METATDENOVO:METATDENOVO:TRANSRATE
+Feb-05 17:38:02.814 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:TRANSRATE
+Feb-05 17:38:02.815 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:TRANSRATE
+Feb-05 17:38:02.816 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Feb-05 17:38:02.817 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Feb-05 17:38:02.843 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_high` matches labels `process_high` for process with name NFCORE_METATDENOVO:METATDENOVO:DIAMOND_TAXONOMY
+Feb-05 17:38:02.844 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:DIAMOND_TAXONOMY
+Feb-05 17:38:02.845 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:DIAMOND_TAXONOMY` matches process NFCORE_METATDENOVO:METATDENOVO:DIAMOND_TAXONOMY
+Feb-05 17:38:02.846 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:DIAMOND_TAXONOMY
+Feb-05 17:38:02.847 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:DIAMOND_TAXONOMY
+Feb-05 17:38:02.851 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Feb-05 17:38:02.851 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Feb-05 17:38:02.880 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_low` matches labels `process_low` for process with name NFCORE_METATDENOVO:METATDENOVO:TAXONKIT_LINEAGE
+Feb-05 17:38:02.881 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:TAXONKIT_LINEAGE` matches process NFCORE_METATDENOVO:METATDENOVO:TAXONKIT_LINEAGE
+Feb-05 17:38:02.882 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:TAXONKIT_LINEAGE
+Feb-05 17:38:02.883 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:TAXONKIT_LINEAGE
+Feb-05 17:38:02.885 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Feb-05 17:38:02.885 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Feb-05 17:38:02.901 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_low` matches labels `process_low` for process with name NFCORE_METATDENOVO:METATDENOVO:PIGZ_DIAMOND_LINEAGE
+Feb-05 17:38:02.902 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:PIGZ_DIAMOND_LINEAGE
+Feb-05 17:38:02.903 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:PIGZ_DIAMOND_LINEAGE` matches process NFCORE_METATDENOVO:METATDENOVO:PIGZ_DIAMOND_LINEAGE
+Feb-05 17:38:02.904 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:PIGZ_DIAMOND_LINEAGE
+Feb-05 17:38:02.904 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:PIGZ_DIAMOND_LINEAGE
+Feb-05 17:38:02.907 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Feb-05 17:38:02.907 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Feb-05 17:38:02.927 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_single` matches labels `process_single` for process with name NFCORE_METATDENOVO:METATDENOVO:FORMAT_DIAMOND_TAX_RANKLIST
+Feb-05 17:38:02.929 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:FORMAT_DIAMOND_TAX_RANKLIST` matches process NFCORE_METATDENOVO:METATDENOVO:FORMAT_DIAMOND_TAX_RANKLIST
+Feb-05 17:38:02.929 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:FORMAT_DIAMOND_TAX_RANKLIST
+Feb-05 17:38:02.930 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:FORMAT_DIAMOND_TAX_RANKLIST
+Feb-05 17:38:02.934 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Feb-05 17:38:02.935 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Feb-05 17:38:02.962 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_medium` matches labels `process_medium` for process with name NFCORE_METATDENOVO:METATDENOVO:FORMAT_DIAMOND_TAX_TAXDUMP
+Feb-05 17:38:02.963 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:FORMAT_DIAMOND_TAX_TAXDUMP` matches process NFCORE_METATDENOVO:METATDENOVO:FORMAT_DIAMOND_TAX_TAXDUMP
+Feb-05 17:38:02.964 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:FORMAT_DIAMOND_TAX_TAXDUMP
+Feb-05 17:38:02.965 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:FORMAT_DIAMOND_TAX_TAXDUMP
+Feb-05 17:38:02.967 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Feb-05 17:38:02.968 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Feb-05 17:38:02.985 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_low` matches labels `process_low` for process with name NFCORE_METATDENOVO:METATDENOVO:SUM_DIAMONDTAX
+Feb-05 17:38:02.987 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:SUM_DIAMONDTAX
+Feb-05 17:38:02.988 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:SUM_DIAMONDTAX
+Feb-05 17:38:02.989 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:SUM_DIAMONDTAX
+Feb-05 17:38:02.991 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Feb-05 17:38:02.991 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Feb-05 17:38:03.013 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_low` matches labels `process_low` for process with name NFCORE_METATDENOVO:METATDENOVO:MERGE_TABLES
+Feb-05 17:38:03.015 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:MERGE_TABLES
+Feb-05 17:38:03.016 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:MERGE_TABLES
+Feb-05 17:38:03.018 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Feb-05 17:38:03.018 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Feb-05 17:38:03.048 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_low` matches labels `process_low` for process with name NFCORE_METATDENOVO:METATDENOVO:COLLECT_STATS
+Feb-05 17:38:03.049 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:COLLECT_STATS` matches process NFCORE_METATDENOVO:METATDENOVO:COLLECT_STATS
+Feb-05 17:38:03.049 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:COLLECT_STATS
+Feb-05 17:38:03.050 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:COLLECT_STATS
+Feb-05 17:38:03.052 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Feb-05 17:38:03.052 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Feb-05 17:38:03.413 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:process_single` matches labels `process_single` for process with name NFCORE_METATDENOVO:METATDENOVO:MULTIQC
+Feb-05 17:38:03.414 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:MULTIQC` matches process NFCORE_METATDENOVO:METATDENOVO:MULTIQC
+Feb-05 17:38:03.415 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:MULTIQC
+Feb-05 17:38:03.453 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process NFCORE_METATDENOVO:METATDENOVO:MULTIQC
+Feb-05 17:38:03.499 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Feb-05 17:38:03.502 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Feb-05 17:38:03.679 [main] DEBUG nextflow.Session - Config process names validation disabled as requested
+Feb-05 17:38:03.686 [main] DEBUG nextflow.Session - Igniting dataflow network (62)
+Feb-05 17:38:03.694 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NFCORE_METATDENOVO:METATDENOVO:CAT_FASTQ
+Feb-05 17:38:03.699 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NFCORE_METATDENOVO:METATDENOVO:FASTQC_TRIMGALORE:FASTQC
+Feb-05 17:38:03.709 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NFCORE_METATDENOVO:METATDENOVO:FASTQC_TRIMGALORE:TRIMGALORE
+Feb-05 17:38:03.771 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NFCORE_METATDENOVO:METATDENOVO:BBMAP_BBDUK
+Feb-05 17:38:03.772 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NFCORE_METATDENOVO:METATDENOVO:SEQTK_MERGEPE
+Feb-05 17:38:03.774 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NFCORE_METATDENOVO:METATDENOVO:MEGAHIT_INTERLEAVED
+Feb-05 17:38:03.777 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NFCORE_METATDENOVO:METATDENOVO:PRODIGAL:PRODIGAL_MODULE
+Feb-05 17:38:03.778 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NFCORE_METATDENOVO:METATDENOVO:PRODIGAL:FORMAT_PRODIGAL_GFF
+Feb-05 17:38:03.779 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NFCORE_METATDENOVO:METATDENOVO:UNPIGZ_GFF
+Feb-05 17:38:03.780 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NFCORE_METATDENOVO:METATDENOVO:BBMAP_INDEX
+Feb-05 17:38:03.780 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NFCORE_METATDENOVO:METATDENOVO:BBMAP_ALIGN
+Feb-05 17:38:03.782 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NFCORE_METATDENOVO:METATDENOVO:HMMCLASSIFY:HMMER_HMMSEARCH
+Feb-05 17:38:03.783 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NFCORE_METATDENOVO:METATDENOVO:HMMCLASSIFY:HMMRANK
+Feb-05 17:38:03.785 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_SORT
+Feb-05 17:38:03.785 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_INDEX
+Feb-05 17:38:03.789 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:BAM_STATS_SAMTOOLS:SAMTOOLS_STATS
+Feb-05 17:38:03.789 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:BAM_STATS_SAMTOOLS:SAMTOOLS_FLAGSTAT
+Feb-05 17:38:03.790 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:BAM_STATS_SAMTOOLS:SAMTOOLS_IDXSTATS
+Feb-05 17:38:03.790 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NFCORE_METATDENOVO:METATDENOVO:FEATURECOUNTS_CDS
+Feb-05 17:38:03.791 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NFCORE_METATDENOVO:METATDENOVO:COLLECT_FEATURECOUNTS
+Feb-05 17:38:03.792 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NFCORE_METATDENOVO:METATDENOVO:UNPIGZ_CONTIGS
+Feb-05 17:38:03.794 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NFCORE_METATDENOVO:METATDENOVO:TRANSRATE
+Feb-05 17:38:03.795 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NFCORE_METATDENOVO:METATDENOVO:DIAMOND_TAXONOMY
+Feb-05 17:38:03.795 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NFCORE_METATDENOVO:METATDENOVO:TAXONKIT_LINEAGE
+Feb-05 17:38:03.795 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NFCORE_METATDENOVO:METATDENOVO:PIGZ_DIAMOND_LINEAGE
+Feb-05 17:38:03.818 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NFCORE_METATDENOVO:METATDENOVO:FORMAT_DIAMOND_TAX_RANKLIST
+Feb-05 17:38:03.819 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NFCORE_METATDENOVO:METATDENOVO:FORMAT_DIAMOND_TAX_TAXDUMP
+Feb-05 17:38:03.819 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NFCORE_METATDENOVO:METATDENOVO:SUM_DIAMONDTAX
+Feb-05 17:38:03.820 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NFCORE_METATDENOVO:METATDENOVO:MERGE_TABLES
+Feb-05 17:38:03.822 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NFCORE_METATDENOVO:METATDENOVO:COLLECT_STATS
+Feb-05 17:38:03.852 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NFCORE_METATDENOVO:METATDENOVO:MULTIQC
+Feb-05 17:38:03.876 [main] DEBUG nextflow.script.ScriptRunner - Parsed script files:
+  Script_c6943badae8006ae: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../subworkflows/local/../../modules/local/prokkagff2tsv.nf
+  Script_d3865926248d0c08: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../subworkflows/nf-core/bam_sort_stats_samtools/../bam_stats_samtools/../../../modules/nf-core/samtools/stats/main.nf
+  Script_9ab0eb5f7fe7c6bf: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../modules/nf-core/cat/fastq/main.nf
+  Script_cdbce3e23a8f89e8: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../subworkflows/nf-core/bam_sort_stats_samtools/../bam_stats_samtools/main.nf
+  Script_9b67a824470a6c1d: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../subworkflows/local/prokka_subsets.nf
+  Script_a53baade040e8dd7: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../modules/nf-core/bbmap/align/main.nf
+  Script_5c5e6babfb5fb619: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../subworkflows/local/../../modules/nf-core/trimgalore/main.nf
+  Script_97018c752216c0c1: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../subworkflows/local/prodigal.nf
+  Script_4cc9691dc6b0e41f: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../modules/local/writespadesyaml.nf
+  Script_0fdb2e5f8575be0c: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../modules/nf-core/multiqc/main.nf
+  Script_3ff1656b1d66c1f2: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../subworkflows/nf-core/bam_sort_stats_samtools/../../../modules/nf-core/samtools/index/main.nf
+  Script_72729db527c0a31b: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../subworkflows/local/../../modules/local/sum_kofamscan.nf
+  Script_391f461fc6d88c96: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../modules/local/sumtaxonomy/main.nf
+  Script_cfbe3db3f8d86852: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../modules/nf-core/subread/featurecounts/main.nf
+  Script_3b937e4ec54fd67c: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../modules/nf-core/bbmap/index/main.nf
+  Script_120c32a2cacdca46: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../subworkflows/local/../../modules/nf-core/prodigal/main.nf
+  Script_4471193d14bdee15: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../modules/local/transdecoder.nf
+  Script_a2aa0d1ede76c3e4: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../subworkflows/local/../../modules/nf-core/cat/cat/main.nf
+  Script_3309a3272db8a01b: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../subworkflows/local/utils_nfcore_metatdenovo_pipeline/main.nf
+  Script_38e284d7271d4f3f: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../modules/local/merge_summary_tables.nf
+  Script_2cd3960e599fb6c8: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../subworkflows/nf-core/bam_sort_stats_samtools/../bam_stats_samtools/../../../modules/nf-core/samtools/idxstats/main.nf
+  Script_e30e53c4f2f983e2: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../subworkflows/local/../../modules/local/format_eukulele_tax.nf
+  Script_b53a9e355616c1b6: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../subworkflows/local/fastqc_trimgalore.nf
+  Script_cc3718b0193ad2c2: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../modules/local/transrate.nf
+  Script_9c2fe9a142da316f: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../modules/local/diamond/blastp.nf
+  Script_78a2c34e07e691a9: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../modules/local/collect_featurecounts.nf
+  Script_fce21679d9511bbc: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../subworkflows/local/../../modules/local/hmmrank.nf
+  Script_d80418b4165c120e: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../modules/local/megahit/interleaved.nf
+  Script_fdc444e1f99c0569: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/metatdenovo.nf
+  Script_5d5e77ecc8762a12: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../modules/local/formatspades.nf
+  Script_215a636da7ab24a2: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./subworkflows/local/utils_nfcore_metatdenovo_pipeline/../../nf-core/utils_nfschema_plugin/main.nf
+  Script_5c4e8d4051efa81e: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../subworkflows/local/utils_nfcore_metatdenovo_pipeline/../../nf-core/utils_nfcore_pipeline/main.nf
+  Script_fe7c72f9826fe609: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../modules/nf-core/seqtk/mergepe/main.nf
+  Script_661a3a77e8297141: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../modules/local/format_diamond_tax_taxdump.nf
+  Script_de1c7c124fa4c7b4: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../subworkflows/nf-core/bam_sort_stats_samtools/../../../modules/nf-core/samtools/sort/main.nf
+  Script_813542a02426f2c4: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../modules/local/format_diamond_tax_ranklist.nf
+  Script_49a076b00fdb2601: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../modules/nf-core/seqtk/seq/main.nf
+  Script_416299c153592619: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../subworkflows/local/../../modules/local/eggnog/download.nf
+  Script_ab482c94216efb38: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../subworkflows/local/eukulele.nf
+  Script_ec7a410c4e02eb62: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../modules/nf-core/spades/main.nf
+  Script_6e811b645d94ead4: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../subworkflows/local/hmmclassify.nf
+  Script_9c01b67cb41cfbea: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../subworkflows/local/eggnog.nf
+  Script_bccdacc34e930bc6: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../subworkflows/local/../../modules/nf-core/hmmer/hmmsearch/main.nf
+  Script_7f6601f4206ed006: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../subworkflows/local/../../modules/local/eukulele/search.nf
+  Script_498db87a6d4f03d8: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../subworkflows/nf-core/bam_sort_stats_samtools/../bam_stats_samtools/../../../modules/nf-core/samtools/flagstat/main.nf
+  Script_593b33030c375731: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../subworkflows/local/../../modules/local/eggnog/mapper.nf
+  Script_77a7c25d543937cf: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/main.nf
+  Script_c308560d15131160: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../subworkflows/local/../../modules/local/format_prodigal.nf
+  Script_4f612cfd8c52e8cd: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../subworkflows/nf-core/utils_nextflow_pipeline/main.nf
+  Script_097d0609ba4a1086: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../modules/local/unpigz.nf
+  Script_df920c7f0b80f478: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../subworkflows/local/kofamscan.nf
+  Script_34076aff62594325: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../modules/nf-core/pigz/compress/main.nf
+  Script_33a0d7c4dda22918: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../subworkflows/local/../../modules/nf-core/prokka/main.nf
+  Script_a02b3ccce05d653a: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../subworkflows/local/../../modules/local/kofamscan/download.nf
+  Script_f81d9cf4925038c2: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../modules/nf-core/taxonkit/lineage/main.nf
+  Script_c5c1f63b8c1e139a: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../modules/local/collect_stats.nf
+  Script_dc41886bdbd95b0b: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../subworkflows/local/../../modules/nf-core/fastqc/main.nf
+  Script_40e28a4694766399: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../subworkflows/local/../../modules/local/eggnog/sum.nf
+  Script_02aeee08e4ed8fcc: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../subworkflows/local/../../modules/local/kofamscan/scan.nf
+  Script_3f536bfa539e8a58: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../modules/nf-core/bbmap/bbduk/main.nf
+  Script_2ebe1d1a775a7432: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../subworkflows/nf-core/bam_sort_stats_samtools/main.nf
+  Script_f9c51e281457c6c1: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/./workflows/../modules/nf-core/bbmap/bbnorm/main.nf
+Feb-05 17:38:03.876 [main] DEBUG nextflow.script.ScriptRunner - > Awaiting termination 
+Feb-05 17:38:03.876 [main] DEBUG nextflow.Session - Session await
+Feb-05 17:38:04.651 [Actor Thread 251] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/test_data/test_minigut_sample2_R1.fastq.gz
+Feb-05 17:38:04.688 [Actor Thread 252] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/test_data/test_minigut_R1.fastq.gz
+Feb-05 17:38:04.725 [Actor Thread 251] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/mag/test_data/test_minigut_sample2_R2.fastq.gz
+Feb-05 17:38:04.745 [Actor Thread 252] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/mag/test_data/test_minigut_R2.fastq.gz
+Feb-05 17:38:04.835 [Actor Thread 254] DEBUG nextflow.sort.BigSort - Sort completed -- entries: 1; slices: 1; internal sort time: 0.011 s; external sort time: 0.11 s; total time: 0.121 s
+Feb-05 17:38:04.835 [Actor Thread 253] DEBUG nextflow.sort.BigSort - Sort completed -- entries: 1; slices: 1; internal sort time: 0.011 s; external sort time: 0.11 s; total time: 0.121 s
+Feb-05 17:38:04.924 [Actor Thread 254] DEBUG nextflow.file.FileCollector - Saved collect-files list to: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/collect-file/9685a3ab7ef18a55b24eda51b8327578
+Feb-05 17:38:04.935 [FileTransfer-1] DEBUG nextflow.file.FilePorter - Copying foreign file https://github.com/nf-core/test-datasets/raw/metatdenovo/test_data/test_minigut_R1.fastq.gz to work dir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/stage-a2a3c3c2-d97e-48aa-ba0b-e64241eb930b/f9/fabd93ed87b1c00a7848c976ad4ca0/test_minigut_R1.fastq.gz
+Feb-05 17:38:04.943 [FileTransfer-2] DEBUG nextflow.file.FilePorter - Copying foreign file https://github.com/nf-core/test-datasets/raw/mag/test_data/test_minigut_R2.fastq.gz to work dir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/stage-a2a3c3c2-d97e-48aa-ba0b-e64241eb930b/b2/32feccb3b6d91a2f8885256bc32816/test_minigut_R2.fastq.gz
+Feb-05 17:38:04.951 [FileTransfer-4] DEBUG nextflow.file.FilePorter - Copying foreign file https://github.com/nf-core/test-datasets/raw/mag/test_data/test_minigut_sample2_R2.fastq.gz to work dir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/stage-a2a3c3c2-d97e-48aa-ba0b-e64241eb930b/a5/8f02c178b6ad173708e69245b00358/test_minigut_sample2_R2.fastq.gz
+Feb-05 17:38:04.956 [FileTransfer-3] DEBUG nextflow.file.FilePorter - Copying foreign file https://github.com/nf-core/test-datasets/raw/metatdenovo/test_data/test_minigut_sample2_R1.fastq.gz to work dir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/stage-a2a3c3c2-d97e-48aa-ba0b-e64241eb930b/3f/6296498a8176e659b513dab8b90eee/test_minigut_sample2_R1.fastq.gz
+Feb-05 17:38:04.983 [FileTransfer-5] DEBUG nextflow.file.FilePorter - Copying foreign file https://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/test_data/SRR6357070_1.fastq.gz to work dir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/stage-a2a3c3c2-d97e-48aa-ba0b-e64241eb930b/11/8b4fe1bf0994f4cd52304e52a859bf/SRR6357070_1.fastq.gz
+Feb-05 17:38:04.984 [Actor Thread 253] DEBUG nextflow.file.FileCollector - Saved collect-files list to: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/collect-file/b006540da18b6919478500c53220f32a
+Feb-05 17:38:04.985 [FileTransfer-6] DEBUG nextflow.file.FilePorter - Copying foreign file https://raw.githubusercontent.com/nf-core/test-datasets/rnaseq/testdata/GSE110004/SRR6357070_2.fastq.gz to work dir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/stage-a2a3c3c2-d97e-48aa-ba0b-e64241eb930b/27/70e052d0b2cfe39f9a293e42054a2c/SRR6357070_2.fastq.gz
+Feb-05 17:38:04.986 [FileTransfer-7] DEBUG nextflow.file.FilePorter - Copying foreign file https://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/test_data/SRR6357071_1.fastq.gz to work dir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/stage-a2a3c3c2-d97e-48aa-ba0b-e64241eb930b/74/50c22840f13bd668b25d2727f0ad26/SRR6357071_1.fastq.gz
+Feb-05 17:38:04.988 [FileTransfer-8] DEBUG nextflow.file.FilePorter - Copying foreign file https://raw.githubusercontent.com/nf-core/test-datasets/rnaseq/testdata/GSE110004/SRR6357071_2.fastq.gz to work dir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/stage-a2a3c3c2-d97e-48aa-ba0b-e64241eb930b/4f/233c2b86db6586f50498d02aa2e523/SRR6357071_2.fastq.gz
+Feb-05 17:38:04.990 [FileTransfer-3] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/test_data/test_minigut_sample2_R1.fastq.gz
+Feb-05 17:38:05.115 [Actor Thread 253] DEBUG nextflow.file.FileCollector - Deleting file collector temp dir: /tmp/nxf-16598556454095282891
+Feb-05 17:38:05.117 [Actor Thread 254] DEBUG nextflow.file.FileCollector - Deleting file collector temp dir: /tmp/nxf-8059104299289548448
+Feb-05 17:38:05.172 [FileTransfer-3] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/test_data/test_minigut_sample2_R1.fastq.gz
+Feb-05 17:38:05.222 [FileTransfer-1] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/test_data/test_minigut_R1.fastq.gz
+Feb-05 17:38:05.222 [FileTransfer-2] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/mag/test_data/test_minigut_R2.fastq.gz
+Feb-05 17:38:05.240 [FileTransfer-4] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/mag/test_data/test_minigut_sample2_R2.fastq.gz
+Feb-05 17:38:05.259 [FileTransfer-1] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/test_data/test_minigut_R1.fastq.gz
+Feb-05 17:38:05.268 [FileTransfer-2] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/mag/test_data/test_minigut_R2.fastq.gz
+Feb-05 17:38:05.270 [FileTransfer-4] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/mag/test_data/test_minigut_sample2_R2.fastq.gz
+Feb-05 17:38:05.502 [Actor Thread 254] DEBUG nextflow.container.SingularityCache - Singularity found local store for image=https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/52/52ccce28d2ab928ab862e25aae26314d69c8e38bd41ca9431c67ef05221348aa/data; path=/cfs/klemming/projects/snic/snic2020-16-76/data/singularity/community-cr-prod.seqera.io-docker-registry-v2-blobs-sha256-52-52ccce28d2ab928ab862e25aae26314d69c8e38bd41ca9431c67ef05221348aa-data.img
+Feb-05 17:38:06.035 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:38:06.039 [Task submitter] INFO  nextflow.Session - [4a/5d7884] Submitted process > NFCORE_METATDENOVO:METATDENOVO:CAT_FASTQ (SAMPLE3_PE_1)
+Feb-05 17:38:06.079 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:38:06.080 [Task submitter] INFO  nextflow.Session - [01/46511f] Submitted process > NFCORE_METATDENOVO:METATDENOVO:CAT_FASTQ (SAMPLE2_PE)
+Feb-05 17:38:06.094 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:38:06.094 [Task submitter] INFO  nextflow.Session - [52/706a9c] Submitted process > NFCORE_METATDENOVO:METATDENOVO:CAT_FASTQ (SAMPLE1_PE)
+Feb-05 17:38:12.551 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 3; name: NFCORE_METATDENOVO:METATDENOVO:CAT_FASTQ (SAMPLE3_PE_1); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/4a/5d7884f50bda0d845ef72745e866d5]
+Feb-05 17:38:12.553 [Task monitor] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'TaskFinalizer' minSize=10; maxSize=768; workQueue=LinkedBlockingQueue[10000]; allowCoreThreadTimeout=false
+Feb-05 17:38:12.570 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 2; name: NFCORE_METATDENOVO:METATDENOVO:CAT_FASTQ (SAMPLE2_PE); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/01/46511fe88aad4edcef12ae72137739]
+Feb-05 17:38:12.579 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 1; name: NFCORE_METATDENOVO:METATDENOVO:CAT_FASTQ (SAMPLE1_PE); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/52/706a9c0e72ee8842de173b58a87106]
+Feb-05 17:38:12.740 [Actor Thread 257] DEBUG nextflow.container.SingularityCache - Singularity found local store for image=https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/9b/9becad054093ad4083a961d12733f2a742e11728fe9aa815d678b882b3ede520/data; path=/cfs/klemming/projects/snic/snic2020-16-76/data/singularity/community-cr-prod.seqera.io-docker-registry-v2-blobs-sha256-9b-9becad054093ad4083a961d12733f2a742e11728fe9aa815d678b882b3ede520-data.img
+Feb-05 17:38:12.795 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:38:12.843 [Task submitter] INFO  nextflow.Session - [ca/d21d3f] Submitted process > NFCORE_METATDENOVO:METATDENOVO:FASTQC_TRIMGALORE:TRIMGALORE (SAMPLE2_PE)
+Feb-05 17:38:12.844 [Actor Thread 210] DEBUG nextflow.container.SingularityCache - Singularity found local store for image=https://depot.galaxyproject.org/singularity/fastqc:0.12.1--hdfd78af_0; path=/cfs/klemming/projects/snic/snic2020-16-76/data/singularity/depot.galaxyproject.org-singularity-fastqc-0.12.1--hdfd78af_0.img
+Feb-05 17:38:12.880 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:38:12.880 [Task submitter] INFO  nextflow.Session - [9d/a0f660] Submitted process > NFCORE_METATDENOVO:METATDENOVO:FASTQC_TRIMGALORE:TRIMGALORE (SAMPLE1_PE)
+Feb-05 17:38:12.919 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:38:12.923 [Task submitter] INFO  nextflow.Session - [c2/0f5812] Submitted process > NFCORE_METATDENOVO:METATDENOVO:FASTQC_TRIMGALORE:TRIMGALORE (SAMPLE3_PE_1)
+Feb-05 17:38:12.990 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:38:12.991 [Task submitter] INFO  nextflow.Session - [37/11d007] Submitted process > NFCORE_METATDENOVO:METATDENOVO:FASTQC_TRIMGALORE:FASTQC (SAMPLE1_PE)
+Feb-05 17:38:13.012 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:38:13.012 [Task submitter] INFO  nextflow.Session - [52/416d60] Submitted process > NFCORE_METATDENOVO:METATDENOVO:FASTQC_TRIMGALORE:FASTQC (SAMPLE2_PE)
+Feb-05 17:38:13.022 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:38:13.022 [Task submitter] INFO  nextflow.Session - [ce/c9b9cd] Submitted process > NFCORE_METATDENOVO:METATDENOVO:FASTQC_TRIMGALORE:FASTQC (SAMPLE3_PE_1)
+Feb-05 17:38:27.285 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 4; name: NFCORE_METATDENOVO:METATDENOVO:FASTQC_TRIMGALORE:FASTQC (SAMPLE1_PE); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/37/11d007a4bb1309667d6c3cc6f296d5]
+Feb-05 17:38:27.305 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 7; name: NFCORE_METATDENOVO:METATDENOVO:FASTQC_TRIMGALORE:FASTQC (SAMPLE2_PE); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/52/416d6053a1ddb498e32fd2b68b5050]
+Feb-05 17:38:27.908 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 9; name: NFCORE_METATDENOVO:METATDENOVO:FASTQC_TRIMGALORE:FASTQC (SAMPLE3_PE_1); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/ce/c9b9cd57f58a367ca78f3c3f226b28]
+Feb-05 17:38:36.201 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 6; name: NFCORE_METATDENOVO:METATDENOVO:FASTQC_TRIMGALORE:TRIMGALORE (SAMPLE2_PE); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/ca/d21d3f00371960d1c2648905d70b66]
+Feb-05 17:38:36.899 [TaskFinalizer-7] DEBUG nextflow.processor.TaskProcessor - Process NFCORE_METATDENOVO:METATDENOVO:FASTQC_TRIMGALORE:TRIMGALORE > Skipping output binding because one or more optional files are missing: fileoutparam<2:1>
+Feb-05 17:38:36.922 [TaskFinalizer-7] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'PublishDir' minSize=10; maxSize=768; workQueue=LinkedBlockingQueue[10000]; allowCoreThreadTimeout=false
+Feb-05 17:38:37.198 [Actor Thread 254] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/test_data/rrna.fna.gz
+Feb-05 17:38:37.367 [FileTransfer-9] DEBUG nextflow.file.FilePorter - Copying foreign file https://github.com/nf-core/test-datasets/raw/metatdenovo/test_data/rrna.fna.gz to work dir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/stage-a2a3c3c2-d97e-48aa-ba0b-e64241eb930b/1f/2635f9616566ba5f8863a3087b97fc/rrna.fna.gz
+Feb-05 17:38:37.380 [FileTransfer-9] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/test_data/rrna.fna.gz
+Feb-05 17:38:37.398 [FileTransfer-9] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/test_data/rrna.fna.gz
+Feb-05 17:38:37.414 [Actor Thread 255] DEBUG nextflow.container.SingularityCache - Singularity found local store for image=https://depot.galaxyproject.org/singularity/bbmap:39.10--h92535d8_0; path=/cfs/klemming/projects/snic/snic2020-16-76/data/singularity/depot.galaxyproject.org-singularity-bbmap-39.10--h92535d8_0.img
+Feb-05 17:38:37.454 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:38:37.455 [Task submitter] INFO  nextflow.Session - [d6/f0aa0e] Submitted process > NFCORE_METATDENOVO:METATDENOVO:BBMAP_BBDUK (SAMPLE2_PE)
+Feb-05 17:38:39.664 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 5; name: NFCORE_METATDENOVO:METATDENOVO:FASTQC_TRIMGALORE:TRIMGALORE (SAMPLE1_PE); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/9d/a0f6607cd163ba58c477672a812c4d]
+Feb-05 17:38:39.689 [TaskFinalizer-8] DEBUG nextflow.processor.TaskProcessor - Process NFCORE_METATDENOVO:METATDENOVO:FASTQC_TRIMGALORE:TRIMGALORE > Skipping output binding because one or more optional files are missing: fileoutparam<2:1>
+Feb-05 17:38:39.700 [Actor Thread 249] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/test_data/rrna.fna.gz
+Feb-05 17:38:39.731 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:38:39.733 [Task submitter] INFO  nextflow.Session - [cc/ab141b] Submitted process > NFCORE_METATDENOVO:METATDENOVO:BBMAP_BBDUK (SAMPLE1_PE)
+Feb-05 17:38:40.369 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 8; name: NFCORE_METATDENOVO:METATDENOVO:FASTQC_TRIMGALORE:TRIMGALORE (SAMPLE3_PE_1); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/c2/0f5812fa9b7cd569e4b6a960690b31]
+Feb-05 17:38:40.390 [TaskFinalizer-9] DEBUG nextflow.processor.TaskProcessor - Process NFCORE_METATDENOVO:METATDENOVO:FASTQC_TRIMGALORE:TRIMGALORE > Skipping output binding because one or more optional files are missing: fileoutparam<2:1>
+Feb-05 17:38:40.402 [Actor Thread 255] DEBUG n.file.http.XFileSystemProvider - Remote redirect location: https://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/test_data/rrna.fna.gz
+Feb-05 17:38:40.456 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:38:40.457 [Task submitter] INFO  nextflow.Session - [00/83e7d1] Submitted process > NFCORE_METATDENOVO:METATDENOVO:BBMAP_BBDUK (SAMPLE3_PE_1)
+Feb-05 17:38:57.029 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 10; name: NFCORE_METATDENOVO:METATDENOVO:BBMAP_BBDUK (SAMPLE2_PE); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/d6/f0aa0e4a843bb2e70c61cfd052949f]
+Feb-05 17:38:57.049 [Actor Thread 253] DEBUG nextflow.container.SingularityCache - Singularity found local store for image=https://depot.galaxyproject.org/singularity/seqtk:1.4--he4a0461_1; path=/cfs/klemming/projects/snic/snic2020-16-76/data/singularity/depot.galaxyproject.org-singularity-seqtk-1.4--he4a0461_1.img
+Feb-05 17:38:57.064 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:38:57.065 [Task submitter] INFO  nextflow.Session - [02/ccaf75] Submitted process > NFCORE_METATDENOVO:METATDENOVO:SEQTK_MERGEPE (SAMPLE2_PE)
+Feb-05 17:39:00.569 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 11; name: NFCORE_METATDENOVO:METATDENOVO:BBMAP_BBDUK (SAMPLE1_PE); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/cc/ab141b09f2fb3129518945260957f9]
+Feb-05 17:39:00.597 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:39:00.597 [Task submitter] INFO  nextflow.Session - [28/925d0f] Submitted process > NFCORE_METATDENOVO:METATDENOVO:SEQTK_MERGEPE (SAMPLE1_PE)
+Feb-05 17:39:01.452 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 12; name: NFCORE_METATDENOVO:METATDENOVO:BBMAP_BBDUK (SAMPLE3_PE_1); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/00/83e7d1ac9b4d262db394348f68c6e3]
+Feb-05 17:39:01.487 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:39:01.488 [Task submitter] INFO  nextflow.Session - [11/aa6923] Submitted process > NFCORE_METATDENOVO:METATDENOVO:SEQTK_MERGEPE (SAMPLE3_PE_1)
+Feb-05 17:39:07.455 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 13; name: NFCORE_METATDENOVO:METATDENOVO:SEQTK_MERGEPE (SAMPLE2_PE); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/02/ccaf75b80a3ce63b8bc02459fa851e]
+Feb-05 17:39:08.270 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 14; name: NFCORE_METATDENOVO:METATDENOVO:SEQTK_MERGEPE (SAMPLE1_PE); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/28/925d0f9888c36cc2f4e991c79306ed]
+Feb-05 17:39:11.811 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 15; name: NFCORE_METATDENOVO:METATDENOVO:SEQTK_MERGEPE (SAMPLE3_PE_1); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/11/aa692345b8088c9fb56f73f650ba8b]
+Feb-05 17:39:11.839 [Actor Thread 251] DEBUG nextflow.container.SingularityCache - Singularity found local store for image=https://depot.galaxyproject.org/singularity/mulled-v2-0f92c152b180c7cd39d9b0e6822f8c89ccb59c99:8ec213d21e5d03f9db54898a2baeaf8ec729b447-0; path=/cfs/klemming/projects/snic/snic2020-16-76/data/singularity/depot.galaxyproject.org-singularity-mulled-v2-0f92c152b180c7cd39d9b0e6822f8c89ccb59c99-8ec213d21e5d03f9db54898a2baeaf8ec729b447-0.img
+Feb-05 17:39:11.855 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:39:11.857 [Task submitter] INFO  nextflow.Session - [60/fd151a] Submitted process > NFCORE_METATDENOVO:METATDENOVO:MEGAHIT_INTERLEAVED (megahit_assembly)
+Feb-05 17:40:45.169 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 16; name: NFCORE_METATDENOVO:METATDENOVO:MEGAHIT_INTERLEAVED (megahit_assembly); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/60/fd151a61e327269bc2b1c2c32ae10b]
+Feb-05 17:40:45.566 [Actor Thread 256] DEBUG nextflow.container.SingularityCache - Singularity found local store for image=https://depot.galaxyproject.org/singularity/mulled-v2-2e442ba7b07bfa102b9cf8fac6221263cd746ab8:57f05cfa73f769d6ed6d54144cb3aa2a6a6b17e0-0; path=/cfs/klemming/projects/snic/snic2020-16-76/data/singularity/depot.galaxyproject.org-singularity-mulled-v2-2e442ba7b07bfa102b9cf8fac6221263cd746ab8-57f05cfa73f769d6ed6d54144cb3aa2a6a6b17e0-0.img
+Feb-05 17:40:45.658 [Actor Thread 254] DEBUG nextflow.container.SingularityCache - Singularity found local store for image=https://depot.galaxyproject.org/singularity/pigz:2.3.4; path=/cfs/klemming/projects/snic/snic2020-16-76/data/singularity/depot.galaxyproject.org-singularity-pigz-2.3.4.img
+Feb-05 17:40:45.702 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:40:45.703 [Task submitter] INFO  nextflow.Session - [95/687198] Submitted process > NFCORE_METATDENOVO:METATDENOVO:BBMAP_INDEX (megahit_assembly.contigs.fa.gz)
+Feb-05 17:40:45.711 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:40:45.712 [Task submitter] INFO  nextflow.Session - [d3/016ba3] Submitted process > NFCORE_METATDENOVO:METATDENOVO:PRODIGAL:PRODIGAL_MODULE (megahit.prodigal)
+Feb-05 17:40:45.718 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:40:45.719 [Task submitter] INFO  nextflow.Session - [9f/db6521] Submitted process > NFCORE_METATDENOVO:METATDENOVO:UNPIGZ_CONTIGS (megahit_assembly.contigs.fa.gz)
+Feb-05 17:40:50.792 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 17; name: NFCORE_METATDENOVO:METATDENOVO:UNPIGZ_CONTIGS (megahit_assembly.contigs.fa.gz); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/9f/db652125e55f1fa59e55a9ad0fad40]
+Feb-05 17:40:50.806 [Actor Thread 253] DEBUG nextflow.container.SingularityCache - Singularity found local store for image=https://depot.galaxyproject.org/singularity/transrate:1.0.3--hec16e2b_4; path=/cfs/klemming/projects/snic/snic2020-16-76/data/singularity/depot.galaxyproject.org-singularity-transrate-1.0.3--hec16e2b_4.img
+Feb-05 17:40:50.827 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:40:50.828 [Task submitter] INFO  nextflow.Session - [d8/c821b1] Submitted process > NFCORE_METATDENOVO:METATDENOVO:TRANSRATE (megahit)
+Feb-05 17:40:55.317 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 18; name: NFCORE_METATDENOVO:METATDENOVO:BBMAP_INDEX (megahit_assembly.contigs.fa.gz); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/95/687198e6ca3dec64dc4d7096dfebf5]
+Feb-05 17:40:55.361 [Actor Thread 210] DEBUG nextflow.container.SingularityCache - Singularity found local store for image=https://depot.galaxyproject.org/singularity/mulled-v2-008daec56b7aaf3f162d7866758142b9f889d690:e8a286b2e789c091bac0a57302cdc78aa0112353-0; path=/cfs/klemming/projects/snic/snic2020-16-76/data/singularity/depot.galaxyproject.org-singularity-mulled-v2-008daec56b7aaf3f162d7866758142b9f889d690-e8a286b2e789c091bac0a57302cdc78aa0112353-0.img
+Feb-05 17:40:55.437 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:40:55.438 [Task submitter] INFO  nextflow.Session - [c7/ae1f3a] Submitted process > NFCORE_METATDENOVO:METATDENOVO:BBMAP_ALIGN (SAMPLE3_PE_1)
+Feb-05 17:40:55.447 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:40:55.447 [Task submitter] INFO  nextflow.Session - [07/08e5e1] Submitted process > NFCORE_METATDENOVO:METATDENOVO:BBMAP_ALIGN (SAMPLE1_PE)
+Feb-05 17:40:55.454 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:40:55.454 [Task submitter] INFO  nextflow.Session - [70/0f9ed0] Submitted process > NFCORE_METATDENOVO:METATDENOVO:BBMAP_ALIGN (SAMPLE2_PE)
+Feb-05 17:41:00.607 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 20; name: NFCORE_METATDENOVO:METATDENOVO:TRANSRATE (megahit); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/d8/c821b106b2d9e958c445a8d8d4c099]
+Feb-05 17:41:07.247 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 19; name: NFCORE_METATDENOVO:METATDENOVO:PRODIGAL:PRODIGAL_MODULE (megahit.prodigal); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/d3/016ba3173fd6e26f2b3c8bd84bbc2a]
+Feb-05 17:41:07.267 [Actor Thread 253] DEBUG nextflow.container.SingularityCache - Singularity found local store for image=https://depot.galaxyproject.org/singularity/gzip:1.11; path=/cfs/klemming/projects/snic/snic2020-16-76/data/singularity/depot.galaxyproject.org-singularity-gzip-1.11.img
+Feb-05 17:41:07.281 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:41:07.282 [Task submitter] INFO  nextflow.Session - [8f/b14c62] Submitted process > NFCORE_METATDENOVO:METATDENOVO:PRODIGAL:FORMAT_PRODIGAL_GFF (megahit.prodigal)
+Feb-05 17:41:10.378 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 24; name: NFCORE_METATDENOVO:METATDENOVO:PRODIGAL:FORMAT_PRODIGAL_GFF (megahit.prodigal); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/8f/b14c629e0a32438f45e660bf5fbd5d]
+Feb-05 17:41:10.414 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:41:10.415 [Task submitter] INFO  nextflow.Session - [f7/b7091c] Submitted process > NFCORE_METATDENOVO:METATDENOVO:UNPIGZ_GFF (megahit.prodigal_format.gff.gz)
+Feb-05 17:41:13.341 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 21; name: NFCORE_METATDENOVO:METATDENOVO:BBMAP_ALIGN (SAMPLE2_PE); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/70/0f9ed097f92cfddac01cfb2f2b4261]
+Feb-05 17:41:13.362 [Actor Thread 254] DEBUG nextflow.container.SingularityCache - Singularity found local store for image=https://depot.galaxyproject.org/singularity/samtools:1.21--h50ea8bc_0; path=/cfs/klemming/projects/snic/snic2020-16-76/data/singularity/depot.galaxyproject.org-singularity-samtools-1.21--h50ea8bc_0.img
+Feb-05 17:41:13.377 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:41:13.377 [Task submitter] INFO  nextflow.Session - [78/949647] Submitted process > NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_SORT (SAMPLE2_PE)
+Feb-05 17:41:14.091 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 25; name: NFCORE_METATDENOVO:METATDENOVO:UNPIGZ_GFF (megahit.prodigal_format.gff.gz); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/f7/b7091c00d9636920cfc1484b9f958f]
+Feb-05 17:41:16.995 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 26; name: NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_SORT (SAMPLE2_PE); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/78/949647c4e25b40b3e281e59d9d7ad1]
+Feb-05 17:41:17.017 [TaskFinalizer-5] DEBUG nextflow.processor.TaskProcessor - Process NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_SORT > Skipping output binding because one or more optional files are missing: fileoutparam<1:1>
+Feb-05 17:41:17.017 [TaskFinalizer-5] DEBUG nextflow.processor.TaskProcessor - Process NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_SORT > Skipping output binding because one or more optional files are missing: fileoutparam<2:1>
+Feb-05 17:41:17.018 [TaskFinalizer-5] DEBUG nextflow.processor.TaskProcessor - Process NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_SORT > Skipping output binding because one or more optional files are missing: fileoutparam<3:1>
+Feb-05 17:41:17.065 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:41:17.066 [Task submitter] INFO  nextflow.Session - [3d/e0ab60] Submitted process > NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_INDEX (SAMPLE2_PE)
+Feb-05 17:41:17.086 [Actor Thread 255] DEBUG nextflow.container.SingularityCache - Singularity found local store for image=https://depot.galaxyproject.org/singularity/subread:2.0.6--he4a0461_2; path=/cfs/klemming/projects/snic/snic2020-16-76/data/singularity/depot.galaxyproject.org-singularity-subread-2.0.6--he4a0461_2.img
+Feb-05 17:41:17.114 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:41:17.118 [Task submitter] INFO  nextflow.Session - [7f/890858] Submitted process > NFCORE_METATDENOVO:METATDENOVO:FEATURECOUNTS_CDS (SAMPLE2_PE)
+Feb-05 17:41:17.859 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 22; name: NFCORE_METATDENOVO:METATDENOVO:BBMAP_ALIGN (SAMPLE1_PE); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/07/08e5e162c1db6a3d5741895ed9c844]
+Feb-05 17:41:17.946 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:41:17.948 [Task submitter] INFO  nextflow.Session - [03/4fda5f] Submitted process > NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_SORT (SAMPLE1_PE)
+Feb-05 17:41:19.520 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 23; name: NFCORE_METATDENOVO:METATDENOVO:BBMAP_ALIGN (SAMPLE3_PE_1); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/c7/ae1f3a9525da7a292714b80fd933a8]
+Feb-05 17:41:19.552 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:41:19.552 [Task submitter] INFO  nextflow.Session - [8f/3b4404] Submitted process > NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_SORT (SAMPLE3_PE_1)
+Feb-05 17:41:20.263 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 28; name: NFCORE_METATDENOVO:METATDENOVO:FEATURECOUNTS_CDS (SAMPLE2_PE); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/7f/89085847e32fd13c42545c429c3713]
+Feb-05 17:41:21.822 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 27; name: NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_INDEX (SAMPLE2_PE); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/3d/e0ab609c51eff2c1a08ec53371a069]
+Feb-05 17:41:21.834 [TaskFinalizer-8] DEBUG nextflow.processor.TaskProcessor - Process NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_INDEX > Skipping output binding because one or more optional files are missing: fileoutparam<1:1>
+Feb-05 17:41:21.834 [TaskFinalizer-8] DEBUG nextflow.processor.TaskProcessor - Process NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_INDEX > Skipping output binding because one or more optional files are missing: fileoutparam<2:1>
+Feb-05 17:41:22.168 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 29; name: NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_SORT (SAMPLE1_PE); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/03/4fda5fe202a8301674b9a01d62ec22]
+Feb-05 17:41:22.183 [TaskFinalizer-9] DEBUG nextflow.processor.TaskProcessor - Process NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_SORT > Skipping output binding because one or more optional files are missing: fileoutparam<1:1>
+Feb-05 17:41:22.185 [TaskFinalizer-9] DEBUG nextflow.processor.TaskProcessor - Process NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_SORT > Skipping output binding because one or more optional files are missing: fileoutparam<2:1>
+Feb-05 17:41:22.185 [TaskFinalizer-9] DEBUG nextflow.processor.TaskProcessor - Process NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_SORT > Skipping output binding because one or more optional files are missing: fileoutparam<3:1>
+Feb-05 17:41:22.206 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:41:22.207 [Task submitter] INFO  nextflow.Session - [11/e8bfa5] Submitted process > NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_INDEX (SAMPLE1_PE)
+Feb-05 17:41:22.216 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:41:22.217 [Task submitter] INFO  nextflow.Session - [c8/7f0ca5] Submitted process > NFCORE_METATDENOVO:METATDENOVO:FEATURECOUNTS_CDS (SAMPLE1_PE)
+Feb-05 17:41:24.754 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 30; name: NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_SORT (SAMPLE3_PE_1); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/8f/3b4404327b8b7db48ba4d1a6d4ca6c]
+Feb-05 17:41:24.806 [TaskFinalizer-10] DEBUG nextflow.processor.TaskProcessor - Process NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_SORT > Skipping output binding because one or more optional files are missing: fileoutparam<1:1>
+Feb-05 17:41:24.806 [TaskFinalizer-10] DEBUG nextflow.processor.TaskProcessor - Process NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_SORT > Skipping output binding because one or more optional files are missing: fileoutparam<2:1>
+Feb-05 17:41:24.806 [TaskFinalizer-10] DEBUG nextflow.processor.TaskProcessor - Process NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_SORT > Skipping output binding because one or more optional files are missing: fileoutparam<3:1>
+Feb-05 17:41:24.845 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:41:24.846 [Task submitter] INFO  nextflow.Session - [05/5eef1c] Submitted process > NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_INDEX (SAMPLE3_PE_1)
+Feb-05 17:41:24.858 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:41:24.858 [Task submitter] INFO  nextflow.Session - [f3/6e0511] Submitted process > NFCORE_METATDENOVO:METATDENOVO:FEATURECOUNTS_CDS (SAMPLE3_PE_1)
+Feb-05 17:41:26.566 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 32; name: NFCORE_METATDENOVO:METATDENOVO:FEATURECOUNTS_CDS (SAMPLE1_PE); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/c8/7f0ca5c38480fbc1853f1a43232aec]
+Feb-05 17:41:27.262 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 31; name: NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_INDEX (SAMPLE1_PE); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/11/e8bfa5d8f6c4e058aa94fde60d11a2]
+Feb-05 17:41:27.278 [TaskFinalizer-3] DEBUG nextflow.processor.TaskProcessor - Process NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_INDEX > Skipping output binding because one or more optional files are missing: fileoutparam<1:1>
+Feb-05 17:41:27.279 [TaskFinalizer-3] DEBUG nextflow.processor.TaskProcessor - Process NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_INDEX > Skipping output binding because one or more optional files are missing: fileoutparam<2:1>
+Feb-05 17:41:29.352 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 33; name: NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_INDEX (SAMPLE3_PE_1); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/05/5eef1c087b0a566caf04f4b20ab606]
+Feb-05 17:41:29.366 [TaskFinalizer-2] DEBUG nextflow.processor.TaskProcessor - Process NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_INDEX > Skipping output binding because one or more optional files are missing: fileoutparam<1:1>
+Feb-05 17:41:29.367 [TaskFinalizer-2] DEBUG nextflow.processor.TaskProcessor - Process NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:SAMTOOLS_INDEX > Skipping output binding because one or more optional files are missing: fileoutparam<2:1>
+Feb-05 17:41:29.439 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:41:29.440 [Task submitter] INFO  nextflow.Session - [fc/e0bea3] Submitted process > NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:BAM_STATS_SAMTOOLS:SAMTOOLS_STATS (SAMPLE2_PE)
+Feb-05 17:41:29.448 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:41:29.449 [Task submitter] INFO  nextflow.Session - [55/a76f63] Submitted process > NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:BAM_STATS_SAMTOOLS:SAMTOOLS_IDXSTATS (SAMPLE1_PE)
+Feb-05 17:41:29.460 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:41:29.461 [Task submitter] INFO  nextflow.Session - [20/ba7596] Submitted process > NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:BAM_STATS_SAMTOOLS:SAMTOOLS_STATS (SAMPLE3_PE_1)
+Feb-05 17:41:29.473 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:41:29.474 [Task submitter] INFO  nextflow.Session - [95/615226] Submitted process > NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:BAM_STATS_SAMTOOLS:SAMTOOLS_IDXSTATS (SAMPLE2_PE)
+Feb-05 17:41:29.490 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:41:29.491 [Task submitter] INFO  nextflow.Session - [73/11058d] Submitted process > NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:BAM_STATS_SAMTOOLS:SAMTOOLS_IDXSTATS (SAMPLE3_PE_1)
+Feb-05 17:41:29.499 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:41:29.500 [Task submitter] INFO  nextflow.Session - [3d/c4d792] Submitted process > NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:BAM_STATS_SAMTOOLS:SAMTOOLS_FLAGSTAT (SAMPLE3_PE_1)
+Feb-05 17:41:29.509 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:41:29.509 [Task submitter] INFO  nextflow.Session - [f2/2bee8c] Submitted process > NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:BAM_STATS_SAMTOOLS:SAMTOOLS_FLAGSTAT (SAMPLE1_PE)
+Feb-05 17:41:29.518 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:41:29.519 [Task submitter] INFO  nextflow.Session - [df/6698f6] Submitted process > NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:BAM_STATS_SAMTOOLS:SAMTOOLS_FLAGSTAT (SAMPLE2_PE)
+Feb-05 17:41:29.526 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:41:29.527 [Task submitter] INFO  nextflow.Session - [69/66d191] Submitted process > NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:BAM_STATS_SAMTOOLS:SAMTOOLS_STATS (SAMPLE1_PE)
+Feb-05 17:41:29.593 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 34; name: NFCORE_METATDENOVO:METATDENOVO:FEATURECOUNTS_CDS (SAMPLE3_PE_1); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/f3/6e0511526a173bac71fdca273ef5b1]
+Feb-05 17:41:29.618 [Actor Thread 253] DEBUG nextflow.container.SingularityCache - Singularity found local store for image=https://depot.galaxyproject.org/singularity/mulled-v2-b2ec1fea5791d428eebb8c8ea7409c350d31dada:a447f6b7a6afde38352b24c30ae9cd6e39df95c4-1; path=/cfs/klemming/projects/snic/snic2020-16-76/data/singularity/depot.galaxyproject.org-singularity-mulled-v2-b2ec1fea5791d428eebb8c8ea7409c350d31dada-a447f6b7a6afde38352b24c30ae9cd6e39df95c4-1.img
+Feb-05 17:41:29.632 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:41:29.632 [Task submitter] INFO  nextflow.Session - [26/6bbd9a] Submitted process > NFCORE_METATDENOVO:METATDENOVO:COLLECT_FEATURECOUNTS (megahit.prodigal)
+Feb-05 17:41:42.189 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 37; name: NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:BAM_STATS_SAMTOOLS:SAMTOOLS_IDXSTATS (SAMPLE2_PE); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/95/61522646d336956f18ad94a222e668]
+Feb-05 17:41:42.510 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 40; name: NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:BAM_STATS_SAMTOOLS:SAMTOOLS_IDXSTATS (SAMPLE1_PE); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/55/a76f63ec663825dd57f00e42f0347f]
+Feb-05 17:41:42.522 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 36; name: NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:BAM_STATS_SAMTOOLS:SAMTOOLS_FLAGSTAT (SAMPLE2_PE); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/df/6698f68e8ea4422e2ac0a59d627c84]
+Feb-05 17:41:43.328 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 39; name: NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:BAM_STATS_SAMTOOLS:SAMTOOLS_FLAGSTAT (SAMPLE1_PE); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/f2/2bee8cf038d4fdd441c35708a92261]
+Feb-05 17:41:43.341 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 43; name: NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:BAM_STATS_SAMTOOLS:SAMTOOLS_IDXSTATS (SAMPLE3_PE_1); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/73/11058d255fbcc776abe2c5168bbafc]
+Feb-05 17:41:43.368 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 42; name: NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:BAM_STATS_SAMTOOLS:SAMTOOLS_FLAGSTAT (SAMPLE3_PE_1); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/3d/c4d7922b5368dd767ca8fbc4ad795d]
+Feb-05 17:41:43.524 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 35; name: NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:BAM_STATS_SAMTOOLS:SAMTOOLS_STATS (SAMPLE2_PE); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/fc/e0bea3580df5649bbfbf5af689f12d]
+Feb-05 17:41:43.732 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 38; name: NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:BAM_STATS_SAMTOOLS:SAMTOOLS_STATS (SAMPLE1_PE); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/69/66d1913f7012b295619abaed15e48f]
+Feb-05 17:41:43.870 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 41; name: NFCORE_METATDENOVO:METATDENOVO:BAM_SORT_STATS_SAMTOOLS:BAM_STATS_SAMTOOLS:SAMTOOLS_STATS (SAMPLE3_PE_1); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/20/ba7596734855428fdd26892cb2db50]
+Feb-05 17:41:47.477 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 44; name: NFCORE_METATDENOVO:METATDENOVO:COLLECT_FEATURECOUNTS (megahit.prodigal); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/26/6bbd9aa8ae4c30c83ea7c928c501b7]
+Feb-05 17:41:47.537 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:41:47.537 [Task submitter] INFO  nextflow.Session - [88/db2549] Submitted process > NFCORE_METATDENOVO:METATDENOVO:COLLECT_STATS (megahit.prodigal)
+Feb-05 17:41:58.284 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 45; name: NFCORE_METATDENOVO:METATDENOVO:COLLECT_STATS (megahit.prodigal); status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/88/db2549906003eac6df6e7cfa201845]
+Feb-05 17:41:58.323 [Actor Thread 248] DEBUG nextflow.sort.BigSort - Sort completed -- entries: 22; slices: 1; internal sort time: 0.026 s; external sort time: 0.004 s; total time: 0.03 s
+Feb-05 17:41:58.329 [Actor Thread 248] DEBUG nextflow.file.FileCollector - Saved collect-files list to: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/collect-file/0838c2c219afb52c16e71bd15242b499
+Feb-05 17:41:58.342 [Actor Thread 248] DEBUG nextflow.file.FileCollector - Deleting file collector temp dir: /tmp/nxf-14583268824246215633
+Feb-05 17:41:58.354 [Actor Thread 248] DEBUG nextflow.container.SingularityCache - Singularity found local store for image=https://depot.galaxyproject.org/singularity/multiqc:1.27--pyhdfd78af_0; path=/cfs/klemming/projects/snic/snic2020-16-76/data/singularity/depot.galaxyproject.org-singularity-multiqc-1.27--pyhdfd78af_0.img
+Feb-05 17:41:58.369 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Feb-05 17:41:58.369 [Task submitter] INFO  nextflow.Session - [ca/a216a5] Submitted process > NFCORE_METATDENOVO:METATDENOVO:MULTIQC
+Feb-05 17:42:18.747 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 46; name: NFCORE_METATDENOVO:METATDENOVO:MULTIQC; status: COMPLETED; exit: 0; error: -; workDir: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/ca/a216a59ed29488519cd3ab34528a81]
+Feb-05 17:42:18.774 [main] DEBUG nextflow.Session - Session await > all processes finished
+Feb-05 17:42:18.846 [Task monitor] DEBUG n.processor.TaskPollingMonitor - <<< barrier arrives (monitor: local) - terminating tasks monitor poll loop
+Feb-05 17:42:18.846 [main] DEBUG nextflow.Session - Session await > all barriers passed
+Feb-05 17:42:19.019 [main] DEBUG nextflow.util.ThreadPoolManager - Thread pool 'TaskFinalizer' shutdown completed (hard=false)
+Feb-05 17:42:19.023 [main] DEBUG nextflow.util.ThreadPoolManager - Thread pool 'PublishDir' shutdown completed (hard=false)
+Feb-05 17:42:19.119 [main] INFO  nextflow.Nextflow - -[0;35m[nf-core/metatdenovo][0;32m Pipeline completed successfully[0m-
+Feb-05 17:42:19.178 [main] DEBUG n.trace.WorkflowStatsObserver - Workflow completed > WorkflowStats[succeededCount=46; failedCount=0; ignoredCount=0; cachedCount=0; pendingCount=0; submittedCount=0; runningCount=0; retriesCount=0; abortedCount=0; succeedDuration=16m 17s; failedDuration=0ms; cachedDuration=0ms;loadCpus=0; loadMemory=0; peakRunning=10; peakCpus=40; peakMemory=40 GB; ]
+Feb-05 17:42:19.178 [main] DEBUG nextflow.trace.TraceFileObserver - Workflow completed -- saving trace file
+Feb-05 17:42:19.204 [main] DEBUG nextflow.cache.CacheDB - Closing CacheDB done
+Feb-05 17:42:19.249 [main] INFO  org.pf4j.AbstractPluginManager - Stop plugin 'nf-schema@2.3.0'
+Feb-05 17:42:19.249 [main] DEBUG nextflow.plugin.BasePlugin - Plugin stopped nf-schema
+Feb-05 17:42:19.251 [main] DEBUG nextflow.util.ThreadPoolManager - Thread pool 'FileTransfer' shutdown completed (hard=false)
+Feb-05 17:42:19.254 [main] DEBUG nextflow.script.ScriptRunner - > Execution complete -- Goodbye

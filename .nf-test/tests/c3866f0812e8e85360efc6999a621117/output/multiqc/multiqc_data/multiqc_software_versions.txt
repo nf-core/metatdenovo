@@ -1,0 +1,24 @@
+Sample	bbmap	samtools	pigz	cat	R	dplyr	dtplyr	data.table	readr	purrr	tidyr	stringr	fastqc	subread	gzip	prodigal	seqtk	spades	transrate	trimgalore	cutadapt	writespadesyaml	nf-core/metatdenovo	Nextflow
+BBMAP_ALIGN	39.01	1.16.1	2.6																					
+BBMAP_INDEX	39.1																							
+CAT_FASTQ				9.5																				
+COLLECT_FEATURECOUNTS					4.2.3	1.1.2	1.3.1	1.14.8																
+COLLECT_STATS					4.2.3	1.1.2			2.1.4	1.0.1	1.3.0	1.5.0												
+FASTQC													0.12.1											
+FEATURECOUNTS_CDS														2.0.6										
+FORMATSPADES															gzip 1.11 Copyright (C) 2018 Free Software Foundation, Inc. Copyright (C) 1993 Jean-loup Gailly. This is free software. You may redistribute copies of it under the terms of the GNU General Public License <https://www.gnu.org/licenses/gpl.html>. There is NO WARRANTY, to the extent permitted by law. Written by Jean-loup Gailly.									
+FORMAT_PRODIGAL_GFF															1.11									
+PRODIGAL_MODULE			2.6													2.6.3								
+SAMTOOLS_FLAGSTAT		1.21																						
+SAMTOOLS_IDXSTATS		1.21																						
+SAMTOOLS_INDEX		1.21																						
+SAMTOOLS_SORT		1.21																						
+SAMTOOLS_STATS		1.21																						
+SEQTK_MERGEPE																	1.4-r122							
+SPADES																		4.0.0						
+TRANSRATE																			1.0.3					
+TRIMGALORE			2.8																	0.6.10	4.9			
+UNPIGZ_CONTIGS			2.3.4																					
+UNPIGZ_GFF			2.3.4																					
+WRITESPADESYAML																						4.2.25(1)-release		
+Workflow																							v1.1dev	24.10.4

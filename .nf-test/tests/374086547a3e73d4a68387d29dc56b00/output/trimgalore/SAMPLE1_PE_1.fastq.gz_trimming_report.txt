@@ -1,0 +1,68 @@
+
+SUMMARISING RUN PARAMETERS
+==========================
+Input filename: SAMPLE1_PE_1.fastq.gz
+Trimming mode: paired-end
+Trim Galore version: 0.6.10
+Cutadapt version: 4.9
+Number of cores used for trimming: 1
+Quality Phred score cutoff: 20
+Quality encoding type selected: ASCII+33
+Unable to auto-detect most prominent adapter from the first specified file (count Nextera: 0, count Illumina: 0, count smallRNA: 0)
+Defaulting to Illumina universal adapter ( AGATCGGAAGAGC ). Specify -a SEQUENCE to avoid this behavior).
+Adapter sequence: 'AGATCGGAAGAGC' (Illumina TruSeq, Sanger iPCR; default (inconclusive auto-detection))
+Maximum trimming error rate: 0.1 (default)
+Minimum required adapter overlap (stringency): 1 bp
+Minimum required sequence length for both reads before a sequence pair gets removed: 20 bp
+Running FastQC on the data once trimming has completed
+Output file will be GZIP compressed
+
+
+This is cutadapt 4.9 with Python 3.12.8
+Command line parameters: -j 1 -e 0.1 -q 20 -O 1 -a AGATCGGAAGAGC SAMPLE1_PE_1.fastq.gz
+Processing single-end reads on 1 core ...
+Finished in 2.102 s (42.035 µs/read; 1.43 M reads/minute).
+
+=== Summary ===
+
+Total reads processed:                  50,000
+Reads with adapters:                    15,799 (31.6%)
+Reads written (passing filters):        50,000 (100.0%)
+
+Total basepairs processed:     6,300,000 bp
+Quality-trimmed:                  12,196 bp (0.2%)
+Total written (filtered):      6,266,678 bp (99.5%)
+
+=== Adapter 1 ===
+
+Sequence: AGATCGGAAGAGC; Type: regular 3'; Length: 13; Trimmed: 15799 times
+
+Minimum overlap: 1
+No. of allowed errors:
+1-9 bp: 0; 10-13 bp: 1
+
+Bases preceding removed adapters:
+  A: 32.5%
+  C: 25.6%
+  G: 20.0%
+  T: 22.0%
+  none/other: 0.0%
+
+Overview of removed sequences
+length	count	expect	max.err	error counts
+1	12033	12500.0	0	12033
+2	2711	3125.0	0	2711
+3	767	781.2	0	767
+4	231	195.3	0	231
+5	39	48.8	0	39
+6	13	12.2	0	13
+8	1	0.8	0	1
+9	1	0.2	0	0 1
+17	1	0.0	1	0 1
+37	1	0.0	1	0 1
+102	1	0.0	1	0 1
+
+RUN STATISTICS FOR INPUT FILE: SAMPLE1_PE_1.fastq.gz
+=============================================
+50000 sequences processed in total
+

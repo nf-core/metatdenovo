@@ -1,0 +1,1 @@
+{"input":"https://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/samplesheet/samplesheet.csv","skip_eukulele":true,"skip_eggnog":true,"assembler":"spades","skip_kofamscan":true,"outdir":"/cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/c3866f0812e8e85360efc6999a621117/output"}

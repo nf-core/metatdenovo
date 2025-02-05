@@ -1,0 +1,1 @@
+[ { orientation: "fr", type: "paired-end", interlaced reads: [ "SAMPLE2_PE.processed.fastq.gz", "SAMPLE1_PE.processed.fastq.gz", "SAMPLE3_PE_1.processed.fastq.gz" ] } ]

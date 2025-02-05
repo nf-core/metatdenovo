@@ -1,0 +1,3 @@
+Sample	bbduk-Total_Removed_bases_percent	bbduk-Total_Removed_bases	bbduk-Total_Removed_reads_percent	bbduk-Total_Removed_reads	bbduk-Input_reads
+SAMPLE1_PE_1_val_1	0.11	0.014032	0.11	0.000112	0.09999
+SAMPLE2_PE_1_val_1	0.3	0.022857	0.3	0.00015199999999999998	0.049985999999999996
