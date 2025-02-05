@@ -1,3 +1,0 @@
-Module	Section	Sample Name	Source
-BBDuk	all_sections	SAMPLE2_PE_1_val_1	/cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/ca/a216a59ed29488519cd3ab34528a81/3/SAMPLE2_PE.bbduk.log
-BBDuk	all_sections	SAMPLE1_PE_1_val_1	/cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/f1cb7d92dfb67a6837ee0588018cb491/work/ca/a216a59ed29488519cd3ab34528a81/4/SAMPLE1_PE.bbduk.log

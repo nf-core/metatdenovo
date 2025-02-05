@@ -1,3 +1,0 @@
-Sample	Result bases
-SAMPLE1_PE_1_val_1	12514462.0
-SAMPLE2_PE_1_val_1	7494489.0

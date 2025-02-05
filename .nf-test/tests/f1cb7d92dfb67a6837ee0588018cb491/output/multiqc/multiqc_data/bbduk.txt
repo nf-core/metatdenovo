@@ -1,3 +1,0 @@
-Sample	Input reads	Input bases	Total Removed reads	Total Removed reads percent	Total Removed bases	Total Removed bases percent	Result reads	Result reads percent	Result bases	Result bases percent
-SAMPLE1_PE_1_val_1	99990	12528494	112	0.11	14032	0.11	99878	99.89	12514462	99.89
-SAMPLE2_PE_1_val_1	49986	7517346	152	0.3	22857	0.3	49834	99.7	7494489	99.7

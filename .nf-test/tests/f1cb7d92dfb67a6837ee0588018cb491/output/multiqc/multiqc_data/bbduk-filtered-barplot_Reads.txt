@@ -1,3 +1,0 @@
-Sample	Result reads
-SAMPLE1_PE_1_val_1	99878.0
-SAMPLE2_PE_1_val_1	49834.0

@@ -1,5 +1,0 @@
-[2025-02-05 16:11:38,579] multiqc.config                                     [INFO   ]  Loading config settings from: multiqc_config.yml
-[2025-02-05 16:11:38,787] multiqc.core.file_search                           [INFO   ]  Search path: /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/.nf-test/tests/374086547a3e73d4a68387d29dc56b00/work/48/be02867500f7502440e663a4ae6c94
-[2025-02-05 16:11:38,904] multiqc.modules.custom_content.custom_content      [INFO   ]  nf-core-metatdenovo-methods-description: Found 1 sample (html)
-[2025-02-05 16:11:38,904] multiqc.modules.custom_content.custom_content      [INFO   ]  nf-core-metatdenovo-summary: Found 1 sample (html)
-[2025-02-05 16:11:38,914] multiqc.core.write_results                         [INFO   ]  Rendering plots. Export plots to formats png, svg, pdf is requested, so it might take a while. To disable plot export, set `export_plots: false` in config, or remove the `--export-plots` command line flag
