@@ -1,6 +1,6 @@
 process EGGNOG_MAPPER {
     tag "$meta.id"
-    label 'process_medium'
+    label 'process_high'
 
     conda "bioconda::eggnog-mapper=2.1.9"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?

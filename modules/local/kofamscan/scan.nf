@@ -1,6 +1,6 @@
 process KOFAMSCAN_SCAN {
     tag "$meta.id"
-    label 'process_medium'
+    label 'process_high'
 
     conda "bioconda::kofamscan=1.3.0"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?

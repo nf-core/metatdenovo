@@ -3,12 +3,13 @@ nextflow_pipeline {
     script "../main.nf"
     tag "PIPELINE"
 
-    test("Run with profile test") {
+    test("Run with profile test_prokka") {
 
     when {
         params {
             outdir = "$outputDir"
             input = 'https://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/samplesheet/samplesheet.csv'
+            orf_caller     = 'prokka'
             skip_eukulele  = true
             skip_eggnog    = true
             skip_kofamscan = true
@@ -23,14 +24,14 @@ nextflow_pipeline {
             { assert snapshot(path("$outputDir/trimgalore/fastqc/SAMPLE1_PE_1_val_1_fastqc.html")).match("SAMPLE1_PE_1_val_1_fastqc.html") },
             { assert new File("$outputDir/megahit/megahit_out/megahit_assembly.log").exists() },
             { assert snapshot(path("$outputDir/megahit/megahit_out/megahit_assembly.log")).match("megahit_assembly.log") },
-            { assert new File("$outputDir/prodigal/megahit.prodigal.gff.gz").exists() },
+            { assert new File("$outputDir/prokka/prokka.faa.gz").exists() },
             { assert new File("$outputDir/samtools/SAMPLE1_PE.sorted.bam.bai").exists() },
             { assert new File("$outputDir/bbmap/logs/SAMPLE1_PE.bbmap.log").exists() },
             { assert snapshot(path("$outputDir/bbmap/logs/SAMPLE1_PE.bbmap.log")).match("SAMPLE1_PE.bbmap.log") },
             { assert new File("$outputDir/featurecounts/SAMPLE1_PE.featureCounts.tsv.summary").exists() },
             { assert snapshot(path("$outputDir/featurecounts/SAMPLE1_PE.featureCounts.tsv.summary")).match("SAMPLE1_PE.featureCounts.tsv.summary") },
-            { assert new File("$outputDir/summary_tables/megahit.prodigal.counts.tsv.gz").exists() },
-            { assert new File("$outputDir/summary_tables/megahit.prodigal.overall_stats.tsv.gz").exists() },
+            { assert new File("$outputDir/summary_tables/megahit.prokka.counts.tsv.gz").exists() },
+            { assert new File("$outputDir/summary_tables/megahit.prokka.overall_stats.tsv.gz").exists() },
             { assert new File("$outputDir/multiqc/multiqc_report.html").exists() },
             { assert snapshot(path("$outputDir/multiqc/multiqc_report.html")).match("multiqc_report.html") },
             { assert new File("$outputDir/pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml").exists() }

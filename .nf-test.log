@@ -1,0 +1,30 @@
+Feb-05 20:06:02.260 [main] INFO  com.askimed.nf.test.App - nf-test 0.9.0
+Feb-05 20:06:02.316 [main] INFO  com.askimed.nf.test.App - Arguments: [test, --profile, test_transdecoder,singularity, ./tests/test_transdecoder.nf.test]
+Feb-05 20:06:06.067 [main] INFO  com.askimed.nf.test.App - Nextflow Version: 24.10.4
+Feb-05 20:06:06.071 [main] INFO  com.askimed.nf.test.commands.RunTestsCommand - Load config from file /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/nf-test.config...
+Feb-05 20:06:13.221 [main] INFO  com.askimed.nf.test.lang.dependencies.DependencyResolver - Loaded 136 files from directory /cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo in 5.363 sec
+Feb-05 20:06:13.226 [main] INFO  com.askimed.nf.test.lang.dependencies.DependencyResolver - Found 1 tests.
+Feb-05 20:06:13.227 [main] DEBUG com.askimed.nf.test.lang.dependencies.DependencyResolver - Found tests: [/cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/tests/test_transdecoder.nf.test]
+Feb-05 20:06:13.227 [main] INFO  com.askimed.nf.test.commands.RunTestsCommand - Detected 1 test files.
+Feb-05 20:06:13.957 [main] INFO  com.askimed.nf.test.core.TestExecutionEngine - Started test plan
+Feb-05 20:06:13.958 [main] INFO  com.askimed.nf.test.core.TestExecutionEngine - Running testsuite 'Test pipeline' from file '/cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/tests/test_transdecoder.nf.test'.
+Feb-05 20:06:13.958 [main] INFO  com.askimed.nf.test.core.TestExecutionEngine - Run test '994b2388: Run with profile test transdecoder'. type: com.askimed.nf.test.lang.pipeline.PipelineTest
+Feb-05 20:12:02.732 [main] DEBUG com.askimed.nf.test.lang.extensions.SnapshotFile - Init new snapshot file '/cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/tests/test_transdecoder.nf.test.snap'
+Feb-05 20:12:02.735 [main] DEBUG com.askimed.nf.test.lang.extensions.Snapshot - Snapshot 'SAMPLE1_PE_1_val_1_fastqc.html' not found.
+Feb-05 20:12:02.748 [main] DEBUG com.askimed.nf.test.lang.extensions.SnapshotFile - Created snapshot 'SAMPLE1_PE_1_val_1_fastqc.html'
+Feb-05 20:12:02.854 [main] DEBUG com.askimed.nf.test.lang.extensions.SnapshotFile - Wrote snapshots to file '/cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/tests/test_transdecoder.nf.test.snap'
+Feb-05 20:12:02.855 [main] DEBUG com.askimed.nf.test.lang.extensions.Snapshot - Snapshot 'megahit_assembly.log' not found.
+Feb-05 20:12:02.855 [main] DEBUG com.askimed.nf.test.lang.extensions.SnapshotFile - Created snapshot 'megahit_assembly.log'
+Feb-05 20:12:02.882 [main] DEBUG com.askimed.nf.test.lang.extensions.SnapshotFile - Wrote snapshots to file '/cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/tests/test_transdecoder.nf.test.snap'
+Feb-05 20:12:02.884 [main] DEBUG com.askimed.nf.test.lang.extensions.Snapshot - Snapshot 'SAMPLE1_PE.bbmap.log' not found.
+Feb-05 20:12:02.884 [main] DEBUG com.askimed.nf.test.lang.extensions.SnapshotFile - Created snapshot 'SAMPLE1_PE.bbmap.log'
+Feb-05 20:12:02.910 [main] DEBUG com.askimed.nf.test.lang.extensions.SnapshotFile - Wrote snapshots to file '/cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/tests/test_transdecoder.nf.test.snap'
+Feb-05 20:12:02.911 [main] DEBUG com.askimed.nf.test.lang.extensions.Snapshot - Snapshot 'SAMPLE1_PE.featureCounts.tsv.summary' not found.
+Feb-05 20:12:02.911 [main] DEBUG com.askimed.nf.test.lang.extensions.SnapshotFile - Created snapshot 'SAMPLE1_PE.featureCounts.tsv.summary'
+Feb-05 20:12:03.190 [main] DEBUG com.askimed.nf.test.lang.extensions.SnapshotFile - Wrote snapshots to file '/cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/tests/test_transdecoder.nf.test.snap'
+Feb-05 20:12:03.191 [main] DEBUG com.askimed.nf.test.lang.extensions.Snapshot - Snapshot 'multiqc_report.html' not found.
+Feb-05 20:12:03.192 [main] DEBUG com.askimed.nf.test.lang.extensions.SnapshotFile - Created snapshot 'multiqc_report.html'
+Feb-05 20:12:03.317 [main] DEBUG com.askimed.nf.test.lang.extensions.SnapshotFile - Wrote snapshots to file '/cfs/klemming/projects/supr/snic2020-16-76/ddl/dev/metatdenovo/tests/test_transdecoder.nf.test.snap'
+Feb-05 20:12:03.327 [main] INFO  com.askimed.nf.test.core.TestExecutionEngine - Test '994b2388: Run with profile test transdecoder' finished. status: PASSED
+Feb-05 20:12:03.342 [main] INFO  com.askimed.nf.test.core.TestExecutionEngine - Testsuite 'Test pipeline' finished. snapshot file: true, skipped tests: false, failed tests: false
+Feb-05 20:12:03.346 [main] INFO  com.askimed.nf.test.core.TestExecutionEngine - Executed 1 tests. 0 tests failed. Done!
