@@ -1,5 +1,5 @@
-include { HMMER_HMMSEARCH } from '../../modules/nf-core/hmmer/hmmsearch/main'
-include { HMMRANK         } from '../../modules/local/hmmrank'
+include { HMMER_HMMSEARCH } from '../../../modules/nf-core/hmmer/hmmsearch/main'
+include { HMMRANK         } from '../../../modules/local/hmmrank/main'
 
 workflow HMMCLASSIFY {
 

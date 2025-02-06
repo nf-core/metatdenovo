@@ -2,9 +2,9 @@
 // Run EUKULELE on protein fasta from orf_caller output
 //
 
-include { EUKULELE_SEARCH                      } from '../../modules/local/eukulele/search'
-include { FORMAT_EUKULELE_TAX                  } from '../../modules/local/format_eukulele_tax'
-include { SUMTAXONOMY as SUM_EUKULELE_TAXONOMY } from '../../modules/local/sumtaxonomy'
+include { EUKULELE_SEARCH                      } from '../../../modules/local/eukulele/search/main'
+include { FORMAT_EUKULELE_TAX                  } from '../../../modules/local/eukulele/format_tax/main'
+include { SUMTAXONOMY as SUM_EUKULELE_TAXONOMY } from '../../../modules/local/sumtaxonomy'
 
 workflow SUB_EUKULELE {
 

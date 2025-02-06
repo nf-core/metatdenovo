@@ -2,8 +2,8 @@
 // Run prodigal as orf caller then generate nice format for gff
 //
 
-include { PRODIGAL as PRODIGAL_MODULE } from '../../modules/nf-core/prodigal/main'
-include { FORMAT_PRODIGAL_GFF         } from '../../modules/local/format_prodigal'
+include { PRODIGAL as PRODIGAL_MODULE } from '../../../modules/nf-core/prodigal/main'
+include { FORMAT_PRODIGAL_GFF         } from '../../../modules/local/format/prodigal/main'
 
 workflow PRODIGAL {
     take:

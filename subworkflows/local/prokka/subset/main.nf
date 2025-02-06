@@ -2,11 +2,11 @@
 // Run PROKKA on contigs that are split by size, then concatenate output and gunzip it
 //
 
-include { PROKKA               } from '../../modules/nf-core/prokka/main'
-include { CAT_CAT as GFF_CAT   } from '../../modules/nf-core/cat/cat/main'
-include { CAT_CAT as FAA_CAT   } from '../../modules/nf-core/cat/cat/main'
-include { CAT_CAT as FFN_CAT   } from '../../modules/nf-core/cat/cat/main'
-include { PROKKAGFF2TSV        } from '../../modules/local/prokkagff2tsv'
+include { PROKKA               } from '../../../../modules/nf-core/prokka/main'
+include { CAT_CAT as GFF_CAT   } from '../../../../modules/nf-core/cat/cat/main'
+include { CAT_CAT as FAA_CAT   } from '../../../../modules/nf-core/cat/cat/main'
+include { CAT_CAT as FFN_CAT   } from '../../../../modules/nf-core/cat/cat/main'
+include { PROKKAGFF2TSV        } from '../../../../modules/local/prokka/gff2tsv/main'
 
 workflow PROKKA_SUBSETS {
     take:

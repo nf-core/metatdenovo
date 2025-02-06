@@ -2,9 +2,9 @@
 // Run eggnog-mapper on called ORFs, first optionally downloading the required databases
 //
 
-include { EGGNOG_DOWNLOAD } from '../../modules/local/eggnog/download'
-include { EGGNOG_MAPPER   } from '../../modules/local/eggnog/mapper'
-include { EGGNOG_SUM      } from '../../modules/local/eggnog/sum'
+include { EGGNOG_DOWNLOAD } from '../../../modules/local/eggnog/download/main'
+include { EGGNOG_MAPPER   } from '../../../modules/local/eggnog/mapper/main'
+include { EGGNOG_SUM      } from '../../../modules/local/eggnog/sum/main'
 
 workflow EGGNOG {
     take:

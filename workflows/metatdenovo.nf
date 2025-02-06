@@ -53,20 +53,20 @@ if ( params.hmmdir ) {
 //
 // MODULE: local
 //
-include { COLLECT_FEATURECOUNTS              } from '../modules/local/collect_featurecounts'
-include { COLLECT_STATS                      } from '../modules/local/collect_stats'
-include { DIAMOND_BLASTP as DIAMOND_TAXONOMY } from '../modules/local/diamond/blastp'
-include { FORMATSPADES                       } from '../modules/local/formatspades'
-include { MEGAHIT_INTERLEAVED                } from '../modules/local/megahit/interleaved'
-include { MERGE_TABLES                       } from '../modules/local/merge_summary_tables'
-include { FORMAT_DIAMOND_TAX_RANKLIST        } from '../modules/local/format_diamond_tax_ranklist'
-include { FORMAT_DIAMOND_TAX_TAXDUMP         } from '../modules/local/format_diamond_tax_taxdump'
-include { SUMTAXONOMY as SUM_DIAMONDTAX      } from '../modules/local/sumtaxonomy'
-include { TRANSDECODER                       } from '../modules/local/transdecoder'
-include { TRANSRATE                          } from '../modules/local/transrate'
-include { UNPIGZ as UNPIGZ_CONTIGS           } from '../modules/local/unpigz'
-include { UNPIGZ as UNPIGZ_GFF               } from '../modules/local/unpigz'
-include { WRITESPADESYAML                    } from '../modules/local/writespadesyaml'
+include { COLLECT_FEATURECOUNTS              } from '../modules/local/collect/featurecounts/main'
+include { COLLECT_STATS                      } from '../modules/local/collect/stats/main'
+include { DIAMOND_BLASTP as DIAMOND_TAXONOMY } from '../modules/local/diamond/blastp/main'
+include { FORMATSPADES                       } from '../modules/local/format/spades/main'
+include { MEGAHIT_INTERLEAVED                } from '../modules/local/megahit/interleaved/main'
+include { MERGE_TABLES                       } from '../modules/local/merge/summary/main'
+include { FORMAT_DIAMOND_TAX_RANKLIST        } from '../modules/local/diamond/format_tax/ranklist/main'
+include { FORMAT_DIAMOND_TAX_TAXDUMP         } from '../modules/local/diamond/format_tax/taxdump/main'
+include { SUMTAXONOMY as SUM_DIAMONDTAX      } from '../modules/local/sumtaxonomy/main'
+include { TRANSDECODER                       } from '../modules/local/transdecoder/main'
+include { TRANSRATE                          } from '../modules/local/transrate/main'
+include { UNPIGZ as UNPIGZ_CONTIGS           } from '../modules/local/unpigz/main'
+include { UNPIGZ as UNPIGZ_GFF               } from '../modules/local/unpigz/main'
+include { WRITESPADESYAML                    } from '../modules/local/spades/writeyaml/main'
 
 
 //
@@ -77,13 +77,13 @@ include { validateInputSamplesheet       } from '../subworkflows/local/utils_nfc
 //
 // SUBWORKFLOW: Consisting of local modules
 //
-include { EGGNOG                  } from '../subworkflows/local/eggnog'
-include { SUB_EUKULELE            } from '../subworkflows/local/eukulele'
-include { HMMCLASSIFY             } from '../subworkflows/local/hmmclassify'
-include { PROKKA_SUBSETS          } from '../subworkflows/local/prokka_subsets'
-include { FASTQC_TRIMGALORE       } from '../subworkflows/local/fastqc_trimgalore'
-include { PRODIGAL                } from '../subworkflows/local/prodigal'
-include { KOFAMSCAN               } from '../subworkflows/local/kofamscan'
+include { EGGNOG                  } from '../subworkflows/local/eggnog/main'
+include { SUB_EUKULELE            } from '../subworkflows/local/eukulele/main'
+include { HMMCLASSIFY             } from '../subworkflows/local/hmmclassify/main'
+include { PROKKA_SUBSETS          } from '../subworkflows/local/prokka/subset/main'
+include { FASTQC_TRIMGALORE       } from '../subworkflows/local/fastqc/trimgalore/main'
+include { PRODIGAL                } from '../subworkflows/local/prodigal/main'
+include { KOFAMSCAN               } from '../subworkflows/local/kofamscan/main'
 include { PIPELINE_INITIALISATION } from '../subworkflows/local/utils_nfcore_metatdenovo_pipeline'
 include { PIPELINE_COMPLETION     } from '../subworkflows/local/utils_nfcore_metatdenovo_pipeline'
 
@@ -460,7 +460,7 @@ workflow METATDENOVO {
         ch_merge_tables = ch_merge_tables.mix ( KOFAMSCAN.out.kofamscan_summary.map { meta, tsv -> tsv } )
     }
 
-    // set up contig channel to use in CAT and TransRate
+    // set up contig channel to use in TransRate
     UNPIGZ_CONTIGS(ch_assembly_contigs)
     ch_unzipped_contigs = UNPIGZ_CONTIGS.out.unzipped
     ch_versions = ch_versions.mix(UNPIGZ_CONTIGS.out.versions)

@@ -2,9 +2,9 @@
 // Run KOFAMSCAN on protein fasta from orf_caller output
 //
 
-include { KOFAMSCAN_SCAN     } from '../../modules/local/kofamscan/scan'
-include { KOFAMSCAN_DOWNLOAD } from '../../modules/local/kofamscan/download'
-include { SUM_KOFAMSCAN      } from '../../modules/local/sum_kofamscan'
+include { KOFAMSCAN_SCAN     } from '../../../modules/local/kofamscan/scan/main'
+include { KOFAMSCAN_DOWNLOAD } from '../../../modules/local/kofamscan/download/main'
+include { SUM_KOFAMSCAN      } from '../../../modules/local/kofamscan/sum/main'
 
 workflow KOFAMSCAN {
 
