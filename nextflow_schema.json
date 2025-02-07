@@ -535,10 +535,12 @@
                     "hidden": true
                 },
                 "validationSkipDuplicateCheck": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "description": "validation plugin"
                 },
                 "validationS3PathCheck": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "description": "validation plugin"
                 }
             }
         }
