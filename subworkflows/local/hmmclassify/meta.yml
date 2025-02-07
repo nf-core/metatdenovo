@@ -7,8 +7,8 @@ keywords:
   - hmmer
   - ranking
 components:
-  - HMMER_HMMSEARCH
-  - HMMRANK
+  - hmmer/hmmsearch
+  - hmmrank
 input:
   - ch_hmmclassify:
       type: tuple

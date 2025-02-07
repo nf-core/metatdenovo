@@ -6,9 +6,9 @@ keywords:
   - orthology
   - functional annotation
 components:
-  - KOFAMSCAN_SCAN
-  - KOFAMSCAN_DOWNLOAD
-  - KOFAMSCAN_SUM
+  - kofam/scan
+  - kofam/download
+  - kofam/sum
 input:
   - kofamscan:
       type: tuple

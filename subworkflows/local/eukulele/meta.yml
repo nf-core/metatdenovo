@@ -6,9 +6,9 @@ keywords:
   - eukaryotes
   - classification
 components:
-  - EUKULELE_SEARCH
-  - FORMAT_EUKULELE_TAX
-  - SUMTAXONOMY
+  - eukulele/search
+  - format/eukulele/tax
+  - sumtaxonomy
 input:
   - eukulele:
       type: tuple

@@ -7,8 +7,8 @@ keywords:
   - read trimming
   - UMI extraction
 components:
-  - FASTQC
-  - TRIMGALORE
+  - fastqc
+  - trimgalore
 input:
   - reads:
       type: file

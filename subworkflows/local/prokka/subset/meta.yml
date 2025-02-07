@@ -8,9 +8,9 @@ keywords:
   - faa
   - ffn
 components:
-  - PROKKA
-  - CAT_CAT
-  - PROKKAGFF2TSV
+  - prokka
+  - cat/cat
+  - prokkagff2tsv
 input:
   - contigs:
       type: tuple

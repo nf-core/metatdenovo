@@ -6,9 +6,9 @@ keywords:
   - orthology
   - protein sequences
 components:
-  - EGGNOG_DOWNLOAD
-  - EGGNOG_MAPPER
-  - EGGNOG_SUM
+  - eggnog/download
+  - eggnog/mapper
+  - eggnog/sum
 input:
   - faa:
       type: file

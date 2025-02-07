@@ -6,8 +6,8 @@ keywords:
   - gene prediction
   - gff format
 components:
-  - PRODIGAL_MODULE
-  - FORMAT_PRODIGAL_GFF
+  - prodigal
+  - format/prodigal/gff
 input:
   - fastafile:
       type: file
