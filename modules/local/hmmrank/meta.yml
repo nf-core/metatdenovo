@@ -1,0 +1,29 @@
+name: "hmmrank"
+description: Ranks HMM profile matches based on score and e-value
+keywords:
+  - hmm
+  - rank
+  - profile
+  - protein
+input:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - tblouts:
+      type: file
+      description: HMM search output files in table format
+      pattern: "*.tbl.gz"
+output:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - hmmrank:
+      type: file
+      description: Ranked HMM profile matches
+      pattern: "*.hmmrank.tsv.gz"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+authors:
+  - "@danilodileo"

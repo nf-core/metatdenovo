@@ -1,0 +1,29 @@
+name: "unpigz"
+description: Decompresses gzipped files using pigz
+keywords:
+  - unpigz
+  - decompress
+  - gunzip
+  - pigz
+input:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - file:
+      type: file
+      description: Gzipped input file
+      pattern: "*.gz"
+output:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - unzipped:
+      type: file
+      description: Decompressed output file
+      pattern: "*"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+authors:
+  - "@danilodileo"

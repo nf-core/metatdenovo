@@ -1,0 +1,28 @@
+name: "prokkagff2tsv"
+description: Converts Prokka GFF output to a tabular TSV format
+keywords:
+  - prokka
+  - gff
+  - conversion
+input:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - gff:
+      type: file
+      description: Prokka GFF annotation file
+      pattern: "*.gff{.gz,}"
+output:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - tsv:
+      type: file
+      description: Converted TSV file containing Prokka annotations
+      pattern: "*.prokka-annotations.tsv.gz"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+authors:
+  - "@danilodileo"

@@ -1,4 +1,4 @@
-process SUM_KOFAMSCAN {
+process KOFAMSCAN_SUM {
     tag "$meta.id"
     label 'process_low'
 
