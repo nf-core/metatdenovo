@@ -1,0 +1,72 @@
+name: "diamond_blastp"
+description: Performs protein BLAST searches using DIAMOND
+keywords:
+  - diamond
+  - blastp
+  - protein
+input:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+  - fasta:
+      type: file
+      description: Input protein FASTA file
+      pattern: "*.{fasta,fa}"
+  - meta2:
+      type: map
+      description: |
+        Groovy Map containing database information
+        e.g. [ id:'nr' ]
+  - db:
+      type: file
+      description: DIAMOND formatted database file
+      pattern: "*.dmnd"
+  - outfmt:
+      type: value
+      description: |
+        Output format code (0, 5, 6, 100, 101, 102, or 103)
+  - blast_columns:
+      type: value
+      description: |
+        BLAST output columns (only used when outfmt is 6)
+output:
+  - outmeta:
+      type: map
+      description: |
+        Groovy Map containing sample information and database id
+  - blast:
+      type: file
+      description: BLAST format output (when outfmt is 0)
+      pattern: "*.blast*"
+  - xml:
+      type: file
+      description: XML format output (when outfmt is 5)
+      pattern: "*.xml*"
+  - txt:
+      type: file
+      description: Tabular format output (when outfmt is 6)
+      pattern: "*.txt*"
+  - daa:
+      type: file
+      description: DAA format output (when outfmt is 100)
+      pattern: "*.daa"
+  - sam:
+      type: file
+      description: SAM format output (when outfmt is 101)
+      pattern: "*.sam*"
+  - tsv:
+      type: file
+      description: TSV format output (when outfmt is 102)
+      pattern: "*.tsv*"
+  - paf:
+      type: file
+      description: PAF format output (when outfmt is 103)
+      pattern: "*.paf*"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+authors:
+  - "@danilodileo"

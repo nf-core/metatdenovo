@@ -1,0 +1,43 @@
+name: "eukulele_search"
+description: Performs taxonomic classification using EUKulele
+keywords:
+  - eukulele
+  - taxonomy
+  - classification
+  - eukaryotes
+input:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - fasta:
+      type: file
+      description: Input protein FASTA file
+      pattern: "*.{faa,fasta}"
+  - dbname:
+      type: value
+      description: Name of the database to use for classification
+  - eukdb:
+      type: directory
+      description: Directory containing EUKulele reference database
+output:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - taxonomy_estimation:
+      type: file
+      description: EUKulele taxonomy estimation output
+      pattern: "*/taxonomy_estimation/*.out.gz"
+  - taxonomy_counts:
+      type: file
+      description: EUKulele taxonomy counts output
+      pattern: "*/taxonomy_counts/*.csv.gz"
+  - diamond:
+      type: directory
+      description: DIAMOND alignment results
+      pattern: "*/mets_full/diamond/*"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+authors:
+  - "@danilodileo"
