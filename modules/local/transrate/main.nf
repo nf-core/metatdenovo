@@ -2,7 +2,7 @@ process TRANSRATE {
     tag "$meta.id"
     label 'process_low'
 
-    conda "bioconda::transrate=1.0.3"
+    conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/transrate:1.0.3--hec16e2b_4':
         'biocontainers/transrate:1.0.3--hec16e2b_4' }"

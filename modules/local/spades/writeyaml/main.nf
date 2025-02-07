@@ -2,7 +2,7 @@ process WRITESPADESYAML {
     tag "spades.yaml"
     label 'process_single'
 
-    conda "conda-forge::pigz=2.3.4=2.6"
+    conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/pigz:2.3.4' :
         'biocontainers/pigz:2.3.4' }"

@@ -2,7 +2,7 @@ process KOFAMSCAN_DOWNLOAD {
     tag "KEGG data"
     label 'process_long'
 
-    conda "bioconda::gnu-wget=1.18"
+    conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/gnu-wget:1.18--h36e9172_9':
         'quay.io/biocontainers/gnu-wget:1.18--h36e9172_9' }"

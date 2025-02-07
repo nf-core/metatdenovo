@@ -2,7 +2,7 @@ process FORMAT_PRODIGAL_GFF {
     tag "$meta.id"
     label 'process_low'
 
-    conda "conda-forge::gzip=1.12"
+    conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/gzip:1.11':
         'biocontainers/gzip:1.11' }"

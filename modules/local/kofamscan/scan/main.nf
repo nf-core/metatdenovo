@@ -2,7 +2,7 @@ process KOFAMSCAN_SCAN {
     tag "$meta.id"
     label 'process_high'
 
-    conda "bioconda::kofamscan=1.3.0"
+    conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/kofamscan:1.3.0--hdfd78af_2':
         'quay.io/biocontainers/kofamscan:1.3.0--hdfd78af_2' }"

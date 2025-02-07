@@ -2,7 +2,7 @@ process TRANSDECODER {
     tag "$meta.id"
     label 'process_medium'
 
-    conda "bioconda::transdecoder=5.7.1"
+    conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
     'https://depot.galaxyproject.org/singularity/transdecoder:5.7.1--pl5321hdfd78af_0' :
     'biocontainers/transdecoder:5.7.1--pl5321hdfd78af_0' }"
