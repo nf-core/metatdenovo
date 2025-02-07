@@ -533,6 +533,12 @@
                     "fa_icon": "far calendar",
                     "description": "Suffix to add to the trace report filename. Default is the date and time in the format yyyy-MM-dd_HH-mm-ss.",
                     "hidden": true
+                },
+                "validationSkipDuplicateCheck": {
+                    "type": "boolean"
+                },
+                "validationS3PathCheck": {
+                    "type": "boolean"
                 }
             }
         }
@@ -574,13 +580,5 @@
         {
             "$ref": "#/$defs/generic_options"
         }
-    ],
-    "properties": {
-        "validationSkipDuplicateCheck": {
-            "type": "boolean"
-        },
-        "validationS3PathCheck": {
-            "type": "boolean"
-        }
-    }
+    ]
 }
