@@ -1,0 +1,45 @@
+name: "collect_stats"
+description: Collects and processes various statistics from different analysis steps
+keywords:
+  - stats
+  - collect
+input:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+  - samples:
+      type: value
+      description: List of sample names
+  - trimlogs:
+      type: file
+      description: Trimming log files
+      pattern: "*.trimming_report.txt"
+  - bblogs:
+      type: file
+      description: BBDuk log files
+      pattern: "*.bbduk.log"
+  - idxstats:
+      type: file
+      description: SAMtools idxstats output files
+      pattern: "*.idxstats"
+  - fcs:
+      type: file
+      description: Feature counts output file
+      pattern: "*.featureCounts.tsv"
+  - mergetab:
+      type: file
+      description: Merged taxonomy and function statistics file (optional)
+      pattern: "*.tsv"
+output:
+  - overall_stats:
+      type: file
+      description: Compiled overall statistics file
+      pattern: "*.overall_stats.tsv.gz"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+authors:
+  - "@danilodileo"

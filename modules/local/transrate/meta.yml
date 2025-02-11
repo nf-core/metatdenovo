@@ -1,0 +1,29 @@
+name: TRANSRATE
+description: Evaluates the quality of de novo transcriptome assemblies
+keywords:
+  - transrate
+  - transcriptome
+  - assembly
+  - quality assessment
+input:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - assembly:
+      type: file
+      description: Input transcriptome assembly file
+      pattern: "*.{fa,fasta,fna}"
+output:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - assembly_qc:
+      type: file
+      description: Transrate assembly quality assessment results
+      pattern: "*assemblies_mqc.csv"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+authors:
+  - "@danilodileo"

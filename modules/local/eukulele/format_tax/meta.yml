@@ -1,0 +1,29 @@
+name: "format_eukuelel_tax"
+description: Formats EUKulele taxonomy classification results
+keywords:
+  - eukulele
+  - taxonomy
+  - classification
+  - format
+input:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - taxtable:
+      type: file
+      description: EUKulele taxonomy classification table
+      pattern: "*.tsv"
+output:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - tax:
+      type: file
+      description: Formatted taxonomy classification file
+      pattern: "*.taxonomy_classification.tsv.gz"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+authors:
+  - "@danilodileo"

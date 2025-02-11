@@ -1,0 +1,39 @@
+name: "format_taxonomy_tax_dump"
+description: Formats DIAMOND taxonomy results using NCBI taxdump files
+keywords:
+  - taxonomy
+  - diamond
+  - format
+input:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - taxfile:
+      type: file
+      description: Input taxonomy file from DIAMOND
+      pattern: "*.{tsv,txt}"
+  - names:
+      type: file
+      description: NCBI taxdump names.dmp file
+      pattern: "names.dmp"
+  - nodes:
+      type: file
+      description: NCBI taxdump nodes.dmp file
+      pattern: "nodes.dmp"
+  - ranks:
+      type: value
+      description: Semicolon-separated list of taxonomic ranks to consider
+output:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - taxonomy:
+      type: file
+      description: Formatted taxonomy TSV file with taxdump information
+      pattern: "*.taxonomy-taxdump.tsv.gz"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+authors:
+  - "@danilodileo"

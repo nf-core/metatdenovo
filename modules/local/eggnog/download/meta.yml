@@ -1,0 +1,32 @@
+name: "eggnog_download"
+description: Downloads EggNOG database files for functional annotation
+keywords:
+  - eggnog
+  - download
+  - database
+  - functional annotation
+input:
+  - none
+output:
+  - eggnog_db:
+      type: file
+      description: EggNOG database file
+      pattern: "eggnog.db"
+  - dmnd:
+      type: file
+      description: DIAMOND-formatted EggNOG protein database
+      pattern: "eggnog_proteins.dmnd"
+  - taxa_db:
+      type: file
+      description: EggNOG taxonomy database
+      pattern: "eggnog.taxa.db"
+  - pkl:
+      type: file
+      description: EggNOG taxonomy traverse pickle file
+      pattern: "eggnog.taxa.db.traverse.pkl"
+  - all:
+      type: directory
+      description: Directory containing all downloaded EggNOG files
+      pattern: "*"
+authors:
+  - "@danilodileo"

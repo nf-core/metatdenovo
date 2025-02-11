@@ -1,0 +1,53 @@
+name: fastqc_trimgalore
+description: Performs quality control, UMI extraction, and trimming on input reads
+keywords:
+  - fastqc
+  - trimgalore
+  - quality control
+  - read trimming
+  - UMI extraction
+components:
+  - fastqc
+  - trimgalore
+input:
+  - reads:
+      type: file
+      description: Input read files
+      pattern: "*.{fastq,fq,fastq.gz,fq.gz}"
+  - skip_fastqc:
+      type: boolean
+      description: Whether to skip FastQC analysis
+  - skip_trimming:
+      type: boolean
+      description: Whether to skip read trimming
+output:
+  - reads:
+      type: file
+      description: Trimmed read files (if trimming was performed)
+      pattern: "*.{fastq,fq,fastq.gz,fq.gz}"
+  - fastqc_html:
+      type: file
+      description: FastQC report in HTML format
+      pattern: "*.html"
+  - fastqc_zip:
+      type: file
+      description: FastQC report archive
+      pattern: "*.zip"
+  - trim_html:
+      type: file
+      description: Trim Galore report in HTML format
+      pattern: "*.html"
+  - trim_zip:
+      type: file
+      description: Trim Galore report archive
+      pattern: "*.zip"
+  - trim_log:
+      type: file
+      description: Trim Galore log file
+      pattern: "*.txt"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+authors:
+  - "@danilodileo"

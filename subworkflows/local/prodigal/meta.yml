@@ -1,0 +1,30 @@
+name: "prodigal"
+description: Runs Prodigal for ORF calling and formats the resulting GFF file
+keywords:
+  - prodigal
+  - orf calling
+  - gene prediction
+  - gff format
+components:
+  - prodigal
+  - format/prodigal/gff
+input:
+  - fastafile:
+      type: file
+      description: Input FASTA file containing nucleotide sequences
+      pattern: "*.{fa,fasta,fna}"
+output:
+  - faa:
+      type: file
+      description: Amino acid sequences of predicted genes in FASTA format
+      pattern: "*.faa"
+  - gff:
+      type: file
+      description: Formatted GFF file containing gene predictions
+      pattern: "*_format.gff.gz"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+authors:
+  - "@danilodileo"

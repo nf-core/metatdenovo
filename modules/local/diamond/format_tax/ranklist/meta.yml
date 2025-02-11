@@ -1,0 +1,31 @@
+name: "format_diamond_tax_ranklist"
+description: Formats DIAMOND taxonomy results into a structured TSV file
+keywords:
+  - taxonomy
+  - diamond
+  - format
+input:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - taxfile:
+      type: file
+      description: Input taxonomy file from DIAMOND
+      pattern: "*.{tsv,txt}"
+  - ranks:
+      type: value
+      description: Semicolon-separated list of taxonomic ranks to separate
+output:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - taxonomy:
+      type: file
+      description: Formatted taxonomy TSV file
+      pattern: "*.taxonomy.tsv.gz"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+authors:
+  - "@danilodileo"

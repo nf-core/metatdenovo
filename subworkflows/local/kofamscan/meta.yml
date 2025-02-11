@@ -1,0 +1,35 @@
+name: KOFAMSCAN
+description: Runs KOFAMSCAN on protein sequences and summarizes the results
+keywords:
+  - kofamscan
+  - kegg
+  - orthology
+  - functional annotation
+components:
+  - kofamscan/scan
+  - kofamscan/download
+  - kofamscan/sum
+input:
+  - kofamscan:
+      type: tuple
+      description: Channel containing metadata and protein FASTA file
+      pattern: "[ val(meta), path(fasta) ]"
+  - fcs:
+      type: file
+      description: Feature count files from featureCounts output
+      pattern: "*.counts.tsv.gz"
+output:
+  - kofam_table_out:
+      type: file
+      description: KOFAMSCAN output table
+      pattern: "kofamscan_output.tsv.gz"
+  - kofamscan_summary:
+      type: file
+      description: Summarized KOFAMSCAN results
+      pattern: "*.kofamscan_summary.tsv.gz"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+authors:
+  - "@danilodileo"
