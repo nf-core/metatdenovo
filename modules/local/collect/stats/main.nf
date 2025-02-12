@@ -117,4 +117,21 @@ process COLLECT_STATS {
         "versions.yml"
     )
     """
+
+    stub:
+    def prefix = task.ext.prefix ?: "${meta.id}"
+    """
+    touch ${prefix}.overall_stats.tsv
+    gzip ${prefix}.overall_stats.tsv
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        R: 4.1.0
+        dplyr: 1.0.7
+        readr: 2.0.0
+        purrr: 0.3.4
+        tidyr: 1.1.3
+        stringr: 1.4.0
+    END_VERSIONS
+    """
 }

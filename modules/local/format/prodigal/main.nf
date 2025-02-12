@@ -30,4 +30,18 @@ process FORMAT_PRODIGAL_GFF {
         gzip: \$( echo \$(gzip --version 2>&1) | sed -n 's/.*gzip \\([0-9.]\\+\\).*/\\1/p')
     END_VERSIONS
     """
+
+    stub:
+    def args = task.ext.args   ?: ''
+    prefix   = task.ext.prefix ?: "${meta.id}"
+
+    """
+    touch ${prefix}_format.gff
+    gzip ${prefix}_format.gff
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        gzip: 1.11
+    END_VERSIONS
+    """
 }
