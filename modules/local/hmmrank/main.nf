@@ -53,4 +53,17 @@ process HMMRANK {
         "versions.yml"
     )
     """
+
+    stub:
+    def prefix = task.ext.prefix ?: "${meta.id}"
+    """
+    touch ${prefix}.hmmrank.tsv
+    gzip ${prefix}.hmmrank.tsv
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        R: 4.1.0
+        tidyverse: 1.3.1
+    END_VERSIONS
+    """
 }

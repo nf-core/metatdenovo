@@ -49,4 +49,20 @@ process MEGAHIT_INTERLEAVED {
         megahit_interleaved: \$(echo \$(megahit -v 2>&1) | sed 's/MEGAHIT v//')
     END_VERSIONS
     """
+    stub:
+    def prefix = task.ext.prefix ?: ''
+    """
+    mkdir -p megahit_out/intermediate_contigs
+    echo "" | gzip > megahit_out/${assembly}.contigs.fa.gz
+    touch megahit_out/${assembly}.log
+    echo "" | gzip > megahit_out/intermediate_contigs/k21.contigs.fa.gz
+    echo "" | gzip > megahit_out/intermediate_contigs/k21.addi.fa.gz
+    echo "" | gzip > megahit_out/intermediate_contigs/k21.local.fa.gz
+    echo "" | gzip > megahit_out/intermediate_contigs/k21.final.contigs.fa.gz
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        megahit_interleaved: 1.2.9
+    END_VERSIONS
+    """
 }

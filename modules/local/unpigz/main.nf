@@ -31,4 +31,14 @@ process UNPIGZ {
         pigz: \$( echo \$(pigz --version 2>&1) | sed 's/pigz //')
     END_VERSIONS
     """
+
+    stub:
+    gunzip = file.toString() - '.gz'
+    """
+    touch ${gunzip}
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        pigz: 2.3.4
+    END_VERSIONS
+    """
 }

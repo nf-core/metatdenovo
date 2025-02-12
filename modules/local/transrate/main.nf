@@ -36,4 +36,15 @@ process TRANSRATE {
         transrate: \$(transrate --version)
     END_VERSIONS
     """
+
+    stub:
+    def prefix = task.ext.prefix ?: "${meta.id}"
+    """
+    touch ${prefix}_assemblies_mqc.csv
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        transrate: 1.0.3
+    END_VERSIONS
+"""
 }

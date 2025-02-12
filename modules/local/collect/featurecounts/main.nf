@@ -66,5 +66,20 @@ process COLLECT_FEATURECOUNTS {
             ),
             "versions.yml"
         )
-        """
+    """
+
+    stub:
+    def prefix = task.ext.prefix ?: "${meta.id}"
+    """
+    touch ${prefix}.counts.tsv
+    gzip ${prefix}.counts.tsv
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        R: 4.1.0
+        dplyr: 1.0.7
+        dtplyr: 1.1.0
+        data.table: 1.14.0
+    END_VERSIONS
+    """
 }
