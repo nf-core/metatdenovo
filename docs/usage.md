@@ -149,7 +149,7 @@ cd eukulele
 EUKulele download --database mmetsp (you can use the name of the database you would like to download)
 ```
 
-- There are some cases when even after the download, EUKulele doesn't produce the correct files. In these cases you will end up with the `reference.pep.fa`file only. To fix the problematic database tables follow this instruction (this example is made with mmetsp but you can check EUKulele documentation for other databases since it can be slightly different!):
+- There are some cases when even after the download, EUKulele doesn't produce the correct files. In these cases you will end up with the `reference.pep.fa` file only. To fix the problematic database tables follow this instruction (this example is made with mmetsp but you can check EUKulele documentation for other databases since it can be slightly different!):
 
 ```bash
 mkdir mmetsp
