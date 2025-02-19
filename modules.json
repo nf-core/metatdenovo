@@ -7,22 +7,22 @@
                 "nf-core": {
                     "bbmap/align": {
                         "branch": "master",
-                        "git_sha": "81880787133db07d9b4c1febd152c090eb8325dc",
+                        "git_sha": "3888846f8ee887f5a0f0a730e170a591731bea72",
                         "installed_by": ["modules"]
                     },
                     "bbmap/bbduk": {
                         "branch": "master",
-                        "git_sha": "81880787133db07d9b4c1febd152c090eb8325dc",
+                        "git_sha": "3888846f8ee887f5a0f0a730e170a591731bea72",
                         "installed_by": ["modules"]
                     },
                     "bbmap/bbnorm": {
                         "branch": "master",
-                        "git_sha": "81880787133db07d9b4c1febd152c090eb8325dc",
+                        "git_sha": "3888846f8ee887f5a0f0a730e170a591731bea72",
                         "installed_by": ["modules"]
                     },
                     "bbmap/index": {
                         "branch": "master",
-                        "git_sha": "81880787133db07d9b4c1febd152c090eb8325dc",
+                        "git_sha": "3888846f8ee887f5a0f0a730e170a591731bea72",
                         "installed_by": ["modules"]
                     },
                     "cat/cat": {
