@@ -68,12 +68,11 @@ process COLLECT_STATS {
             sample = str_remove(basename(fname), '.idxstats'),
             d = map(
                 fname,
-                \\(f) {
-                    read_tsv(pipe(sprintf("grep -v '^\\\\*' %s", f)), col_names = c('chr', 'length', 'idxs_n_mapped', 'idxs_n_unmapped'), col_types = 'ciii') %>%
-                        lazy_dt() %>%
-                        select(-chr, -length) %>%
-                        summarise(idxs_n_mapped = sum(idxs_n_mapped), idxs_n_unmapped = sum(idxs_n_unmapped)) %>%
-                        as_tibble()
+                \\(f) { read_tsv(pipe(sprintf("grep -v '^\\\\*' %s", f)), col_names = c('chr', 'length', 'idxs_n_mapped', 'idxs_n_unmapped'), col_types = 'ciii') %>%
+                    lazy_dt() %>%
+                    select(-chr, -length) %>%
+                    summarise(idxs_n_mapped = sum(idxs_n_mapped), idxs_n_unmapped = sum(idxs_n_unmapped)) %>%
+                    as_tibble()
                  }
             )
         ) %>%
