@@ -80,7 +80,7 @@ include { validateInputSamplesheet       } from '../subworkflows/local/utils_nfc
 include { EGGNOG                  } from '../subworkflows/local/eggnog/main'
 include { SUB_EUKULELE            } from '../subworkflows/local/eukulele/main'
 include { HMMCLASSIFY             } from '../subworkflows/local/hmmclassify/main'
-include { PROKKA_SUBSETS          } from '../subworkflows/local/prokka/subset/main'
+include { PROKKA_SUBSET           } from '../subworkflows/local/prokka/subset/main'
 include { FASTQC_TRIMGALORE       } from '../subworkflows/local/fastqc/trimgalore/main'
 include { PRODIGAL                } from '../subworkflows/local/prodigal/main'
 include { KOFAMSCAN               } from '../subworkflows/local/kofamscan/main'
