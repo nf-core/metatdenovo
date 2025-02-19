@@ -135,8 +135,8 @@ Optionally, you can use [Spades](https://github.com/ablab/spades) to assemble re
 <summary>Output files</summary>
 
 - `spades/`
-  - `spades.assembly.gfa.gz`: gfa file output from spades
-  - `spades.spades.log`: log file output from spades run
+  - `spades.assembly.gfa.gz`: gfa file output from Spades
+  - `spades.spades.log`: log file output from Spades
   - `spades.transcripts.fa.gz`: reference genome created by Spades
 
 </details>
