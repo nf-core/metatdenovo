@@ -170,7 +170,7 @@
                 "assembler": {
                     "type": "string",
                     "enum": ["megahit", "spades"],
-                    "description": "Specify which assembler you would like to run, possible alternatives: megahit, spades. default: megahit",
+                    "description": "Specify which assembler you would like to run, possible alternatives: megahit, spades.",
                     "fa_icon": "fas fa-bezier-curve"
                 },
                 "user_assembly": {
