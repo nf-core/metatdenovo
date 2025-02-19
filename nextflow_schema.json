@@ -251,7 +251,7 @@
                     "format": "file-path",
                     "exists": true,
                     "mimetype": "text/plain",
-                    "description": "Path to a protein fasta file for user-provided ORFs",
+                    "description": "Path to a protein fasta file for user-provided ORFs.",
                     "fa_icon": "far fa-file-code"
                 },
                 "user_orfs_gff": {
@@ -259,7 +259,7 @@
                     "format": "file-path",
                     "exists": true,
                     "mimetype": "text/plain",
-                    "description": "Path to a gff file for user-provided ORFs",
+                    "description": "Path to a gff file for user-provided ORFs.",
                     "fa_icon": "far fa-file-code"
                 },
                 "user_orfs_name": {
