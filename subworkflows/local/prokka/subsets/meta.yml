@@ -1,0 +1,48 @@
+name: "prokka_subset"
+description: Runs PROKKA on contigs split by size, concatenates outputs, and converts GFF to TSV
+keywords:
+  - prokka
+  - annotation
+  - contigs
+  - gff
+  - faa
+  - ffn
+components:
+  - prokka
+  - cat/cat
+  - prokkagff2tsv
+input:
+  - contigs:
+      type: tuple
+      description: Channel containing metadata and contig FASTA files
+      pattern: "[ val(meta), file(contigs) ]"
+  - batchsize:
+      type: value
+      description: Size of contig batches for processing (e.g., '10.MB')
+output:
+  - gff:
+      type: file
+      description: Concatenated GFF file from PROKKA output
+      pattern: "*.gff.gz"
+  - faa:
+      type: file
+      description: Concatenated protein FASTA file from PROKKA output
+      pattern: "*.faa.gz"
+  - ffn:
+      type: file
+      description: Concatenated nucleotide FASTA file from PROKKA output
+      pattern: "*.ffn.gz"
+  - gfftsv:
+      type: file
+      description: TSV file converted from PROKKA GFF output
+      pattern: "*.prokka-annotations.tsv.gz"
+  - prokka_log:
+      type: file
+      description: PROKKA log files
+      pattern: "*.txt"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+authors:
+  - "@danilodileo"
