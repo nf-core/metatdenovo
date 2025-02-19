@@ -1,7 +1,7 @@
 nextflow_pipeline {
     name "Test pipeline"
     script "../../main.nf"
-    tag "megahit_transdecoder"
+    tag "test_megahit_transdecoder"
     tag "PIPELINE"
 
     test("Test MEGAHIT/transdecoder") {

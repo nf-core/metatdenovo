@@ -1,7 +1,7 @@
 nextflow_pipeline {
     name "Test pipeline"
     script "../../main.nf"
-    tag "bbduk"
+    tag "test_filter"
     tag "PIPELINE"
 
     test("Test with BBDuk option active") {

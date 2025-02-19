@@ -1,7 +1,7 @@
 nextflow_pipeline {
     name "Test pipeline"
     script "../../main.nf"
-    tag "megahit_prodigal"
+    tag "test"
     tag "PIPELINE"
 
     test("Test MEGAHIT/Prodigal") {

@@ -1,7 +1,7 @@
 nextflow_pipeline {
     name "Test pipeline"
     script "../../main.nf"
-    tag "spades_prodigal"
+    tag "test_spades_prodigal"
     tag "PIPELINE"
 
     test("Test Spades/Prodigal") {
