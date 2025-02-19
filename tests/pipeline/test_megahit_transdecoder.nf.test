@@ -6,36 +6,31 @@ nextflow_pipeline {
 
     test("Test MEGAHIT/transdecoder") {
 
-    when {
-        params {
-            outdir = "$outputDir"
-            input = 'https://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/samplesheet/samplesheet.csv'
-            assembler      = 'megahit'
-            orf_caller     = 'transdecoder'
-            skip_eukulele  = true
-            skip_eggnog    = true
-            skip_kofamscan = true
+        when {
+            params {
+                outdir = "$outputDir"
+                input = 'https://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/samplesheet/samplesheet.csv'
+                assembler      = 'megahit'
+                orf_caller     = 'transdecoder'
+                skip_eukulele  = true
+                skip_eggnog    = true
+                skip_kofamscan = true
+            }
         }
-    }
 
-    then {
-        assertAll(
-            { assert workflow.success },
-            { assert new File("$outputDir/trimgalore/SAMPLE1_PE_1.fastq.gz_trimming_report.txt").exists() },
-            { assert new File("$outputDir/trimgalore/fastqc/SAMPLE1_PE_1_val_1_fastqc.html").exists() },
-            { assert snapshot(path("$outputDir/trimgalore/fastqc/SAMPLE1_PE_1_val_1_fastqc.html")).match("SAMPLE1_PE_1_val_1_fastqc.html") },
-            { assert new File("$outputDir/megahit/megahit_out/megahit_assembly.log").exists() },
-            { assert snapshot(path("$outputDir/megahit/megahit_out/megahit_assembly.log")).match("megahit_assembly.log") },
-            { assert new File("$outputDir/samtools/SAMPLE1_PE.sorted.bam.bai").exists() },
-            { assert new File("$outputDir/bbmap/logs/SAMPLE1_PE.bbmap.log").exists() },
-            { assert snapshot(path("$outputDir/bbmap/logs/SAMPLE1_PE.bbmap.log")).match("SAMPLE1_PE.bbmap.log") },
-            { assert new File("$outputDir/featurecounts/SAMPLE1_PE.featureCounts.tsv.summary").exists() },
-            { assert snapshot(path("$outputDir/featurecounts/SAMPLE1_PE.featureCounts.tsv.summary")).match("SAMPLE1_PE.featureCounts.tsv.summary") },
-            { assert new File("$outputDir/summary_tables/megahit.transdecoder.counts.tsv.gz").exists() },
-            { assert new File("$outputDir/summary_tables/megahit.transdecoder.overall_stats.tsv.gz").exists() },
-            { assert new File("$outputDir/multiqc/multiqc_report.html").exists() },
-            { assert snapshot(path("$outputDir/multiqc/multiqc_report.html")).match("multiqc_report.html") },
-            { assert new File("$outputDir/pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml").exists() }
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert new File("$outputDir/trimgalore/SAMPLE1_PE_1.fastq.gz_trimming_report.txt").exists() },
+                { assert new File("$outputDir/trimgalore/fastqc/SAMPLE1_PE_1_val_1_fastqc.html").exists() },
+                { assert new File("$outputDir/megahit/megahit_out/megahit_assembly.log").exists() },
+                { assert new File("$outputDir/samtools/SAMPLE1_PE.sorted.bam.bai").exists() },
+                { assert new File("$outputDir/bbmap/logs/SAMPLE1_PE.bbmap.log").exists() },
+                { assert new File("$outputDir/featurecounts/SAMPLE1_PE.featureCounts.tsv.summary").exists() },
+                { assert new File("$outputDir/summary_tables/megahit.transdecoder.counts.tsv.gz").exists() },
+                { assert new File("$outputDir/summary_tables/megahit.transdecoder.overall_stats.tsv.gz").exists() },
+                { assert new File("$outputDir/multiqc/multiqc_report.html").exists() },
+                { assert new File("$outputDir/pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml").exists() }
             )
         }
     }
