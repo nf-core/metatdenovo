@@ -359,7 +359,7 @@
                 "diamond_top": {
                     "type": "integer",
                     "default": 10,
-                    "description": "Argument to Diamond'd --top that controls the percentage of hits to include in the LCA.",
+                    "description": "Argument to Diamond's `--top` that controls the percentage of hits to include in the LCA.",
                     "fa_icon": "fas fa-align-justify"
                 },
                 "skip_eukulele": {
