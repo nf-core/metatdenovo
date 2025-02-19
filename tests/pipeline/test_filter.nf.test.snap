@@ -11,52 +11,52 @@
     },
     "SAMPLE1_PE.bbmap.log": {
         "content": [
-            "SAMPLE1_PE.bbmap.log:md5,18af04db80818250c9641a34553885d5"
+            "SAMPLE1_PE.bbmap.log:md5,317a755926c33123d9669278395bfad3"
         ],
         "meta": {
             "nf-test": "0.9.2",
             "nextflow": "24.10.4"
         },
-        "timestamp": "2025-02-19T20:26:54.904831"
+        "timestamp": "2025-02-19T20:52:01.129532"
     },
     "megahit_assembly.log": {
         "content": [
-            "megahit_assembly.log:md5,4ca410e093d264db71639c2b79e04c1a"
+            "megahit_assembly.log:md5,ef039784173b6c5db200bd9923c7f889"
         ],
         "meta": {
             "nf-test": "0.9.2",
             "nextflow": "24.10.4"
         },
-        "timestamp": "2025-02-19T20:26:54.522497"
+        "timestamp": "2025-02-19T20:52:00.778882"
     },
     "multiqc_report.html": {
         "content": [
-            "multiqc_report.html:md5,2f1887c4abc397870dfb815573fb299c"
+            "multiqc_report.html:md5,cd27eef2ea214d9b54a21bf584ded3cf"
         ],
         "meta": {
             "nf-test": "0.9.2",
             "nextflow": "24.10.4"
         },
-        "timestamp": "2025-02-19T20:26:55.576061"
+        "timestamp": "2025-02-19T20:52:01.749683"
     },
     "SAMPLE1_PE_1.fastq.gz": {
         "content": [
-            "SAMPLE1_PE_1.fastq.gz:md5,8fbc4937a32a23d6281931c12f49c2e1"
+            "SAMPLE1_PE_1.fastq.gz:md5,a83ad3ba1c443d1c9805bd654ea345cb"
         ],
         "meta": {
             "nf-test": "0.9.2",
             "nextflow": "24.10.4"
         },
-        "timestamp": "2025-02-19T20:26:54.146545"
+        "timestamp": "2025-02-19T20:52:00.415246"
     },
     "SAMPLE1_PE.featureCounts.tsv.summary": {
         "content": [
-            "SAMPLE1_PE.featureCounts.tsv.summary:md5,44562b13db587c92d909a7459fe81893"
+            "SAMPLE1_PE.featureCounts.tsv.summary:md5,80f338528a01881dd7a619ecad57e529"
         ],
         "meta": {
             "nf-test": "0.9.2",
             "nextflow": "24.10.4"
         },
-        "timestamp": "2025-02-19T20:26:55.255117"
+        "timestamp": "2025-02-19T20:52:01.427668"
     }
 }
