@@ -1,6 +1,6 @@
 process COLLECT_STATS {
     tag "$meta.id"
-    label 'process_low'
+    label 'process_medium'
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
@@ -63,14 +63,21 @@ process COLLECT_STATS {
 
     trimming <- tibble(sample = c("${samples.join('", "')}")) ${read_trimlogs}
 
-    idxs <- read_tsv(
-        pipe("grep -Hv '^*' *.idxstats"),
-        col_names = c('c', 'length', 'idxs_n_mapped', 'idxs_n_unmapped'),
-        col_types = 'ciii'
-    ) %>%
-        separate(c, c('sample', 'chr'), sep = ':') %>%
-        transmute(sample = str_remove(sample, '.idxstats'), idxs_n_mapped, idxs_n_unmapped) %>%
-        group_by(sample) %>% summarise(idxs_n_mapped = sum(idxs_n_mapped), idxs_n_unmapped = sum(idxs_n_unmapped))
+    idxs <- tibble(fname = Sys.glob('2files/*.idxstats')) %>%
+        mutate(
+            sample = str_remove(basename(fname), '.idxstats'),
+            d = map(
+                fname,
+                \\(f) {
+                    read_tsv(pipe(sprintf("grep -v '^\\\\*' %s", f)), col_names = c('chr', 'length', 'idxs_n_mapped', 'idxs_n_unmapped'), col_types = 'ciii') %>%
+                        lazy_dt() %>%
+                        select(-chr, -length) %>%
+                        summarise(idxs_n_mapped = sum(idxs_n_mapped), idxs_n_unmapped = sum(idxs_n_unmapped)) %>%
+                        as_tibble()
+                 }
+            )
+        ) %>%
+        unnest(d)
 
     counts <- read_tsv("${fcs}", col_types = 'cciicicid') %>%
         group_by(sample) %>% summarise(n_feature_count = sum(count))
