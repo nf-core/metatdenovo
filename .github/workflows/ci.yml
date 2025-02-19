@@ -34,11 +34,11 @@ jobs:
           - "docker"
           - "singularity"
         test_name:
-          - "test_megahit_prodigal"
+          - "test"
           - "test_megahit_prokka"
           - "test_megahit_transdecoder"
           - "test_spades_prodigal"
-          - "test_bbduk"
+          - "test_filter"
         isMaster:
           - ${{ github.base_ref == 'master' }}
         # Exclude conda and singularity on dev
