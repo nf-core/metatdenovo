@@ -242,6 +242,7 @@
             "properties": {
                 "orf_caller": {
                     "type": "string",
+                    "default": "prodigal",
                     "enum": ["prodigal", "prokka", "transdecoder"],
                     "description": "Specify which ORF caller you would like to run, possible alternatives: prodigal, prokka, transdecoder, default: prodigal.",
                     "fa_icon": "fas fa-phone-volume"
