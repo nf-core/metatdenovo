@@ -1,0 +1,52 @@
+{
+    "SAMPLE1_PE_1_val_1_fastqc.html": {
+        "content": [
+            "SAMPLE1_PE_1_val_1_fastqc.html:md5,89c71d5bf2499665b8c036a2ffae3bd7"
+        ],
+        "meta": {
+            "nf-test": "0.9.2",
+            "nextflow": "24.10.4"
+        },
+        "timestamp": "2025-02-19T17:26:13.683669"
+    },
+    "SAMPLE1_PE.bbmap.log": {
+        "content": [
+            "SAMPLE1_PE.bbmap.log:md5,11ffc20a686fd7e463dd9b15dd87042f"
+        ],
+        "meta": {
+            "nf-test": "0.9.2",
+            "nextflow": "24.10.4"
+        },
+        "timestamp": "2025-02-19T21:05:37.616945"
+    },
+    "megahit_assembly.log": {
+        "content": [
+            "megahit_assembly.log:md5,c8224c794a1222da0d69ae01763bdb76"
+        ],
+        "meta": {
+            "nf-test": "0.9.2",
+            "nextflow": "24.10.4"
+        },
+        "timestamp": "2025-02-19T21:05:37.607824"
+    },
+    "multiqc_report.html": {
+        "content": [
+            "multiqc_report.html:md5,3c9e212093b1d2e52160a2c986041bce"
+        ],
+        "meta": {
+            "nf-test": "0.9.2",
+            "nextflow": "24.10.4"
+        },
+        "timestamp": "2025-02-19T21:05:37.673214"
+    },
+    "SAMPLE1_PE.featureCounts.tsv.summary": {
+        "content": [
+            "SAMPLE1_PE.featureCounts.tsv.summary:md5,df179ac6c812b4f263a369838a8de83a"
+        ],
+        "meta": {
+            "nf-test": "0.9.2",
+            "nextflow": "24.10.4"
+        },
+        "timestamp": "2025-02-19T21:05:37.62507"
+    }
+}

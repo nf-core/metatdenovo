@@ -74,7 +74,7 @@ process COLLECT_STATS {
                         select(-chr, -length) %>%
                         summarise(idxs_n_mapped = sum(idxs_n_mapped), idxs_n_unmapped = sum(idxs_n_unmapped)) %>%
                         as_tibble()
-                 }
+                }
             )
         ) %>%
         unnest(d)

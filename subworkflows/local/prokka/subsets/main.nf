@@ -8,7 +8,7 @@ include { CAT_CAT as FAA_CAT   } from '../../../../modules/nf-core/cat/cat/main'
 include { CAT_CAT as FFN_CAT   } from '../../../../modules/nf-core/cat/cat/main'
 include { PROKKAGFF2TSV        } from '../../../../modules/local/prokka/gff2tsv/main'
 
-workflow PROKKA_SUBSET {
+workflow PROKKA_SUBSETS {
     take:
     contigs   // channel:  tuple val(meta), file(contigs)
     batchsize // channel: strings like '10.MB'. Usually from params.prokka_batchsize
