@@ -77,7 +77,8 @@ process COLLECT_STATS {
                 }
             )
         ) %>%
-        unnest(d)
+        unnest(d) %>%
+        select(-fname, -d)
 
     counts <- read_tsv("${fcs}", col_types = 'cciicicid') %>%
         group_by(sample) %>% summarise(n_feature_count = sum(count))
