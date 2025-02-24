@@ -63,22 +63,20 @@ process COLLECT_STATS {
 
     trimming <- tibble(sample = c("${samples.join('", "')}")) ${read_trimlogs}
 
-    idxs <- tibble(fname = Sys.glob('2files/*.idxstats')) %>%
+    idxs <- tibble(fname = Sys.glob('*.idxstats')) %>%
         mutate(
             sample = str_remove(basename(fname), '.idxstats'),
             d = map(
                 fname,
                 \\(f) {
                     read_tsv(pipe(sprintf("grep -v '^\\\\*' %s", f)), col_names = c('chr', 'length', 'idxs_n_mapped', 'idxs_n_unmapped'), col_types = 'ciii') %>%
-                        lazy_dt() %>%
                         select(-chr, -length) %>%
-                        summarise(idxs_n_mapped = sum(idxs_n_mapped), idxs_n_unmapped = sum(idxs_n_unmapped)) %>%
-                        as_tibble()
+                        summarise(idxs_n_mapped = sum(idxs_n_mapped), idxs_n_unmapped = sum(idxs_n_unmapped))
                 }
             )
         ) %>%
         unnest(d) %>%
-        select(-fname, -d)
+        select(-fname)
 
     counts <- read_tsv("${fcs}", col_types = 'cciicicid') %>%
         group_by(sample) %>% summarise(n_feature_count = sum(count))
