@@ -1,0 +1,25 @@
+name: "writespadesyeaml"
+description: Creates a YAML configuration file for SPAdes assembly
+keywords:
+  - spades
+  - yaml
+input:
+  - pe:
+      type: file
+      description: Paired-end read files (optional)
+      pattern: "*.{fastq,fq,fastq.gz,fq.gz}"
+  - se:
+      type: file
+      description: Single-end read files (optional)
+      pattern: "*.{fastq,fq,fastq.gz,fq.gz}"
+output:
+  - yaml:
+      type: file
+      description: SPAdes YAML configuration file
+      pattern: "*.yaml"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+authors:
+  - "@danilodileo"

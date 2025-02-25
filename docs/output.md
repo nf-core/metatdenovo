@@ -20,15 +20,16 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and the results
     - [BBnorm](#bbnorm) - Normalize the reads in the samples to use less resources for assembly (optional)
   - [Assembly step](#assembly-step) - Generate contigs with an assembler program
     - [Megahit](#megahit) - Output from Megahit assembly (default)
-    - [RNASpades](#rnaspades) - Output from Spades assembly (optional)
+    - [Spades](#spades) - Output from Spades assembly (optional)
   - [ORF Caller step](#orf-caller-step) - Identify protein-coding genes (ORFs) with an ORF caller
     - [Prodigal](#prodigal) - Output from Prodigal (default)
     - [Prokka](#prokka) - Output from Prokka (optional)
     - [TransDecoder](#transdecoder) - Output from transdecoder (optional)
-  - [Functional and taxonomical annotation](#functional-and-taxonomical-annotation) - Predict the function and the taxonomy of ORFs
+  - [Functional and taxonomic annotation](#functional-and-taxonomic-annotation) - Predict the function and the taxonomy of ORFs
     - [EggNOG](#eggnog) - Output from EggNOG-mapper (default; optional)
     - [KOfamSCAN](#kofamscan) - Output KOfamSCAN (optional)
     - [EUKulele](#eukulele) - Output from EUKulele taxonomy annotation (default; optional)
+    - [Diamond taxonomy](#diamond-taxonomy) - Output from the Diamond-based taxonomy processing (optional)
     - [Hmmsearch](#hmmsearch) - Output from HMMER run with user-supplied HMM profiles (optional)
 - [Custom metatdenovo output](#metatdenovo-output)
   - [Summary tables folder](#summary-tables) - Tab separated tables ready for further analysis in tools like R and Python
@@ -40,7 +41,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and the results
 
 #### FastQC
 
-[FastQC](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/) gives general quality metrics about your sequenced reads. It provides information about the quality score distribution across your reads, per base sequence content (%A/T/G/C), adapter contamination and overrepresented sequences. For further reading and documentation see the [FastQC help pages](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/). FastQC is run as part of Trim galore! therefore its output can be found in Trimgalore's folder.
+[FastQC](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/) gives general quality metrics about your sequenced reads. It provides information about the quality score distribution across your reads, per base sequence content (%A/T/G/C), adapter contamination and overrepresented sequences. For further reading and documentation see the [FastQC help pages](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/).
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -52,7 +53,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and the results
 
 #### Trim galore!
 
-[Trimgalore](https://github.com/FelixKrueger/TrimGalore) is trimming primer sequences from sequencing reads. Primer sequences are non-biological sequences that often introduce point mutations that do not reflect sample sequences. This is especially true for degenerated PCR primers. If primer trimming would be omitted, artifactual amplicon sequence variants might be computed by the denoising tool or sequences might be lost due to become labelled as PCR chimera.
+[Trimgalore](https://github.com/FelixKrueger/TrimGalore) is a fastq preprocessor for read/adapter trimming and quality control. It is used in this pipeline for trimming adapter sequences and discard low-quality reads. Its output is in the results folder and part of the MultiQC report.
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -126,17 +127,17 @@ BBnorm is a BBmap tool.
 
 </details>
 
-#### RNASpades
+#### Spades
 
-Optionally, you can use [RNASpades](https://cab.spbu.ru/software/rnaspades/) to assemble reads into contigs.
+Optionally, you can use [Spades](https://github.com/ablab/spades) to assemble reads into contigs.
 
 <details markdown="1">
 <summary>Output files</summary>
 
-- `rnaspades/`
-  - `rnaspades.assembly.gfa.gz`: gfa file output from rnaspades
-  - `rnaspades.spades.log`: log file output from rnaspades run
-  - `rnaspades.transcripts.fa.gz`: reference genome created by RNASpades
+- `spades/`
+  - `spades.assembly.gfa.gz`: gfa file output from Spades
+  - `spades.spades.log`: log file output from Spades
+  - `spades.transcripts.fa.gz`: reference genome created by Spades
 
 </details>
 
@@ -228,6 +229,24 @@ GTDB currently only works as a user provided database, i.e. data must be downloa
   - `*.diamond.out.gz`: Diamond output
 - `eukulele/assembler.orfcaller/taxonomy_estimation/`
   - `*-estimated-taxonomy.out.gz`: EUKulele output
+
+</details>
+
+#### Diamond taxonomy
+
+[Diamond](https://github.com/bbuchfink/diamond) is a fast protein sequence aligner that can also assign taxonomy based on a "Last Common Ancestor" (LCA)
+algorithm.
+At the time of writing, users of the pipeline need to craft their own databases, see the usage documentation.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `diamond_taxonomy/`
+  - `*.tsv.gz`: Output directly from the Diamond aligner
+  - `*.lineage.tsv.gz`: Output after `taxonkit lineage` added the full taxonomic lineage to the above
+- `summary_tables/`
+  - `*.taxonomy.tsv.gz`: Cleaned up output, including addition of a header row and, if a list of ranks was given, the taxonomy parsed into individual taxa
+  - `*.taxonomy-taxdump.tsv.gz`: Only if `parse_with_taxdump` was set in the input file; like the above, but with the taxonomy parsed using the taxonomy dump files
 
 </details>
 

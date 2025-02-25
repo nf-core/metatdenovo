@@ -1,0 +1,20 @@
+name: "kofamscan_download"
+description: Downloads KEGG Orthology (KO) data for KofamScan
+keywords:
+  - kofamscan
+  - kegg
+  - orthology
+  - download
+input:
+  - none
+output:
+  - ko_list:
+      type: file
+      description: KEGG Orthology (KO) list file
+      pattern: "ko_list"
+  - koprofiles:
+      type: directory
+      description: Directory containing KEGG Orthology profiles
+      pattern: "profiles"
+authors:
+  - "@danilodileo"

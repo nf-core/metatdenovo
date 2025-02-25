@@ -1,0 +1,29 @@
+name: "merge_tables"
+description: Merges multiple tables into a single wide-format table
+keywords:
+  - merge
+  - tables
+  - summarize
+  - pivot
+input:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - tables:
+      type: file
+      description: Input tables to be merged
+      pattern: "*.tsv.gz"
+output:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - merged_table:
+      type: file
+      description: Merged table in wide format
+      pattern: "*_merged_table.tsv.gz"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+authors:
+  - "@danilodileo"

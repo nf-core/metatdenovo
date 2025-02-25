@@ -1,0 +1,40 @@
+name: TRANSDECODER
+description: Identifies coding regions within transcripts using TransDecoder
+keywords:
+  - transdecoder
+  - transcripts
+  - protein prediction
+input:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - fasta:
+      type: file
+      description: Input transcript FASTA file
+      pattern: "*.{fa,fasta,fna}"
+output:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - pep:
+      type: file
+      description: Predicted peptide sequences
+      pattern: "*.pep"
+  - gff:
+      type: file
+      description: GFF3 file with predicted coding regions
+      pattern: "*.gff3"
+  - cds:
+      type: file
+      description: Predicted coding sequences
+      pattern: "*.cds"
+  - bed:
+      type: file
+      description: BED file with predicted coding regions
+      pattern: "*.bed"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+authors:
+  - "@danilodileo"

@@ -1,0 +1,10 @@
+nextflow_process {
+
+    name "Test Process SUMTAXONOMY"
+    script "../main.nf"
+    process "SUMTAXONOMY"
+
+    tag "modules"
+    tag "modules_"
+    tag "sumdiamondtax"
+}

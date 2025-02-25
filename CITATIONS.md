@@ -12,36 +12,34 @@
 
 - [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)
 
-  > Andrews, S. (2010). FastQC: A Quality Control Tool for High Throughput Sequence Data [Online].
+> Andrews, S. (2010). FastQC: A Quality Control Tool for High Throughput Sequence Data [Online].
 
-- [MultiQC](https://pubmed.ncbi.nlm.nih.gov/27312411/)
-
-  > Ewels P, Magnusson M, Lundin S, Käller M. MultiQC: summarize analysis results for multiple tools and samples in a single report. Bioinformatics. 2016 Oct 1;32(19):3047-8. doi: 10.1093/bioinformatics/btw354. Epub 2016 Jun 16. PubMed PMID: 27312411; PubMed Central PMCID: PMC5039924.
+> Ewels P, Magnusson M, Lundin S, Käller M. MultiQC: summarize analysis results for multiple tools and samples in a single report. Bioinformatics. 2016 Oct 1;32(19):3047-8. doi: 10.1093/bioinformatics/btw354. Epub 2016 Jun 16. PubMed PMID: 27312411; PubMed Central PMCID: PMC5039924.
 
 - [Trim Galore!](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/)
 
 - [khmer](https://github.com/dib-lab/khmer)
 
-  > Brown, C. Titus, Adina Howe, Qingpeng Zhang, Alexis B. Pyrkosz, and Timothy H. Brom. 2012. “A Reference-Free Algorithm for Computational Normalization of Shotgun Sequencing Data.” ArXiv:1203.4802 [q-Bio], May. arxiv.org/abs/1203.4802.
-  > Crusoe, Michael R., Hussien F. Alameldin, Sherine Awad, Elmar Boucher, Adam Caldwell, Reed Cartwright, Amanda Charbonneau, et al. 2015. “The Khmer Software Package: Enabling Efficient Nucleotide Sequence Analysis.” F1000Research 4 (September): 900. doi.org/10.12688/f1000research.6924.1.
-  > Zhang, Qingpeng, Jason Pell, Rosangela Canino-Koning, Adina Chuang Howe, and C. Titus Brown. 2014. “These Are Not the K-Mers You Are Looking For: Efficient Online K-Mer Counting Using a Probabilistic Data Structure.” PLOS ONE 9 (7): e101271. doi.org/10.1371/journal.pone.0101271.
+  > Brown C, Howe A, Zhang Q, Pyrkosz , and Brom T. 2012. “A Reference-Free Algorithm for Computational Normalization of Shotgun Sequencing Data.” ArXiv:1203.4802 [q-Bio], May. arxiv.org/abs/1203.4802.
+  > Crusoe M, Alameldin H, Awad S, Boucher E, Caldwell A, Cartwright R, Charbonneau A, et al. 2015. “The Khmer Software Package: Enabling Efficient Nucleotide Sequence Analysis.” F1000Research 4 (September): 900. doi.org/10.12688/f1000research.6924.1.
+  > Qingpeng Z, Pell J, Canino-Koning R, Howe A, and Brown C. 2014. “These Are Not the K-Mers You Are Looking For: Efficient Online K-Mer Counting Using a Probabilistic Data Structure.” PLOS ONE 9 (7): e101271. doi.org/10.1371/journal.pone.0101271.
 
 - [Seqtk](https://github.com/lh3/seqtk)
 
 - [RNAspade](https://cab.spbu.ru/software/rnaspades/)
 
-  > Elena Bushmanova, Dmitry Antipov, Alla Lapidus, Andrey D Prjibelski rnaSPAdes: a de novo transcriptome assembler and its application to RNA-Seq data GigaScience, 2019
+  > Bushmanova E, Antipov D, Lapidus A, Prjibelski A, rnaSPAdes: a de novo transcriptome assembler and its application to RNA-Seq data GigaScience, 2019
 
 - [Megahit](https://github.com/voutcn/megahit)
 
-  > Li, D., Liu, C-M., Luo, R., Sadakane, K., and Lam, T-W., (2015) MEGAHIT: An ultra-fast single-node solution for large and complex metagenomics assembly via succinct de Bruijn graph. Bioinformatics, doi: 10.1093/bioinformatics/btv033 [PMID: 25609793].
-  > Li, D., Luo, R., Liu, C.M., Leung, C.M., Ting, H.F., Sadakane, K., Yamashita, H. and Lam, T.W., 2016. MEGAHIT v1.0: A Fast and Scalable Metagenome Assembler driven by Advanced Methodologies and Community Practices. Methods.
+  > Li D, Liu C, Luo R, Sadakane K, and Lam T, (2015) MEGAHIT: An ultra-fast single-node solution for large and complex metagenomics assembly via succinct de Bruijn graph. Bioinformatics, doi: 10.1093/bioinformatics/btv033 [PMID: 25609793].
+  > Li D, Luo R, Liu C, Leung C, Ting H, Sadakane K, Yamashita H and Lam T, 2016. MEGAHIT v1.0: A Fast and Scalable Metagenome Assembler driven by Advanced Methodologies and Community Practices. Methods.
 
 - [TransDecoder](https://github.com/TransDecoder/TransDecoder)
 
 - [Prokka](https://github.com/tseemann/prokka)
 
-  > Seemann T. Prokka: rapid prokaryotic genome annotation Bioinformatics 2014 Jul 15;30(14):2068-9. PMID:24642063
+  > Seemann T Prokka: rapid prokaryotic genome annotation Bioinformatics 2014 Jul 15;30(14):2068-9. PMID:24642063
 
 - [Prodigal](https://github.com/hyattpd/Prodigal)
 
@@ -55,9 +53,9 @@
 
 - [Eggnog](https://github.com/eggnogdb/eggnog-mapper)
 
+  > Cantalapiedra C, Hernandez-Plaza A, Letunic I, Bork P, Huerta-Cepas J.
   > eggNOG-mapper v2: functional annotation, orthology assignments, and domain
-  > prediction at the metagenomic scale. Carlos P. Cantalapiedra,
-  > Ana Hernandez-Plaza, Ivica Letunic, Peer Bork, Jaime Huerta-Cepas. 2021.
+  > prediction at the metagenomic scale 2021.
   > Molecular Biology and Evolution, msab293, https://doi.org/10.1093/molbev/msab293
   > eggNOG 5.0: a hierarchical, functionally and phylogenetically annotated
   > orthology resource based on 5090 organisms and 2502 viruses. Jaime
@@ -72,13 +70,21 @@
 
 - [EUKulele](https://github.com/AlexanderLabWHOI/EUKulele)
 
+- [Diamond](https://github.com/bbuchfink/diamond)
+
+  > Buchfink B, Xie C, and Huson D. 2015. “Fast and Sensitive Protein Alignment Using DIAMOND.” Nature Methods 12 (1): 59–60. https://doi.org/10.1038/nmeth.3176.
+
+- [TaxonKit](https://bioinf.shenwei.me/taxonkit/)
+
+  > Wei S, Ren H. 2021. “TaxonKit: A Practical and Efficient NCBI Taxonomy Toolkit.” Journal of Genetics and Genomics, Special issue on Microbiome, 48 (9): 844–50. https://doi.org/10.1016/j.jgg.2021.03.006.
+
 - [CAT](https://github.com/dutilh/CAT)
 
   > von Meijenfeldt FAB, Arkhipova K, Cambuy DD, Coutinho FH, Dutilh BE. Robust taxonomic classification of uncharted microbial sequences and bins with CAT and BAT. Genome Biology. 2019;20:217.
 
 - [transrate](https://hibberdlab.com/transrate/)
 
-  > TransRate: reference free quality assessment of de-novo transcriptome assemblies (2016). Richard D Smith-Unna, Chris Boursnell, Rob Patro, Julian M Hibberd, Steven Kelly. Genome Research doi: [http://dx.doi.org/10.1101/gr.196469.115](http://dx.doi.org/10.1101/gr.196469.115)
+  > Smith-Unna R, Boursnell C, Patro R, Hibberd J, Kelly S. TransRate: reference free quality assessment of de-novo transcriptome assemblies (2016). Genome Research doi: [http://dx.doi.org/10.1101/gr.196469.115](http://dx.doi.org/10.1101/gr.196469.115)
 
 ## Software packaging/containerisation tools
 

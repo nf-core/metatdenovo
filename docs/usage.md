@@ -6,9 +6,9 @@
 
 ## Introduction
 
-Metatdenovo is a workflow primarily designed for annotation of metatranscriptomes for which reference genomes are not available.
+Metatdenovo is a workflow primarily designed for annotation of metatranscriptomes and metagenomics for which reference genomes are not available.
 The approach is to first create an assembly, then call genes and finally quantify and annotate the genes.
-Since the workflow includes gene callers and annotation tools and databases both for prokaryotes and eukaryotes, the workflow should be suitable for both
+Since the workflow includes gene callers and annotation tools and databases for prokaryotes, eukaryotes and viruses, the workflow should be suitable for all
 organism groups and mixed communities can be handled by trying different gene callers and comparing the results.
 
 While the rationale for writing the workflow was metatranscriptomes, there is nothing in the workflow that precludes use for single organisms rather than
@@ -93,7 +93,8 @@ To turn on digital normalization, use the `--bbnorm` parameter and, if required,
 
 By default, the pipeline uses Megahit (`--assembler megahit`) to assemble the cleaned and trimmed reads to create the reference contigs.
 Megahit is fast and it does not require a lot of memory to run, making it ideal for large sets of samples.
-The workflow also supports RNAspades, (`--assembler rnaspades` ) as an alternative.
+The workflow also supports Spades (`--assembler spades` ) as an alternative.
+If you work with virus RNA you can specify that by using the Spades option `--spades_flavor rnaviral` (see [parameter documentation](/metatdenovo/parameters/#spades_flavor))
 
 You can also choose to input contigs from an assembly that you made outside the pipeline using the `--assembly file.fna` (where `file.fna` is the name of a fasta file with contigs) option.
 
@@ -108,7 +109,10 @@ For eukaryotic genes, we recommend users to use Transdecoder (`--orf_caller tran
 
 ### Taxonomic annotation options
 
-Metatdenovo uses EUKulele as the main program for taxonomy annotation.
+Metatdenovo uses two different programs for taxonomy annotation: EUKulele and Diamond.
+
+#### Taxonomic annotation with EUKulele
+
 EUKulele can be run with different reference datasets.
 The default dataset is PhyloDB (`--eukulele_db phylodb` ) which works for mixed communities of prokaryotes and eukaryotes.
 Other database options for running the pipeline are MMETSP (`--eukulele_db mmetsp`; for marine protists) and GTDB (`--eukulele_db gtdb`; for prokarytes
@@ -145,7 +149,7 @@ cd eukulele
 EUKulele download --database mmetsp (you can use the name of the database you would like to download)
 ```
 
-- Fix the problematic database tables:
+- There are some cases when even after the download, EUKulele doesn't produce the correct files. In these cases you will end up with the `reference.pep.fa` file only. To fix the problematic database tables follow this instruction (this example is made with mmetsp but you can check EUKulele documentation for other databases since it can be slightly different!):
 
 ```bash
 mkdir mmetsp
@@ -158,17 +162,64 @@ create_protein_table.py --infile_peptide reference.pep.fa \
     --taxonomy_col_id taxonomy --column SOURCE_ID
 ```
 
-> :warning:
+#### Taxonomic annotation with Diamond
 
-<!-- I commented out the CAT documentation as we're not certain that we want to support this. -->
-<!-- An alternative to EUKulele is the CAT program. In contrast to EUKulele that annotates open reading frames (ORFs), CAT annotates the contigs from the assembly.
+The Diamond taxonomy-annotation process uses Diamond database files (`.dmnd` files) that have been prepared with taxonomy information.
+Currently we are not supplying any standard databases, but we hope to be able to do so soon.
+To make a database, you will need to collect four files: a protein fasta file, the `names.dmp` and `nodes.dmp` files from an NCBI-style taxon dump plus
+a mapping file in which protein accessions are translated into taxon ids.
+As an example, you can download the [NCBI NR database in fasta format](ftp://ftp.ncbi.nih.gov/blast/db/FASTA/nr.gz), the
+[taxonomy dump](ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz) and the [mapping file](ftp://ftp.ncbi.nih.gov/pub/taxonomy/accession2taxid/).
+(_Note_ that the mapping file is actually several files that need to be first downloaded, the concatenated into one.)
+After this, you can run `diamond makedb` with the proper parameters (see example below) to create your database.
+Here's the whole procedure for the NCBI NR example (worked for us in January 2025; things might change):
 
-CAT is uses Prodigal to call ORFs and DIAMOND for the alignment to a reference database. Subsequently, DIAMOND hits for individual ORFs are translated by CAT into contig annotations.
+```bash
+# Make sure you have Diamond and wget installed
 
-The database can be generated with the option `--cat_db_generate` or you can provide a prepared database that you downloaded from [CAT website](https://tbb.bio.uu.nl/bastiaan/CAT_prepare/).
-Check the also the [options]() documentation to learn how to configure CATproperly.
+# Download the protein NR fasta file (takes a looong time)
+wget ftp://ftp.ncbi.nih.gov/blast/db/FASTA/nr.gz
 
-> Please, check the `CAT` documentation for more information about the database cited [HERE](https://github.com/dutilh/CAT) -->
+# Download and untar the taxonomy dump
+wget ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz
+tar xfz taxdump.tar.gz
+
+# Download all the individual mapping files and concatenate them (also takes long)
+wget ftp://ftp.ncbi.nih.gov/pub/taxonomy/accession2taxid/prot.accession2taxid.FULL.gz
+
+# Create the Diamond database
+gunzip -c nr.gz | sed '/^>/s/ .*//' | diamond makedb --taxonmap prot.accession2taxid.FULL.gz --taxonnames names.dmp --taxonnodes nodes.dmp --db ncbi-nr.taxonomy.dmnd
+```
+
+We are also, in collaboration with SciLifeLab Data Center, providing a [GTDB (R09RS220) taxonomy database](https://figshare.scilifelab.se/articles/dataset/nf-core_metatdenovo_taxonomy/28211678), DOI: https://doi.org/10.17044/scilifelab.28211678.
+
+After creating one or more databases, you can provide them to the pipeline by filling out a file looking like the below and providing that to the pipeline
+with `--diamond_dbs diamond_dbs.csv` (see the parameter documentation).
+(The example is a `.csv`, but `.tsv`, `.json` and `.yml` are also supported.)
+
+```csv title="diamond_dbs.csv"
+db,dmnd_path,taxdump_names,taxdump_nodes,ranks,parse_with_taxdump
+gtdb,diamond-taxonomy/gtdb_r220_repr.dmnd,diamond-taxonomy/gtdb_taxdump/names.dmp,diamond-taxonomy/gtdb_taxdump/nodes.dmp,domain;phylum;class;order;genus;species;strain,
+refseq,diamond-taxonomy/refseq_protein.taxonomy.dmnd,diamond-taxonomy/ncbi_taxdump/names.dmp,diamond-taxonomy/ncbi_taxdump/nodes.dmp,,true
+```
+
+The `db`, `dmnd_path`, `taxdump_names` and `taxdump_nodes` fields are all required, while the remaining two are optional.
+We strongly recommend that you download files for nf-core/metatdenovo to your own machine rather than specifying remote urls when running the pipeline since the files are large.
+If you specify urls, the files will be downloaded by Nextflow on each run of the pipeline.
+
+The pipeline will run three or four processes:
+
+1. Align protein sequences of ORFs to the database with `diamond blastp`.
+2. Add taxonomic lineage information with `taxonkit lineage`.
+3. Format the output nicely and, if given a list of ranks in the `ranks` field of the db file, parse the taxonomy string into individual taxa.
+4. If the `parse_with_taxdump` field is set to `true`, try to parse the taxonomy string using the `taxdump_names` and `taxdump_nodes` files.
+
+Output from the first two steps will be saved in `results/diamond_taxonomy` whereas the second two goes to `results/summary_tables`.
+
+_Note_ that some databases (e.g. from NCBI) output different numbers of taxa in their taxonomy strings.
+These cannot be parsed by enumerating the ranks in `ranks`.
+The only option is to set `parse_with_taxdump` to true.
+This process is a bit unstable though.
 
 ### Functional annotation options
 
@@ -184,13 +235,47 @@ A more targeted annotation option offered by the workflow is the possibility for
 Each HMM file will be used to search the amino acid sequences of the ORF set and the results will be summarized in a tab separated file in which each
 ORF-HMM combination will be ranked according to score and E-value.
 
+#### How to manually download the databases for functional annotation
+
+There are some cases (e.g. offline run) where you prefer to download the databases before running the pipeline. Currently, `eggnog-mapper` and `kofamscan` use databases that can be downloaded.
+
+##### Eggnog databases
+
+For `eggnog-mapper` the easiest way is to use `download_eggnog_data.py` provided when you install locally eggnog-mapper (documentation [here](https://github.com/eggnogdb/eggnog-mapper/wiki/eggNOG-mapper-v2.1.5-to-v2.1.12#user-content-Installation)).
+
+First, install eggnog-mapper:
+
+```bash
+conda install -c bioconda -c conda-forge eggnog-mapper
+```
+
+Then, you can download all databases available
+
+```bash
+ download_eggnog_data.py
+```
+
+You can select which database you want to download (read eggnog-mapper docs) but you need to be sure you will store them in a directory that will be called with the option `--eggnog_dbpath`
+
+##### Kofamscan databases
+
+No need installation. You can use `wget` to download the file in a new directory that will be used with `--kofamscan_dbpath`
+
+```bash
+wget https://www.genome.jp/ftp/db/kofam/ko_list.gz
+gunzip ko_list.gz
+
+wget https://www.genome.jp/ftp/db/kofam/profiles.tar.gz
+tar -zxf profiles.tar.gz
+```
+
 ## Example pipeline command with some common features
 
 ```bash
-nextflow run nf-core/metatdenovo -profile docker --input samplesheet.csv --assembler rnaspades --orf_caller prokka --eggnog --eukulele_db gtdb
+nextflow run nf-core/metatdenovo -profile docker --input samplesheet.csv --assembler spades --orf_caller prokka --eggnog --eukulele_db gtdb
 ```
 
-In this example, we are running metatdenovo with `rnaspades` as assembler, `prokka` as ORF caller, `eggnog` for functional annotation and EUKulele with the GTDB database for taxonomic annotation.
+In this example, we are running metatdenovo with `spades` as assembler, `prokka` as ORF caller, `eggnog` for functional annotation and EUKulele with the GTDB database for taxonomic annotation.
 
 Note that the pipeline will create the following files in your working directory:
 
@@ -205,9 +290,8 @@ If you wish to repeatedly use the same parameters for multiple runs, rather than
 
 Pipeline settings can be provided in a `yaml` or `json` file via `-params-file <file>`.
 
-:::warning
-Do not use `-c <file>` to specify parameters as this will result in errors. Custom config files specified with `-c` must only be used for [tuning process resource specifications](https://nf-co.re/docs/usage/configuration#tuning-workflow-resources), other infrastructural tweaks (such as output directories), or module arguments (args).
-:::
+> [!WARNING]
+> Do not use `-c <file>` to specify parameters as this will result in errors. Custom config files specified with `-c` must only be used for [tuning process resource specifications](https://nf-co.re/docs/usage/configuration#tuning-workflow-resources), other infrastructural tweaks (such as output directories), or module arguments (args).
 
 The above pipeline run specified with a params file in yaml format:
 
@@ -215,11 +299,11 @@ The above pipeline run specified with a params file in yaml format:
 nextflow run nf-core/metatdenovo -profile docker -params-file params.yaml
 ```
 
-with `params.yaml` containing:
+with:
 
-```yaml
+```yaml title="params.yaml"
 input: 'samplesheet.csv'
-assembler: 'rnaspades'
+assembler: 'spades'
 orf_caller: 'prokka'
 eggnog: true
 eukulele_db: 'gtdb'
@@ -238,23 +322,21 @@ nextflow pull nf-core/metatdenovo
 
 ### Reproducibility
 
-It is a good idea to specify a pipeline version when running the pipeline on your data. This ensures that a specific version of the pipeline code and software are used when you run your pipeline. If you keep using the same tag, you'll be running the same version of the pipeline, even if there have been changes to the code since.
+It is a good idea to specify the pipeline version when running the pipeline on your data. This ensures that a specific version of the pipeline code and software are used when you run your pipeline. If you keep using the same tag, you'll be running the same version of the pipeline, even if there have been changes to the code since.
 
 First, go to the [nf-core/metatdenovo releases page](https://github.com/nf-core/metatdenovo/releases) and find the latest pipeline version - numeric only (eg. `1.3.1`). Then specify this when running the pipeline with `-r` (one hyphen) - eg. `-r 1.3.1`. Of course, you can switch to another version by changing the number after the `-r` flag.
 
 This version number will be logged in reports when you run the pipeline, so that you'll know what you used when you look back in the future. For example, at the bottom of the MultiQC reports.
 
-To further assist in reproducbility, you can use share and re-use [parameter files](#running-the-pipeline) to repeat pipeline runs with the same settings without having to write out a command with every single parameter.
+To further assist in reproducibility, you can use share and reuse [parameter files](#running-the-pipeline) to repeat pipeline runs with the same settings without having to write out a command with every single parameter.
 
-:::tip
-If you wish to share such profile (such as uploaded as supplementary material for academic publications), make sure to NOT include cluster specific paths to files, nor institutional specific profiles.
-:::
+> [!TIP]
+> If you wish to share such profile (such as upload as supplementary material for academic publications), make sure to NOT include cluster specific paths to files, nor institutional specific profiles.
 
 ## Core Nextflow arguments
 
-:::note
-These options are part of Nextflow and use a _single_ hyphen (pipeline parameters use a double-hyphen).
-:::
+> [!NOTE]
+> These options are part of Nextflow and use a _single_ hyphen (pipeline parameters use a double-hyphen)
 
 ### `-profile`
 
@@ -262,16 +344,15 @@ Use this parameter to choose a configuration profile. Profiles can give configur
 
 Several generic profiles are bundled with the pipeline which instruct the pipeline to use software packaged using different methods (Docker, Singularity, Podman, Shifter, Charliecloud, Apptainer, Conda) - see below.
 
-:::info
-We highly recommend the use of Docker or Singularity containers for full pipeline reproducibility, however when this is not possible, Conda is also supported.
-:::
+> [!IMPORTANT]
+> We highly recommend the use of Docker or Singularity containers for full pipeline reproducibility, however when this is not possible, Conda is also supported.
 
-The pipeline also dynamically loads configurations from [https://github.com/nf-core/configs](https://github.com/nf-core/configs) when it runs, making multiple config profiles for various institutional clusters available at run time. For more information and to see if your system is available in these configs please see the [nf-core/configs documentation](https://github.com/nf-core/configs#documentation).
+The pipeline also dynamically loads configurations from [https://github.com/nf-core/configs](https://github.com/nf-core/configs) when it runs, making multiple config profiles for various institutional clusters available at run time. For more information and to check if your system is supported, please see the [nf-core/configs documentation](https://github.com/nf-core/configs#documentation).
 
 Note that multiple profiles can be loaded, for example: `-profile test,docker` - the order of arguments is important!
 They are loaded in sequence, so later profiles can overwrite earlier profiles.
 
-If `-profile` is not specified, the pipeline will run locally and expect all software to be installed and available on the `PATH`. This is _not_ recommended, since it can lead to different results on different machines dependent on the computer enviroment.
+If `-profile` is not specified, the pipeline will run locally and expect all software to be installed and available on the `PATH`. This is _not_ recommended, since it can lead to different results on different machines dependent on the computer environment.
 
 - `test`
   - A profile with a complete configuration for automated testing
@@ -288,6 +369,8 @@ If `-profile` is not specified, the pipeline will run locally and expect all sof
   - A generic configuration profile to be used with [Charliecloud](https://hpc.github.io/charliecloud/)
 - `apptainer`
   - A generic configuration profile to be used with [Apptainer](https://apptainer.org/)
+- `wave`
+  - A generic configuration profile to enable [Wave](https://seqera.io/wave/) containers. Use together with one of the above (requires Nextflow ` 24.03.0-edge` or later).
 - `conda`
   - A generic configuration profile to be used with [Conda](https://conda.io/docs/). Please only use Conda as a last resort i.e. when it's not possible to run the pipeline with Docker, Singularity, Podman, Shifter, Charliecloud, or Apptainer.
 
@@ -305,13 +388,13 @@ Specify the path to a specific config file (this is a core Nextflow command). Se
 
 ### Resource requests
 
-Whilst the default requirements set within the pipeline will hopefully work for most people and with most input data, you may find that you want to customise the compute resources that the pipeline requests. Each step in the pipeline has a default set of requirements for number of CPUs, memory and time. For most of the steps in the pipeline, if the job exits with any of the error codes specified [here](https://github.com/nf-core/rnaseq/blob/4c27ef5610c87db00c3c5a3eed10b1d161abf575/conf/base.config#L18) it will automatically be resubmitted with higher requests (2 x original, then 3 x original). If it still fails after the third attempt then the pipeline execution is stopped.
+Whilst the default requirements set within the pipeline will hopefully work for most people and with most input data, you may find that you want to customise the compute resources that the pipeline requests. Each step in the pipeline has a default set of requirements for number of CPUs, memory and time. For most of the pipeline steps, if the job exits with any of the error codes specified [here](https://github.com/nf-core/rnaseq/blob/4c27ef5610c87db00c3c5a3eed10b1d161abf575/conf/base.config#L18) it will automatically be resubmitted with higher resources request (2 x original, then 3 x original). If it still fails after the third attempt then the pipeline execution is stopped.
 
 To change the resource requests, please see the [max resources](https://nf-co.re/docs/usage/configuration#max-resources) and [tuning workflow resources](https://nf-co.re/docs/usage/configuration#tuning-workflow-resources) section of the nf-core website.
 
 ### Custom Containers
 
-In some cases you may wish to change which container or conda environment a step of the pipeline uses for a particular tool. By default nf-core pipelines use containers and software from the [biocontainers](https://biocontainers.pro/) or [bioconda](https://bioconda.github.io/) projects. However in some cases the pipeline specified version maybe out of date.
+In some cases, you may wish to change the container or conda environment used by a pipeline steps for a particular tool. By default, nf-core pipelines use containers and software from the [biocontainers](https://biocontainers.pro/) or [bioconda](https://bioconda.github.io/) projects. However, in some cases the pipeline specified version maybe out of date.
 
 To use a different container from the default container or conda environment specified in a pipeline, please see the [updating tool versions](https://nf-co.re/docs/usage/configuration#updating-tool-versions) section of the nf-core website.
 
@@ -328,14 +411,6 @@ In most cases, you will only need to create a custom config as a one-off but if 
 See the main [Nextflow documentation](https://www.nextflow.io/docs/latest/config.html) for more information about creating your own configuration files.
 
 If you have any questions or issues please send us a message on [Slack](https://nf-co.re/join/slack) on the [`#configs` channel](https://nfcore.slack.com/channels/configs).
-
-## Azure Resource Requests
-
-To be used with the `azurebatch` profile by specifying the `-profile azurebatch`.
-We recommend providing a compute `params.vm_type` of `Standard_D16_v3` VMs by default but these options can be changed if required.
-
-Note that the choice of VM size depends on your quota and the overall workload during the analysis.
-For a thorough list, please refer the [Azure Sizes for virtual machines in Azure](https://docs.microsoft.com/en-us/azure/virtual-machines/sizes).
 
 ## Running in the background
 

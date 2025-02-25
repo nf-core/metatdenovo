@@ -1,0 +1,31 @@
+name: "collect_featurecounts"
+description: Collects and processes featureCounts output files
+keywords:
+  - featurecounts
+  - collect
+input:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+  - inputfiles:
+      type: file
+      description: Input featureCounts TSV files
+      pattern: "*.featureCounts.tsv"
+output:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+  - counts:
+      type: file
+      description: Processed counts TSV file
+      pattern: "*.counts.tsv.gz"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+authors:
+  - "@danilodileo"

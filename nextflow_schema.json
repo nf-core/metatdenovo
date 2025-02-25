@@ -1,10 +1,10 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://raw.githubusercontent.com/nf-core/metatdenovo/master/nextflow_schema.json",
     "title": "nf-core/metatdenovo pipeline parameters",
     "description": "Assembly and annotation of metatranscriptomic data, both prokaryotic and eukaryotic",
     "type": "object",
-    "definitions": {
+    "$defs": {
         "input_output_options": {
             "title": "Input/output options",
             "type": "object",
@@ -16,6 +16,7 @@
                     "type": "string",
                     "format": "file-path",
                     "exists": true,
+                    "schema": "assets/schema_input.json",
                     "mimetype": "text/csv",
                     "pattern": "^\\S+\\.csv$",
                     "description": "Path to comma-separated file containing information about the samples in the experiment.",
@@ -168,12 +169,11 @@
             "properties": {
                 "assembler": {
                     "type": "string",
-                    "default": "megahit",
-                    "enum": ["megahit", "rnaspades"],
-                    "description": "Specify which assembler you would like to run, possible alternatives: megahit, rnaspades. default: megahit",
+                    "enum": ["megahit", "spades"],
+                    "description": "Specify which assembler you would like to run, possible alternatives: megahit, spades.",
                     "fa_icon": "fas fa-bezier-curve"
                 },
-                "assembly": {
+                "user_assembly": {
                     "type": "string",
                     "format": "file-path",
                     "exists": true,
@@ -181,11 +181,30 @@
                     "description": "Path to a fasta file with a finished assembly. Assembly will be skipped by the pipeline.",
                     "fa_icon": "far fa-file-code"
                 },
+                "user_assembly_name": {
+                    "type": "string",
+                    "default": "user_assembly",
+                    "description": "Name to give to the user-provided assembly.",
+                    "fa_icon": "fas fa-bezier-curve"
+                },
                 "min_contig_length": {
                     "type": "integer",
                     "default": 0,
                     "description": "Filter out contigs shorter than this.",
                     "fa_icon": "fas fa-align-justify"
+                },
+                "spades_flavor": {
+                    "type": "string",
+                    "default": "rna",
+                    "enum": ["rna", "isolate", "sc", "meta", "plasmid", "metaplasmid", "metaviral", "rnaviral"],
+                    "description": "Select which type of assembly you want to make. Default: rna",
+                    "help_text": "This option allows you to run an assembly for a different scope. For instance, with `--spades_flavor rna` you will get an assembly for prokaryotic metatranscriptomes, `--spades_flavor rnaviral` for viral metatranscriptomes or `--spades_flavor metaviral` for viral metagenomes. The argument to the parameter will be passed as a parameter to Spades; e.g. `--spades_flavor rna` will be passed as `--rna` to Spades.",
+                    "fa_icon": "fas fa-pepper-hot"
+                },
+                "save_formatspades": {
+                    "type": "boolean",
+                    "description": "Save the formatted spades fasta file",
+                    "fa_icon": "fas fa-download"
                 }
             },
             "fa_icon": "fas fa-bezier-curve"
@@ -203,7 +222,14 @@
                 },
                 "save_samtools": {
                     "type": "boolean",
-                    "description": "Save the output from samtools"
+                    "description": "Save the output from samtools",
+                    "fa_icon": "fas fa-download"
+                },
+                "bbmap_minid": {
+                    "type": "number",
+                    "default": 0.9,
+                    "fa_icon": "fas fa-address-card",
+                    "description": "Minimum identity needed to assign read to a contig"
                 }
             },
             "fa_icon": "fas fa-filter"
@@ -214,22 +240,33 @@
             "description": "",
             "default": "",
             "properties": {
-                "protein_fasta": {
-                    "type": "string",
-                    "fa_icon": "fas fa-file-code",
-                    "description": "Path to a protein fasta file"
-                },
-                "gff": {
-                    "type": "string",
-                    "fa_icon": "fas fa-file-code",
-                    "description": "Path to a gff file"
-                },
                 "orf_caller": {
                     "type": "string",
-                    "default": "prodigal",
                     "enum": ["prodigal", "prokka", "transdecoder"],
                     "description": "Specify which ORF caller you would like to run, possible alternatives: prodigal, prokka, transdecoder, default: prodigal.",
                     "fa_icon": "fas fa-phone-volume"
+                },
+                "user_orfs_faa": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "mimetype": "text/plain",
+                    "description": "Path to a protein fasta file for user-provided ORFs.",
+                    "fa_icon": "far fa-file-code"
+                },
+                "user_orfs_gff": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "mimetype": "text/plain",
+                    "description": "Path to a gff file for user-provided ORFs.",
+                    "fa_icon": "far fa-file-code"
+                },
+                "user_orfs_name": {
+                    "type": "string",
+                    "default": "user_orfs",
+                    "description": "Name to give to user-provided ORFs.",
+                    "fa_icon": "fas fa-bezier-curve"
                 },
                 "prodigal_trainingfile": {
                     "type": "string",
@@ -242,7 +279,8 @@
                     "default": "10 MB",
                     "pattern": "^\\d+(\\.\\d+)?\\.?\\s*(K|M|G|T)?B$",
                     "hidden": true,
-                    "help_text": "Prokka usually fails on very large input files. This parameter controls the size of smaller batches for which Prokka will be called. Should be a string in the format integer-unit e.g. `--prokka_batchsize '8.MB'`"
+                    "help_text": "Prokka usually fails on very large input files. This parameter controls the size of smaller batches for which Prokka will be called. Should be a string in the format integer-unit e.g. `--prokka_batchsize '8.MB'`",
+                    "fa_icon": "fas fa-expand-alt"
                 }
             },
             "fa_icon": "fas fa-phone-volume"
@@ -255,7 +293,6 @@
             "properties": {
                 "skip_eggnog": {
                     "type": "boolean",
-                    "default": false,
                     "description": "Skip EGGNOG functional annotation",
                     "fa_icon": "fas fa-forward"
                 },
@@ -268,7 +305,6 @@
                 },
                 "skip_kofamscan": {
                     "type": "boolean",
-                    "default": false,
                     "description": "skip kofamscan run",
                     "fa_icon": "fas fa-forward"
                 },
@@ -309,9 +345,25 @@
             "description": "",
             "default": "",
             "properties": {
+                "diamond_dbs": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "schema": "assets/schema_diamond_dbs.json",
+                    "mimetype": "text/csv",
+                    "pattern": "^\\S+\\.csv$",
+                    "description": "Path to comma-separated file containing information about Diamond database files you want to use for taxonomy assignment.",
+                    "help_text": "This has to be a comma-separated file with a header row and four mandatory columns: db, dmnd_path, taxdump_names, taxdump_nodes, plus two optional: ranks and parse_with_taxdump",
+                    "fa_icon": "fas fa-file-csv"
+                },
+                "diamond_top": {
+                    "type": "integer",
+                    "default": 10,
+                    "description": "Argument to Diamond's `--top` that controls the percentage of hits to include in the LCA.",
+                    "fa_icon": "fas fa-align-justify"
+                },
                 "skip_eukulele": {
                     "type": "boolean",
-                    "default": false,
                     "description": "skip eukulele run",
                     "fa_icon": "fas fa-forward"
                 },
@@ -387,41 +439,6 @@
                 }
             }
         },
-        "max_job_request_options": {
-            "title": "Max job request options",
-            "type": "object",
-            "fa_icon": "fas fa-microchip",
-            "description": "Set the top limit for requested resources for any single job.",
-            "help_text": "If you are running on a smaller system, a pipeline step requesting more resources than are available may cause the Nextflow to stop the run with an error. These options allow you to cap the maximum resources requested by any single job so that the pipeline will run on your system.\n\nNote that you can not _increase_ the resources requested by any job using these options. For that you will need your own configuration file. See [the nf-core website](https://nf-co.re/usage/configuration) for details.",
-            "properties": {
-                "max_cpus": {
-                    "type": "integer",
-                    "description": "Maximum number of CPUs that can be requested for any single job.",
-                    "default": 16,
-                    "fa_icon": "fas fa-microchip",
-                    "hidden": true,
-                    "help_text": "Use to set an upper-limit for the CPU requirement for each process. Should be an integer e.g. `--max_cpus 1`"
-                },
-                "max_memory": {
-                    "type": "string",
-                    "description": "Maximum amount of memory that can be requested for any single job.",
-                    "default": "128.GB",
-                    "fa_icon": "fas fa-memory",
-                    "pattern": "^\\d+(\\.\\d+)?\\.?\\s*(K|M|G|T)?B$",
-                    "hidden": true,
-                    "help_text": "Use to set an upper-limit for the memory requirement for each process. Should be a string in the format integer-unit e.g. `--max_memory '8.GB'`"
-                },
-                "max_time": {
-                    "type": "string",
-                    "description": "Maximum amount of time that can be requested for any single job.",
-                    "default": "240.h",
-                    "fa_icon": "far fa-clock",
-                    "pattern": "^(\\d+\\.?\\s*(s|m|h|d|day)\\s*)+$",
-                    "hidden": true,
-                    "help_text": "Use to set an upper-limit for the time requirement for each process. Should be a string in the format integer-unit e.g. `--max_time '2.h'`"
-                }
-            }
-        },
         "generic_options": {
             "title": "Generic options",
             "type": "object",
@@ -429,12 +446,6 @@
             "description": "Less common options for the pipeline, typically set in a config file.",
             "help_text": "These options are common to all nf-core pipelines and allow you to customise some of the core preferences for how the pipeline runs.\n\nTypically these options would be set in a Nextflow config file loaded for all pipeline runs, such as `~/.nextflow/config`.",
             "properties": {
-                "help": {
-                    "type": "boolean",
-                    "description": "Display help text.",
-                    "fa_icon": "fas fa-question-circle",
-                    "hidden": true
-                },
                 "version": {
                     "type": "boolean",
                     "description": "Display version and exit.",
@@ -507,71 +518,69 @@
                     "type": "boolean",
                     "description": "Boolean whether to validate parameters against the schema at runtime",
                     "fa_icon": "fas fa-check-square",
+                    "hidden": true,
+                    "default": true
+                },
+                "pipelines_testdata_base_path": {
+                    "type": "string",
+                    "fa_icon": "far fa-check-circle",
+                    "description": "Base URL or local path to location of pipeline test dataset files",
+                    "default": "https://raw.githubusercontent.com/nf-core/test-datasets/",
                     "hidden": true
                 },
-                "validationShowHiddenParams": {
-                    "type": "boolean",
-                    "fa_icon": "far fa-eye-slash",
-                    "description": "Show all params when using `--help`",
-                    "hidden": true,
-                    "help_text": "By default, parameters set as _hidden_ in the schema are not shown on the command line when a user runs with `--help`. Specifying this option will tell the pipeline to show all parameters."
+                "trace_report_suffix": {
+                    "type": "string",
+                    "fa_icon": "far calendar",
+                    "description": "Suffix to add to the trace report filename. Default is the date and time in the format yyyy-MM-dd_HH-mm-ss.",
+                    "hidden": true
                 },
-                "validationFailUnrecognisedParams": {
+                "validationSkipDuplicateCheck": {
                     "type": "boolean",
-                    "fa_icon": "far fa-check-circle",
-                    "description": "Validation of parameters fails when an unrecognised parameter is found.",
-                    "hidden": true,
-                    "help_text": "By default, when an unrecognised parameter is found, it returns a warinig."
+                    "description": "validation plugin"
                 },
-                "validationLenientMode": {
+                "validationS3PathCheck": {
                     "type": "boolean",
-                    "fa_icon": "far fa-check-circle",
-                    "description": "Validation of parameters in lenient more.",
-                    "hidden": true,
-                    "help_text": "Allows string values that are parseable as numbers or booleans. For further information see [JSONSchema docs](https://github.com/everit-org/json-schema#lenient-mode)."
+                    "description": "validation plugin"
                 }
             }
         }
     },
     "allOf": [
         {
-            "$ref": "#/definitions/input_output_options"
+            "$ref": "#/$defs/input_output_options"
         },
         {
-            "$ref": "#/definitions/quality_control_options"
+            "$ref": "#/$defs/quality_control_options"
         },
         {
-            "$ref": "#/definitions/trimming_options"
+            "$ref": "#/$defs/trimming_options"
         },
         {
-            "$ref": "#/definitions/bbnorm_options"
+            "$ref": "#/$defs/bbnorm_options"
         },
         {
-            "$ref": "#/definitions/digital_normalization_options"
+            "$ref": "#/$defs/digital_normalization_options"
         },
         {
-            "$ref": "#/definitions/assembler_options"
+            "$ref": "#/$defs/assembler_options"
         },
         {
-            "$ref": "#/definitions/mapping_options"
+            "$ref": "#/$defs/mapping_options"
         },
         {
-            "$ref": "#/definitions/orf_caller_options"
+            "$ref": "#/$defs/orf_caller_options"
         },
         {
-            "$ref": "#/definitions/functional_annotation_options"
+            "$ref": "#/$defs/functional_annotation_options"
         },
         {
-            "$ref": "#/definitions/taxonomy_annotation_options"
+            "$ref": "#/$defs/taxonomy_annotation_options"
         },
         {
-            "$ref": "#/definitions/institutional_config_options"
+            "$ref": "#/$defs/institutional_config_options"
         },
         {
-            "$ref": "#/definitions/max_job_request_options"
-        },
-        {
-            "$ref": "#/definitions/generic_options"
+            "$ref": "#/$defs/generic_options"
         }
     ]
 }

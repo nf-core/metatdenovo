@@ -1,0 +1,28 @@
+name: "formatspades"
+description: Formats SPAdes assembly output by simplifying contig headers
+keywords:
+  - spades
+  - assembly
+  - format
+input:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - assembly:
+      type: file
+      description: SPAdes assembly output file
+      pattern: "*.fa{.gz,}"
+output:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - assembly:
+      type: file
+      description: Formatted SPAdes assembly with simplified headers
+      pattern: "rnaspades.format_header.transcript.fa.gz"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+authors:
+  - "@danilodileo"

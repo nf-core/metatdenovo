@@ -1,0 +1,50 @@
+name: "megahit_interleaved"
+description: Performs de novo assembly using MEGAHIT with interleaved paired-end reads
+keywords:
+  - megahit
+  - assembly
+  - de novo
+  - interleaved
+input:
+  - intl_pe_reads:
+      type: file
+      description: Interleaved paired-end read files
+      pattern: "*.{fastq,fq,fastq.gz,fq.gz}"
+  - se_reads:
+      type: file
+      description: Single-end read files (optional)
+      pattern: "*.{fastq,fq,fastq.gz,fq.gz}"
+  - assembly:
+      type: value
+      description: Assembly name or identifier
+output:
+  - contigs:
+      type: file
+      description: Final assembled contigs
+      pattern: "megahit_out/*.contigs.fa.gz"
+  - log:
+      type: file
+      description: MEGAHIT log file
+      pattern: "megahit_out/*.log"
+  - k_contigs:
+      type: file
+      description: Intermediate contigs for each k-mer size
+      pattern: "megahit_out/intermediate_contigs/k*.contigs.fa.gz"
+  - addi_contigs:
+      type: file
+      description: Additional contigs for each k-mer size
+      pattern: "megahit_out/intermediate_contigs/k*.addi.fa.gz"
+  - local_contigs:
+      type: file
+      description: Local contigs for each k-mer size
+      pattern: "megahit_out/intermediate_contigs/k*.local.fa.gz"
+  - kfinal_contigs:
+      type: file
+      description: Final contigs for each k-mer size
+      pattern: "megahit_out/intermediate_contigs/k*.final.contigs.fa.gz"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+authors:
+  - "@danilodileo"

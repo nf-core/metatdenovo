@@ -1,0 +1,41 @@
+name: "kofamscan_scan"
+description: Performs KEGG Orthology annotation using KofamScan
+keywords:
+  - kofamscan
+  - kegg
+  - orthology
+  - annotation
+input:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - fasta:
+      type: file
+      description: Input protein FASTA file
+      pattern: "*.{faa,fasta},{.gz,}"
+  - ko_list:
+      type: file
+      description: KEGG Orthology (KO) list file
+      pattern: "ko_list"
+  - koprofiles:
+      type: directory
+      description: Directory containing KEGG Orthology profiles
+      pattern: "profiles"
+output:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - kout:
+      type: file
+      description: KofamScan detailed output file
+      pattern: "kofamscan_output.tsv.gz"
+  - kofamtsv:
+      type: file
+      description: Cleaned KofamScan output for summary tables
+      pattern: "kofamscan.tsv.gz"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+authors:
+  - "@danilodileo"

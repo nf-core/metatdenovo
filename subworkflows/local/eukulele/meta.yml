@@ -1,0 +1,43 @@
+name: "sub_eukulele"
+description: Runs EUKulele for taxonomic classification of eukaryotic sequences and summarizes the results
+keywords:
+  - eukulele
+  - taxonomy
+  - eukaryotes
+  - classification
+components:
+  - eukulele/search
+  - format/eukulele/tax
+  - sumtaxonomy
+input:
+  - eukulele:
+      type: tuple
+      description: Channel containing metadata, protein FASTA, database name, and database directory
+      pattern: "[ val(meta), path(fasta), val(database), path(directory) ]"
+  - feature_counts:
+      type: file
+      description: Feature count files
+      pattern: "*.counts.tsv.gz"
+output:
+  - taxonomy_summary:
+      type: file
+      description: Summarized taxonomy results
+      pattern: "*.taxonomy_summary.tsv.gz"
+  - taxonomy_estimation:
+      type: file
+      description: EUKulele taxonomy estimation output
+      pattern: "*/taxonomy_estimation/*.out.gz"
+  - taxonomy_counts:
+      type: file
+      description: EUKulele taxonomy counts output
+      pattern: "*/taxonomy_counts/*.csv.gz"
+  - diamond:
+      type: directory
+      description: DIAMOND alignment results
+      pattern: "*/mets_full/diamond/*"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+authors:
+  - "@danilodileo"

@@ -1,0 +1,50 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/nf-core/metatdenovo/master/assets/schema_diamond_dbs.json",
+    "title": "nf-core/metatdenovo pipeline - params.diamond_dbs schema",
+    "description": "Schema for the file provided with params.diamond_dbs",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "db": {
+                "type": "string",
+                "pattern": "^\\S+$",
+                "errorMessage": "Database name must be provided and cannot contain spaces",
+                "meta": ["id"]
+            },
+            "dmnd_path": {
+                "type": "string",
+                "format": "file-path",
+                "exists": true,
+                "pattern": "^\\S+\\.dmnd",
+                "errorMessage": "Diamond dmnd file must be provided."
+            },
+            "taxdump_names": {
+                "type": "string",
+                "format": "path",
+                "exists": true,
+                "pattern": "^\\S+",
+                "errorMessage": "A path to a names.dmp must be provided."
+            },
+            "taxdump_nodes": {
+                "type": "string",
+                "format": "path",
+                "exists": true,
+                "pattern": "^\\S+",
+                "errorMessage": "A path to a nodes.dmp must be provided."
+            },
+            "ranks": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_;]+$",
+                "errorMessage": "Provide a semicolon-separated list of ranks. Letters, numbers, underscores and semicolons only."
+            },
+            "parse_with_taxdump": {
+                "type": "boolean",
+                "default": false,
+                "errorMessage": "Set to `true` if you want to parse the taxonomy string with information from the names and nodes in the taxdump columns."
+            }
+        },
+        "required": ["db", "dmnd_path", "taxdump_names", "taxdump_nodes"]
+    }
+}
