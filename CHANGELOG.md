@@ -9,7 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Changed`
 
+- [#352](https://github.com/nf-core/metatdenovo/pull/352) - Updated some modules.
+
 ### `Fixed`
+
+- [#352](https://github.com/nf-core/metatdenovo/pull/352) - Assign less memory to BBNorm to avoid getting killed.
 
 ### `Dependencies`
 
