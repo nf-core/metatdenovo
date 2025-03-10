@@ -17,7 +17,7 @@
                     },
                     "bbmap/bbnorm": {
                         "branch": "master",
-                        "git_sha": "3888846f8ee887f5a0f0a730e170a591731bea72",
+                        "git_sha": "29bb0c2f7e06b1945cdd2f2f324e6baa30d1c4e7",
                         "installed_by": ["modules"]
                     },
                     "bbmap/index": {
