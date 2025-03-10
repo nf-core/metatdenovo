@@ -191,7 +191,7 @@ wget ftp://ftp.ncbi.nih.gov/pub/taxonomy/accession2taxid/prot.accession2taxid.FU
 gunzip -c nr.gz | sed '/^>/s/ .*//' | diamond makedb --taxonmap prot.accession2taxid.FULL.gz --taxonnames names.dmp --taxonnodes nodes.dmp --db ncbi-nr.taxonomy.dmnd
 ```
 
-In the near future, we hope to provide files to make it possible to create a GTDB database with the nf-core/createtaxdb pipeline.
+We are also, in collaboration with SciLifeLab Data Center, providing a [GTDB (R09RS220) taxonomy database](https://figshare.scilifelab.se/articles/dataset/nf-core_metatdenovo_taxonomy/28211678), DOI: https://doi.org/10.17044/scilifelab.28211678.
 
 After creating one or more databases, you can provide them to the pipeline by filling out a file looking like the below and providing that to the pipeline
 with `--diamond_dbs diamond_dbs.csv` (see the parameter documentation).
@@ -204,6 +204,8 @@ refseq,diamond-taxonomy/refseq_protein.taxonomy.dmnd,diamond-taxonomy/ncbi_taxdu
 ```
 
 The `db`, `dmnd_path`, `taxdump_names` and `taxdump_nodes` fields are all required, while the remaining two are optional.
+We strongly recommend that you download files for nf-core/metatdenovo to your own machine rather than specifying remote urls when running the pipeline since the files are large.
+If you specify urls, the files will be downloaded by Nextflow on each run of the pipeline.
 
 The pipeline will run three or four processes:
 
