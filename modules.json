@@ -7,12 +7,12 @@
                 "nf-core": {
                     "bbmap/align": {
                         "branch": "master",
-                        "git_sha": "3888846f8ee887f5a0f0a730e170a591731bea72",
+                        "git_sha": "dd32ce5a1e5e16d56510768d027c36f0660ee2b8",
                         "installed_by": ["modules"]
                     },
                     "bbmap/bbduk": {
                         "branch": "master",
-                        "git_sha": "3888846f8ee887f5a0f0a730e170a591731bea72",
+                        "git_sha": "dd32ce5a1e5e16d56510768d027c36f0660ee2b8",
                         "installed_by": ["modules"]
                     },
                     "bbmap/bbnorm": {
@@ -22,7 +22,7 @@
                     },
                     "bbmap/index": {
                         "branch": "master",
-                        "git_sha": "3888846f8ee887f5a0f0a730e170a591731bea72",
+                        "git_sha": "dd32ce5a1e5e16d56510768d027c36f0660ee2b8",
                         "installed_by": ["modules"]
                     },
                     "cat/cat": {
@@ -32,7 +32,7 @@
                     },
                     "cat/fastq": {
                         "branch": "master",
-                        "git_sha": "81880787133db07d9b4c1febd152c090eb8325dc",
+                        "git_sha": "c03f4019225fce21c11f194ff32eca396963f305",
                         "installed_by": ["modules"]
                     },
                     "fastqc": {
