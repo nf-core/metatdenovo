@@ -1,4 +1,4 @@
-name: "prokka_subset"
+name: "PROKKA_SUBSETS"
 description: Runs PROKKA on contigs split by size, concatenates outputs, and converts GFF to TSV
 keywords:
   - prokka
