@@ -7,22 +7,22 @@
                 "nf-core": {
                     "bbmap/align": {
                         "branch": "master",
-                        "git_sha": "dd32ce5a1e5e16d56510768d027c36f0660ee2b8",
+                        "git_sha": "f06465ff69516528b0178b2a2a5f6b1d4287faa9",
                         "installed_by": ["modules"]
                     },
                     "bbmap/bbduk": {
                         "branch": "master",
-                        "git_sha": "dd32ce5a1e5e16d56510768d027c36f0660ee2b8",
+                        "git_sha": "f06465ff69516528b0178b2a2a5f6b1d4287faa9",
                         "installed_by": ["modules"]
                     },
                     "bbmap/bbnorm": {
                         "branch": "master",
-                        "git_sha": "29bb0c2f7e06b1945cdd2f2f324e6baa30d1c4e7",
+                        "git_sha": "f06465ff69516528b0178b2a2a5f6b1d4287faa9",
                         "installed_by": ["modules"]
                     },
                     "bbmap/index": {
                         "branch": "master",
-                        "git_sha": "dd32ce5a1e5e16d56510768d027c36f0660ee2b8",
+                        "git_sha": "f06465ff69516528b0178b2a2a5f6b1d4287faa9",
                         "installed_by": ["modules"]
                     },
                     "cat/cat": {
@@ -52,7 +52,7 @@
                     },
                     "pigz/compress": {
                         "branch": "master",
-                        "git_sha": "81880787133db07d9b4c1febd152c090eb8325dc",
+                        "git_sha": "0a779996e564c4882b6f51aed269bfc05b757ffc",
                         "installed_by": ["modules"]
                     },
                     "prodigal": {
