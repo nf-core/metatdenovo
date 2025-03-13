@@ -7,22 +7,22 @@
                 "nf-core": {
                     "bbmap/align": {
                         "branch": "master",
-                        "git_sha": "3888846f8ee887f5a0f0a730e170a591731bea72",
+                        "git_sha": "f06465ff69516528b0178b2a2a5f6b1d4287faa9",
                         "installed_by": ["modules"]
                     },
                     "bbmap/bbduk": {
                         "branch": "master",
-                        "git_sha": "3888846f8ee887f5a0f0a730e170a591731bea72",
+                        "git_sha": "f06465ff69516528b0178b2a2a5f6b1d4287faa9",
                         "installed_by": ["modules"]
                     },
                     "bbmap/bbnorm": {
                         "branch": "master",
-                        "git_sha": "3888846f8ee887f5a0f0a730e170a591731bea72",
+                        "git_sha": "f06465ff69516528b0178b2a2a5f6b1d4287faa9",
                         "installed_by": ["modules"]
                     },
                     "bbmap/index": {
                         "branch": "master",
-                        "git_sha": "3888846f8ee887f5a0f0a730e170a591731bea72",
+                        "git_sha": "f06465ff69516528b0178b2a2a5f6b1d4287faa9",
                         "installed_by": ["modules"]
                     },
                     "cat/cat": {
@@ -32,7 +32,7 @@
                     },
                     "cat/fastq": {
                         "branch": "master",
-                        "git_sha": "81880787133db07d9b4c1febd152c090eb8325dc",
+                        "git_sha": "c03f4019225fce21c11f194ff32eca396963f305",
                         "installed_by": ["modules"]
                     },
                     "fastqc": {
@@ -52,7 +52,7 @@
                     },
                     "pigz/compress": {
                         "branch": "master",
-                        "git_sha": "81880787133db07d9b4c1febd152c090eb8325dc",
+                        "git_sha": "0a779996e564c4882b6f51aed269bfc05b757ffc",
                         "installed_by": ["modules"]
                     },
                     "prodigal": {

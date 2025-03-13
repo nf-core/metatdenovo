@@ -35,6 +35,7 @@ jobs:
           - "singularity"
         test_name:
           - "test"
+          - "test_bbnorm"
           - "test_megahit_prokka"
           - "test_megahit_transdecoder"
           - "test_spades_prodigal"

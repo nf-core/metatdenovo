@@ -3,9 +3,23 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v1.1.0 - [25 - 02 - 2025]
+## v1.1.1 - [2025-03-13]
 
-Initial release of nf-core/metatdenovo, created with the [nf-core](https://nf-co.re/) template.
+### `Added`
+
+### `Changed`
+
+- [#352](https://github.com/nf-core/metatdenovo/pull/352) - Updated some modules (@erikrikarddaniel).
+
+### `Fixed`
+
+- [#352](https://github.com/nf-core/metatdenovo/pull/352) - Assign less memory to BBNorm to avoid getting killed (@erikrikarddaniel).
+
+### `Dependencies`
+
+### `Deprecated`
+
+## v1.1.0 - [2025-02-25]
 
 ### `Added`
 
