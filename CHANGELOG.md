@@ -3,6 +3,22 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v1.1.2 - [date]
+
+### `Added`
+
+### `Changed`
+
+- [#352](https://github.com/nf-core/metatdenovo/pull/352) - Updated some modules (@erikrikarddaniel).
+
+### `Fixed`
+
+- [#352](https://github.com/nf-core/metatdenovo/pull/352) - Assign less memory to BBNorm to avoid getting killed (@erikrikarddaniel).
+
+### `Dependencies`
+
+### `Deprecated`
+
 ## v1.1.1 - [2025-03-13]
 
 ### `Added`
