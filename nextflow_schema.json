@@ -53,7 +53,6 @@
             "title": "Quality control options",
             "type": "object",
             "description": "Option for QC steps",
-            "default": "",
             "fa_icon": "fas fa-check",
             "properties": {
                 "skip_qc": {
@@ -118,7 +117,7 @@
             "title": "Filtering options",
             "type": "object",
             "description": "",
-            "default": "",
+
             "properties": {
                 "sequence_filter": {
                     "type": "string",
@@ -133,7 +132,6 @@
             "title": "Digital normalization options",
             "type": "object",
             "description": "Use these option if you need to normalize the reads before the assembly",
-            "default": "",
             "fa_icon": "fas fa-align-justify",
             "properties": {
                 "bbnorm": {
@@ -165,7 +163,7 @@
             "title": "Assembler options",
             "type": "object",
             "description": "",
-            "default": "",
+
             "properties": {
                 "assembler": {
                     "type": "string",
@@ -213,7 +211,6 @@
             "title": "Mapping options",
             "type": "object",
             "description": "",
-            "default": "",
             "properties": {
                 "save_bam": {
                     "type": "boolean",
@@ -238,7 +235,6 @@
             "title": "Orf Caller options",
             "type": "object",
             "description": "",
-            "default": "",
             "properties": {
                 "orf_caller": {
                     "type": "string",
@@ -289,7 +285,6 @@
             "title": "Functional annotation options",
             "type": "object",
             "description": "",
-            "default": "",
             "properties": {
                 "skip_eggnog": {
                     "type": "boolean",
@@ -343,7 +338,6 @@
             "title": "Taxonomy annotation options",
             "type": "object",
             "description": "",
-            "default": "",
             "properties": {
                 "diamond_dbs": {
                     "type": "string",

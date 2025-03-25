@@ -3,13 +3,29 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v1.1.3 - [date]
+
+### `Added`
+
+### `Changed`
+
+-  - Updated some objects in nextflow_schema.json (@herich0).
+
+### `Fixed`
+
+### `Dependencies`
+
+### `Deprecated`
+
+## v1.1.1 - [2025-03-13]
+
 ## v1.1.2 - [date]
 
 ### `Added`
 
 ### `Changed`
 
-- [#352](https://github.com/nf-core/metatdenovo/pull/352) - Updated some modules (@erikrikarddaniel).
+- [#352](https://github.com/nf-core/metatdenovo/pull/352) - removed "removed":"" from objects in nextflow_schema.json as it is not necessary (@erikrikarddaniel).
 
 ### `Fixed`
 
