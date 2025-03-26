@@ -11,18 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#359](https://github.com/nf-core/metatdenovo/pull/359) - Updated some descriptions and error messages in the json schema for better readability. Also made the input validation stricter in the hopes of preventing more errors during the pipeline run. (@herich0).
 
-### `Fixed`
-
-### `Dependencies`
-
-### `Deprecated`
-
-## v1.1.2 - [date]
-
-### `Added`
-
-### `Changed`
-
 - [#352](https://github.com/nf-core/metatdenovo/pull/352) - Updated some modules (@erikrikarddaniel).
 
 ### `Fixed`
