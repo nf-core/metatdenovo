@@ -17,7 +17,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#360](https://github.com/nf-core/metatdenovo/issues/360) - Ensure `COLLECT_STATS` executes properly when trimming is skipped (@m3hdad).
 
-- [#352](https://github.com/nf-core/metatdenovo/pull/352) - Assign less memory to BBNorm to avoid getting killed (@erikrikarddaniel).
 
 ### `Dependencies`
 
