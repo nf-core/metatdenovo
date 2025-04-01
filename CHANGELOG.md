@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Fixed`
 
-- [#360](https://github.com/nf-core/metatdenovo/issues/360) - Pre-defined `read_trimlogs` as an empty string to prevent errors when trimming is skipped, ensuring proper execution of the COLLECT_STATS process (@m3hdad).
+- [#360](https://github.com/nf-core/metatdenovo/issues/360) - Ensure `COLLECT_STATS` executes properly when trimming is skipped (@m3hdad).
 
 - [#352](https://github.com/nf-core/metatdenovo/pull/352) - Assign less memory to BBNorm to avoid getting killed (@erikrikarddaniel).
 
