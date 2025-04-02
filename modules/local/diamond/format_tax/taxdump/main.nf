@@ -56,7 +56,7 @@ process FORMAT_DIAMOND_TAX_TAXDUMP {
         transmute(taxonomy, name = taxonomy) %>%
         separate_rows(name, sep = ';') %>%
         distinct(taxonomy, name) %>%
-        # Some duplicates will occur for combinations of taxonomy and rank. Allow many-to-many and concatenate the names.
+        # Some duplicates might occur for combinations of taxonomy and rank. Allow many-to-many and concatenate the names.
         inner_join(taxa, by = join_by(name), relationship = 'many-to-many') %>%
         group_by(taxonomy, rank) %>%
         arrange(name) %>%
