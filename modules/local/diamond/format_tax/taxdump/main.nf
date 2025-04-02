@@ -59,6 +59,7 @@ process FORMAT_DIAMOND_TAX_TAXDUMP {
         # Some duplicate will occur for combinations of taxonomy and rank. Allow many-to-many and concatenate the names.
         inner_join(taxa, by = join_by(name), relationship = 'many-to-many') %>%
         group_by(taxonomy, rank) %>%
+        arrange(name) %>%
         summarise(name = str_c(name, collapse = '/'), .groups = 'drop') %>%
         pivot_wider(names_from = rank, values_from = name)
 
