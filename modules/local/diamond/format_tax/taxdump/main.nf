@@ -32,18 +32,19 @@ process FORMAT_DIAMOND_TAX_TAXDUMP {
     library(tidyverse)
 
     names <- read_tsv(
-        pipe("grep 'scientific name' $names | sed 's/\t|\t/\t/g' | sed 's/\t|\$/\t/' | cut -f 1,2"),
+        pipe("grep 'scientific name' $names | sed 's/\\t|\\t/\\t/g' | sed 's/\\t|\$/\\t/' | cut -f 1,2"),
         col_names = c('taxid', 'name'),
         col_types = 'ic'
     )
     nodes <- read_tsv(
-        pipe("cat $nodes | sed 's/\t|\t/\t/g' | sed 's/\t|\$/\t/' | cut -f 1,3"),
+        pipe("cat $nodes | sed 's/\\t|\\t/\\t/g' | sed 's/\\t|\$/\\t/' | cut -f 1,3"),
         col_names = c('taxid', 'rank'),
         col_types = 'ic'
     ) %>%
         filter(rank %in% $ranks_to_consider)
 
-    taxa <- names %>% inner_join(nodes, by = join_by(taxid)) %>%
+    taxa <- names %>%
+        inner_join(nodes, by = join_by(taxid)) %>%
         distinct(name, rank)
 
     taxassign <- read_tsv("${taxfile}", col_names = c("orf", "taxid", "evalue", "taxonomy"), col_types = 'cidc')
@@ -55,7 +56,11 @@ process FORMAT_DIAMOND_TAX_TAXDUMP {
         transmute(taxonomy, name = taxonomy) %>%
         separate_rows(name, sep = ';') %>%
         distinct(taxonomy, name) %>%
-        inner_join(taxa, by = join_by(name)) %>%
+        # Some duplicates might occur for combinations of taxonomy and rank. Allow many-to-many and concatenate the names.
+        inner_join(taxa, by = join_by(name), relationship = 'many-to-many') %>%
+        group_by(taxonomy, rank) %>%
+        arrange(name) %>%
+        summarise(name = str_c(name, collapse = '/'), .groups = 'drop') %>%
         pivot_wider(names_from = rank, values_from = name)
 
     # And left-join with the original table
