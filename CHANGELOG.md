@@ -8,7 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### `Added`
 
 ### `Changed`
-- [#364] - Use conda-forge::wget instead of bioconda::gnu-wget in kofamscan
+
+- [#364](https://github.com/nf-core/metatdenovo/pull/364) - Update environment.yml: use wget not gnu-wget (@dslarm)
 - [#352](https://github.com/nf-core/metatdenovo/pull/352) - Updated some modules (@erikrikarddaniel).
 
 ### `Fixed`
