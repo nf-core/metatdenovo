@@ -22,7 +22,7 @@ input:
         description: |
           Groovy Map containing sample information
           e.g. `[ id:'sample1', single_end:false ]`
-  
+
     - hmmrank:
         type: file
         description: TSV file containing best ranked HMMER hits
@@ -31,24 +31,23 @@ input:
         type: file
         description: Amino acid fasta file
         pattern: "*.faa.gz"
-          
 
 output:
   - hitfaas:
-    - meta:
-        type: map
-        description: |
-          Groovy Map containing sample information
-          e.g. `[ id:'sample1', single_end:false ]`
-    - "hits/*.faa.gz":
-        type: file
-        description: Subsets of the input fasta file corresponding to hits in the hmmrank file
-          
+      - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. `[ id:'sample1', single_end:false ]`
+      - "hits/*.faa.gz":
+          type: file
+          description: Subsets of the input fasta file corresponding to hits in the hmmrank file
+
   - versions:
-    - "versions.yml":
-        type: file
-        description: File containing software versions
-        pattern: "versions.yml"
+      - "versions.yml":
+          type: file
+          description: File containing software versions
+          pattern: "versions.yml"
 
 authors:
   - "@erikrikarddaniel"
