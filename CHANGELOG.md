@@ -3,12 +3,32 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v1.1.2 - [date]
+
+### `Added`
+
+### `Changed`
+
+- [#359](https://github.com/nf-core/metatdenovo/pull/359) - Updated some descriptions and error messages in the json schema for better readability. Also made the input validation stricter in the hopes of preventing more errors during the pipeline run. (@herich0).
+- [#352](https://github.com/nf-core/metatdenovo/pull/352) - Updated some modules (@erikrikarddaniel).
+
+### `Fixed`
+
+- [#363](https://github.com/nf-core/metatdenovo/pull/363) - Handle duplicate names in taxonomies better (@erikrikarddaniel)
+- [#362](https://github.com/nf-core/metatdenovo/pull/362) - Ensure correct Transdecoder publishing and test assertions (@m3hdad)
+- [#361](https://github.com/nf-core/metatdenovo/pull/361) - Ensure `COLLECT_STATS` executes properly when trimming is skipped (@m3hdad).
+
+### `Dependencies`
+
+### `Deprecated`
+
 ## v1.1.1 - [2025-03-13]
 
 ### `Added`
 
 ### `Changed`
 
+- [#364](https://github.com/nf-core/metatdenovo/pull/364) - Use `wget` not `gnu-wget` to fetch KofamScan database to improve arm64 support (@dslarm)
 - [#352](https://github.com/nf-core/metatdenovo/pull/352) - Updated some modules (@erikrikarddaniel).
 
 ### `Fixed`

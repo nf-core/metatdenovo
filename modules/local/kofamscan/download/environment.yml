@@ -4,4 +4,4 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - bioconda::gnu-wget=1.18
+  - conda-forge::wget=1.21.4

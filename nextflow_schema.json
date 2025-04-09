@@ -17,15 +17,14 @@
                     "format": "file-path",
                     "exists": true,
                     "schema": "assets/schema_input.json",
-                    "mimetype": "text/csv",
-                    "pattern": "^\\S+\\.csv$",
+                    "pattern": "^\\S+\\.(csv|tsv|json|yaml|yml)$",
                     "description": "Path to comma-separated file containing information about the samples in the experiment.",
                     "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row.",
                     "fa_icon": "fas fa-file-csv"
                 },
                 "se_reads": {
                     "type": "boolean",
-                    "description": "activate when using single end reads input",
+                    "description": "Activate when using single end reads input",
                     "fa_icon": "fas fa-long-arrow-alt-right"
                 },
                 "outdir": {
@@ -156,7 +155,7 @@
                 },
                 "save_bbnorm_fastq": {
                     "type": "boolean",
-                    "description": "save the resulting fastq files from normalization",
+                    "description": "Save the resulting fastq files from normalization",
                     "fa_icon": "fas fa-align-center"
                 }
             }
@@ -170,7 +169,7 @@
                 "assembler": {
                     "type": "string",
                     "enum": ["megahit", "spades"],
-                    "description": "Specify which assembler you would like to run, possible alternatives: megahit, spades.",
+                    "description": "Specify the assembler to run. Possible alternatives: megahit, spades.",
                     "fa_icon": "fas fa-bezier-curve"
                 },
                 "user_assembly": {
@@ -243,7 +242,7 @@
                 "orf_caller": {
                     "type": "string",
                     "enum": ["prodigal", "prokka", "transdecoder"],
-                    "description": "Specify which ORF caller you would like to run, possible alternatives: prodigal, prokka, transdecoder, default: prodigal.",
+                    "description": "Specify which ORF caller to run. Possible alternatives: prodigal, prokka, transdecoder. Default: prodigal.",
                     "fa_icon": "fas fa-phone-volume"
                 },
                 "user_orfs_faa": {
@@ -301,11 +300,11 @@
                     "default": "eggnog",
                     "description": "Specify EGGNOG database path",
                     "fa_icon": "far fa-file-code",
-                    "help_text": "This parameter specifies where you have an EGGNOG database, or, where it will be created using the --create_eggnog_db parameter. The directory must exist."
+                    "help_text": "This parameter specifies the location of the EGGNOG database or where it will be created using the --create_eggnog_db parameter. The directory must exist."
                 },
                 "skip_kofamscan": {
                     "type": "boolean",
-                    "description": "skip kofamscan run",
+                    "description": "If enabled, skips the run of KofamScan.",
                     "fa_icon": "fas fa-forward"
                 },
                 "kofam_dir": {
@@ -333,7 +332,7 @@
                 "hmmpattern": {
                     "type": "string",
                     "default": "*.hmm",
-                    "description": "specify which pattern hmm files end with",
+                    "description": "Specify which pattern hmm files end with",
                     "fa_icon": "fas fa-barcode"
                 }
             },
@@ -350,8 +349,7 @@
                     "format": "file-path",
                     "exists": true,
                     "schema": "assets/schema_diamond_dbs.json",
-                    "mimetype": "text/csv",
-                    "pattern": "^\\S+\\.csv$",
+                    "pattern": "^\\S+\\.(csv|tsv|json|yaml|yml)$",
                     "description": "Path to comma-separated file containing information about Diamond database files you want to use for taxonomy assignment.",
                     "help_text": "This has to be a comma-separated file with a header row and four mandatory columns: db, dmnd_path, taxdump_names, taxdump_nodes, plus two optional: ranks and parse_with_taxdump",
                     "fa_icon": "fas fa-file-csv"
@@ -364,7 +362,7 @@
                 },
                 "skip_eukulele": {
                     "type": "boolean",
-                    "description": "skip eukulele run",
+                    "description": "If enabled, skips the run of EUKulele",
                     "fa_icon": "fas fa-forward"
                 },
                 "eukulele_method": {
