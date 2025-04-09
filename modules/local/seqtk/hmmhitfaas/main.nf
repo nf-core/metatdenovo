@@ -25,7 +25,7 @@ process SEQTK_HMMHITFAAS {
 
     # Loop over all unique profiles found in hmmrank, and call seqtk subseq for all orfs matching that profile
     for profile in \$(gunzip -c $hmmrank | grep -v '^profile' | cut -f 1 | sort -u); do
-        seqtk subseq $faa <(zgrep -P "^\${profile}\\t" | cut -f 2) | gzip -c > hits/${prefix}.\${profile}.faa.gz
+        seqtk subseq $faa <(gunzip -c $hmmrank | grep "^\${profile}" | cut -f 2) | gzip -c > hits/${prefix}.\${profile}.faa.gz
     done
 
     cat <<-END_VERSIONS > versions.yml
