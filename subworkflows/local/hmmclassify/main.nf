@@ -29,7 +29,6 @@ workflow HMMCLASSIFY {
         HMMRANK.out.hmmrank
             .join(ch_hmmclassify)
             .map { meta, hmmrank, hmms, faa -> [ meta, hmmrank, faa ] }
-            .view()
     )
     ch_versions = ch_versions.mix(SEQTK_HMMHITFAAS.out.versions)
 
