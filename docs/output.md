@@ -259,6 +259,7 @@ You can run [hmmsearch](https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch) on O
 
 - `hmmer/`
   - `*.tbl.gz`: Table output gzipped as result of Hmmsearch run.
+  - `hits/*.faa.gz`: Sequences of the best ranked hits to the different HMMER profiles.
 
 </details>
 
