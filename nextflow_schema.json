@@ -242,7 +242,7 @@
                 "orf_caller": {
                     "type": "string",
                     "enum": ["prodigal", "prokka", "transdecoder"],
-                    "description": "Specify which ORF caller to run. Possible alternatives: prodigal, prokka, transdecoder. Default: prodigal.",
+                    "description": "Specify which ORF caller to run. Possible alternatives: prodigal, prokka, transdecoder. This needs to be set unless the `--user_orfs_*` params are set.",
                     "fa_icon": "fas fa-phone-volume"
                 },
                 "user_orfs_faa": {
