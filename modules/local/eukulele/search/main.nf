@@ -19,7 +19,7 @@ process EUKULELE_SEARCH {
 
     script:
     def args     = task.ext.args ?: ''
-    def prefix   = task.ext.prefix ?: "${meta.id}"
+    def prefix   = task.ext.prefix ?: ("${dbname}" ? "${meta.id}_${dbname}" : "${meta.id}")
     def gunzip   = fasta =~ /\.gz$/ ? "gunzip -c ${fasta} > ./contigs/proteins.faa" : "mv ${fasta} contigs/proteins.faa"
     def database = dbname ? "--database ${dbname}" : ''
 
