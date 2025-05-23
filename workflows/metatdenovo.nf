@@ -105,6 +105,10 @@ include { FASTQC                                     } from '../modules/nf-core/
 include { MULTIQC                                    } from '../modules/nf-core/multiqc/main'
 include { PIGZ_COMPRESS as PIGZ_ASSEMBLY             } from '../modules/nf-core/pigz/compress/main'
 include { PIGZ_COMPRESS as PIGZ_DIAMOND_LINEAGE      } from '../modules/nf-core/pigz/compress/main'
+include { PIGZ_COMPRESS as PIGZ_TRANSDECODER_BED     } from '../modules/nf-core/pigz/compress/main'
+include { PIGZ_COMPRESS as PIGZ_TRANSDECODER_CDS     } from '../modules/nf-core/pigz/compress/main'
+include { PIGZ_COMPRESS as PIGZ_TRANSDECODER_GFF     } from '../modules/nf-core/pigz/compress/main'
+include { PIGZ_COMPRESS as PIGZ_TRANSDECODER_PEP     } from '../modules/nf-core/pigz/compress/main'
 include { SEQTK_MERGEPE                              } from '../modules/nf-core/seqtk/mergepe/main'
 include { SEQTK_SEQ as SEQTK_SEQ_CONTIG_FILTER       } from '../modules/nf-core/seqtk/seq/main'
 include { SPADES                                     } from '../modules/nf-core/spades/main'
@@ -369,6 +373,15 @@ workflow METATDENOVO {
         ch_gff      = TRANSDECODER.out.gff
         ch_protein  = TRANSDECODER.out.pep
         ch_versions = ch_versions.mix(TRANSDECODER.out.versions)
+
+        PIGZ_TRANSDECODER_BED(TRANSDECODER.out.bed)
+        ch_versions = ch_versions.mix(PIGZ_TRANSDECODER_BED.out.versions)
+        PIGZ_TRANSDECODER_CDS(TRANSDECODER.out.cds)
+        ch_versions = ch_versions.mix(PIGZ_TRANSDECODER_CDS.out.versions)
+        PIGZ_TRANSDECODER_GFF(TRANSDECODER.out.gff)
+        ch_versions = ch_versions.mix(PIGZ_TRANSDECODER_GFF.out.versions)
+        PIGZ_TRANSDECODER_PEP(TRANSDECODER.out.pep)
+        ch_versions = ch_versions.mix(PIGZ_TRANSDECODER_PEP.out.versions)
     }
 
     // Populate channels if the user provided the orfs
