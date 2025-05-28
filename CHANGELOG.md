@@ -11,10 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Changed`
 
-- [#368](https://github.com/nf-core/metatdenovo/pull/368) - Added eukulele database name in filenames (@m3hdad).
-- [#367](https://github.com/nf-core/metatdenovo/pull/367) - Gzip Transdecoder output (@erikrikarddaniel).
-- [#359](https://github.com/nf-core/metatdenovo/pull/359) - Updated some descriptions and error messages in the json schema for better readability. Also made the input validation stricter in the hopes of preventing more errors during the pipeline run. (@herich0).
-- [#352](https://github.com/nf-core/metatdenovo/pull/352) - Updated some modules (@erikrikarddaniel).
+- [#368](https://github.com/nf-core/metatdenovo/pull/368) - Added eukulele database name in filenames (@m3hdad)
+- [#367](https://github.com/nf-core/metatdenovo/pull/367) - Gzip Transdecoder output (@erikrikarddaniel)
+- [#359](https://github.com/nf-core/metatdenovo/pull/359) - Updated some descriptions and error messages in the json schema for better readability. Also made the input validation stricter in the hopes of preventing more errors during the pipeline run. (@herich0)
+- [#352](https://github.com/nf-core/metatdenovo/pull/352) - Updated some modules (@erikrikarddaniel)
 
 ### `Fixed`
 
