@@ -11,7 +11,7 @@ input:
         description: |
           Groovy Map containing sample information
           e.g. `[ id:'sample1', single_end:false ]`
-  
+
     - kofamtsv:
         type: file
         description: tsv file from kofamscan
@@ -19,21 +19,21 @@ input:
 
 output:
   - uniqtsv:
-    - meta:
-        type: map
-        description: |
-          Groovy Map containing sample information
-          e.g. `[ id:'sample1', single_end:false ]`
-    - "*.unique.tsv.gz":
-        type: file
-        description: tsv file with a single entry per ORF
-        pattern: "*.tsv.gz"
-          
+      - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. `[ id:'sample1', single_end:false ]`
+      - "*.unique.tsv.gz":
+          type: file
+          description: tsv file with a single entry per ORF
+          pattern: "*.tsv.gz"
+
   - versions:
-    - "versions.yml":
-        type: file
-        description: File containing software versions
-        pattern: "versions.yml"
+      - "versions.yml":
+          type: file
+          description: File containing software versions
+          pattern: "versions.yml"
 
 authors:
   - "@erikrikarddaniel"
