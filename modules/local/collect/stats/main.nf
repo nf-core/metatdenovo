@@ -29,7 +29,7 @@ process COLLECT_STATS {
                 sample,
                 function(s) {
                     read_tsv(
-                        pipe(sprintf("grep 'Reads written (passing filters)' %s*trimming_report.txt | sed 's/.*: *//' | sed 's/ .*//' | sed 's/,//g'", s)),
+                        pipe(sprintf("grep 'Reads written (passing filters)' %s_*_trimming_report.txt | sed 's/.*: *//' | sed 's/ .*//' | sed 's/,//g'", s)),
                         col_names = c('n_trimmed'),
                         col_types = 'i'
                     ) %>%
