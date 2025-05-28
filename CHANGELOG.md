@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Fixed`
 
+- [#372](https://github.com/nf-core/metatdenovo/pull/372) - Fix bug in overall stats table creation for certain sample names (@erikrikarddaniel)
 - [#371](https://github.com/nf-core/metatdenovo/pull/371) - Template update to nf-core tools 3.2.1 (@erikrikarddaniel)
 - [#363](https://github.com/nf-core/metatdenovo/pull/363) - Handle duplicate names in taxonomies better (@erikrikarddaniel)
 - [#362](https://github.com/nf-core/metatdenovo/pull/362) - Ensure correct Transdecoder publishing and test assertions (@m3hdad)
