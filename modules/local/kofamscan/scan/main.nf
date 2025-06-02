@@ -14,7 +14,7 @@ process KOFAMSCAN_SCAN {
 
     output:
     tuple val(meta), path("kofamscan_output.tsv.gz"), emit: kout
-    path("kofamscan.tsv.gz")                        , emit: kofamtsv
+    tuple val(meta), path("kofamscan.tsv.gz")       , emit: kofamtsv
     path "versions.yml"                             , emit: versions
 
     when:
