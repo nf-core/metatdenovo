@@ -38,4 +38,3 @@ workflow HMMCLASSIFY {
 
     versions = ch_versions                     // channel: [ versions.yml ]
 }
-
