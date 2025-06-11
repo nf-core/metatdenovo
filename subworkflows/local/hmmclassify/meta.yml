@@ -9,6 +9,7 @@ keywords:
 components:
   - hmmer/hmmsearch
   - hmmrank
+  - seqtk/hmmhitfaas
 input:
   - ch_hmmclassify:
       type: tuple

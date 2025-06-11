@@ -9,6 +9,7 @@ components:
   - kofamscan/scan
   - kofamscan/download
   - kofamscan/sum
+  - kofamscan/unique
 input:
   - kofamscan:
       type: tuple
