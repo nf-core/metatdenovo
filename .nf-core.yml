@@ -14,7 +14,3 @@ template:
   org: nf-core
   outdir: .
   version: 1.1.0
-lint:
-  files_unchanged:
-    - assets/nf-core-metatdenovo_logo_light.png
-    - docs/images/nf-core-metatdenovo_logo_light.png
