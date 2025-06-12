@@ -171,19 +171,15 @@
             ],
             [
                 "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f",
-                "versions.yml:md5,069fffe1c38bd4bbce26b40bcc449fb2",
-                "SAMPLE1_PE_1_val_1_fastqc.html:md5,cc3353521f96129165d9cb0c7e02ade9",
-                "SAMPLE1_PE_2_val_2_fastqc.html:md5,559c29113a9997edee575d5b706231b8",
-                "SAMPLE2_PE_1_val_1_fastqc.html:md5,631063071a06919ded0bf2e4ef045ba2",
-                "SAMPLE2_PE_2_val_2_fastqc.html:md5,11698d4dd697a2bf1da7dffa9c104609",
-                "SAMPLE3_PE_1_1_val_1_fastqc.html:md5,10077849496645deb96a966674aa4a11",
-                "SAMPLE3_PE_1_2_val_2_fastqc.html:md5,ddd6c0c13a5541097281fb12e294f7a8"
-            ]
+                "versions.yml:md5,069fffe1c38bd4bbce26b40bcc449fb2"
+            ],
+            4,
+            4
         ],
         "meta": {
             "nf-test": "0.9.2",
             "nextflow": "25.04.2"
         },
-        "timestamp": "2025-06-11T19:33:03.015201018"
+        "timestamp": "2025-06-12T07:44:37.441491822"
     }
 }

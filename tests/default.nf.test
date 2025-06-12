@@ -28,8 +28,12 @@ nextflow_pipeline {
                     // All stable path name, with a relative path
                     stable_name,
                     // All files with stable contents
-                    stable_path
-                ).match() }
+                    stable_path,
+                    path("${params.outdir}/summary_tables/megahit.prodigal.hmmrank.tsv.gz").linesGzip.size(),
+                    path("${params.outdir}/summary_tables/megahit.prodigal.overall_stats.tsv.gz").linesGzip.size()
+                ).match() },
+                //{ assert path("${params.outdir}/summary_tables/megahit.prodigal.count.tsv.gz").linesGzip.size() > 3400 }
+                //{ assert path("${params.outdir}/summary_tables/megahit.prodigal.hmmrank.tsv.gz").linesGzip.toString() ==~ /PF00848\tk.*\tRing_hydroxyl_A\t1.8e-20\t71.4\t1/ }
             )
         }
     }

@@ -17,5 +17,5 @@ prodigal/*.gz
 samtools/*
 summary_tables/*.tsv.gz
 transrate/megahit_assemblies_mqc.csv
-trimgalore/fastqc/*.{zip}
+trimgalore/fastqc/*.{html,zip}
 trimgalore/*trimming_report.txt
