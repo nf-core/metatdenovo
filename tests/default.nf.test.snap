@@ -173,13 +173,20 @@
                 "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f",
                 "versions.yml:md5,069fffe1c38bd4bbce26b40bcc449fb2"
             ],
+            [
+                "orf\tchr\tstart\tend\tstrand\tlength\tsample\tcount\ttpm"
+            ],
             4,
-            4
+            1,
+            4,
+            [
+                "sample\tn_trimmed\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count"
+            ]
         ],
         "meta": {
             "nf-test": "0.9.2",
             "nextflow": "25.04.2"
         },
-        "timestamp": "2025-06-12T07:44:37.441491822"
+        "timestamp": "2025-06-12T10:33:42.336720209"
     }
 }
