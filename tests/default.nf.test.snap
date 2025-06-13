@@ -1,12 +1,15 @@
 {
     "-profile test": {
         "content": [
-            49,
+            52,
             {
                 "BBMAP_ALIGN": {
                     "bbmap": 39.18,
                     "samtools": 1.21,
                     "pigz": 2.8
+                },
+                "BBMAP_BBDUK": {
+                    "bbmap": 39.18
                 },
                 "BBMAP_INDEX": {
                     "bbmap": 39.18
@@ -92,6 +95,13 @@
             },
             [
                 "bbmap",
+                "bbmap/bbduk",
+                "bbmap/bbduk/SAMPLE1_PE_1.fastq.gz",
+                "bbmap/bbduk/SAMPLE1_PE_2.fastq.gz",
+                "bbmap/bbduk/SAMPLE2_PE_1.fastq.gz",
+                "bbmap/bbduk/SAMPLE2_PE_2.fastq.gz",
+                "bbmap/bbduk/SAMPLE3_PE_1_1.fastq.gz",
+                "bbmap/bbduk/SAMPLE3_PE_1_2.fastq.gz",
                 "bbmap/logs",
                 "bbmap/logs/SAMPLE1_PE.bbmap.log",
                 "bbmap/logs/SAMPLE2_PE.bbmap.log",
@@ -114,11 +124,31 @@
                 "multiqc",
                 "multiqc/multiqc_data",
                 "multiqc/multiqc_data/BETA-multiqc.parquet",
+                "multiqc/multiqc_data/bbduk-filtered-barplot_Bases.txt",
+                "multiqc/multiqc_data/bbduk-filtered-barplot_Reads.txt",
+                "multiqc/multiqc_data/bbduk.txt",
                 "multiqc/multiqc_data/multiqc.log",
                 "multiqc/multiqc_data/multiqc_citations.txt",
                 "multiqc/multiqc_data/multiqc_data.json",
+                "multiqc/multiqc_data/multiqc_general_stats.txt",
                 "multiqc/multiqc_data/multiqc_software_versions.txt",
                 "multiqc/multiqc_data/multiqc_sources.txt",
+                "multiqc/multiqc_plots",
+                "multiqc/multiqc_plots/pdf",
+                "multiqc/multiqc_plots/pdf/bbduk-filtered-barplot_Bases-cnt.pdf",
+                "multiqc/multiqc_plots/pdf/bbduk-filtered-barplot_Bases-pct.pdf",
+                "multiqc/multiqc_plots/pdf/bbduk-filtered-barplot_Reads-cnt.pdf",
+                "multiqc/multiqc_plots/pdf/bbduk-filtered-barplot_Reads-pct.pdf",
+                "multiqc/multiqc_plots/png",
+                "multiqc/multiqc_plots/png/bbduk-filtered-barplot_Bases-cnt.png",
+                "multiqc/multiqc_plots/png/bbduk-filtered-barplot_Bases-pct.png",
+                "multiqc/multiqc_plots/png/bbduk-filtered-barplot_Reads-cnt.png",
+                "multiqc/multiqc_plots/png/bbduk-filtered-barplot_Reads-pct.png",
+                "multiqc/multiqc_plots/svg",
+                "multiqc/multiqc_plots/svg/bbduk-filtered-barplot_Bases-cnt.svg",
+                "multiqc/multiqc_plots/svg/bbduk-filtered-barplot_Bases-pct.svg",
+                "multiqc/multiqc_plots/svg/bbduk-filtered-barplot_Reads-cnt.svg",
+                "multiqc/multiqc_plots/svg/bbduk-filtered-barplot_Reads-pct.svg",
                 "multiqc/multiqc_report.html",
                 "pipeline_info",
                 "pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml",
@@ -181,13 +211,13 @@
             1,
             4,
             [
-                "sample\tn_trimmed\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count"
+                "sample\tn_trimmed\tn_non_contaminated\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count"
             ]
         ],
         "meta": {
             "nf-test": "0.9.2",
             "nextflow": "25.04.2"
         },
-        "timestamp": "2025-06-12T11:46:55.243245289"
+        "timestamp": "2025-06-13T09:28:12.810565639"
     }
 }
