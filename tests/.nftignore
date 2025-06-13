@@ -21,8 +21,10 @@ pipeline_info/*.{html,json,txt,yml}
 prodigal/*.gz
 prokka/*.gz
 samtools/*
+spades/spades.spades.log
 summary_tables/*.tsv.gz
 transdecoder/*.gz
 transrate/megahit_assemblies_mqc.csv
+transrate/spades_assemblies_mqc.csv
 trimgalore/fastqc/*.{html,zip}
 trimgalore/*trimming_report.txt
