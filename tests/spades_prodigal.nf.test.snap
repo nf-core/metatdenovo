@@ -163,9 +163,7 @@
             ],
             [
                 "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f",
-                "spades.assembly.gfa.gz:md5,707510ead55d6844fd529f2a876f3a8d",
-                "spades.transcripts.fa.gz:md5,0dc9c9cc5a2e666950ef7f8c2ca4bdda",
-                "spades.yaml:md5,d3263b8cd12e8e834db2d58eca0c9bc2",
+                "spades.yaml:md5,6852ba5cf7ef42d0efff686c7dc20ca9",
                 "versions.yml:md5,069fffe1c38bd4bbce26b40bcc449fb2"
             ],
             16,
@@ -181,6 +179,6 @@
             "nf-test": "0.9.2",
             "nextflow": "25.04.2"
         },
-        "timestamp": "2025-06-13T10:41:37.309649918"
+        "timestamp": "2025-06-13T11:32:54.707818175"
     }
 }
