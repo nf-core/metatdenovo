@@ -35,10 +35,10 @@
                     "subread": "2.0.6"
                 },
                 "FORMATSPADES": {
-                    "gzip": "gzip 1.11 Copyright (C) 2018 Free Software Foundation, Inc. Copyright (C) 1993 Jean-loup Gailly. This is free software. You may redistribute copies of it under the terms of the GNU General Public License <https://www.gnu.org/licenses/gpl.html>. There is NO WARRANTY, to the extent permitted by law. Written by Jean-loup Gailly."
+                    "gzip": "1.11"
                 },
                 "FORMAT_PRODIGAL_GFF": {
-                    "gzip": 1.11
+                    "gzip": "1.11"
                 },
                 "PRODIGAL_MODULE": {
                     "prodigal": "2.6.3",
@@ -179,6 +179,6 @@
             "nf-test": "0.9.2",
             "nextflow": "25.04.2"
         },
-        "timestamp": "2025-06-13T11:32:54.707818175"
+        "timestamp": "2025-06-13T16:06:41.959061132"
     }
 }
