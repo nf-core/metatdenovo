@@ -90,7 +90,7 @@
                     "pigz": "2.3.4"
                 },
                 "Workflow": {
-                    "nf-core/metatdenovo": "v1.2.0"
+                    "nf-core/metatdenovo": "v1.1.2dev"
                 }
             },
             [
@@ -199,6 +199,6 @@
             "nf-test": "0.9.2",
             "nextflow": "25.04.2"
         },
-        "timestamp": "2025-06-16T10:28:02.230067908"
+        "timestamp": "2025-06-16T10:59:02.188741722"
     }
 }

@@ -83,7 +83,7 @@
                     "writespadesyaml": "4.2.25(1)-release"
                 },
                 "Workflow": {
-                    "nf-core/metatdenovo": "v1.2.0"
+                    "nf-core/metatdenovo": "v1.1.2dev"
                 }
             },
             [
@@ -163,7 +163,7 @@
             ],
             [
                 "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f",
-                "spades.yaml:md5,d3263b8cd12e8e834db2d58eca0c9bc2",
+                "spades.yaml:md5,6852ba5cf7ef42d0efff686c7dc20ca9",
                 "versions.yml:md5,069fffe1c38bd4bbce26b40bcc449fb2"
             ],
             16,
@@ -179,6 +179,6 @@
             "nf-test": "0.9.2",
             "nextflow": "25.04.2"
         },
-        "timestamp": "2025-06-16T10:34:23.736048987"
+        "timestamp": "2025-06-16T11:05:32.376160255"
     }
 }
