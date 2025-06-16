@@ -1,0 +1,46 @@
+nextflow_pipeline {
+
+    name "Test pipeline"
+    script "../main.nf"
+    tag "pipeline"
+    profile "test_megahit_transdecoder"
+
+    test("-profile test_megahit_transdecoder") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+        }
+
+        then {
+            // stable_name: All files + folders in ${params.outdir}/ with a stable name
+            def stable_name = getAllFilesFromDir(params.outdir, relative: true, includeDir: true, ignore: ['pipeline_info/*.{html,json,txt}'])
+            // stable_path: All files in ${params.outdir}/ with stable content
+            def stable_path = getAllFilesFromDir(params.outdir, ignoreFile: 'tests/.nftignore')
+            assertAll(
+                { assert workflow.success },
+                { assert snapshot(
+                    // Number of successful tasks
+                    workflow.trace.succeeded().size(),
+                    // pipeline versions.yml file for multiqc from which Nextflow version is removed because we test pipelines on multiple Nextflow versions
+                    removeNextflowVersion("$outputDir/pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml"),
+                    // All stable path name, with a relative path
+                    stable_name,
+                    // All files with stable contents
+                    stable_path,
+                    // Important files with unstable content
+                    path("${params.outdir}/samtools/megahit.SAMPLE1_PE.flagstat").readLines().size(),
+                    path("${params.outdir}/summary_tables/megahit.transdecoder.counts.tsv.gz").linesGzip.findAll { l -> l.contains('orf') },
+                    path("${params.outdir}/summary_tables/megahit.transdecoder.overall_stats.tsv.gz").linesGzip.size(),
+                    path("${params.outdir}/summary_tables/megahit.transdecoder.overall_stats.tsv.gz").linesGzip.findAll { l -> l.contains('n_feature_count') },
+                ).match() },
+                { assert path("${params.outdir}/megahit/megahit_out/megahit_assembly.log").readLines().any { l -> l.contains('ALL DONE') } },
+                { assert path("${params.outdir}/megahit/megahit_out/megahit_assembly.contigs.fa.gz").linesGzip.size() > 3000 },
+                { assert path("${params.outdir}/samtools/megahit.SAMPLE1_PE.idxstats").readLines().size() > 1700 },
+                { assert path("${params.outdir}/transdecoder/megahit_assembly.contigs.fa.transdecoder.gff3.gz").linesGzip.findAll { l -> l.contains('CDS') }.size() > 2200 },
+                { assert path("${params.outdir}/summary_tables/megahit.transdecoder.counts.tsv.gz").linesGzip.size() > 2000 },
+            )
+        }
+    }
+}
