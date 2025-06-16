@@ -27,7 +27,7 @@ process FORMAT_PRODIGAL_GFF {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        gzip: \$( echo \$(gzip --version 2>&1) | sed -n 's/.*gzip \\([0-9.]\\+\\).*/\\1/p')
+        gzip: "\$(gzip --version 2>&1 | grep '^gzip' | sed 's/^gzip \\([0-9.]\\+\\).*/\\1/')"
     END_VERSIONS
     """
 
