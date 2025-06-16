@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Added`
 
-- [#373](https://github.com/nf-core/metatdenovo/pull/373) - Add module to save tsv with unique ORF Kofamscan hits to summary_tables (@erikrikarddaniel)
+- [#373](https://github.com/nf-core/metatdenovo/pull/373) - Add module to save tsv with unique ORF Kofamscan hits to `<outdir>/summary_tables` (@erikrikarddaniel)
 - [#366](https://github.com/nf-core/metatdenovo/pull/366) - Save amino acid sequences for HMMER hits (@erikrikarddaniel)
 
 ### `Changed`
@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Fixed`
 
+- [#380](https://github.com/nf-core/metatdenovo/pull/380) - Fix malformatted versions in two modules (@erikrikarddaniel)
 - [#378](https://github.com/nf-core/metatdenovo/pull/378) - Add more nf-test tests (@erikrikarddaniel)
 - [#377](https://github.com/nf-core/metatdenovo/pull/377) - Updated default nf-test (@erikrikarddaniel)
 - [#376](https://github.com/nf-core/metatdenovo/pull/376) - Template update to nf-core tools 3.3.1 (@erikrikarddaniel)

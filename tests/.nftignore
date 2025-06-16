@@ -22,6 +22,7 @@ prodigal/*.gz
 prokka/*.gz
 samtools/*
 spades/spades.spades.log
+spades/spades.yaml
 spades/*.gz
 summary_tables/*.tsv.gz
 transdecoder/*.gz
