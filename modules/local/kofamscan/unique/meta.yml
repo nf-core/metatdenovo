@@ -1,0 +1,41 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "kofamscan_unique"
+description: R script that produces a kofamscan tsv with a unique, best-scoring, entry for each ORF
+keywords:
+  - R
+  - kofamscan
+input:
+  - - meta:
+        type: map
+        description: |
+          Groovy Map containing sample information
+          e.g. `[ id:'sample1', single_end:false ]`
+
+    - kofamtsv:
+        type: file
+        description: tsv file from kofamscan
+        pattern: "*.tsv.gz"
+
+output:
+  - uniqtsv:
+      - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. `[ id:'sample1', single_end:false ]`
+      - "*.unique.tsv.gz":
+          type: file
+          description: tsv file with a single entry per ORF
+          pattern: "*.tsv.gz"
+
+  - versions:
+      - "versions.yml":
+          type: file
+          description: File containing software versions
+          pattern: "versions.yml"
+
+authors:
+  - "@erikrikarddaniel"
+maintainers:
+  - "@erikrikarddaniel"

@@ -1,0 +1,223 @@
+{
+    "-profile test": {
+        "content": [
+            52,
+            {
+                "BBMAP_ALIGN": {
+                    "bbmap": 39.18,
+                    "samtools": 1.21,
+                    "pigz": 2.8
+                },
+                "BBMAP_BBDUK": {
+                    "bbmap": 39.18
+                },
+                "BBMAP_INDEX": {
+                    "bbmap": 39.18
+                },
+                "CAT_FASTQ": {
+                    "cat": 9.5
+                },
+                "COLLECT_FEATURECOUNTS": {
+                    "R": "4.2.3",
+                    "dplyr": "1.1.2",
+                    "dtplyr": "1.3.1",
+                    "data.table": "1.14.8"
+                },
+                "COLLECT_STATS": {
+                    "R": "4.2.3",
+                    "dplyr": "1.1.2",
+                    "readr": "2.1.4",
+                    "purrr": "1.0.1",
+                    "tidyr": "1.3.0",
+                    "stringr": "1.5.0"
+                },
+                "FASTQC": {
+                    "fastqc": "0.12.1"
+                },
+                "FEATURECOUNTS_CDS": {
+                    "subread": "2.0.6"
+                },
+                "FORMAT_PRODIGAL_GFF": {
+                    "gzip": "1.11"
+                },
+                "HMMER_HMMSEARCH": {
+                    "hmmer": 3.4
+                },
+                "HMMRANK": {
+                    "R": "4.2.3",
+                    "tidyverse": "2.0.0"
+                },
+                "MEGAHIT_INTERLEAVED": {
+                    "megahit_interleaved": "1.2.9"
+                },
+                "PRODIGAL_MODULE": {
+                    "prodigal": "2.6.3",
+                    "pigz": 2.6
+                },
+                "SAMTOOLS_FLAGSTAT": {
+                    "samtools": 1.21
+                },
+                "SAMTOOLS_IDXSTATS": {
+                    "samtools": 1.21
+                },
+                "SAMTOOLS_INDEX": {
+                    "samtools": 1.21
+                },
+                "SAMTOOLS_SORT": {
+                    "samtools": 1.21
+                },
+                "SAMTOOLS_STATS": {
+                    "samtools": 1.21
+                },
+                "SEQTK_HMMHITFAAS": {
+                    "seqtk": "1.4-r122"
+                },
+                "SEQTK_MERGEPE": {
+                    "seqtk": "1.4-r122"
+                },
+                "TRANSRATE": {
+                    "transrate": "1.0.3"
+                },
+                "TRIMGALORE": {
+                    "trimgalore": "0.6.10",
+                    "cutadapt": 4.9,
+                    "pigz": 2.8
+                },
+                "UNPIGZ_CONTIGS": {
+                    "pigz": "2.3.4"
+                },
+                "UNPIGZ_GFF": {
+                    "pigz": "2.3.4"
+                },
+                "Workflow": {
+                    "nf-core/metatdenovo": "v1.2.0"
+                }
+            },
+            [
+                "bbmap",
+                "bbmap/bbduk",
+                "bbmap/bbduk/SAMPLE1_PE_1.fastq.gz",
+                "bbmap/bbduk/SAMPLE1_PE_2.fastq.gz",
+                "bbmap/bbduk/SAMPLE2_PE_1.fastq.gz",
+                "bbmap/bbduk/SAMPLE2_PE_2.fastq.gz",
+                "bbmap/bbduk/SAMPLE3_PE_1_1.fastq.gz",
+                "bbmap/bbduk/SAMPLE3_PE_1_2.fastq.gz",
+                "bbmap/logs",
+                "bbmap/logs/SAMPLE1_PE.bbmap.log",
+                "bbmap/logs/SAMPLE2_PE.bbmap.log",
+                "bbmap/logs/SAMPLE3_PE_1.bbmap.log",
+                "featurecounts",
+                "featurecounts/SAMPLE1_PE.featureCounts.tsv",
+                "featurecounts/SAMPLE1_PE.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE2_PE.featureCounts.tsv",
+                "featurecounts/SAMPLE2_PE.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE3_PE_1.featureCounts.tsv",
+                "featurecounts/SAMPLE3_PE_1.featureCounts.tsv.summary",
+                "hmmer",
+                "hmmer/hits",
+                "hmmer/hits/megahit.prodigal.PF00848.faa.gz",
+                "hmmer/hits/megahit.prodigal.PF03477.faa.gz",
+                "megahit",
+                "megahit/megahit_out",
+                "megahit/megahit_out/megahit_assembly.contigs.fa.gz",
+                "megahit/megahit_out/megahit_assembly.log",
+                "multiqc",
+                "multiqc/multiqc_data",
+                "multiqc/multiqc_data/BETA-multiqc.parquet",
+                "multiqc/multiqc_data/bbduk-filtered-barplot_Bases.txt",
+                "multiqc/multiqc_data/bbduk-filtered-barplot_Reads.txt",
+                "multiqc/multiqc_data/bbduk.txt",
+                "multiqc/multiqc_data/multiqc.log",
+                "multiqc/multiqc_data/multiqc_citations.txt",
+                "multiqc/multiqc_data/multiqc_data.json",
+                "multiqc/multiqc_data/multiqc_general_stats.txt",
+                "multiqc/multiqc_data/multiqc_software_versions.txt",
+                "multiqc/multiqc_data/multiqc_sources.txt",
+                "multiqc/multiqc_plots",
+                "multiqc/multiqc_plots/pdf",
+                "multiqc/multiqc_plots/pdf/bbduk-filtered-barplot_Bases-cnt.pdf",
+                "multiqc/multiqc_plots/pdf/bbduk-filtered-barplot_Bases-pct.pdf",
+                "multiqc/multiqc_plots/pdf/bbduk-filtered-barplot_Reads-cnt.pdf",
+                "multiqc/multiqc_plots/pdf/bbduk-filtered-barplot_Reads-pct.pdf",
+                "multiqc/multiqc_plots/png",
+                "multiqc/multiqc_plots/png/bbduk-filtered-barplot_Bases-cnt.png",
+                "multiqc/multiqc_plots/png/bbduk-filtered-barplot_Bases-pct.png",
+                "multiqc/multiqc_plots/png/bbduk-filtered-barplot_Reads-cnt.png",
+                "multiqc/multiqc_plots/png/bbduk-filtered-barplot_Reads-pct.png",
+                "multiqc/multiqc_plots/svg",
+                "multiqc/multiqc_plots/svg/bbduk-filtered-barplot_Bases-cnt.svg",
+                "multiqc/multiqc_plots/svg/bbduk-filtered-barplot_Bases-pct.svg",
+                "multiqc/multiqc_plots/svg/bbduk-filtered-barplot_Reads-cnt.svg",
+                "multiqc/multiqc_plots/svg/bbduk-filtered-barplot_Reads-pct.svg",
+                "multiqc/multiqc_report.html",
+                "pipeline_info",
+                "pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml",
+                "prodigal",
+                "prodigal/megahit.prodigal.faa.gz",
+                "prodigal/megahit.prodigal.fna.gz",
+                "prodigal/megahit.prodigal.gff.gz",
+                "prodigal/megahit.prodigal_all.txt.gz",
+                "prodigal/megahit.prodigal_format.gff.gz",
+                "samtools",
+                "samtools/SAMPLE1_PE.sorted.bam",
+                "samtools/SAMPLE1_PE.sorted.bam.bai",
+                "samtools/SAMPLE2_PE.sorted.bam",
+                "samtools/SAMPLE2_PE.sorted.bam.bai",
+                "samtools/SAMPLE3_PE_1.sorted.bam",
+                "samtools/SAMPLE3_PE_1.sorted.bam.bai",
+                "samtools/megahit.SAMPLE1_PE.flagstat",
+                "samtools/megahit.SAMPLE1_PE.idxstats",
+                "samtools/megahit.SAMPLE2_PE.flagstat",
+                "samtools/megahit.SAMPLE2_PE.idxstats",
+                "samtools/megahit.SAMPLE3_PE_1.flagstat",
+                "samtools/megahit.SAMPLE3_PE_1.idxstats",
+                "summary_tables",
+                "summary_tables/megahit.prodigal.counts.tsv.gz",
+                "summary_tables/megahit.prodigal.hmmrank.tsv.gz",
+                "summary_tables/megahit.prodigal.overall_stats.tsv.gz",
+                "transrate",
+                "transrate/megahit_assemblies_mqc.csv",
+                "transrate/versions.yml",
+                "trimgalore",
+                "trimgalore/SAMPLE1_PE_1.fastq.gz_trimming_report.txt",
+                "trimgalore/SAMPLE1_PE_2.fastq.gz_trimming_report.txt",
+                "trimgalore/SAMPLE2_PE_1.fastq.gz_trimming_report.txt",
+                "trimgalore/SAMPLE2_PE_2.fastq.gz_trimming_report.txt",
+                "trimgalore/SAMPLE3_PE_1_1.fastq.gz_trimming_report.txt",
+                "trimgalore/SAMPLE3_PE_1_2.fastq.gz_trimming_report.txt",
+                "trimgalore/fastqc",
+                "trimgalore/fastqc/SAMPLE1_PE_1_val_1_fastqc.html",
+                "trimgalore/fastqc/SAMPLE1_PE_1_val_1_fastqc.zip",
+                "trimgalore/fastqc/SAMPLE1_PE_2_val_2_fastqc.html",
+                "trimgalore/fastqc/SAMPLE1_PE_2_val_2_fastqc.zip",
+                "trimgalore/fastqc/SAMPLE2_PE_1_val_1_fastqc.html",
+                "trimgalore/fastqc/SAMPLE2_PE_1_val_1_fastqc.zip",
+                "trimgalore/fastqc/SAMPLE2_PE_2_val_2_fastqc.html",
+                "trimgalore/fastqc/SAMPLE2_PE_2_val_2_fastqc.zip",
+                "trimgalore/fastqc/SAMPLE3_PE_1_1_val_1_fastqc.html",
+                "trimgalore/fastqc/SAMPLE3_PE_1_1_val_1_fastqc.zip",
+                "trimgalore/fastqc/SAMPLE3_PE_1_2_val_2_fastqc.html",
+                "trimgalore/fastqc/SAMPLE3_PE_1_2_val_2_fastqc.zip"
+            ],
+            [
+                "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f",
+                "versions.yml:md5,069fffe1c38bd4bbce26b40bcc449fb2"
+            ],
+            16,
+            [
+                "orf\tchr\tstart\tend\tstrand\tlength\tsample\tcount\ttpm"
+            ],
+            4,
+            1,
+            4,
+            [
+                "sample\tn_trimmed\tn_non_contaminated\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count"
+            ]
+        ],
+        "meta": {
+            "nf-test": "0.9.2",
+            "nextflow": "25.04.2"
+        },
+        "timestamp": "2025-06-16T13:46:26.592625579"
+    }
+}
