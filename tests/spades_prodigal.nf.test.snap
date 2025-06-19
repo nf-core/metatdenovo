@@ -83,7 +83,7 @@
                     "writespadesyaml": "4.2.25(1)-release"
                 },
                 "Workflow": {
-                    "nf-core/metatdenovo": "v1.2.0"
+                    "nf-core/metatdenovo": "v1.2.1dev"
                 }
             },
             [
@@ -178,6 +178,6 @@
             "nf-test": "0.9.2",
             "nextflow": "25.04.2"
         },
-        "timestamp": "2025-06-16T13:41:32.625202932"
+        "timestamp": "2025-06-19T09:43:38.859034214"
     }
 }
