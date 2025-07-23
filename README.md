@@ -73,7 +73,7 @@ sample4,./a.fastq.gz,./b.fastq.gz
 ```
 
 Each row represents a fastq file (single-end) or a pair of fastq files (paired-end).
-The fastq files need to be gzipped and their names end with `.fq.gz` or `.fastq.gz`.
+The fastq files _need to be gzipped_ and their names end with `.fq.gz` or `.fastq.gz`.
 
 Now, you can run the pipeline using:
 
