@@ -87,6 +87,10 @@ nextflow run nf-core/metatdenovo \
 > [!WARNING]
 > Please provide pipeline parameters via the CLI or Nextflow `-params-file` option. Custom config files including those provided by the `-c` Nextflow option can be used to provide any configuration _**except for parameters**_; see [docs](https://nf-co.re/docs/usage/getting_started/configuration#custom-configuration-files).
 
+> [!NOTE]
+> The pipeline currently only supports paired reads.
+> If support for single end reads is important to you, make a comment on the [GitHub issue](https://github.com/nf-core/metatdenovo/issues/396).
+
 For more details and further functionality, please refer to the [usage documentation](https://nf-co.re/metatdenovo/usage) and the [parameter documentation](https://nf-co.re/metatdenovo/parameters).
 
 ## Pipeline output

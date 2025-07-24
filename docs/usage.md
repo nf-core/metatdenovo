@@ -39,6 +39,10 @@ CONTROL_REP1,AEG588A1_S1_L003_R1_001.fastq.gz,AEG588A1_S1_L003_R2_001.fastq.gz
 CONTROL_REP1,AEG588A1_S1_L004_R1_001.fastq.gz,AEG588A1_S1_L004_R2_001.fastq.gz
 ```
 
+> [!NOTE]
+> The pipeline currently only supports paired reads.
+> If support for single end reads is important to you, make a comment on the [GitHub issue](https://github.com/nf-core/metatdenovo/issues/396).
+
 #### Full samplesheet
 
 <!-- I commented out text about single-end samples as we don't know whether this works yet. -->
