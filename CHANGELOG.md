@@ -9,18 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Changed`
 
-### `Fixed`
-
-### `Dependencies`
-
-### `Deprecated`
-
-## v1.2.1 - [2025-08-22]
-
-### `Added`
-
-### `Changed`
-
 - [#406](https://github.com/nf-core/metatdenovo/pull/406) - Updating modules and removing warnings before release 1.3.0 (@danilodileo)
 - [#405](https://github.com/nf-core/metatdenovo/pull/405) - Upgrade EUKulele to 2.1.2. This appears to fix problems with downloads of certain databases (@erikrikarddaniel)
 - [#404](https://github.com/nf-core/metatdenovo/pull/404) - Added new reference for SPAdes in CITATIONS.md (@danilodileo)
