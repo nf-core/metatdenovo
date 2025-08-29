@@ -1,0 +1,96 @@
+name: PIPELINE_INITIALISATION
+description: Subworkflow with functionality specific to the nf-core/metatdenovo pipeline
+keywords:
+  - utility
+  - pipeline
+  - initialization
+  - completion
+  - validation
+  - nf-core
+  - metatdenovo
+components:
+  - utils_nfschema_plugin
+  - utils_nfcore_pipeline
+  - utils_nextflow_pipeline
+  - completionemail
+  - completionsummary
+  - imnotification
+  - paramssummarymap
+  - samplesheettolist
+workflows:
+  - name: PIPELINE_INITIALISATION
+    description: Initialize pipeline with parameter validation and input processing
+    input:
+      - name: version
+        type: boolean
+        description: Display version and exit
+      - name: validate_params
+        type: boolean
+        description: Boolean whether to validate parameters against the schema at runtime
+      - name: monochrome_logs
+        type: boolean
+        description: Do not use coloured log outputs
+      - name: nextflow_cli_args
+        type: array
+        description: List of positional nextflow CLI args
+      - name: outdir
+        type: string
+        description: The output directory where the results will be saved
+      - name: input
+        type: string
+        description: Path to input samplesheet
+      - name: diamond_dbs
+        type: string
+        description: Path to csv file with Diamond taxonomy dbs
+    output:
+      - name: samplesheet
+        type: channel
+        description: Processed samplesheet channel
+      - name: diamond_paths
+        type: channel
+        description: Diamond database paths channel
+      - name: versions
+        type: channel
+        description: Software versions channel
+  - name: PIPELINE_COMPLETION
+    description: Handle pipeline completion tasks including email notifications
+    input:
+      - name: email
+        type: string
+        description: Email address for completion notification
+      - name: email_on_fail
+        type: string
+        description: Email address sent on pipeline failure
+      - name: plaintext_email
+        type: boolean
+        description: Send plain-text email instead of HTML
+      - name: outdir
+        type: path
+        description: Path to output directory where results will be published
+      - name: monochrome_logs
+        type: boolean
+        description: Disable ANSI colour codes in log output
+      - name: hook_url
+        type: string
+        description: Hook URL for notifications
+      - name: multiqc_report
+        type: string
+        description: Path to MultiQC report
+    output: []
+functions:
+  - name: validateInputParameters
+    description: Check and validate pipeline parameters
+  - name: validateInputSamplesheet
+    description: Validate channels from input samplesheet
+  - name: toolCitationText
+    description: Generate tool citation text for MultiQC
+  - name: toolBibliographyText
+    description: Generate tool bibliography text for MultiQC
+  - name: methodsDescriptionText
+    description: Generate methods description for MultiQC
+input: []
+output: []
+authors:
+  - "@danilodileo"
+maintainers:
+  - "@danilodileo"

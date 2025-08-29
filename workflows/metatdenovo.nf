@@ -105,6 +105,9 @@ include { FASTQC                                     } from '../modules/nf-core/
 include { MULTIQC                                    } from '../modules/nf-core/multiqc/main'
 include { PIGZ_COMPRESS as PIGZ_ASSEMBLY             } from '../modules/nf-core/pigz/compress/main'
 include { PIGZ_COMPRESS as PIGZ_DIAMOND_LINEAGE      } from '../modules/nf-core/pigz/compress/main'
+include { PIGZ_COMPRESS as PIGZ_PE_READS_FWD         } from '../modules/nf-core/pigz/compress/main'
+include { PIGZ_COMPRESS as PIGZ_PE_READS_REV         } from '../modules/nf-core/pigz/compress/main'
+include { PIGZ_COMPRESS as PIGZ_SE_READS             } from '../modules/nf-core/pigz/compress/main'
 include { PIGZ_COMPRESS as PIGZ_TRANSDECODER_BED     } from '../modules/nf-core/pigz/compress/main'
 include { PIGZ_COMPRESS as PIGZ_TRANSDECODER_CDS     } from '../modules/nf-core/pigz/compress/main'
 include { PIGZ_COMPRESS as PIGZ_TRANSDECODER_GFF     } from '../modules/nf-core/pigz/compress/main'
@@ -154,57 +157,122 @@ workflow METATDENOVO {
                 return [[ meta.id, pairs.collect { meta + [id: "${meta.id}_${pairs.indexOf(it) + 1}"] }, fastq_files ]]
             }
         }
+        /** DL: In my testing, this fails as entries come in with single meta, multiple read files when appear for single ends
         .map { id, metas, fastq_files ->
             // Ensure single_end is set correctly in meta
-            def updatedMetas = metas.collect { it + [single_end: (fastq_files.size() / metas.size() == 1)] }
+            def updatedMetas = metas
+                .collect { it + [single_end: (fastq_files.size() / metas.size() == 1)] }
             return [id, updatedMetas, fastq_files]
         }
+        **/
         .map { validateInputSamplesheet(it) }
         .branch {
             meta, fastqs ->
-                single  : fastqs.size() == 1
+                single  : ( meta.single_end && fastqs.size() == 1 ) || ( ! meta.single_end && fastqs.size == 2 )
                     return [ meta, fastqs ]
-                multiple: fastqs.size() > 1
+                multiple: true
                     return [ meta, fastqs ]
         }
 
     //
-    // MODULE: Concatenate FastQ files from same sample if required
+    // MODULE: Concatenate FastQ files from the same sample if required
     //
     CAT_FASTQ (
         ch_fastq.multiple
     )
-        .reads
-        .mix(ch_fastq.single)
-        .set { ch_cat_fastq }
-
     ch_versions = ch_versions.mix(CAT_FASTQ.out.versions.first())
+
+    //
+    // Gzip unzipped read files
+    //
+    // We're only doing this for samples having a single row in the sample sheet since those with more than one
+    // were gzipped by CAT_FASTQ above.
+    //
+
+    // Paired end, forward
+    fwd = ch_fastq.single
+        .filter { meta, f -> ! meta.single_end }
+        .map { meta, fastqs -> [ meta, fastqs[0] ] }
+        .branch {
+            meta, fastqs ->
+                zipped  : fastqs.name.endsWith('.gz')
+                    return [ meta, fastqs ]
+                unzipped: true
+                    return [ meta, fastqs ]
+        }
+    PIGZ_PE_READS_FWD(fwd.unzipped)
+    ch_versions      = ch_versions.mix(PIGZ_PE_READS_FWD.out.versions)
+
+    // Paired end, reverse
+    rev = ch_fastq.single
+        .filter { meta, f -> ! meta.single_end }
+        .map { meta, fastqs -> [ meta, fastqs[1] ] }
+        .branch {
+            meta, fastqs ->
+                zipped  : fastqs.name.endsWith('.gz')
+                    return [ meta, fastqs ]
+                unzipped: true
+                    return [ meta, fastqs ]
+        }
+    PIGZ_PE_READS_REV(rev.unzipped)
+    ch_versions      = ch_versions.mix(PIGZ_PE_READS_REV.out.versions)
+
+    // Single end
+    se = ch_fastq.single
+        .filter { meta, f -> meta.single_end }
+        .map { meta, fastqs -> [ meta, fastqs[0] ] }
+        .branch {
+            meta, fastqs ->
+                zipped  : fastqs.name.endsWith('.gz')
+                    return [ meta, fastqs ]
+                unzipped: true
+                    return [ meta, fastqs ]
+        }
+    PIGZ_SE_READS(se.unzipped)
+    ch_versions      = ch_versions.mix(PIGZ_SE_READS.out.versions)
+
+    // Join the three channels with the originally zipped to form a new ch_fastq of the same structure as the original
+    ch_fastq = fwd.zipped.concat(PIGZ_PE_READS_FWD.out.archive)
+        .join(rev.zipped.concat(PIGZ_PE_READS_REV.out.archive))
+        .map { meta, fwd, rev -> [ meta, [ fwd, rev ] ] }
+        .concat(
+            se.zipped
+                .concat(PIGZ_SE_READS.out.archive)
+                .map { meta, fastq -> [ meta, [ fastq ] ] }
+        )
+        .concat(CAT_FASTQ.out.reads)
 
     //
     // SUBWORKFLOW: Read QC and trim adapters
     //
     FASTQC_TRIMGALORE (
-        ch_cat_fastq,
+        ch_fastq,
         params.skip_fastqc || params.skip_qc,
         params.skip_trimming
     )
     ch_versions = ch_versions.mix(FASTQC_TRIMGALORE.out.versions)
-    ch_collect_stats = ch_cat_fastq.collect { meta, fasta -> meta.id }.map { [ [ id:"${assembly_name}.${orfs_name}" ], it ] }
+
+    ch_collect_stats = ch_fastq
+        .collect { meta, fasta -> meta }
+        .map { [ [ id:"${assembly_name}.${orfs_name}" ], it ] }
+
     if ( params.skip_trimming ) {
-        ch_collect_stats
+        ch_collect_stats = ch_collect_stats
             .map { meta, samples -> [ meta, samples, [] ] }
-            .set { ch_collect_stats }
 
     } else {
-        if ( params.se_reads ) {
-            ch_collect_stats
-                .combine(FASTQC_TRIMGALORE.out.trim_log.collect { meta, report -> report }.map { [ it ] })
-                .set { ch_collect_stats }
-        } else {
-            ch_collect_stats
-                .combine(FASTQC_TRIMGALORE.out.trim_log.collect { meta, report -> report[0] }.map { [ it ] })
-                .set { ch_collect_stats }
-        }
+        ch_collect_stats = ch_collect_stats
+            .combine(
+                FASTQC_TRIMGALORE.out.trim_log
+                    .collect { meta, report ->
+                        if ( report in List ) {
+                            report[0]
+                        } else {
+                            report
+                        }
+                    }
+                    .map { [ it ] }
+            )
     }
 
     //
@@ -215,56 +283,46 @@ workflow METATDENOVO {
         ch_clean_reads  = BBMAP_BBDUK.out.reads
         ch_bbduk_logs = BBMAP_BBDUK.out.log.collect { meta, log ->  log }.map { [ it ] }
         ch_versions   = ch_versions.mix(BBMAP_BBDUK.out.versions.first())
-        ch_collect_stats
-            .combine(ch_bbduk_logs)
-            .set {ch_collect_stats}
+        ch_collect_stats = ch_collect_stats.combine(ch_bbduk_logs)
         ch_multiqc_files = ch_multiqc_files.mix(BBMAP_BBDUK.out.log.collect{ meta, log -> log })
     } else {
         ch_clean_reads  = FASTQC_TRIMGALORE.out.reads
         ch_bbduk_logs = Channel.empty()
-        ch_collect_stats
+        ch_collect_stats = ch_collect_stats
             .map { meta, samples, report -> [ meta, samples, report, [] ] }
-            .set { ch_collect_stats }
     }
 
     //
     // MODULE: Interleave sequences for assembly
     //
-    // DL & DDL: We can probably not deal with single end input
     ch_interleaved = Channel.empty()
     if ( ! params.user_assembly ) {
-        if ( params.se_reads) {
-            ch_single_end = ch_clean_reads
-        } else {
-            SEQTK_MERGEPE(ch_clean_reads)
-            ch_interleaved = SEQTK_MERGEPE.out.reads
-            ch_versions    = ch_versions.mix(SEQTK_MERGEPE.out.versions)
-        }
+        SEQTK_MERGEPE(ch_clean_reads)
+        ch_interleaved = SEQTK_MERGEPE.out.reads
+        ch_versions    = ch_versions.mix(SEQTK_MERGEPE.out.versions)
     }
 
     //
-    // SUBWORKFLOW: Perform digital normalization. There are two options: khmer or BBnorm. The latter is faster.
+    // SUBWORKFLOW: Perform digital normalization.
     //
     if ( ! params.user_assembly ) {
-        if ( params.se_reads ) {
-            if ( params.bbnorm ) {
-                BBMAP_BBNORM(ch_single_end.collect { meta, fastq -> fastq }.map {[ [id:'all_samples', single_end:true], it ] } )
-                ch_se_reads_to_assembly = BBMAP_BBNORM.out.fastq.map { meta, fasta -> fasta }
-                ch_pe_reads_to_assembly = Channel.empty()
-                ch_versions    = ch_versions.mix(BBMAP_BBNORM.out.versions)
-            } else {
-                ch_se_reads_to_assembly = ch_single_end.map { meta, fastq -> fastq }
-                ch_pe_reads_to_assembly = Channel.empty()
-            }
-        }
-        else if ( params.bbnorm ) {
-            BBMAP_BBNORM(ch_interleaved.collect { meta, fastq -> fastq }.map {[ [id:'all_samples', single_end:true], it ] } )
+        if ( params.bbnorm ) {
+            BBMAP_BBNORM(
+                ch_interleaved
+                    .collect { meta, fastq -> fastq }
+                    .map { [ [id:'all_samples', single_end:true], it ] }
+            )
             ch_pe_reads_to_assembly = BBMAP_BBNORM.out.fastq.map { meta, fasta -> fasta }
             ch_se_reads_to_assembly = Channel.empty()
             ch_versions    = ch_versions.mix(BBMAP_BBNORM.out.versions)
         } else {
-            ch_pe_reads_to_assembly = ch_interleaved.map { meta, fastq -> fastq }
-            ch_se_reads_to_assembly = Channel.empty()
+            ch_pe_reads_to_assembly = ch_interleaved
+                .filter { meta, fastq -> ! meta.single_end }
+                .map { meta, fastq -> fastq }
+            ch_se_reads_to_assembly = ch_interleaved
+                .filter { meta, fastq -> meta.single_end }
+                .map { meta, fastq -> fastq }
+            //ch_se_reads_to_assembly = Channel.empty()
         }
     }
 
@@ -274,12 +332,15 @@ workflow METATDENOVO {
     if ( params.user_assembly ) {
         // If the input assembly is not gzipped, do that since all downstream calls assume this
         if ( ! params.user_assembly.endsWith('.gz') ) {
-            PIGZ_ASSEMBLY(Channel.fromPath(params.user_assembly).map { [ [ id:params.user_assembly ], it ] } )
-            PIGZ_ASSEMBLY.out.archive.first().set { ch_assembly_contigs }
+            PIGZ_ASSEMBLY(
+                Channel
+                    .fromPath(params.user_assembly)
+                    .map { [ [ id:params.user_assembly ], it ] }
+            )
+            ch_assembly_contigs = PIGZ_ASSEMBLY.out.archive.first()
         } else {
-            Channel
+            ch_assembly_contigs = Channel
                 .value ( [ [ id: assembly_name ], file(params.user_assembly) ] )
-                .set { ch_assembly_contigs }
         }
     } else if ( assembler == 'spades' ) {
         // 1. Write a yaml file for Spades
@@ -288,36 +349,34 @@ workflow METATDENOVO {
             ch_se_reads_to_assembly.toList()
         )
         ch_versions    = ch_versions.mix(WRITESPADESYAML.out.versions)
+
         // 2. Call the module with a channel with all fastq files plus the yaml
-        ch_pe_reads_to_assembly
+        ch_spades = ch_pe_reads_to_assembly
             .mix(ch_se_reads_to_assembly)
             .collect()
             .map { it -> [ [ id: assembly_name ], it, [], [] ] }
-            .set { ch_spades }
         SPADES (
             ch_spades,
             WRITESPADESYAML.out.yaml,
             []
         )
 
-        SPADES.out.transcripts
+        ch_spades_assembly = SPADES.out.transcripts
             .ifEmpty { [] }
             .combine(SPADES.out.contigs.ifEmpty { [] } )
-            .set { ch_assembly }
         ch_versions = ch_versions.mix(SPADES.out.versions)
 
-        FORMATSPADES( ch_assembly.first() )
+        FORMATSPADES( ch_spades_assembly.first() )
         ch_assembly_contigs = FORMATSPADES.out.assembly
-        ch_versions    = ch_versions.mix(FORMATSPADES.out.versions)
+        ch_versions = ch_versions.mix(FORMATSPADES.out.versions)
     } else if ( assembler == 'megahit' ) {
         MEGAHIT_INTERLEAVED(
             ch_pe_reads_to_assembly.toList(),
             ch_se_reads_to_assembly.toList(),
             'megahit_assembly'
         )
-        MEGAHIT_INTERLEAVED.out.contigs
+        ch_assembly_contigs = MEGAHIT_INTERLEAVED.out.contigs
             .map { it -> [ [ id: assembly_name ], it ] }
-            .set { ch_assembly_contigs }
         ch_versions = ch_versions.mix(MEGAHIT_INTERLEAVED.out.versions)
     } else {
         error 'Assembler not specified!'
@@ -368,7 +427,7 @@ workflow METATDENOVO {
     //
     // SUBWORKFLOW: run TRANSDECODER. Orf caller alternative for eukaryotes.
     //
-    if ( orf_caller == 'transdecoder' && ! ( params.user_orfs_gff ) ) {
+    if ( orf_caller == 'transdecoder' ) {
         TRANSDECODER ( ch_assembly_contigs.map { meta, contigs -> [ [id: "${assembly_name}.${orfs_name}" ], contigs ] } )
         ch_gff      = TRANSDECODER.out.gff
         ch_protein  = TRANSDECODER.out.pep
@@ -386,12 +445,8 @@ workflow METATDENOVO {
 
     // Populate channels if the user provided the orfs
     if ( params.user_orfs_faa && params.user_orfs_gff ) {
-        Channel
-            .value ( [ [ id: "${assembly_name}.${orfs_name}" ], file(params.user_orfs_gff) ] )
-            .set { ch_gff }
-        Channel
-            .value ( [ [ id: "${assembly_name}.${orfs_name}" ], file(params.user_orfs_faa) ] )
-            .set { ch_protein }
+        ch_gff = Channel.value ( [ [ id: "${assembly_name}.${orfs_name}" ], file(params.user_orfs_gff) ] )
+        ch_protein = Channel.value ( [ [ id: "${assembly_name}.${orfs_name}" ], file(params.user_orfs_faa) ] )
     }
 
     //
@@ -409,10 +464,9 @@ workflow METATDENOVO {
     //
     // SUBWORKFLOW: classify ORFs with a set of hmm files
     //
-    ch_hmmrs
+    ch_hmmclassify = ch_hmmrs
         .combine(ch_protein)
         .map { hmm, meta, protein ->[ [ id: "${assembly_name}.${orfs_name}" ], hmm, protein ] }
-        .set { ch_hmmclassify }
     HMMCLASSIFY ( ch_hmmclassify )
     ch_versions = ch_versions.mix(HMMCLASSIFY.out.versions)
 
@@ -423,13 +477,11 @@ workflow METATDENOVO {
     BAM_SORT_STATS_SAMTOOLS ( BBMAP_ALIGN.out.bam, ch_assembly_contigs )
     ch_versions = ch_versions.mix(BAM_SORT_STATS_SAMTOOLS.out.versions)
 
-    BAM_SORT_STATS_SAMTOOLS.out.bam
+    ch_featurecounts = BAM_SORT_STATS_SAMTOOLS.out.bam
         .combine(ch_gff.map { meta, bam -> bam } )
-        .set { ch_featurecounts }
 
-    ch_collect_stats
+    ch_collect_stats = ch_collect_stats
         .combine(BAM_SORT_STATS_SAMTOOLS.out.idxstats.collect { meta, idxstats -> idxstats }.map { [ it ] } )
-        .set { ch_collect_stats }
 
     FEATURECOUNTS_CDS ( ch_featurecounts)
     ch_versions       = ch_versions.mix(FEATURECOUNTS_CDS.out.versions)
@@ -437,20 +489,19 @@ workflow METATDENOVO {
     //
     // MODULE: Collect featurecounts output counts in one table
     //
-    FEATURECOUNTS_CDS.out.counts
+    ch_collect_feature = FEATURECOUNTS_CDS.out.counts
         .collect() { meta, featurecounts -> featurecounts }
         .map { featurecounts -> [ [ id:"${assembly_name}.${orfs_name}" ], featurecounts ] }
-        .set { ch_collect_feature }
 
     COLLECT_FEATURECOUNTS ( ch_collect_feature )
     ch_versions           = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
     ch_fcs_for_stats      = COLLECT_FEATURECOUNTS.out.counts.collect { meta, tsv -> tsv }.map { [ it ] }
     ch_fcs_for_summary    = COLLECT_FEATURECOUNTS.out.counts.map { meta, tsv -> tsv }
-    ch_collect_stats
-        .combine(ch_fcs_for_stats)
-        .set { ch_collect_stats }
+    ch_collect_stats = ch_collect_stats.combine(ch_fcs_for_stats)
 
+    // Initialize ch_merge_tables that will be populated with tables from annotation tools and used by the MERGE_TABLES module which output will then be passed to the COLLECT_STATS module
     ch_merge_tables = Channel.empty()
+
     //
     // SUBWORKFLOW: run eggnog_mapper on the ORF-called amino acid sequences
     //
@@ -460,14 +511,11 @@ workflow METATDENOVO {
         ch_merge_tables = ch_merge_tables.mix ( EGGNOG.out.sumtable.map { meta, tsv -> tsv } )
     }
 
-
     //
     // SUBWORKFLOW: run kofamscan on the ORF-called amino acid sequences
     //
     if( !params.skip_kofamscan ) {
-        ch_protein
-            .map { meta, protein -> [ meta, protein ] }
-            .set { ch_kofamscan }
+        ch_kofamscan = ch_protein.map { meta, protein -> [ meta, protein ] }
         KOFAMSCAN( ch_kofamscan, ch_fcs_for_summary)
         ch_versions = ch_versions.mix(KOFAMSCAN.out.versions)
         ch_merge_tables = ch_merge_tables.mix ( KOFAMSCAN.out.kofamscan_summary.map { meta, tsv -> tsv } )
@@ -489,21 +537,24 @@ workflow METATDENOVO {
     //
     ch_eukulele_db = Channel.empty()
     if( ! params.skip_eukulele ) {
+        // Make sure the eukulele_dbpath exists
+        d = new File("${params.eukulele_dbpath}")
+        if ( ! d.exists() ) {
+            d.mkdirs()
+        }
+
         // Create a channel for EUKulele either with a named database or not. The latter means a user-provided database in a directory.
         if ( params.eukulele_db ) {
-            Channel
+            ch_eukulele_db = Channel
                 .of ( params.eukulele_db )
                 .map { [ it, file(params.eukulele_dbpath) ] }
-                .set { ch_eukulele_db }
         } else {
-            Channel.fromPath(params.eukulele_dbpath, checkIfExists: true)
+            ch_eukulele_db = Channel.fromPath(params.eukulele_dbpath, checkIfExists: true)
                 .map { [ [], it ] }
-                .set { ch_eukulele_db }
         }
-        ch_protein
+        ch_eukulele = ch_protein
             .map { meta, protein -> [ [ id:"${meta.id}" ], protein ] }
             .combine( ch_eukulele_db )
-            .set { ch_eukulele }
         SUB_EUKULELE( ch_eukulele, ch_fcs_for_summary )
         ch_versions = ch_versions.mix(SUB_EUKULELE.out.versions)
         ch_merge_tables = ch_merge_tables.mix ( SUB_EUKULELE.out.taxonomy_summary.map { meta, tsv -> tsv } )
@@ -574,17 +625,12 @@ workflow METATDENOVO {
             .map { it -> [ [ id: "${assembly_name}.${orfs_name}" ], it ] }
     )
     MERGE_TABLES.out.merged_table
-        //.view { "merged0: ${it}" }
-        //.collect { meta, tblout -> tblout }
-        //.view { "merged1: ${it}" }
-        //.map { meta, tblout -> [ tblout ] }
-        //.view { "merged2: ${it}" }
+
     ch_collect_stats = ch_collect_stats
         .combine(
             Channel.empty()
                 .mix ( MERGE_TABLES.out.merged_table.map { meta, tblout -> [ tblout ] } )
                 .ifEmpty { [ [] ] }
-                //.map { [ it ] }
         )
     ch_versions     = ch_versions.mix(MERGE_TABLES.out.versions)
 

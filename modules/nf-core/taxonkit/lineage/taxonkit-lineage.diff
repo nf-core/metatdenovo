@@ -1,5 +1,5 @@
 Changes in component 'nf-core/taxonkit/lineage'
-'modules/nf-core/taxonkit/lineage/environment.yml' is unchanged
+'modules/nf-core/taxonkit/lineage/meta.yml' is unchanged
 Changes in 'taxonkit/lineage/main.nf':
 --- modules/nf-core/taxonkit/lineage/main.nf
 +++ modules/nf-core/taxonkit/lineage/main.nf
@@ -24,7 +24,7 @@ Changes in 'taxonkit/lineage/main.nf':
          --out-file ${prefix}.tsv \\
          ${taxid? "<<< '$taxid'": taxidfile}
 
-'modules/nf-core/taxonkit/lineage/meta.yml' is unchanged
-'modules/nf-core/taxonkit/lineage/tests/main.nf.test' is unchanged
+'modules/nf-core/taxonkit/lineage/environment.yml' is unchanged
 'modules/nf-core/taxonkit/lineage/tests/main.nf.test.snap' is unchanged
+'modules/nf-core/taxonkit/lineage/tests/main.nf.test' is unchanged
 ************************************************************

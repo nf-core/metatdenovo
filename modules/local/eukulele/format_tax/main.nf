@@ -33,7 +33,7 @@ process FORMAT_EUKULELE_TAX {
         select(-1) %>%
         rename(orf = transcript_name) %>%
         group_by(orf) %>%
-        filter(max_pid == max(max_pid)) %>%
+        filter(max_score == max(max_score)) %>%
         ungroup() %>%
         separate(
             full_classification,

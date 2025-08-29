@@ -5,12 +5,12 @@
   </picture>
 </h1>
 
-[![GitHub Actions CI Status](https://github.com/nf-core/metatdenovo/actions/workflows/ci.yml/badge.svg)](https://github.com/nf-core/metatdenovo/actions/workflows/ci.yml)
+[![GitHub Actions CI Status](https://github.com/nf-core/metatdenovo/actions/workflows/nf-test.yml/badge.svg)](https://github.com/nf-core/metatdenovo/actions/workflows/nf-test.yml)
 [![GitHub Actions Linting Status](https://github.com/nf-core/metatdenovo/actions/workflows/linting.yml/badge.svg)](https://github.com/nf-core/metatdenovo/actions/workflows/linting.yml)[![AWS CI](https://img.shields.io/badge/CI%20tests-full%20size-FF9900?labelColor=000000&logo=Amazon%20AWS)](https://nf-co.re/metatdenovo/results)[![Cite with Zenodo](http://img.shields.io/badge/DOI-10.5281/zenodo.10666590-1073c8?labelColor=000000)](https://doi.org/10.5281/zenodo.10666590)
 [![nf-test](https://img.shields.io/badge/unit_tests-nf--test-337ab7.svg)](https://www.nf-test.com)
 
-[![Nextflow](https://img.shields.io/badge/version-%E2%89%A524.04.2-green?style=flat&logo=nextflow&logoColor=white&color=%230DC09D&link=https%3A%2F%2Fnextflow.io)](https://www.nextflow.io/)
-[![nf-core template version](https://img.shields.io/badge/nf--core_template-3.3.1-green?style=flat&logo=nfcore&logoColor=white&color=%2324B064&link=https%3A%2F%2Fnf-co.re)](https://github.com/nf-core/tools/releases/tag/3.3.1)
+[![Nextflow](https://img.shields.io/badge/version-%E2%89%A524.10.5-green?style=flat&logo=nextflow&logoColor=white&color=%230DC09D&link=https%3A%2F%2Fnextflow.io)](https://www.nextflow.io/)
+[![nf-core template version](https://img.shields.io/badge/nf--core_template-3.3.2-green?style=flat&logo=nfcore&logoColor=white&color=%2324B064&link=https%3A%2F%2Fnf-co.re)](https://github.com/nf-core/tools/releases/tag/3.3.2)
 [![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)
 [![run with docker](https://img.shields.io/badge/run%20with-docker-0db7ed?labelColor=000000&logo=docker)](https://www.docker.com/)
 [![run with singularity](https://img.shields.io/badge/run%20with-singularity-1d355c.svg?labelColor=000000)](https://sylabs.io/docs/)
@@ -35,24 +35,25 @@ On release, automated continuous integration tests run the pipeline on a full-si
 5. Optional: Normalize the sequencing depth with [`BBnorm`](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbnorm-guide/)
 6. Merge trimmed, pair-end reads ([`Seqtk`](https://github.com/lh3/seqtk))
 7. Choice of de novo assembly programs:
-   1. [`RNAspades`](https://cab.spbu.ru/software/rnaspades/) suggested for Eukaryote de novo assembly
-   2. [`Megahit`](https://github.com/voutcn/megahit) suggested for Prokaryote de novo assembly
+   1. [`RNAspades`](https://cab.spbu.ru/software/rnaspades/) suggested for both prokaryote and eukaryote assembly
+   2. [`Megahit`](https://github.com/voutcn/megahit) suggested for both prokaryote and eukaryote assembly; requires less resources
 8. Choice of orf caller:
-   1. [`TransDecoder`](https://github.com/TransDecoder/TransDecoder) suggested for Eukaryotes
-   2. [`Prokka`](https://github.com/tseemann/prokka) suggested for Prokaryotes
-   3. [`Prodigal`](https://github.com/hyattpd/Prodigal) suggested for Prokaryotes
+   1. [`TransDecoder`](https://github.com/TransDecoder/TransDecoder) suggested for eukaryotes; only ORFs
+   2. [`Prokka`](https://github.com/tseemann/prokka) suggested for prokaryotes; ORFs and other features plus functional annotation
+   3. [`Prodigal`](https://github.com/hyattpd/Prodigal) suggested for Prokaryotes; only ORFs
 9. Quantification of genes identified in assemblies:
    1. Generate index of assembly ([`BBmap index`](https://sourceforge.net/projects/bbmap/))
    2. Mapping cleaned reads to the assembly for quantification ([`BBmap`](https://sourceforge.net/projects/bbmap/))
    3. Get raw counts per each gene present in the assembly ([`Featurecounts`](http://subread.sourceforge.net)) -> TSV table with collected featurecounts output
 10. Functional annotation:
-    1. [`Eggnog`](https://github.com/eggnogdb/eggnog-mapper) -> Reformat TSV output "eggnog table"
-    2. [`KOfamscan`](https://github.com/takaram/kofam_scan)
-    3. [`HMMERsearch`](https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch) -> Ranking orfs based on HMMprofile with [`Hmmrank`](https://github.com/erikrikarddaniel/hmmrank)
+    1. [`Prokka`](https://github.com/tseemann/prokka) feature identification and annotation for prokaryotes
+    2. [`eggNOG-mapper`](https://github.com/eggnogdb/eggnog-mapper)
+    3. [`KofamScan`](https://github.com/takaram/kofam_scan)
+    4. [`HMMER`](https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch) search ORFs with a set of HMM profiles, and rank results
 11. Taxonomic annotation:
-    1. [`EUKulele`](https://github.com/AlexanderLabWHOI/EUKulele) -> Reformat TSV output "Reformat_tax.R"
-    2. [`CAT`](https://github.com/dutilh/CAT)
-12. Summary statistics table. "Collect_stats.R"
+    1. [`EUKulele`](https://github.com/AlexanderLabWHOI/EUKulele)
+    2. [`Diamond`](https://github.com/bbuchfink/diamond)
+12. Summary statistics.
 
 ## Usage
 
@@ -64,15 +65,17 @@ First, prepare a samplesheet with your input data that looks as follows:
 `samplesheet.csv`:
 
 ```
-| sample   | fastq_1                   | fastq_2
-| -------- | ------------------------- | ------------------------- |
-| sample1  | ./data/S1_R1_001.fastq.gz | ./data/S1_R2_001.fastq.gz |
-| sample2  | ./data/S2_fw.fastq.gz     | ./data/S2_rv.fastq.gz     |
-| sample3  | ./S4x.fastq.gz            | ./S4y.fastq.gz            |
-| sample4  | ./a.fastq.gz              | ./b.fastq.gz              |
+sample,fastq_1,fastq_2
+sample1,./data/S1_R1_001.fastq.gz,./data/S1_R2_001.fastq.gz
+sample2,./data/S2_fw.fastq.gz,./data/S2_rv.fastq.gz
+sample3,./S4x.fastq.gz,./S4y.fastq.gz
+sample3,./a.fastq.gz,./b.fastq.gz
 ```
 
 Each row represents a fastq file (single-end) or a pair of fastq files (paired-end).
+The fastq files need to end with `.fq` or `.fastq`, followed by `.gz` if gzipped.
+Read files from multiple rows with the same sample name will be concatenated and treated as a single sample.
+A mix of single-end and paired-end files is allowed, but do not mix single-end and paired-end for the same sample name.
 
 Now, you can run the pipeline using:
 
@@ -95,7 +98,8 @@ For more details about the output files and reports, please refer to the
 [output documentation](https://nf-co.re/metatdenovo/output).
 
 > [!NOTE]
-> Tables in `summary_tables` directory under the output directory are made especially for further analysis in tools like R or Python.
+> Tables in the `summary_tables` directory under the output directory are made especially for further analysis in tools like R or Python.
+> Their formats are standardized and column names consistent between tables.
 
 ## Credits
 

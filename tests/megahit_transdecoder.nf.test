@@ -37,7 +37,7 @@ nextflow_pipeline {
                 ).match() },
                 { assert path("${params.outdir}/megahit/megahit_out/megahit_assembly.log").readLines().any { l -> l.contains('ALL DONE') } },
                 { assert path("${params.outdir}/megahit/megahit_out/megahit_assembly.contigs.fa.gz").linesGzip.size() > 3000 },
-                { assert path("${params.outdir}/samtools/megahit.SAMPLE1_PE.idxstats").readLines().size() > 1700 },
+                { assert path("${params.outdir}/samtools/megahit.SAMPLE1_PE.idxstats").readLines().size() > 1600 },
                 { assert path("${params.outdir}/transdecoder/megahit_assembly.contigs.fa.transdecoder.gff3.gz").linesGzip.findAll { l -> l.contains('CDS') }.size() > 2200 },
                 { assert path("${params.outdir}/summary_tables/megahit.transdecoder.counts.tsv.gz").linesGzip.size() > 2000 },
             )

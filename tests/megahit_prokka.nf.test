@@ -39,7 +39,7 @@ nextflow_pipeline {
                 { assert path("${params.outdir}/megahit/megahit_out/megahit_assembly.log").readLines().any { l -> l.contains('ALL DONE') } },
                 { assert path("${params.outdir}/megahit/megahit_out/megahit_assembly.contigs.fa.gz").linesGzip.size() > 3000 },
                 { assert path("${params.outdir}/prokka/prokka.gff.gz").linesGzip.size() > 2000 },
-                { assert path("${params.outdir}/samtools/megahit.SAMPLE1_PE.idxstats").readLines().size() > 1700 },
+                { assert path("${params.outdir}/samtools/megahit.SAMPLE1_PE.idxstats").readLines().size() > 1600 },
                 { assert path("${params.outdir}/summary_tables/megahit.prokka.counts.tsv.gz").linesGzip.size() > 2000 },
                 { assert path("${params.outdir}/summary_tables/megahit.prokka.prokka-annotations.tsv.gz").linesGzip.size() > 2000 },
             )

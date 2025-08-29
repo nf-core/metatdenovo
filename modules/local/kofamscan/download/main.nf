@@ -10,6 +10,7 @@ process KOFAMSCAN_DOWNLOAD {
     output:
     path "ko_list"     , emit: ko_list
     path "profiles"    , emit: koprofiles
+    path "versions.yml", emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -23,5 +24,10 @@ process KOFAMSCAN_DOWNLOAD {
 
     wget https://www.genome.jp/ftp/db/kofam/profiles.tar.gz
     tar -zxf profiles.tar.gz
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        wget: \$(wget --version 2>&1 | head -n 1 | awk '{print \$3}')
+    END_VERSIONS
     """
 }

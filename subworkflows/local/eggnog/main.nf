@@ -15,6 +15,7 @@ workflow EGGNOG {
     ch_versions = Channel.empty()
 
     EGGNOG_DOWNLOAD()
+    ch_versions = ch_versions.mix(EGGNOG_DOWNLOAD.out.versions)
 
     EGGNOG_DOWNLOAD.out.eggnog_db
         .combine(EGGNOG_DOWNLOAD.out.dmnd)

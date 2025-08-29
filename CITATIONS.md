@@ -30,7 +30,11 @@
 
 - [RNAspade](https://cab.spbu.ru/software/rnaspades/)
 
+  > Bankevich A, Nurk S, Antipov D, Gurevich AA, Dvorkin M, Kulikov AS, Lesin VM, Nikolenko SI, Pham S, Prjibelski AD, Pyshkin AV, Sirotkin AV, Vyahhi N, Tesler G, Alekseyev MA, Pevzner PA. SPAdes: a new genome assembly algorithm and its applications to single-cell sequencing. J Comput Biol. 2012 May;19(5):455-77. doi: 10.1089/cmb.2012.0021.
+  > Nurk S, Meleshko D, Korobeynikov A, Pevzner PA. metaSPAdes: a new versatile metagenomic assembler. Genome Res. 2017 May;27(5):824-834. doi: 10.1101/gr.213959.116. Epub 2017 Mar 15.
   > Bushmanova E, Antipov D, Lapidus A, Prjibelski A, rnaSPAdes: a de novo transcriptome assembler and its application to RNA-Seq data GigaScience, 2019
+  > Prjibelski, A., Antipov, D., Meleshko, D., Lapidus, A., & Korobeynikov, A. (2020). “Using SPAdes de novo assembler.” Current Protocols in Bioinformatics, 70, e102. doi: 10.1002/cpbi.102
+  > Antipov D, Raiko M, Lapidus A, Pevzner P, METAVIRALSPADES: assembly of viruses from metagenomic data, Bioinformatics, Volume 36, Issue 14, July 2020, Pages 4126–4129, https://doi.org/10.1093/bioinformatics/btaa490
 
 - [Megahit](https://github.com/voutcn/megahit)
 

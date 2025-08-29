@@ -1,0 +1,49 @@
+Changes in component 'nf-core/cat/fastq'
+'modules/nf-core/cat/fastq/meta.yml' is unchanged
+Changes in 'cat/fastq/main.nf':
+--- modules/nf-core/cat/fastq/main.nf
++++ modules/nf-core/cat/fastq/main.nf
+@@ -23,7 +23,13 @@
+     if (meta.single_end) {
+         if (readList.size >= 1) {
+             """
+-            cat ${readList.join(' ')} > ${prefix}.merged.fastq.gz
++            for f in ${readList.join(' ')}; do
++                if [ \$(echo \$f | grep '.gz\$') ]; then
++                    cat \$f >> ${prefix}.merged.fastq.gz
++                else
++                    gzip -c \$f >> ${prefix}.merged.fastq.gz
++                fi
++            done
+ 
+             cat <<-END_VERSIONS > versions.yml
+             "${task.process}":
+@@ -40,8 +46,21 @@
+             def read2 = []
+             readList.eachWithIndex { v, ix -> (ix & 1 ? read2 : read1) << v }
+             """
+-            cat ${read1.join(' ')} > ${prefix}_1.merged.fastq.gz
+-            cat ${read2.join(' ')} > ${prefix}_2.merged.fastq.gz
++            for f in ${read1.join(' ')}; do
++                if [ \$(echo \$f | grep '.gz\$') ]; then
++                    cat \$f >> ${prefix}_1.merged.fastq.gz
++                else
++                    gzip -c \$f >> ${prefix}_1.merged.fastq.gz
++                fi
++            done
++
++            for f in ${read2.join(' ')}; do
++                if [ \$(echo \$f | grep '.gz\$') ]; then
++                    cat \$f >> ${prefix}_2.merged.fastq.gz
++                else
++                    gzip -c \$f >> ${prefix}_2.merged.fastq.gz
++                fi
++            done
+ 
+             cat <<-END_VERSIONS > versions.yml
+             "${task.process}":
+
+'modules/nf-core/cat/fastq/environment.yml' is unchanged
+'modules/nf-core/cat/fastq/tests/main.nf.test.snap' is unchanged
+'modules/nf-core/cat/fastq/tests/main.nf.test' is unchanged
+************************************************************

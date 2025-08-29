@@ -38,7 +38,7 @@ nextflow_pipeline {
                 { assert path("${params.outdir}/spades/spades.spades.log").readLines().any { l -> l.contains('======= SPAdes pipeline finished.') } },
                 { assert path("${params.outdir}/spades/spades.assembly.gfa.gz").linesGzip.size() > 10000 },
                 { assert path("${params.outdir}/spades/spades.transcripts.fa.gz").linesGzip.size() > 3500 },
-                { assert path("${params.outdir}/samtools/spades.SAMPLE1_PE.idxstats").readLines().size() > 1700 },
+                { assert path("${params.outdir}/samtools/spades.SAMPLE1_PE.idxstats").readLines().size() > 1600 },
                 { assert path("${params.outdir}/prodigal/spades.prodigal.gff.gz").linesGzip.findAll { l -> l.contains('CDS') }.size() > 3000 },
                 { assert path("${params.outdir}/summary_tables/spades.prodigal.counts.tsv.gz").linesGzip.size() > 3000 },
             )

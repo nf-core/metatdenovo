@@ -23,22 +23,36 @@ process COLLECT_STATS {
 
     def read_trimlogs = ""
     if ( trimlogs ) {
-        read_trimlogs = """%>%
-        mutate(
-            d = map(
-                sample,
-                function(s) {
-                    read_tsv(
-                        pipe(sprintf("grep 'Reads written (passing filters)' %s_*_trimming_report.txt | sed 's/.*: *//' | sed 's/ .*//' | sed 's/,//g'", s)),
-                        col_names = c('n_trimmed'),
-                        col_types = 'i'
-                    ) %>%
-                        mutate(n_trimmed = n_trimmed * 2)
-                }
-            )
+        def se_trimlogs = samples
+            .findAll { s -> s.single_end }
+            .collect { s -> "'${s.id}', '${s.id}.*_trimming_report.txt', 1," }
+        def pe_trimlogs = samples
+            .findAll { s -> ! s.single_end }
+            .collect { s -> "'${s.id}', '${s.id}_1.*_trimming_report.txt', 2," }
+
+        read_trimlogs = """
+        trimming <- tribble(
+            ~sample, ~tlogglob, ~mult,
+            ${se_trimlogs.join("\n")}
+            ${pe_trimlogs.join("\n")}
         ) %>%
-        unnest(d)
+            mutate(
+                d = map(
+                    tlogglob,
+                    function(s) {
+                        read_tsv(
+                            pipe(sprintf("grep 'Reads written (passing filters)' %s | sed 's/.*: *//' | sed 's/ .*//' | sed 's/,//g'", s)),
+                            col_names = c('n_post_trimming'),
+                            col_types = 'i'
+                        )
+                    }
+                )
+            ) %>%
+            unnest(d) %>%
+            transmute(sample, n_post_trimming = n_post_trimming * mult)
         """
+    } else {
+        read_trimlogs = "trimming <- tibble(sample = character(), n_post_trimming = integer())"
     }
 
     if ( mergetab ) {
@@ -60,9 +74,9 @@ process COLLECT_STATS {
     library(tidyr)
     library(stringr)
 
-    start    <- tibble(sample = c("${samples.join('", "')}"))
+    start    <- tibble(sample = c("${samples.collect { s -> s.id }.join('", "')}"))
 
-    trimming <- tibble(sample = c("${samples.join('", "')}")) ${read_trimlogs}
+    ${read_trimlogs}
 
     idxs <- tibble(fname = Sys.glob('*.idxstats')) %>%
         mutate(
@@ -81,7 +95,6 @@ process COLLECT_STATS {
 
     counts <- read_tsv("${fcs}", col_types = 'cciicicid') %>%
         group_by(sample) %>% summarise(n_feature_count = sum(count))
-
 
     bbduk <- tibble(sample = character(), n_non_contaminated = integer())
     for ( f in Sys.glob('*.bbduk.log') ) {

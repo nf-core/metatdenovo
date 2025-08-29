@@ -17,6 +17,7 @@ workflow KOFAMSCAN {
     ch_versions = Channel.empty()
 
     KOFAMSCAN_DOWNLOAD()
+    ch_versions = ch_versions.mix(KOFAMSCAN_DOWNLOAD.out.versions)
 
     KOFAMSCAN_SCAN( kofamscan, KOFAMSCAN_DOWNLOAD.out.ko_list, KOFAMSCAN_DOWNLOAD.out.koprofiles )
     ch_versions = ch_versions.mix(KOFAMSCAN_SCAN.out.versions)

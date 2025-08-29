@@ -3,6 +3,31 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v1.3.0 - [29-08-2025]
+
+### `Added`
+
+### `Changed`
+
+- [#406](https://github.com/nf-core/metatdenovo/pull/406) - Updating modules and removing warnings before release 1.3.0 (@danilodileo)
+- [#405](https://github.com/nf-core/metatdenovo/pull/405) - Upgrade EUKulele to 2.1.2. This appears to fix problems with downloads of certain databases (@erikrikarddaniel)
+- [#404](https://github.com/nf-core/metatdenovo/pull/404) - Added new reference for SPAdes in CITATIONS.md (@danilodileo)
+- [#394](https://github.com/nf-core/metatdenovo/pull/394) - allow unzipped input files (@erikrikarddaniel)
+- [#389](https://github.com/nf-core/metatdenovo/pull/389) - template update to nf-core tools 3.3.2 plus module updates (@erikrikarddaniel)
+
+### `Fixed`
+
+- [#402](https://github.com/nf-core/metatdenovo/pull/402) - improve documentation for download of FigShare Diamond files (@erikrikarddaniel)
+- [#402](https://github.com/nf-core/metatdenovo/pull/402) - allow the BBNorm process to only use 0.8 of the allocated memory not to fail on oversubscription of memory (@erikrikarddaniel)
+- [#400](https://github.com/nf-core/metatdenovo/pull/400) - fix problems with `COLLECT_STATS` when single end reads are used; closes [#396](https://github.com/nf-core/metatdenovo/issues/396) (@erikrikarddaniel)
+- [#398](https://github.com/nf-core/metatdenovo/pull/398) - make sure the EUKulele database directory is created if it doesn't exist (@erikrikarddaniel)
+- [#391](https://github.com/nf-core/metatdenovo/pull/391),[#392](https://github.com/nf-core/metatdenovo/pull/392) - update the documentation and fix some inconsistencies in which output files are saved (@erikrikarddaniel)
+- [#390](https://github.com/nf-core/metatdenovo/pull/390) - remove resource limits on full scale AWS tests to make it work (@erikrikarddaniel)
+
+### `Dependencies`
+
+### `Deprecated`
+
 ## v1.2.0 - [2025-06-18]
 
 ### `Added`

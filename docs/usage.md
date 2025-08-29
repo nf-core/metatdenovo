@@ -27,7 +27,10 @@ nextflow run nf-core/metatdenovo -profile docker --outdir results/ --input sampl
 
 ### Samplesheet input
 
-You will need to create a samplesheet with information about the samples you would like to analyse before running the pipeline. Use this parameter to specify its location. It must be a comma-separated file with 3 columns, and a header row as shown in the examples below
+You will need to create a samplesheet with information about the samples you would like to analyse before running the pipeline.
+Use this parameter to specify its location.
+It must be a comma-separated file with 3 columns, and a header row as shown in the examples below.
+The input fastq files need to have names ending with `.fastq` or `.fq`, followed by `.gz` if gzipped.
 
 ```csv title="samplesheet.csv"
 sample,fastq_1,fastq_2
@@ -58,8 +61,8 @@ T24c,AEG588A6_S3_L002_R1_001.fastq.gz,AEG588A6_S3_L002_R2_001.fastq.gz
 | Column    | Description                                                                                                                                                                            |
 | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `sample`  | Custom sample name. This entry will be identical for multiple sequencing libraries/runs from the same sample. Spaces in sample names are automatically converted to underscores (`_`). |
-| `fastq_1` | Full path to FastQ file for Illumina short reads 1. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                             |
-| `fastq_2` | Full path to FastQ file for Illumina short reads 2. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                             |
+| `fastq_1` | Full path to FastQ file for Illumina short reads 1. The file has to have the extension ".fastq" or ".fq", followed by ".gz" if gzipped.                                                |
+| `fastq_2` | Full path to FastQ file for Illumina short reads 2. The file has to have the extension ".fastq" or ".fq", followed by ".gz" if gzipped.                                                |
 
 An [example samplesheet](../assets/samplesheet.csv) has been provided with the pipeline.
 
@@ -74,17 +77,24 @@ T0a,AEG588A1_S1_L003_R1_001.fastq.gz,AEG588A1_S1_L003_R2_001.fastq.gz
 T0a,AEG588A1_S1_L004_R1_001.fastq.gz,AEG588A1_S1_L004_R2_001.fastq.gz
 ```
 
+#### Paired end, single end or a mix is allowed
+
+The samplesheet may contain either paired end reads (as in the examples above), single end reads or a mixture.
+For single end reads, supply the read file in the `fastq_1` field and leave `fastq_2` empty.
+_Do not mix single end and pairs for the same sample!_
+
 ### Filter/remove sequences from the samples (e.g. rRNA sequences with SILVA database)
 
 The pipeline can remove potential contaminants using the BBduk program.
-Specify a fasta file, gzipped or not, with the --sequence_filter sequences.fasta parameter.
+Specify a fasta file, gzipped or not, with `--sequence_filter sequences.fasta`.
 For further documentation, see the [BBduk official website](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbduk-guide/).
 
 ### Digital normalization
 
 Metatdenovo can perform "digital normalization" of the reads before the assembly.
-This will reduce coverage of highly abundant sequences and remove sequences that are below a threshold, and can be useful if the data set is too large to assemble but also potentially improve an assembly.
-N.B. the digital normalization is done only for the assembly and the full set of sequences will be used for quantification.
+This will reduce coverage of highly abundant sequences and remove sequences that are below a threshold.
+This is normally used if the data set is too large to assemble but can potentially improve an assembly by reducing the coverage of very abundant sequences.
+N.B. digitally normalized reads are used only for the assembly and the full set of sequences will be used for quantification.
 To turn on digital normalization, use the `--bbnorm` parameter and, if required, adjust the `--bbnorm_target` and `--bbnorm_min` parameters.
 
 > Please, check the [bbnorm](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbnorm-guide/) documentation for further information about these programs and how digital normalization works. Remember to check [Parameters](https://nf-co.re/metatdenovo/parameters) page for the all options that can be used for this step.
@@ -94,18 +104,23 @@ To turn on digital normalization, use the `--bbnorm` parameter and, if required,
 By default, the pipeline uses Megahit (`--assembler megahit`) to assemble the cleaned and trimmed reads to create the reference contigs.
 Megahit is fast and it does not require a lot of memory to run, making it ideal for large sets of samples.
 The workflow also supports Spades (`--assembler spades` ) as an alternative.
-If you work with virus RNA you can specify that by using the Spades option `--spades_flavor rnaviral` (see [parameter documentation](/metatdenovo/parameters/#spades_flavor))
+The default "flavour" of Spades is set to RNA, but this can be changed using the `--spades_flavor` parameter (see [parameter documentation](/metatdenovo/parameters/#spades_flavor))
 
-You can also choose to input contigs from an assembly that you made outside the pipeline using the `--assembly file.fna` (where `file.fna` is the name of a fasta file with contigs) option.
+You can also choose to input contigs from an assembly that you made outside the pipeline using the `--user_assembly file.fna.gz` (where `file.fna.gz` is the name of a fasta file with contigs) parameter.
+When you use your own assembly, the name of this -- used in output file names -- can be set using the `--user_assembly_name` parameter.
 
 ### ORF caller options
 
 By default, the pipeline uses prodigal (`--orf_caller prodigal` ) to call genes/ORFs from the assembly.
 This is suitable for prokaryotes, as is the Prokka alternative (`--orf_caller prokka`).
-The latter uses Prodigal internally making it suitable for prokaryotic genes.
+The latter uses Prodigal to identify ORFs, but also identifies other types of features.
 It also performs functional annotation of ORFs.
 
 For eukaryotic genes, we recommend users to use Transdecoder (`--orf_caller transdecoder`) to call ORFs.
+
+You can provide a set of ORFs to the pipeline using the `--user_orfs_faa orfs.faa.gz` and `--user_orfs_gff orfs.gff.gz`
+for an amino acid fasta file and a gff file respectively.
+The name used in filenames for user provided ORFs can be set using `--user_orfs_name` parameter.
 
 ### Taxonomic annotation options
 
@@ -146,10 +161,11 @@ conda activate EUKulele
 ```bash
 mkdir eukulele
 cd eukulele
-EUKulele download --database mmetsp (you can use the name of the database you would like to download)
+EUKulele download --database mmetsp
+EUKulele download --database gtdb
 ```
 
-- There are some cases when even after the download, EUKulele doesn't produce the correct files. In these cases you will end up with the `reference.pep.fa` file only. To fix the problematic database tables follow this instruction (this example is made with mmetsp but you can check EUKulele documentation for other databases since it can be slightly different!):
+- Sometimes after the download, EUKulele doesn't produce the correct files. In these cases you will end up with the `reference.pep.fa` file only. To fix the problematic database tables follow this instruction (this example is made with mmetsp but you can check EUKulele documentation for other databases since it can be slightly different!):
 
 ```bash
 mkdir mmetsp
@@ -165,13 +181,16 @@ create_protein_table.py --infile_peptide reference.pep.fa \
 #### Taxonomic annotation with Diamond
 
 The Diamond taxonomy-annotation process uses Diamond database files (`.dmnd` files) that have been prepared with taxonomy information.
-Currently we are not supplying any standard databases, but we hope to be able to do so soon.
-To make a database, you will need to collect four files: a protein fasta file, the `names.dmp` and `nodes.dmp` files from an NCBI-style taxon dump plus
-a mapping file in which protein accessions are translated into taxon ids.
+Currently we are only supplying a single standard databases, for GTDB release R09-RS220.
+This is provided in collaboration with SciLifeLab Data Center and can be downloaded from here: [GTDB (R09RS220) taxonomy database](https://figshare.scilifelab.se/articles/dataset/nf-core_metatdenovo_taxonomy/28211678), DOI: https://doi.org/10.17044/scilifelab.28211678.
+We hope to add more later.
+
+To make your own database, you will need to collect four files: a protein fasta file, the `names.dmp` and `nodes.dmp` files from an
+NCBI-style taxon dump plus a mapping file in which protein accessions are translated into taxon ids.
 As an example, you can download the [NCBI NR database in fasta format](ftp://ftp.ncbi.nih.gov/blast/db/FASTA/nr.gz), the
 [taxonomy dump](ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz) and the [mapping file](ftp://ftp.ncbi.nih.gov/pub/taxonomy/accession2taxid/).
 (_Note_ that the mapping file is actually several files that need to be first downloaded, the concatenated into one.)
-After this, you can run `diamond makedb` with the proper parameters (see example below) to create your database.
+After this, you can run `diamond makedb` with the proper parameters to create your database.
 Here's the whole procedure for the NCBI NR example (worked for us in January 2025; things might change):
 
 ```bash
@@ -191,7 +210,12 @@ wget ftp://ftp.ncbi.nih.gov/pub/taxonomy/accession2taxid/prot.accession2taxid.FU
 gunzip -c nr.gz | sed '/^>/s/ .*//' | diamond makedb --taxonmap prot.accession2taxid.FULL.gz --taxonnames names.dmp --taxonnodes nodes.dmp --db ncbi-nr.taxonomy.dmnd
 ```
 
-We are also, in collaboration with SciLifeLab Data Center, providing a [GTDB (R09RS220) taxonomy database](https://figshare.scilifelab.se/articles/dataset/nf-core_metatdenovo_taxonomy/28211678), DOI: https://doi.org/10.17044/scilifelab.28211678.
+We are also, in collaboration with SciLifeLab Data Center, providing a [GTDB (R09RS220) taxonomy database](https://figshare.scilifelab.se/articles/dataset/nf-core*metatdenovo_taxonomy/28211678), DOI: https://doi.org/10.17044/scilifelab.28211678.
+
+_Note_: If you can't download the files from FigShare from the command line with `wget` or `curl`, try URLs looking like
+`https://ndownloader.figshare.com/files/52095806` instead of the ones you get from the web page.
+Also note, that the files do not get the correct file names when you download from the command line.
+Use a command like `wget -O gtdb-r220.names.dmp https://ndownloader.figshare.com/files/52095806`.
 
 After creating one or more databases, you can provide them to the pipeline by filling out a file looking like the below and providing that to the pipeline
 with `--diamond_dbs diamond_dbs.csv` (see the parameter documentation).
@@ -223,17 +247,20 @@ This process is a bit unstable though.
 
 ### Functional annotation options
 
-Besides the functional annotation that the gene caller Prokka gives (see above) there are two general purpose functional annotation programs available
-in the workflow: the [eggNOG-mapper](http://eggnog-mapper.embl.de/) and [KofamScan](https://github.com/takaram/kofam_scan).
+Besides the functional annotation that the gene caller Prokka gives (see above) there are two general purpose functional annotation
+programs available in the workflow: the [eggNOG-mapper](http://eggnog-mapper.embl.de/) and
+[KofamScan](https://github.com/takaram/kofam_scan).
 Both are suitable for both prokaryotic and eukaryotic genes and both are run by default, but can be skipped using the `--skip_eggnog` and
 `--skip_kofamscan` options respectivelly.
 The tools use large databases which are downloaded automatically but paths can be provided by the user through the `--eggnog_dbpath directory`
 and `--kofam_dir dir` parameters respectively.
+It is practical to let the pipeline download the files on the first run, and then reuse the data by setting the parameters.
 
 A more targeted annotation option offered by the workflow is the possibility for the user to provide a set of
-[HMMER HMM profiles](http://eddylab.org/software/hmmer/Userguide.pdf) through the `--hmmdir dir` or `hmmfiles file0.hmm,file1.hmm,...,filen.hmm` parameters.
-Each HMM file will be used to search the amino acid sequences of the ORF set and the results will be summarized in a tab separated file in which each
-ORF-HMM combination will be ranked according to score and E-value.
+[HMMER HMM profiles](http://eddylab.org/software/hmmer/Userguide.pdf) through the `--hmmdir dir` or `hmmfiles file0.hmm,file1.hmm,...,filen.hmm`
+parameters.
+Each HMM file will be used to search the amino acid sequences of the ORF set and the results will be summarized in a tab separated file in
+which each ORF-HMM combination will be ranked according to score and E-value.
 
 #### How to manually download the databases for functional annotation
 
@@ -241,7 +268,8 @@ There are some cases (e.g. offline run) where you prefer to download the databas
 
 ##### Eggnog databases
 
-For `eggnog-mapper` the easiest way is to use `download_eggnog_data.py` provided when you install locally eggnog-mapper (documentation [here](https://github.com/eggnogdb/eggnog-mapper/wiki/eggNOG-mapper-v2.1.5-to-v2.1.12#user-content-Installation)).
+For `eggnog-mapper` the easiest way is to use `download_eggnog_data.py` provided when you install eggnog-mapper locally (documentation
+[here](https://github.com/eggnogdb/eggnog-mapper/wiki/eggNOG-mapper-v2.1.5-to-v2.1.12#user-content-Installation)).
 
 First, install eggnog-mapper:
 
@@ -255,11 +283,12 @@ Then, you can download all databases available
  download_eggnog_data.py
 ```
 
-You can select which database you want to download (read eggnog-mapper docs) but you need to be sure you will store them in a directory that will be called with the option `--eggnog_dbpath`
+You can select which database you want to download (read eggnog-mapper docs) but you need to be sure you will store them in a directory that
+will be called with the option `--eggnog_dbpath`
 
 ##### Kofamscan databases
 
-No need installation. You can use `wget` to download the file in a new directory that will be used with `--kofamscan_dbpath`
+You can use `wget` to download the file in a new directory that will be used with `--kofamscan_dbpath`
 
 ```bash
 wget https://www.genome.jp/ftp/db/kofam/ko_list.gz
@@ -286,9 +315,8 @@ work                # Directory containing the nextflow working files
 # Other nextflow hidden files, eg. history of pipeline runs and old logs.
 ```
 
-If you wish to repeatedly use the same parameters for multiple runs, rather than specifying each flag in the command, you can specify these in a params file.
-
-Pipeline settings can be provided in a `yaml` or `json` file via `-params-file <file>`.
+If you wish to repeatedly use the same parameters for multiple runs, rather than specifying each flag in the command, you can specify these
+in a parameter `yml` or `json` file and specify this to the pipeline with `-params-file params.yml`.
 
 > [!WARNING]
 > Do not use `-c <file>` to specify parameters as this will result in errors. Custom config files specified with `-c` must only be used for [tuning process resource specifications](https://nf-co.re/docs/usage/configuration#tuning-workflow-resources), other infrastructural tweaks (such as output directories), or module arguments (args).
@@ -310,7 +338,7 @@ eukulele_db: 'gtdb'
 <...>
 ```
 
-You can also generate such `YAML`/`JSON` files via [nf-core/launch](https://nf-co.re/launch).
+You can also generate such `YAML` or `JSON` files via [nf-core/launch](https://nf-co.re/launch).
 
 ### Updating the pipeline
 
