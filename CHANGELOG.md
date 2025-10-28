@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Changed`
 
-- [#416](https://github.com/nf-core/metatdenovo/pull/416) - Better content pipeline tests
+- [#416](https://github.com/nf-core/metatdenovo/pull/416) - Better content pipeline integration tests
 
 ### `Fixed`
 

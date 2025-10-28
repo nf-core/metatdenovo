@@ -194,6 +194,7 @@
             [
                 "orf\tchr\tstart\tend\tstrand\tlength\tsample\tcount\ttpm"
             ],
+            3000000,
             4,
             [
                 "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count"
@@ -203,9 +204,9 @@
             ]
         ],
         "meta": {
-            "nf-test": "0.9.2",
-            "nextflow": "25.04.6"
+            "nf-test": "0.9.3",
+            "nextflow": "25.10.0"
         },
-        "timestamp": "2025-08-28T09:53:40.951184866"
+        "timestamp": "2025-10-28T16:50:14.520429699"
     }
 }
