@@ -35,6 +35,7 @@ nextflow_pipeline {
                     path("${params.outdir}/summary_tables/megahit.prodigal.hmmrank.tsv.gz").linesGzip.size(),
                     path("${params.outdir}/summary_tables/megahit.prodigal.hmmrank.tsv.gz").linesGzip.findAll { l -> l.contains('PF00848') }.size(),
                     path("${params.outdir}/summary_tables/megahit.prodigal.overall_stats.tsv.gz").linesGzip.size(),
+                    path("${params.outdir}/summary_tables/megahit.prodigal.overall_stats.tsv.gz").csv(sep: '\t', decompress: true, header: true).columns["n_post_trimming"].sum(),
                     path("${params.outdir}/summary_tables/megahit.prodigal.overall_stats.tsv.gz").linesGzip.findAll { l -> l.contains('n_feature_count') },
                 ).match() },
                 { assert path("${params.outdir}/megahit/megahit_out/megahit_assembly.log").readLines().any { l -> l.contains('ALL DONE') } },
