@@ -215,6 +215,7 @@
             [
                 "orf\tchr\tstart\tend\tstrand\tlength\tsample\tcount\ttpm"
             ],
+            3000000,
             4,
             1,
             4,
@@ -227,6 +228,6 @@
             "nf-test": "0.9.3",
             "nextflow": "25.10.0"
         },
-        "timestamp": "2025-10-28T15:20:36.660425043"
+        "timestamp": "2025-10-28T15:52:02.611066395"
     }
 }
