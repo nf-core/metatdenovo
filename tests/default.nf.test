@@ -44,7 +44,6 @@ nextflow_pipeline {
                 { assert path("${params.outdir}/samtools/megahit.SAMPLE1_PE.idxstats").readLines().size() > 1600 },
                 { assert path("${params.outdir}/prodigal/megahit.prodigal.gff.gz").linesGzip.findAll { l -> l.contains('CDS') }.size() > 3000 },
                 { assert path("${params.outdir}/summary_tables/megahit.prodigal.counts.tsv.gz").linesGzip.size() > 3000 },
-                { assert path("${params.outdir}/summary_tables/megahit.prodigal.counts.tsv.gz").linesGzip.size() > 3000 },
                 { assert path("${params.outdir}/summary_tables/megahit.prodigal.counts.tsv.gz").csv(sep: '\t', decompress: true, header: true).columns["count"].sum() > 28000 },
             )
         }
