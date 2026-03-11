@@ -5,6 +5,7 @@
         "https://github.com/nf-core/modules.git": {
             "modules": {
                 "nf-core": {
+<<<<<<< HEAD
                     "bbmap/align": {
                         "branch": "master",
                         "git_sha": "41dfa3f7c0ffabb96a6a813fe321c6d1cc5b6e46",
@@ -45,11 +46,20 @@
                     "hmmer/hmmsearch": {
                         "branch": "master",
                         "git_sha": "41dfa3f7c0ffabb96a6a813fe321c6d1cc5b6e46",
+=======
+                    "fastqc": {
+                        "branch": "master",
+                        "git_sha": "41dfa3f7c0ffabb96a6a813fe321c6d1cc5b6e46",
+>>>>>>> TEMPLATE
                         "installed_by": ["modules"]
                     },
                     "multiqc": {
                         "branch": "master",
+<<<<<<< HEAD
                         "git_sha": "a4488d3d09244f29fb4606ba4eef85d59dcc6ad8",
+=======
+                        "git_sha": "af27af1be706e6a2bb8fe454175b0cdf77f47b49",
+>>>>>>> TEMPLATE
                         "installed_by": ["modules"]
                     },
                     "pigz/compress": {
@@ -155,6 +165,25 @@
                     "utils_nfschema_plugin": {
                         "branch": "master",
                         "git_sha": "dcd088f483cede0c3df4034d405126f05a764cc7",
+                        "installed_by": ["subworkflows"]
+                    }
+                }
+            },
+            "subworkflows": {
+                "nf-core": {
+                    "utils_nextflow_pipeline": {
+                        "branch": "master",
+                        "git_sha": "05954dab2ff481bcb999f24455da29a5828af08d",
+                        "installed_by": ["subworkflows"]
+                    },
+                    "utils_nfcore_pipeline": {
+                        "branch": "master",
+                        "git_sha": "271e7fc14eb1320364416d996fb077421f3faed2",
+                        "installed_by": ["subworkflows"]
+                    },
+                    "utils_nfschema_plugin": {
+                        "branch": "master",
+                        "git_sha": "4b406a74dc0449c0401ed87d5bfff4252fd277fd",
                         "installed_by": ["subworkflows"]
                     }
                 }
