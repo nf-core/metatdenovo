@@ -57,15 +57,12 @@ nextflow_workflow {
                 input[0] = workflow
                 input[1] = validate_params
                 input[2] = ""
-<<<<<<< HEAD
-=======
                 input[3] = false
                 input[4] = false
                 input[5] = false
                 input[6] = ""
                 input[7] = ""
                 input[8] = ""
->>>>>>> TEMPLATE
                 """
             }
         }
@@ -92,15 +89,12 @@ nextflow_workflow {
                 input[0] = workflow
                 input[1] = validate_params
                 input[2] = "${projectDir}/subworkflows/nf-core/utils_nfschema_plugin/tests/nextflow_schema.json"
-<<<<<<< HEAD
-=======
                 input[3] = false
                 input[4] = false
                 input[5] = false
                 input[6] = ""
                 input[7] = ""
                 input[8] = ""
->>>>>>> TEMPLATE
                 """
             }
         }
@@ -127,15 +121,12 @@ nextflow_workflow {
                 input[0] = workflow
                 input[1] = validate_params
                 input[2] = "${projectDir}/subworkflows/nf-core/utils_nfschema_plugin/tests/nextflow_schema.json"
-<<<<<<< HEAD
-=======
                 input[3] = false
                 input[4] = false
                 input[5] = false
                 input[6] = ""
                 input[7] = ""
                 input[8] = ""
->>>>>>> TEMPLATE
                 """
             }
         }
@@ -147,8 +138,6 @@ nextflow_workflow {
             )
         }
     }
-<<<<<<< HEAD
-=======
 
     test("Should create a help message") {
 
@@ -181,5 +170,4 @@ nextflow_workflow {
             )
         }
     }
->>>>>>> TEMPLATE
 }

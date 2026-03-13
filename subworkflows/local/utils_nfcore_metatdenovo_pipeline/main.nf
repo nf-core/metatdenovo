@@ -194,10 +194,6 @@ workflow PIPELINE_COMPLETION {
 // Check and validate pipeline parameters
 //
 def validateInputParameters() {
-<<<<<<< HEAD
-=======
-    genomeExistsError()
->>>>>>> TEMPLATE
 }
 
 //

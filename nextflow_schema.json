@@ -204,23 +204,8 @@
                 },
                 "save_formatspades": {
                     "type": "boolean",
-<<<<<<< HEAD
                     "description": "Save the formatted spades fasta file",
                     "fa_icon": "fas fa-download"
-=======
-                    "description": "Do not load the iGenomes reference config.",
-                    "fa_icon": "fas fa-ban",
-                    "hidden": true,
-                    "help_text": "Do not load `igenomes.config` when running the pipeline. You may choose this option if you observe clashes between custom parameters and those supplied in `igenomes.config`."
-                },
-                "igenomes_base": {
-                    "type": "string",
-                    "format": "directory-path",
-                    "description": "The base path to the igenomes reference files",
-                    "fa_icon": "fas fa-ban",
-                    "hidden": true,
-                    "default": "s3://ngi-igenomes/igenomes/"
->>>>>>> TEMPLATE
                 }
             },
             "fa_icon": "fas fa-bezier-curve"
@@ -544,23 +529,11 @@
                     "default": "https://raw.githubusercontent.com/nf-core/test-datasets/",
                     "hidden": true
                 },
-<<<<<<< HEAD
-=======
-                "pipelines_testdata_base_path": {
-                    "type": "string",
-                    "fa_icon": "far fa-check-circle",
-                    "description": "Base URL or local path to location of pipeline test dataset files",
-                    "default": "https://raw.githubusercontent.com/nf-core/test-datasets/",
-                    "hidden": true
-                },
->>>>>>> TEMPLATE
                 "trace_report_suffix": {
                     "type": "string",
                     "fa_icon": "far calendar",
                     "description": "Suffix to add to the trace report filename. Default is the date and time in the format yyyy-MM-dd_HH-mm-ss.",
                     "hidden": true
-<<<<<<< HEAD
-=======
                 },
                 "help": {
                     "type": ["boolean", "string"],
@@ -573,7 +546,6 @@
                 "show_hidden": {
                     "type": "boolean",
                     "description": "Display hidden parameters in the help message (only works when --help or --help_full are provided)."
->>>>>>> TEMPLATE
                 }
             }
         }
@@ -583,7 +555,6 @@
             "$ref": "#/$defs/input_output_options"
         },
         {
-<<<<<<< HEAD
             "$ref": "#/$defs/quality_control_options"
         },
         {
@@ -614,14 +585,6 @@
             "$ref": "#/$defs/institutional_config_options"
         },
         {
-=======
-            "$ref": "#/$defs/reference_genome_options"
-        },
-        {
-            "$ref": "#/$defs/institutional_config_options"
-        },
-        {
->>>>>>> TEMPLATE
             "$ref": "#/$defs/generic_options"
         }
     ]
