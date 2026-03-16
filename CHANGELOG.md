@@ -12,6 +12,7 @@ Initial release of nf-core/metatdenovo, created with the [nf-core](https://nf-co
 ### `Changed`
 
 - [#416](https://github.com/nf-core/metatdenovo/pull/416) - Better content pipeline integration tests
+- [#428](https://github.com/nf-core/metatdenovo/pull/428) - template update to nf-core tools 3.5.2 (@danilodileo)
 
 ### `Fixed`
 
