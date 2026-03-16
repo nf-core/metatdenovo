@@ -205,7 +205,6 @@
                 "trimgalore/fastqc/SAMPLE3_PE_1_2_val_2_fastqc.zip"
             ],
             [
-                "multiqc.parquet:md5,609fa5f10b969ba985f8f3d165d674da",
                 "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f",
                 "versions.yml:md5,069fffe1c38bd4bbce26b40bcc449fb2"
             ],
@@ -226,6 +225,6 @@
             "nf-test": "0.9.3",
             "nextflow": "25.10.4"
         },
-        "timestamp": "2026-03-16T09:33:41.742111905"
+        "timestamp": "2026-03-16T10:56:55.848530246"
     }
 }

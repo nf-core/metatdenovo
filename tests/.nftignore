@@ -23,6 +23,7 @@ multiqc/multiqc_data/multiqc_sources.txt
 multiqc/multiqc_data/prokka_plot.txt
 multiqc/multiqc_plots/{svg,pdf,png}/*.{svg,pdf,png}
 multiqc/multiqc_report.html
+multiqc/multiqc_data/multiqc.parquet
 pipeline_info/*.{html,json,txt,yml}
 prodigal/*.gz
 prokka/*.gz
