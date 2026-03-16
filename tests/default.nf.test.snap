@@ -205,8 +205,8 @@
                 "trimgalore/fastqc/SAMPLE3_PE_1_2_val_2_fastqc.zip"
             ],
             [
-                "multiqc.parquet:md5,1c7dded518c6e98f09cfc1a492520402",
-                "multiqc_citations.txt:md5,d41d8cd98f00b204e9800998ecf8427e",
+                "multiqc.parquet:md5,609fa5f10b969ba985f8f3d165d674da",
+                "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f",
                 "versions.yml:md5,069fffe1c38bd4bbce26b40bcc449fb2"
             ],
             16,
