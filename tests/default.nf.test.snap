@@ -14,9 +14,6 @@
                 "BBMAP_INDEX": {
                     "bbmap": 39.18
                 },
-                "CAT_FASTQ": {
-                    "cat": 9.5
-                },
                 "COLLECT_FEATURECOUNTS": {
                     "R": "4.2.3",
                     "dplyr": "1.1.2",
@@ -130,12 +127,12 @@
                 "megahit/megahit_out/megahit_assembly.log",
                 "multiqc",
                 "multiqc/multiqc_data",
-                "multiqc/multiqc_data/BETA-multiqc.parquet",
                 "multiqc/multiqc_data/bbduk-filtered-barplot_Bases.txt",
                 "multiqc/multiqc_data/bbduk-filtered-barplot_Reads.txt",
                 "multiqc/multiqc_data/bbduk.txt",
                 "multiqc/multiqc_data/llms-full.txt",
                 "multiqc/multiqc_data/multiqc.log",
+                "multiqc/multiqc_data/multiqc.parquet",
                 "multiqc/multiqc_data/multiqc_citations.txt",
                 "multiqc/multiqc_data/multiqc_data.json",
                 "multiqc/multiqc_data/multiqc_general_stats.txt",
@@ -208,7 +205,8 @@
                 "trimgalore/fastqc/SAMPLE3_PE_1_2_val_2_fastqc.zip"
             ],
             [
-                "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f",
+                "multiqc.parquet:md5,1c7dded518c6e98f09cfc1a492520402",
+                "multiqc_citations.txt:md5,d41d8cd98f00b204e9800998ecf8427e",
                 "versions.yml:md5,069fffe1c38bd4bbce26b40bcc449fb2"
             ],
             16,
@@ -226,8 +224,8 @@
         ],
         "meta": {
             "nf-test": "0.9.3",
-            "nextflow": "25.10.0"
+            "nextflow": "25.10.4"
         },
-        "timestamp": "2025-10-28T15:52:02.611066395"
+        "timestamp": "2026-03-16T09:33:41.742111905"
     }
 }
