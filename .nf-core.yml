@@ -2,7 +2,7 @@ lint:
   files_unchanged:
     - assets/nf-core-metatdenovo_logo_light.png
     - docs/images/nf-core-metatdenovo_logo_light.png
-nf_core_version: 3.3.2
+nf_core_version: 3.5.2
 repository_type: pipeline
 template:
   author: Danilo Di Leo, Emelie Nilsson & Daniel Lundin

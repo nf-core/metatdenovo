@@ -64,7 +64,10 @@ workflow {
         args,
         params.outdir,
         params.input,
-        params.diamond_dbs
+        params.diamond_dbs,
+        params.help,
+        params.help_full,
+        params.show_hidden
     )
 
     //
