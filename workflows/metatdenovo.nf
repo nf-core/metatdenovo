@@ -180,7 +180,6 @@ workflow METATDENOVO {
     CAT_FASTQ (
         ch_fastq.multiple
     )
-    ch_versions = ch_versions.mix(CAT_FASTQ.out.versions.first())
 
     ch_versions = channel.empty()
     ch_multiqc_files = channel.empty()
@@ -203,7 +202,7 @@ workflow METATDENOVO {
                     return [ meta, fastqs ]
         }
     PIGZ_PE_READS_FWD(fwd.unzipped)
-    ch_versions      = ch_versions.mix(PIGZ_PE_READS_FWD.out.versions)
+    // ch_versions      = ch_versions.mix(PIGZ_PE_READS_FWD.out.versions)
 
     // Paired end, reverse
     rev = ch_fastq.single
@@ -217,7 +216,7 @@ workflow METATDENOVO {
                     return [ meta, fastqs ]
         }
     PIGZ_PE_READS_REV(rev.unzipped)
-    ch_versions      = ch_versions.mix(PIGZ_PE_READS_REV.out.versions)
+    // ch_versions      = ch_versions.mix(PIGZ_PE_READS_REV.out.versions)
 
     // Single end
     se = ch_fastq.single
@@ -231,7 +230,7 @@ workflow METATDENOVO {
                     return [ meta, fastqs ]
         }
     PIGZ_SE_READS(se.unzipped)
-    ch_versions      = ch_versions.mix(PIGZ_SE_READS.out.versions)
+    // ch_versions      = ch_versions.mix(PIGZ_SE_READS.out.versions)
 
     // Join the three channels with the originally zipped to form a new ch_fastq of the same structure as the original
     ch_fastq = fwd.zipped.concat(PIGZ_PE_READS_FWD.out.archive)
@@ -252,7 +251,7 @@ workflow METATDENOVO {
         params.skip_fastqc || params.skip_qc,
         params.skip_trimming
     )
-    ch_versions = ch_versions.mix(FASTQC_TRIMGALORE.out.versions)
+    // ch_versions = ch_versions.mix(FASTQC_TRIMGALORE.out.versions)
 
     ch_collect_stats = ch_fastq
         .collect { meta, fasta -> meta }
@@ -284,7 +283,7 @@ workflow METATDENOVO {
         BBMAP_BBDUK ( FASTQC_TRIMGALORE.out.reads, Channel.fromPath(params.sequence_filter).first() )
         ch_clean_reads  = BBMAP_BBDUK.out.reads
         ch_bbduk_logs = BBMAP_BBDUK.out.log.collect { meta, log ->  log }.map { [ it ] }
-        ch_versions   = ch_versions.mix(BBMAP_BBDUK.out.versions.first())
+        // ch_versions   = ch_versions.mix(BBMAP_BBDUK.out.versions.first())
         ch_collect_stats = ch_collect_stats.combine(ch_bbduk_logs)
         ch_multiqc_files = ch_multiqc_files.mix(BBMAP_BBDUK.out.log.collect{ meta, log -> log })
     } else {
@@ -301,7 +300,7 @@ workflow METATDENOVO {
     if ( ! params.user_assembly ) {
         SEQTK_MERGEPE(ch_clean_reads)
         ch_interleaved = SEQTK_MERGEPE.out.reads
-        ch_versions    = ch_versions.mix(SEQTK_MERGEPE.out.versions)
+        // ch_versions    = ch_versions.mix(SEQTK_MERGEPE.out.versions)
     }
 
     //
@@ -316,7 +315,7 @@ workflow METATDENOVO {
             )
             ch_pe_reads_to_assembly = BBMAP_BBNORM.out.fastq.map { meta, fasta -> fasta }
             ch_se_reads_to_assembly = Channel.empty()
-            ch_versions    = ch_versions.mix(BBMAP_BBNORM.out.versions)
+            // ch_versions    = ch_versions.mix(BBMAP_BBNORM.out.versions)
         } else {
             ch_pe_reads_to_assembly = ch_interleaved
                 .filter { meta, fastq -> ! meta.single_end }
@@ -455,13 +454,13 @@ workflow METATDENOVO {
     // MODULE: Create a BBMap index
     //
     BBMAP_INDEX(ch_assembly_contigs.map { meta, contigs -> contigs })
-    ch_versions   = ch_versions.mix(BBMAP_INDEX.out.versions)
+    // ch_versions   = ch_versions.mix(BBMAP_INDEX.out.versions)
 
     //
     // MODULE: Call BBMap with the index once per sample
     //
     BBMAP_ALIGN ( ch_clean_reads, BBMAP_INDEX.out.index )
-    ch_versions = ch_versions.mix(BBMAP_ALIGN.out.versions)
+    // ch_versions = ch_versions.mix(BBMAP_ALIGN.out.versions)
 
     //
     // SUBWORKFLOW: classify ORFs with a set of hmm files
@@ -475,9 +474,11 @@ workflow METATDENOVO {
     //
     // MODULE: FeatureCounts. Create a table for each samples that provides raw counts as result of the alignment.
     //
-
-    BAM_SORT_STATS_SAMTOOLS ( BBMAP_ALIGN.out.bam, ch_assembly_contigs )
-    ch_versions = ch_versions.mix(BAM_SORT_STATS_SAMTOOLS.out.versions)
+    BAM_SORT_STATS_SAMTOOLS (
+    BBMAP_ALIGN.out.bam,
+    ch_assembly_contigs.map { meta, fasta -> [meta, fasta, []] }
+    )
+    // ch_versions = ch_versions.mix(BAM_SORT_STATS_SAMTOOLS.out.versions)
 
     ch_featurecounts = BAM_SORT_STATS_SAMTOOLS.out.bam
         .combine(ch_gff.map { meta, bam -> bam } )
@@ -486,7 +487,7 @@ workflow METATDENOVO {
         .combine(BAM_SORT_STATS_SAMTOOLS.out.idxstats.collect { meta, idxstats -> idxstats }.map { [ it ] } )
 
     FEATURECOUNTS_CDS ( ch_featurecounts)
-    ch_versions       = ch_versions.mix(FEATURECOUNTS_CDS.out.versions)
+    // ch_versions       = ch_versions.mix(FEATURECOUNTS_CDS.out.versions)
 
     //
     // MODULE: Collect featurecounts output counts in one table
@@ -590,7 +591,7 @@ workflow METATDENOVO {
     PIGZ_DIAMOND_LINEAGE(
         TAXONKIT_LINEAGE.out.tsv
     )
-    ch_versions     = ch_versions.mix(PIGZ_DIAMOND_LINEAGE.out.versions)
+    // ch_versions     = ch_versions.mix(PIGZ_DIAMOND_LINEAGE.out.versions)
 
     FORMAT_DIAMOND_TAX_RANKLIST(
         PIGZ_DIAMOND_LINEAGE.out.archive
@@ -700,12 +701,18 @@ workflow METATDENOVO {
     )
 
     MULTIQC (
-        ch_multiqc_files.collect(),
-        ch_multiqc_config.toList(),
-        ch_multiqc_custom_config.toList(),
-        ch_multiqc_logo.toList(),
-        [],
-        []
+        ch_multiqc_files.flatten().collect().map { files ->
+            [
+                [id: 'multiqc_input_files'],
+                files,
+                params.multiqc_config
+                    ? file(params.multiqc_config, checkIfExists: true)
+                    : file("${projectDir}/assets/multiqc_config.yml", checkIfExists: true),
+                params.multiqc_logo ? file(params.multiqc_logo, checkIfExists: true) : [],
+                [],
+                []
+            ]
+        }
     )
 
     emit:

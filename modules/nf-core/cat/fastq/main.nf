@@ -12,29 +12,19 @@ process CAT_FASTQ {
 
     output:
     tuple val(meta), path("*.merged.fastq.gz"), emit: reads
-    path "versions.yml", emit: versions
+    tuple val("${task.process}"), val("cat"), eval("cat --version 2>&1 | head -n 1 | sed 's/^.*coreutils) //; s/ .*\$//'"), emit: versions_cat, topic: versions
 
     when:
     task.ext.when == null || task.ext.when
 
     script:
     def prefix = task.ext.prefix ?: "${meta.id}"
-    def readList = reads instanceof List ? reads.collect { it.toString() } : [reads.toString()]
+    def readList = reads instanceof List ? reads.collect { item -> item.toString() } : [reads.toString()]
+    def compress = readList[0]?.endsWith('.gz') ? '' : '| gzip'
     if (meta.single_end) {
         if (readList.size >= 1) {
             """
-            for f in ${readList.join(' ')}; do
-                if [ \$(echo \$f | grep '.gz\$') ]; then
-                    cat \$f >> ${prefix}.merged.fastq.gz
-                else
-                    gzip -c \$f >> ${prefix}.merged.fastq.gz
-                fi
-            done
-
-            cat <<-END_VERSIONS > versions.yml
-            "${task.process}":
-                cat: \$(echo \$(cat --version 2>&1) | sed 's/^.*coreutils) //; s/ .*\$//')
-            END_VERSIONS
+            cat ${readList.join(' ')} ${compress} > ${prefix}.merged.fastq.gz
             """
         } else {
             error("Could not find any FASTQ files to concatenate in the process input")
@@ -46,26 +36,8 @@ process CAT_FASTQ {
             def read2 = []
             readList.eachWithIndex { v, ix -> (ix & 1 ? read2 : read1) << v }
             """
-            for f in ${read1.join(' ')}; do
-                if [ \$(echo \$f | grep '.gz\$') ]; then
-                    cat \$f >> ${prefix}_1.merged.fastq.gz
-                else
-                    gzip -c \$f >> ${prefix}_1.merged.fastq.gz
-                fi
-            done
-
-            for f in ${read2.join(' ')}; do
-                if [ \$(echo \$f | grep '.gz\$') ]; then
-                    cat \$f >> ${prefix}_2.merged.fastq.gz
-                else
-                    gzip -c \$f >> ${prefix}_2.merged.fastq.gz
-                fi
-            done
-
-            cat <<-END_VERSIONS > versions.yml
-            "${task.process}":
-                cat: \$(echo \$(cat --version 2>&1) | sed 's/^.*coreutils) //; s/ .*\$//')
-            END_VERSIONS
+            cat ${read1.join(' ')} ${compress} > ${prefix}_1.merged.fastq.gz
+            cat ${read2.join(' ')} ${compress} > ${prefix}_2.merged.fastq.gz
             """
         } else {
             error("Could not find any FASTQ file pairs to concatenate in the process input")
@@ -74,16 +46,11 @@ process CAT_FASTQ {
 
     stub:
     def prefix = task.ext.prefix ?: "${meta.id}"
-    def readList = reads instanceof List ? reads.collect { it.toString() } : [reads.toString()]
+    def readList = reads instanceof List ? reads.collect { item -> item.toString() } : [reads.toString()]
     if (meta.single_end) {
         if (readList.size >= 1) {
             """
             echo '' | gzip > ${prefix}.merged.fastq.gz
-
-            cat <<-END_VERSIONS > versions.yml
-            "${task.process}":
-                cat: \$(echo \$(cat --version 2>&1) | sed 's/^.*coreutils) //; s/ .*\$//')
-            END_VERSIONS
             """
         } else {
             error("Could not find any FASTQ files to concatenate in the process input")
@@ -94,11 +61,6 @@ process CAT_FASTQ {
             """
             echo '' | gzip > ${prefix}_1.merged.fastq.gz
             echo '' | gzip > ${prefix}_2.merged.fastq.gz
-
-            cat <<-END_VERSIONS > versions.yml
-            "${task.process}":
-                cat: \$(echo \$(cat --version 2>&1) | sed 's/^.*coreutils) //; s/ .*\$//')
-            END_VERSIONS
             """
         } else {
             error("Could not find any FASTQ file pairs to concatenate in the process input")
