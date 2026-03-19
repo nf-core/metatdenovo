@@ -202,7 +202,6 @@ workflow METATDENOVO {
                     return [ meta, fastqs ]
         }
     PIGZ_PE_READS_FWD(fwd.unzipped)
-    // ch_versions      = ch_versions.mix(PIGZ_PE_READS_FWD.out.versions)
 
     // Paired end, reverse
     rev = ch_fastq.single
@@ -216,7 +215,6 @@ workflow METATDENOVO {
                     return [ meta, fastqs ]
         }
     PIGZ_PE_READS_REV(rev.unzipped)
-    // ch_versions      = ch_versions.mix(PIGZ_PE_READS_REV.out.versions)
 
     // Single end
     se = ch_fastq.single
@@ -230,7 +228,6 @@ workflow METATDENOVO {
                     return [ meta, fastqs ]
         }
     PIGZ_SE_READS(se.unzipped)
-    // ch_versions      = ch_versions.mix(PIGZ_SE_READS.out.versions)
 
     // Join the three channels with the originally zipped to form a new ch_fastq of the same structure as the original
     ch_fastq = fwd.zipped.concat(PIGZ_PE_READS_FWD.out.archive)
@@ -251,7 +248,6 @@ workflow METATDENOVO {
         params.skip_fastqc || params.skip_qc,
         params.skip_trimming
     )
-    // ch_versions = ch_versions.mix(FASTQC_TRIMGALORE.out.versions)
 
     ch_collect_stats = ch_fastq
         .collect { meta, fasta -> meta }
@@ -283,7 +279,6 @@ workflow METATDENOVO {
         BBMAP_BBDUK ( FASTQC_TRIMGALORE.out.reads, Channel.fromPath(params.sequence_filter).first() )
         ch_clean_reads  = BBMAP_BBDUK.out.reads
         ch_bbduk_logs = BBMAP_BBDUK.out.log.collect { meta, log ->  log }.map { [ it ] }
-        // ch_versions   = ch_versions.mix(BBMAP_BBDUK.out.versions.first())
         ch_collect_stats = ch_collect_stats.combine(ch_bbduk_logs)
         ch_multiqc_files = ch_multiqc_files.mix(BBMAP_BBDUK.out.log.collect{ meta, log -> log })
     } else {
@@ -300,7 +295,6 @@ workflow METATDENOVO {
     if ( ! params.user_assembly ) {
         SEQTK_MERGEPE(ch_clean_reads)
         ch_interleaved = SEQTK_MERGEPE.out.reads
-        // ch_versions    = ch_versions.mix(SEQTK_MERGEPE.out.versions)
     }
 
     //
@@ -315,7 +309,6 @@ workflow METATDENOVO {
             )
             ch_pe_reads_to_assembly = BBMAP_BBNORM.out.fastq.map { meta, fasta -> fasta }
             ch_se_reads_to_assembly = Channel.empty()
-            // ch_versions    = ch_versions.mix(BBMAP_BBNORM.out.versions)
         } else {
             ch_pe_reads_to_assembly = ch_interleaved
                 .filter { meta, fastq -> ! meta.single_end }
@@ -365,7 +358,7 @@ workflow METATDENOVO {
         ch_spades_assembly = SPADES.out.transcripts
             .ifEmpty { [] }
             .combine(SPADES.out.contigs.ifEmpty { [] } )
-        ch_versions = ch_versions.mix(SPADES.out.versions)
+        //ch_versions = ch_versions.mix(SPADES.out.versions)
 
         FORMATSPADES( ch_spades_assembly.first() )
         ch_assembly_contigs = FORMATSPADES.out.assembly
@@ -401,14 +394,12 @@ workflow METATDENOVO {
     //
     if ( params.orf_caller == 'prokka' ) {
         PROKKA_SUBSETS(ch_assembly_contigs, params.prokka_batchsize)
-        ch_versions      = ch_versions.mix(PROKKA_SUBSETS.out.versions)
         ch_protein       = PROKKA_SUBSETS.out.faa
         ch_multiqc_files = ch_multiqc_files.mix(PROKKA_SUBSETS.out.prokka_log)
 
         //UNPIGZ_GFF(PROKKA_SUBSETS.out.gff.map { meta, gff -> [ [id: "${orfs_name}.${meta.id}"], gff ] })
         UNPIGZ_GFF(PROKKA_SUBSETS.out.gff)
         ch_gff           = UNPIGZ_GFF.out.unzipped
-        ch_versions      = ch_versions.mix(UNPIGZ_GFF.out.versions)
     }
 
     //
@@ -417,7 +408,6 @@ workflow METATDENOVO {
     if ( orf_caller == 'prodigal' ) {
         PRODIGAL( ch_assembly_contigs.map { meta, contigs -> [ [id: "${assembly_name}.${orfs_name}"], contigs  ] } )
         ch_protein      = PRODIGAL.out.faa
-        ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
 
         //UNPIGZ_GFF(PRODIGAL.out.gff.map { meta, gff -> [ [id: "${meta.id}"], gff ] })
         UNPIGZ_GFF(PRODIGAL.out.gff)
@@ -432,16 +422,11 @@ workflow METATDENOVO {
         TRANSDECODER ( ch_assembly_contigs.map { meta, contigs -> [ [id: "${assembly_name}.${orfs_name}" ], contigs ] } )
         ch_gff      = TRANSDECODER.out.gff
         ch_protein  = TRANSDECODER.out.pep
-        ch_versions = ch_versions.mix(TRANSDECODER.out.versions)
 
         PIGZ_TRANSDECODER_BED(TRANSDECODER.out.bed)
-        ch_versions = ch_versions.mix(PIGZ_TRANSDECODER_BED.out.versions)
         PIGZ_TRANSDECODER_CDS(TRANSDECODER.out.cds)
-        ch_versions = ch_versions.mix(PIGZ_TRANSDECODER_CDS.out.versions)
         PIGZ_TRANSDECODER_GFF(TRANSDECODER.out.gff)
-        ch_versions = ch_versions.mix(PIGZ_TRANSDECODER_GFF.out.versions)
         PIGZ_TRANSDECODER_PEP(TRANSDECODER.out.pep)
-        ch_versions = ch_versions.mix(PIGZ_TRANSDECODER_PEP.out.versions)
     }
 
     // Populate channels if the user provided the orfs
@@ -454,13 +439,11 @@ workflow METATDENOVO {
     // MODULE: Create a BBMap index
     //
     BBMAP_INDEX(ch_assembly_contigs.map { meta, contigs -> contigs })
-    // ch_versions   = ch_versions.mix(BBMAP_INDEX.out.versions)
 
     //
     // MODULE: Call BBMap with the index once per sample
     //
     BBMAP_ALIGN ( ch_clean_reads, BBMAP_INDEX.out.index )
-    // ch_versions = ch_versions.mix(BBMAP_ALIGN.out.versions)
 
     //
     // SUBWORKFLOW: classify ORFs with a set of hmm files
@@ -478,7 +461,6 @@ workflow METATDENOVO {
     BBMAP_ALIGN.out.bam,
     ch_assembly_contigs.map { meta, fasta -> [meta, fasta, []] }
     )
-    // ch_versions = ch_versions.mix(BAM_SORT_STATS_SAMTOOLS.out.versions)
 
     ch_featurecounts = BAM_SORT_STATS_SAMTOOLS.out.bam
         .combine(ch_gff.map { meta, bam -> bam } )
@@ -487,7 +469,6 @@ workflow METATDENOVO {
         .combine(BAM_SORT_STATS_SAMTOOLS.out.idxstats.collect { meta, idxstats -> idxstats }.map { [ it ] } )
 
     FEATURECOUNTS_CDS ( ch_featurecounts)
-    // ch_versions       = ch_versions.mix(FEATURECOUNTS_CDS.out.versions)
 
     //
     // MODULE: Collect featurecounts output counts in one table
@@ -591,7 +572,6 @@ workflow METATDENOVO {
     PIGZ_DIAMOND_LINEAGE(
         TAXONKIT_LINEAGE.out.tsv
     )
-    // ch_versions     = ch_versions.mix(PIGZ_DIAMOND_LINEAGE.out.versions)
 
     FORMAT_DIAMOND_TAX_RANKLIST(
         PIGZ_DIAMOND_LINEAGE.out.archive

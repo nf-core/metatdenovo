@@ -4,12 +4,13 @@
             46,
             {
                 "BBMAP_ALIGN": {
-                    "bbmap": 39.18,
-                    "samtools": 1.21,
-                    "pigz": 2.8
+                    "bbmap": 39.18
                 },
                 "BBMAP_INDEX": {
                     "bbmap": 39.18
+                },
+                "CAT_FASTQ": {
+                    "cat": 9.5
                 },
                 "COLLECT_FEATURECOUNTS": {
                     "R": "4.2.3",
@@ -29,7 +30,7 @@
                     "fastqc": "0.12.1"
                 },
                 "FEATURECOUNTS_CDS": {
-                    "subread": "2.0.6"
+                    "subread": "2.1.1"
                 },
                 "MEGAHIT_INTERLEAVED": {
                     "megahit_interleaved": "1.2.9"
@@ -53,33 +54,28 @@
                     "pigz": 2.8
                 },
                 "SAMTOOLS_FLAGSTAT": {
-                    "samtools": 1.21
+                    "samtools": 1.23
                 },
                 "SAMTOOLS_IDXSTATS": {
-                    "samtools": 1.21
+                    "samtools": 1.23
                 },
                 "SAMTOOLS_INDEX": {
-                    "samtools": 1.21
+                    "samtools": 1.23
                 },
                 "SAMTOOLS_SORT": {
-                    "samtools": 1.21
+                    "samtools": 1.23
                 },
                 "SAMTOOLS_STATS": {
-                    "samtools": 1.21
+                    "samtools": 1.23
                 },
                 "SEQTK_MERGEPE": {
                     "seqtk": "1.4-r122"
-                },
-                "TRANSDECODER": {
-                    "transdecoder": "5.7.1"
                 },
                 "TRANSRATE": {
                     "transrate": "1.0.3"
                 },
                 "TRIMGALORE": {
-                    "trimgalore": "0.6.10",
-                    "cutadapt": 4.9,
-                    "pigz": 2.8
+                    "trimgalore": "0.6.10"
                 },
                 "UNPIGZ_CONTIGS": {
                     "pigz": "2.3.4"
@@ -180,6 +176,6 @@
             "nf-test": "0.9.3",
             "nextflow": "25.10.4"
         },
-        "timestamp": "2026-03-16T11:55:49.177042524"
+        "timestamp": "2026-03-19T13:33:47.009533181"
     }
 }
