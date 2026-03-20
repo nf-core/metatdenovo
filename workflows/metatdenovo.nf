@@ -359,7 +359,6 @@ workflow METATDENOVO {
         ch_spades_assembly = SPADES.out.transcripts
             .ifEmpty { [] }
             .combine(SPADES.out.contigs.ifEmpty { [] } )
-        //ch_versions = ch_versions.mix(SPADES.out.versions)
 
         FORMATSPADES( ch_spades_assembly.first() )
         ch_assembly_contigs = FORMATSPADES.out.assembly
