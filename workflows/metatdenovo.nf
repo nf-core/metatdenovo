@@ -240,7 +240,6 @@ workflow METATDENOVO {
         )
         .concat(CAT_FASTQ.out.reads)
 
-    CAT_FASTQ.out.reads.view()
     //
     // SUBWORKFLOW: Read QC and trim adapters
     //
