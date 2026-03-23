@@ -23,7 +23,6 @@ workflow PROKKA_SUBSETS {
         .combine(PROKKA.out.gff.collect { meta, gff -> gff }.map { [ it ] })
         .set { ch_gff }
     GFF_CAT ( ch_gff )
-    //ch_versions = ch_versions.mix(GFF_CAT.out.versions)
 
     contigs.map{ meta, contigs -> [ id:"${meta.id}.prokka" ] }
         .combine(PROKKA.out.faa.collect { meta, protein -> protein }.map { [ it ] })
