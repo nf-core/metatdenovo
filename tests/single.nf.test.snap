@@ -35,6 +35,9 @@
                 "FEATURECOUNTS_CDS": {
                     "subread": "2.1.1"
                 },
+                "FORMAT_PRODIGAL_GFF": {
+                    "gzip": "1.11"
+                },
                 "MEGAHIT_INTERLEAVED": {
                     "megahit_interleaved": "1.2.9"
                 },
@@ -43,6 +46,10 @@
                 },
                 "PIGZ_SE_READS": {
                     "pigz": 2.8
+                },
+                "PRODIGAL_MODULE": {
+                    "prodigal": "2.6.3",
+                    "pigz": 2.6
                 },
                 "SAMTOOLS_FLAGSTAT": {
                     "samtools": 1.23
@@ -214,6 +221,6 @@
             "nf-test": "0.9.3",
             "nextflow": "25.10.4"
         },
-        "timestamp": "2026-03-19T15:41:25.54846773"
+        "timestamp": "2026-03-23T16:27:28.447327013"
     }
 }

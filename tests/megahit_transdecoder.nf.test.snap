@@ -71,6 +71,9 @@
                 "SEQTK_MERGEPE": {
                     "seqtk": "1.4-r122"
                 },
+                "TRANSDECODER": {
+                    "transdecoder": "5.7.1"
+                },
                 "TRANSRATE": {
                     "transrate": "1.0.3"
                 },
@@ -176,6 +179,6 @@
             "nf-test": "0.9.3",
             "nextflow": "25.10.4"
         },
-        "timestamp": "2026-03-19T13:33:47.009533181"
+        "timestamp": "2026-03-23T17:15:23.016920455"
     }
 }

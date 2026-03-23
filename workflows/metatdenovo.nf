@@ -407,8 +407,7 @@ workflow METATDENOVO {
     if ( orf_caller == 'prodigal' ) {
         PRODIGAL( ch_assembly_contigs.map { meta, contigs -> [ [id: "${assembly_name}.${orfs_name}"], contigs  ] } )
         ch_protein      = PRODIGAL.out.faa
-
-        //UNPIGZ_GFF(PRODIGAL.out.gff.map { meta, gff -> [ [id: "${meta.id}"], gff ] })
+        ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
         UNPIGZ_GFF(PRODIGAL.out.gff)
         ch_gff          = UNPIGZ_GFF.out.unzipped
         ch_versions     = ch_versions.mix(UNPIGZ_GFF.out.versions)
@@ -421,6 +420,7 @@ workflow METATDENOVO {
         TRANSDECODER ( ch_assembly_contigs.map { meta, contigs -> [ [id: "${assembly_name}.${orfs_name}" ], contigs ] } )
         ch_gff      = TRANSDECODER.out.gff
         ch_protein  = TRANSDECODER.out.pep
+        ch_versions = ch_versions.mix(TRANSDECODER.out.versions)
 
         PIGZ_TRANSDECODER_BED(TRANSDECODER.out.bed)
         PIGZ_TRANSDECODER_CDS(TRANSDECODER.out.cds)
