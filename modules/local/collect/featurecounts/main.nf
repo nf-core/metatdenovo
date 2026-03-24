@@ -18,7 +18,7 @@ process COLLECT_FEATURECOUNTS {
     task.ext.when == null || task.ext.when
 
     script:
-    def args     = task.ext.args ?: ''
+    //def args     = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
     #!/usr/bin/env Rscript

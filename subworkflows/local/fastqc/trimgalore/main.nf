@@ -12,8 +12,8 @@ workflow FASTQC_TRIMGALORE {
     skip_trimming // boolean: true/false
 
     main:
-    fastqc_html    = Channel.empty()
-    fastqc_zip     = Channel.empty()
+    fastqc_html    = channel.empty()
+    fastqc_zip     = channel.empty()
 
     if (!skip_fastqc) {
         FASTQC ( reads ).html.set { fastqc_html }
@@ -22,9 +22,9 @@ workflow FASTQC_TRIMGALORE {
     }
 
     trim_reads = reads
-    trim_html  = Channel.empty()
-    trim_zip   = Channel.empty()
-    trim_log   = Channel.empty()
+    trim_html  = channel.empty()
+    trim_zip   = channel.empty()
+    trim_log   = channel.empty()
 
     if (!skip_trimming) {
         TRIMGALORE ( reads ).reads.set { trim_reads }

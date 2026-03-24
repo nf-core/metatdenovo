@@ -15,7 +15,6 @@ process KOFAMSCAN_UNIQUE {
     path "versions.yml"                   , emit: versions
 
     script:
-    def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
 
     """
@@ -51,7 +50,6 @@ process KOFAMSCAN_UNIQUE {
     """
 
     stub:
-    def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
 
     """

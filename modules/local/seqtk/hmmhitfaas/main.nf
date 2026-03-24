@@ -18,7 +18,6 @@ process SEQTK_HMMHITFAAS {
     task.ext.when == null || task.ext.when
 
     script:
-    def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
     mkdir hits/
@@ -35,7 +34,6 @@ process SEQTK_HMMHITFAAS {
     """
 
     stub:
-    def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
     mkdir hits/

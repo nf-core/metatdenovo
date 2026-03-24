@@ -24,7 +24,6 @@ process MEGAHIT_INTERLEAVED {
     script:
     def args = task.ext.args ?: ''
     def args2 = task.ext.args2 ?: ''
-    def prefix = task.ext.prefix ?: ''
     single_ends = se_reads ? "--read ${se_reads.join(',')}" : ""
     pair_ends = intl_pe_reads ? "--12 ${intl_pe_reads.join(',')}" : ""
 
@@ -50,7 +49,7 @@ process MEGAHIT_INTERLEAVED {
     END_VERSIONS
     """
     stub:
-    def prefix = task.ext.prefix ?: ''
+
     """
     mkdir -p megahit_out/intermediate_contigs
     echo "" | gzip > megahit_out/${assembly}.contigs.fa.gz
