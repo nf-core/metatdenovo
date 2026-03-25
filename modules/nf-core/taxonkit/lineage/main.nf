@@ -40,6 +40,7 @@ process TAXONKIT_LINEAGE {
     """
 
     stub:
+    def prefix = task.ext.prefix ?: "${meta.id}"
     """
     touch ${prefix}.tsv
 

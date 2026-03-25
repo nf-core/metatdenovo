@@ -33,8 +33,7 @@ workflow HMMCLASSIFY {
     ch_versions = ch_versions.mix(SEQTK_HMMHITFAAS.out.versions)
 
     emit:
-    HMMRANK.out.hmmrank
-    SEQTK_HMMHITFAAS.out.faas
-
-    versions = ch_versions                     // channel: [ versions.yml ]
+    hmmrank  = HMMRANK.out.hmmrank
+    faas     = SEQTK_HMMHITFAAS.out.faas
+    versions = ch_versions                    // channel: [ versions.yml ]
 }

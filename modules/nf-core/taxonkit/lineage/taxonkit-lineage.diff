@@ -23,14 +23,6 @@ Changes in 'taxonkit/lineage/main.nf':
          --threads $task.cpus \\
          --out-file ${prefix}.tsv \\
          ${taxid? "<<< '$taxid'": taxidfile}
-@@ -38,7 +40,6 @@
-     """
- 
-     stub:
--    def prefix = task.ext.prefix ?: "${meta.id}"
-     """
-     touch ${prefix}.tsv
- 
 
 'modules/nf-core/taxonkit/lineage/environment.yml' is unchanged
 'modules/nf-core/taxonkit/lineage/tests/main.nf.test' is unchanged
