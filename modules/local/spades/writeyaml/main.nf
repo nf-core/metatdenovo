@@ -19,7 +19,6 @@ process WRITESPADESYAML {
     task.ext.when == null || task.ext.when
 
     script:
-    def args = task.ext.args ?: ''
     def read_list = []
     if ( pe ) read_list.add('{ orientation: "fr", type: "paired-end", interlaced reads: [ "' + pe.join('", "') + '" ] }')
     if ( se ) read_list.add('{ type: "single", single reads: [ "' + se.join('", "') + '" ] }')

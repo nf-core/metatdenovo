@@ -14,7 +14,7 @@ workflow KOFAMSCAN {
     fcs       // featureCounts output
 
     main:
-    ch_versions = Channel.empty()
+    ch_versions = channel.empty()
 
     KOFAMSCAN_DOWNLOAD()
     ch_versions = ch_versions.mix(KOFAMSCAN_DOWNLOAD.out.versions)

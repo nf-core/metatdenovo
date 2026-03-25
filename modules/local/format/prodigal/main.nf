@@ -18,7 +18,6 @@ process FORMAT_PRODIGAL_GFF {
     task.ext.when == null || task.ext.when
 
     script:
-    def args = task.ext.args   ?: ''
     prefix   = task.ext.prefix ?: "${meta.id}"
     cat_input = gff =~ /\.gz$/ ? "gunzip -c ${gff}" : "cat ${gff}"
 
@@ -32,7 +31,6 @@ process FORMAT_PRODIGAL_GFF {
     """
 
     stub:
-    def args = task.ext.args   ?: ''
     prefix   = task.ext.prefix ?: "${meta.id}"
 
     """

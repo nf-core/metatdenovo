@@ -1,49 +1,3 @@
-// Exit if the user provides both --assembler and --user_assembly, or both --orf_caller and either of the two --user_orfs,
-// or none of them
-if ( ( params.assembler && params.user_assembly ) || ( ! params.assembler && ! params.user_assembly ) ) {
-    error "Provide either `--assembler` or `--user_assembly`!"
-}
-if ( ( params.orf_caller && ( params.user_orfs_gff ) ) && ( ! params.orf_caller && ! params.user_orfs_gff ) ) {
-    error "Provide either `--orf_caller` or `--user_orfs_gff`/`--user_orfs_faa`!"
-}
-
-// Exit if the user forgot one of the two `--user_orfs_*`
-if ( params.user_orfs_gff && ! params.user_orfs_faa ) {
-    error 'When supplying ORFs, both --user_orfs_gff and --user_orfs_faa must be specified, --user_orfs_faa file is missing!'
-} else if ( params.user_orfs_faa && ! params.user_orfs_gff ) {
-    error 'When supplying ORFs, both --user_orfs_gff and --user_orfs_faa must be specified, --user_orfs_gff file is missing!'
-}
-
-// Exit if the user set params.assembler plus any of params.user_orfs_*
-if ( params.assembler && ( params.user_orfs_gff || params.user_orfs_faa ) ) {
-    error "You can't input your own ORFs (`--user_orfs_*`) if you call for assembly with `--assembler`."
-}
-
-// Deal with user-supplied assembly to make sure output names are correct
-assembler     = params.assembler
-assembly_name = params.assembler ?: params.user_assembly_name
-
-// Deal with params from user-supplied ORFs, and set orf_caller correctly
-orf_caller = params.orf_caller
-orfs_name  = params.orf_caller ?: params.user_orfs_name
-
-// set an empty multiqc channel
-ch_multiqc_files = Channel.empty()
-
-// If the user supplied hmm files, we will run hmmsearch and then rank the results.
-// Create a channel for hmm files.
-ch_hmmrs = Channel.empty()
-if ( params.hmmdir ) {
-    Channel
-        .fromPath(params.hmmdir + params.hmmpattern, checkIfExists: true)
-        .set { ch_hmmrs }
-} else if ( params.hmmfiles ) {
-    Channel
-        .fromList( params.hmmfiles.tokenize(',') )
-        .map { [ file(it) ] }
-        .set { ch_hmmrs }
-}
-
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     IMPORT LOCAL MODULES/SUBWORKFLOWS
@@ -143,8 +97,52 @@ workflow METATDENOVO {
 
     main:
 
-    ch_versions = Channel.empty()
-    ch_multiqc_files = Channel.empty()
+    // Exit if the user provides both --assembler and --user_assembly, or both --orf_caller and either of the two --user_orfs,
+    // or none of them
+    if ( ( params.assembler && params.user_assembly ) || ( ! params.assembler && ! params.user_assembly ) ) {
+        error "Provide either `--assembler` or `--user_assembly`!"
+    }
+    if ( ( params.orf_caller && ( params.user_orfs_gff ) ) && ( ! params.orf_caller && ! params.user_orfs_gff ) ) {
+        error "Provide either `--orf_caller` or `--user_orfs_gff`/`--user_orfs_faa`!"
+    }
+
+    // Exit if the user forgot one of the two `--user_orfs_*`
+    if ( params.user_orfs_gff && ! params.user_orfs_faa ) {
+        error 'When supplying ORFs, both --user_orfs_gff and --user_orfs_faa must be specified, --user_orfs_faa file is missing!'
+    } else if ( params.user_orfs_faa && ! params.user_orfs_gff ) {
+        error 'When supplying ORFs, both --user_orfs_gff and --user_orfs_faa must be specified, --user_orfs_gff file is missing!'
+    }
+
+    // Exit if the user set params.assembler plus any of params.user_orfs_*
+    if ( params.assembler && ( params.user_orfs_gff || params.user_orfs_faa ) ) {
+        error "You can't input your own ORFs (`--user_orfs_*`) if you call for assembly with `--assembler`."
+    }
+
+    // Deal with user-supplied assembly to make sure output names are correct
+    assembler     = params.assembler
+    assembly_name = params.assembler ?: params.user_assembly_name
+
+    // Deal with params from user-supplied ORFs, and set orf_caller correctly
+    orf_caller = params.orf_caller
+    orfs_name  = params.orf_caller ?: params.user_orfs_name
+
+
+    // If the user supplied hmm files, we will run hmmsearch and then rank the results.
+    // Create a channel for hmm files.
+    ch_hmmrs = channel.empty()
+    if ( params.hmmdir ) {
+        channel
+            .fromPath(params.hmmdir + params.hmmpattern, checkIfExists: true)
+            .set { ch_hmmrs }
+    } else if ( params.hmmfiles ) {
+        channel
+            .fromList( params.hmmfiles.tokenize(',') )
+            .map { hmmfile -> [ file(hmmfile) ] }
+            .set { ch_hmmrs }
+    }
+
+    ch_versions = channel.empty()
+    ch_multiqc_files = channel.empty()
 
     // Form a fastq channel from the samplesheet channel
     // DL: I'm not sure which parts are still required after nf-schema. The branch { } certainly is needed.
@@ -154,7 +152,7 @@ workflow METATDENOVO {
                 return [[ meta.id, [meta], fastq_files ]]
             } else {
                 def pairs = fastq_files.collate(2)
-                return [[ meta.id, pairs.collect { meta + [id: "${meta.id}_${pairs.indexOf(it) + 1}"] }, fastq_files ]]
+                return [[ meta.id, pairs.collect { pair -> meta + [id: "${meta.id}_${pairs.indexOf(pair) + 1}"] }, fastq_files ]]
             }
         }
         /** DL: In my testing, this fails as entries come in with single meta, multiple read files when appear for single ends
@@ -165,7 +163,7 @@ workflow METATDENOVO {
             return [id, updatedMetas, fastq_files]
         }
         **/
-        .map { validateInputSamplesheet(it) }
+        .map { row -> validateInputSamplesheet(row) }
         .branch {
             meta, fastqs ->
                 single  : ( meta.single_end && fastqs.size() == 1 ) || ( ! meta.single_end && fastqs.size == 2 )
@@ -192,7 +190,7 @@ workflow METATDENOVO {
 
     // Paired end, forward
     fwd = ch_fastq.single
-        .filter { meta, f -> ! meta.single_end }
+        .filter { meta, _f -> ! meta.single_end }
         .map { meta, fastqs -> [ meta, fastqs[0] ] }
         .branch {
             meta, fastqs ->
@@ -205,7 +203,7 @@ workflow METATDENOVO {
 
     // Paired end, reverse
     rev = ch_fastq.single
-        .filter { meta, f -> ! meta.single_end }
+        .filter { meta, _f -> ! meta.single_end }
         .map { meta, fastqs -> [ meta, fastqs[1] ] }
         .branch {
             meta, fastqs ->
@@ -218,7 +216,7 @@ workflow METATDENOVO {
 
     // Single end
     se = ch_fastq.single
-        .filter { meta, f -> meta.single_end }
+        .filter { meta, _f -> meta.single_end }
         .map { meta, fastqs -> [ meta, fastqs[0] ] }
         .branch {
             meta, fastqs ->
@@ -232,7 +230,7 @@ workflow METATDENOVO {
     // Join the three channels with the originally zipped to form a new ch_fastq of the same structure as the original
     ch_fastq = fwd.zipped.concat(PIGZ_PE_READS_FWD.out.archive)
         .join(rev.zipped.concat(PIGZ_PE_READS_REV.out.archive))
-        .map { meta, fwd, rev -> [ meta, [ fwd, rev ] ] }
+        .map { meta, fwd_read, rev_read -> [ meta, [ fwd_read, rev_read ] ] }
         .concat(
             se.zipped
                 .concat(PIGZ_SE_READS.out.archive)
@@ -250,8 +248,8 @@ workflow METATDENOVO {
     )
 
     ch_collect_stats = ch_fastq
-        .collect { meta, fasta -> meta }
-        .map { [ [ id:"${assembly_name}.${orfs_name}" ], it ] }
+        .collect { meta, _fasta -> meta }
+        .map { metas -> [ [ id:"${assembly_name}.${orfs_name}" ], metas ] }
 
     if ( params.skip_trimming ) {
         ch_collect_stats = ch_collect_stats
@@ -261,14 +259,14 @@ workflow METATDENOVO {
         ch_collect_stats = ch_collect_stats
             .combine(
                 FASTQC_TRIMGALORE.out.trim_log
-                    .collect { meta, report ->
+                    .collect { _meta, report ->
                         if ( report in List ) {
                             report[0]
                         } else {
                             report
                         }
                     }
-                    .map { [ it ] }
+                    .map { report -> [ report ] }
             )
     }
 
@@ -276,14 +274,14 @@ workflow METATDENOVO {
     // MODULE: Run BBDuk to clean out whatever sequences the user supplied via params.sequence_filter
     //
     if ( params.sequence_filter ) {
-        BBMAP_BBDUK ( FASTQC_TRIMGALORE.out.reads, Channel.fromPath(params.sequence_filter).first() )
+        BBMAP_BBDUK ( FASTQC_TRIMGALORE.out.reads, channel.fromPath(params.sequence_filter).first() )
         ch_clean_reads  = BBMAP_BBDUK.out.reads
-        ch_bbduk_logs = BBMAP_BBDUK.out.log.collect { meta, log ->  log }.map { [ it ] }
+        ch_bbduk_logs = BBMAP_BBDUK.out.log.collect { _meta, log ->  log }.map { log -> [ log ] }
         ch_collect_stats = ch_collect_stats.combine(ch_bbduk_logs)
-        ch_multiqc_files = ch_multiqc_files.mix(BBMAP_BBDUK.out.log.collect{ meta, log -> log })
+        ch_multiqc_files = ch_multiqc_files.mix(BBMAP_BBDUK.out.log.collect{ _meta, log -> log })
     } else {
         ch_clean_reads  = FASTQC_TRIMGALORE.out.reads
-        ch_bbduk_logs = Channel.empty()
+        ch_bbduk_logs = channel.empty()
         ch_collect_stats = ch_collect_stats
             .map { meta, samples, report -> [ meta, samples, report, [] ] }
     }
@@ -291,7 +289,7 @@ workflow METATDENOVO {
     //
     // MODULE: Interleave sequences for assembly
     //
-    ch_interleaved = Channel.empty()
+    ch_interleaved = channel.empty()
     if ( ! params.user_assembly ) {
         SEQTK_MERGEPE(ch_clean_reads)
         ch_interleaved = SEQTK_MERGEPE.out.reads
@@ -304,19 +302,18 @@ workflow METATDENOVO {
         if ( params.bbnorm ) {
             BBMAP_BBNORM(
                 ch_interleaved
-                    .collect { meta, fastq -> fastq }
-                    .map { [ [id:'all_samples', single_end:true], it ] }
+                    .collect { _meta, fastq -> fastq }
+                    .map { fastq -> [ [id:'all_samples', single_end:true], fastq ] }
             )
-            ch_pe_reads_to_assembly = BBMAP_BBNORM.out.fastq.map { meta, fasta -> fasta }
-            ch_se_reads_to_assembly = Channel.empty()
+            ch_pe_reads_to_assembly = BBMAP_BBNORM.out.fastq.map { _meta, fasta -> fasta }
+            ch_se_reads_to_assembly = channel.empty()
         } else {
             ch_pe_reads_to_assembly = ch_interleaved
-                .filter { meta, fastq -> ! meta.single_end }
-                .map { meta, fastq -> fastq }
+                .filter { meta, _fastq -> ! meta.single_end }
+                .map { _meta, fastq -> fastq }
             ch_se_reads_to_assembly = ch_interleaved
-                .filter { meta, fastq -> meta.single_end }
-                .map { meta, fastq -> fastq }
-            //ch_se_reads_to_assembly = Channel.empty()
+                .filter { meta, _fastq -> meta.single_end }
+                .map { _meta, fastq -> fastq }
         }
     }
 
@@ -327,13 +324,13 @@ workflow METATDENOVO {
         // If the input assembly is not gzipped, do that since all downstream calls assume this
         if ( ! params.user_assembly.endsWith('.gz') ) {
             PIGZ_ASSEMBLY(
-                Channel
+                channel
                     .fromPath(params.user_assembly)
-                    .map { [ [ id:params.user_assembly ], it ] }
+                    .map { path -> [ [ id:params.user_assembly ], path ] }
             )
             ch_assembly_contigs = PIGZ_ASSEMBLY.out.archive.first()
         } else {
-            ch_assembly_contigs = Channel
+            ch_assembly_contigs = channel
                 .value ( [ [ id: assembly_name ], file(params.user_assembly) ] )
         }
     } else if ( assembler == 'spades' ) {
@@ -385,8 +382,8 @@ workflow METATDENOVO {
     //
     // Call ORFs
     //
-    ch_gff      = Channel.empty()
-    ch_protein  = Channel.empty()
+    ch_gff      = channel.empty()
+    ch_protein  = channel.empty()
 
     //
     // SUBWORKFLOW: Run PROKKA_SUBSETS on assmebly output, but split the fasta file in chunks of 10 MB, then concatenate and compress output.
@@ -405,7 +402,7 @@ workflow METATDENOVO {
     // MODULE: Run PRODIGAL on assembly output.
     //
     if ( orf_caller == 'prodigal' ) {
-        PRODIGAL( ch_assembly_contigs.map { meta, contigs -> [ [id: "${assembly_name}.${orfs_name}"], contigs  ] } )
+        PRODIGAL( ch_assembly_contigs.map { _meta, contigs -> [ [id: "${assembly_name}.${orfs_name}"], contigs  ] } )
         ch_protein      = PRODIGAL.out.faa
         ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
         UNPIGZ_GFF(PRODIGAL.out.gff)
@@ -417,7 +414,7 @@ workflow METATDENOVO {
     // SUBWORKFLOW: run TRANSDECODER. Orf caller alternative for eukaryotes.
     //
     if ( orf_caller == 'transdecoder' ) {
-        TRANSDECODER ( ch_assembly_contigs.map { meta, contigs -> [ [id: "${assembly_name}.${orfs_name}" ], contigs ] } )
+        TRANSDECODER ( ch_assembly_contigs.map { _meta, contigs -> [ [id: "${assembly_name}.${orfs_name}" ], contigs ] } )
         ch_gff      = TRANSDECODER.out.gff
         ch_protein  = TRANSDECODER.out.pep
         ch_versions = ch_versions.mix(TRANSDECODER.out.versions)
@@ -430,14 +427,14 @@ workflow METATDENOVO {
 
     // Populate channels if the user provided the orfs
     if ( params.user_orfs_faa && params.user_orfs_gff ) {
-        ch_gff = Channel.value ( [ [ id: "${assembly_name}.${orfs_name}" ], file(params.user_orfs_gff) ] )
-        ch_protein = Channel.value ( [ [ id: "${assembly_name}.${orfs_name}" ], file(params.user_orfs_faa) ] )
+        ch_gff = channel.value ( [ [ id: "${assembly_name}.${orfs_name}" ], file(params.user_orfs_gff) ] )
+        ch_protein = channel.value ( [ [ id: "${assembly_name}.${orfs_name}" ], file(params.user_orfs_faa) ] )
     }
 
     //
     // MODULE: Create a BBMap index
     //
-    BBMAP_INDEX(ch_assembly_contigs.map { meta, contigs -> contigs })
+    BBMAP_INDEX(ch_assembly_contigs.map { _meta, contigs -> contigs })
 
     //
     // MODULE: Call BBMap with the index once per sample
@@ -449,7 +446,7 @@ workflow METATDENOVO {
     //
     ch_hmmclassify = ch_hmmrs
         .combine(ch_protein)
-        .map { hmm, meta, protein ->[ [ id: "${assembly_name}.${orfs_name}" ], hmm, protein ] }
+        .map { hmm, _meta, protein ->[ [ id: "${assembly_name}.${orfs_name}" ], hmm, protein ] }
     HMMCLASSIFY ( ch_hmmclassify )
     ch_versions = ch_versions.mix(HMMCLASSIFY.out.versions)
 
@@ -462,10 +459,10 @@ workflow METATDENOVO {
     )
 
     ch_featurecounts = BAM_SORT_STATS_SAMTOOLS.out.bam
-        .combine(ch_gff.map { meta, bam -> bam } )
+        .combine(ch_gff.map { _meta, bam -> bam } )
 
     ch_collect_stats = ch_collect_stats
-        .combine(BAM_SORT_STATS_SAMTOOLS.out.idxstats.collect { meta, idxstats -> idxstats }.map { [ it ] } )
+        .combine(BAM_SORT_STATS_SAMTOOLS.out.idxstats.collect { _meta, idxstats -> idxstats }.map { idxstats -> [ idxstats ] } )
 
     FEATURECOUNTS_CDS ( ch_featurecounts)
 
@@ -473,17 +470,17 @@ workflow METATDENOVO {
     // MODULE: Collect featurecounts output counts in one table
     //
     ch_collect_feature = FEATURECOUNTS_CDS.out.counts
-        .collect() { meta, featurecounts -> featurecounts }
+        .collect() { _meta, featurecounts -> featurecounts }
         .map { featurecounts -> [ [ id:"${assembly_name}.${orfs_name}" ], featurecounts ] }
 
     COLLECT_FEATURECOUNTS ( ch_collect_feature )
     ch_versions           = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
-    ch_fcs_for_stats      = COLLECT_FEATURECOUNTS.out.counts.collect { meta, tsv -> tsv }.map { [ it ] }
-    ch_fcs_for_summary    = COLLECT_FEATURECOUNTS.out.counts.map { meta, tsv -> tsv }
+    ch_fcs_for_stats      = COLLECT_FEATURECOUNTS.out.counts.collect { _meta, tsv -> tsv }.map { tsv -> [ tsv ] }
+    ch_fcs_for_summary    = COLLECT_FEATURECOUNTS.out.counts.map { _meta, tsv -> tsv }
     ch_collect_stats = ch_collect_stats.combine(ch_fcs_for_stats)
 
     // Initialize ch_merge_tables that will be populated with tables from annotation tools and used by the MERGE_TABLES module which output will then be passed to the COLLECT_STATS module
-    ch_merge_tables = Channel.empty()
+    ch_merge_tables = channel.empty()
 
     //
     // SUBWORKFLOW: run eggnog_mapper on the ORF-called amino acid sequences
@@ -491,7 +488,7 @@ workflow METATDENOVO {
     if ( ! params.skip_eggnog ) {
         EGGNOG(ch_protein, ch_fcs_for_summary)
         ch_versions = ch_versions.mix(EGGNOG.out.versions)
-        ch_merge_tables = ch_merge_tables.mix ( EGGNOG.out.sumtable.map { meta, tsv -> tsv } )
+        ch_merge_tables = ch_merge_tables.mix ( EGGNOG.out.sumtable.map { _meta, tsv -> tsv } )
     }
 
     //
@@ -501,7 +498,7 @@ workflow METATDENOVO {
         ch_kofamscan = ch_protein.map { meta, protein -> [ meta, protein ] }
         KOFAMSCAN( ch_kofamscan, ch_fcs_for_summary)
         ch_versions = ch_versions.mix(KOFAMSCAN.out.versions)
-        ch_merge_tables = ch_merge_tables.mix ( KOFAMSCAN.out.kofamscan_summary.map { meta, tsv -> tsv } )
+        ch_merge_tables = ch_merge_tables.mix ( KOFAMSCAN.out.kofamscan_summary.map { _meta, tsv -> tsv } )
     }
 
     // set up contig channel to use in TransRate
@@ -518,7 +515,7 @@ workflow METATDENOVO {
     //
     // SUBWORKFLOW: Eukulele
     //
-    ch_eukulele_db = Channel.empty()
+    ch_eukulele_db = channel.empty()
     if( ! params.skip_eukulele ) {
         // Make sure the eukulele_dbpath exists
         d = new File("${params.eukulele_dbpath}")
@@ -528,19 +525,19 @@ workflow METATDENOVO {
 
         // Create a channel for EUKulele either with a named database or not. The latter means a user-provided database in a directory.
         if ( params.eukulele_db ) {
-            ch_eukulele_db = Channel
+            ch_eukulele_db = channel
                 .of ( params.eukulele_db )
-                .map { [ it, file(params.eukulele_dbpath) ] }
+                .map { db -> [ db, file(params.eukulele_dbpath) ] }
         } else {
-            ch_eukulele_db = Channel.fromPath(params.eukulele_dbpath, checkIfExists: true)
-                .map { [ [], it ] }
+            ch_eukulele_db = channel.fromPath(params.eukulele_dbpath, checkIfExists: true)
+                .map { path -> [ [], path ] }
         }
         ch_eukulele = ch_protein
             .map { meta, protein -> [ [ id:"${meta.id}" ], protein ] }
             .combine( ch_eukulele_db )
         SUB_EUKULELE( ch_eukulele, ch_fcs_for_summary )
         ch_versions = ch_versions.mix(SUB_EUKULELE.out.versions)
-        ch_merge_tables = ch_merge_tables.mix ( SUB_EUKULELE.out.taxonomy_summary.map { meta, tsv -> tsv } )
+        ch_merge_tables = ch_merge_tables.mix ( SUB_EUKULELE.out.taxonomy_summary.map { _meta, tsv -> tsv } )
     }
 
     //
@@ -548,7 +545,7 @@ workflow METATDENOVO {
     //
     DIAMOND_TAXONOMY(
         ch_protein,
-        ch_diamond_dbs.map { [ it[0], it[1] ] },
+        ch_diamond_dbs.map { db -> [ db[0], db[1] ] },
         102,
         []
     )
@@ -596,7 +593,7 @@ workflow METATDENOVO {
     )
     ch_versions     = ch_versions.mix(SUM_DIAMONDTAX.out.versions)
 
-    ch_merge_tables = ch_merge_tables.mix ( SUM_DIAMONDTAX.out.taxonomy_summary.map { meta, tsv -> tsv } )
+    ch_merge_tables = ch_merge_tables.mix ( SUM_DIAMONDTAX.out.taxonomy_summary.map { _meta, tsv -> tsv } )
 
     //
     // MODULE: Collect statistics from mapping analysis
@@ -610,8 +607,8 @@ workflow METATDENOVO {
 
     ch_collect_stats = ch_collect_stats
         .combine(
-            Channel.empty()
-                .mix ( MERGE_TABLES.out.merged_table.map { meta, tblout -> [ tblout ] } )
+            channel.empty()
+                .mix ( MERGE_TABLES.out.merged_table.map { _meta, tblout -> [ tblout ] } )
                 .ifEmpty { [ [] ] }
         )
     ch_versions     = ch_versions.mix(MERGE_TABLES.out.versions)
@@ -651,24 +648,15 @@ workflow METATDENOVO {
     //
     // MODULE: MultiQC
     //
-    ch_multiqc_config        = Channel.fromPath(
-        "$projectDir/assets/multiqc_config.yml", checkIfExists: true)
-    ch_multiqc_custom_config = params.multiqc_config ?
-        Channel.fromPath(params.multiqc_config, checkIfExists: true) :
-        Channel.empty()
-    ch_multiqc_logo          = params.multiqc_logo ?
-        Channel.fromPath(params.multiqc_logo, checkIfExists: true) :
-        Channel.empty()
-
     summary_params      = paramsSummaryMap(
         workflow, parameters_schema: "nextflow_schema.json")
-    ch_workflow_summary = Channel.value(paramsSummaryMultiqc(summary_params))
+    ch_workflow_summary = channel.value(paramsSummaryMultiqc(summary_params))
     ch_multiqc_files = ch_multiqc_files.mix(
         ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
     ch_multiqc_custom_methods_description = params.multiqc_methods_description ?
         file(params.multiqc_methods_description, checkIfExists: true) :
         file("$projectDir/assets/methods_description_template.yml", checkIfExists: true)
-    ch_methods_description                = Channel.value(
+    ch_methods_description                = channel.value(
         methodsDescriptionText(ch_multiqc_custom_methods_description))
 
     ch_multiqc_files = ch_multiqc_files.mix(ch_collated_versions)

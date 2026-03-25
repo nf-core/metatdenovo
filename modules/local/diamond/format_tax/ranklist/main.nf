@@ -18,7 +18,6 @@ process FORMAT_DIAMOND_TAX_RANKLIST {
     task.ext.when == null || task.ext.when
 
     script:
-    def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
 
     // Call separate if we have a list of ranks

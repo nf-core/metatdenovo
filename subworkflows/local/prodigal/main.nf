@@ -10,7 +10,7 @@ workflow PRODIGAL {
     fastafile
 
     main:
-    ch_versions = Channel.empty()
+    ch_versions = channel.empty()
 
     PRODIGAL_MODULE     ( fastafile, 'gff' )
     ch_versions = ch_versions.mix(PRODIGAL_MODULE.out.versions)

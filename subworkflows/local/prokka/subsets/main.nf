@@ -14,24 +14,24 @@ workflow PROKKA_SUBSETS {
     batchsize // channel: strings like '10.MB'. Usually from params.prokka_batchsize
 
     main:
-    ch_versions = Channel.empty()
+    ch_versions = channel.empty()
 
-    PROKKA ( contigs.map{ meta, contigs -> contigs }.splitFasta(size: batchsize, file: true).map { contigs -> [ [ id: contigs.getBaseName() ], contigs] }, [], []  )
+    PROKKA ( contigs.map{ _meta, ctg -> ctg }.splitFasta(size: batchsize, file: true).map { ctg -> [ [ id: ctg.getBaseName() ], ctg] }, [], []  )
     ch_versions = ch_versions.mix(PROKKA.out.versions)
-    ch_log  = PROKKA.out.txt.map { meta, log -> log }.collect()
-    contigs.map{ meta, contigs -> [ id:"${meta.id}.prokka" ] }
-        .combine(PROKKA.out.gff.collect { meta, gff -> gff }.map { [ it ] })
+    ch_log  = PROKKA.out.txt.map { _meta, log -> log }.collect()
+    contigs.map{ meta, _contigs -> [ id:"${meta.id}.prokka" ] }
+        .combine(PROKKA.out.gff.collect { _meta, gff -> gff }.map { gff -> [ gff ] })
         .set { ch_gff }
     GFF_CAT ( ch_gff )
 
-    contigs.map{ meta, contigs -> [ id:"${meta.id}.prokka" ] }
-        .combine(PROKKA.out.faa.collect { meta, protein -> protein }.map { [ it ] })
+    contigs.map{ meta, _contigs -> [ id:"${meta.id}.prokka" ] }
+        .combine(PROKKA.out.faa.collect { _meta, protein -> protein }.map { protein -> [ protein ] })
         .set { ch_faa }
     FAA_CAT ( ch_faa )
     //ch_versions = ch_versions.mix(FAA_CAT.out.versions)
 
-    contigs.map{ meta, contigs -> [ id:"${meta.id}.prokka" ] }
-        .combine(PROKKA.out.ffn.collect { meta, fnn -> fnn }.map { [ it ] })
+    contigs.map{ meta, _contigs -> [ id:"${meta.id}.prokka" ] }
+        .combine(PROKKA.out.ffn.collect { _meta, fnn -> fnn }.map { fnn -> [ fnn ] })
         .set { ch_ffn }
     FFN_CAT ( ch_ffn )
     //ch_versions = ch_versions.mix(FFN_CAT.out.versions)

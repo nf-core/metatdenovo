@@ -12,7 +12,7 @@ workflow EGGNOG {
     collect_fcs
 
     main:
-    ch_versions = Channel.empty()
+    ch_versions = channel.empty()
 
     EGGNOG_DOWNLOAD()
     ch_versions = ch_versions.mix(EGGNOG_DOWNLOAD.out.versions)

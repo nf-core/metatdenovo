@@ -7,8 +7,6 @@ process EGGNOG_DOWNLOAD {
         'https://depot.galaxyproject.org/singularity/eggnog-mapper:2.1.9--pyhdfd78af_0':
         'biocontainers/eggnog-mapper:2.1.9--pyhdfd78af_0' }"
 
-    input:
-
     output:
     path "eggnog.db"                  , emit: eggnog_db
     path "eggnog_proteins.dmnd"       , emit: dmnd
@@ -17,9 +15,11 @@ process EGGNOG_DOWNLOAD {
     path "*"                          , emit: all
     path "versions.yml"               , emit: versions
 
+    when:
+    task.ext.when == null || task.ext.when
+
     script:
     def args = task.ext.args ?: ''
-
     """
     download_eggnog_data.py \\
         $args \\
@@ -33,7 +33,6 @@ process EGGNOG_DOWNLOAD {
     """
 
     stub:
-
     """
     mkdir eggnog
     touch ./eggnog/eggnog.db

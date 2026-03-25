@@ -16,7 +16,6 @@ process KOFAMSCAN_DOWNLOAD {
     task.ext.when == null || task.ext.when
 
     script:
-    def args = task.ext.args ?: ''
 
     """
     wget https://www.genome.jp/ftp/db/kofam/ko_list.gz

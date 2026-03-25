@@ -18,7 +18,6 @@ process FORMAT_DIAMOND_TAX_TAXDUMP {
     task.ext.when == null || task.ext.when
 
     script:
-    def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
 
     ranks_to_consider = "c('domain', 'superkingdom', 'kingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species')"
