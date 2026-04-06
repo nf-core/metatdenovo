@@ -19,6 +19,7 @@ Initial release of nf-core/metatdenovo, created with the [nf-core](https://nf-co
 ### `Fixed`
 
 ### `Dependencies`
+
 | Tool        | Previous version | New version |
 | ----------- | ---------------- | ----------- |
 | cat         | 2.3.4            | 2.8         |
