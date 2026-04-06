@@ -25,6 +25,7 @@ Initial release of nf-core/metatdenovo, created with the [nf-core](https://nf-co
 | sometools   | 1.21             | 1.23        |
 | subread     | 2.0.6            | 2.1.1       |
 | trim-galore |                  | 0.6.10      |
+
 ### `Deprecated`
 
 ## v1.3.0 - [29-08-2025]
