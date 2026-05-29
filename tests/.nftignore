@@ -3,8 +3,11 @@ bbmap/bbduk/*.fastq.gz
 bbmap/bbduk/*.bbduk.log
 bbmap/bbnorm/all_samples.bbnorm.log
 bbmap/bbmap/*.log
+bbmap/logs/*.log
 fastqc/*_fastqc.{html,zip}
 featurecounts/*.{tsv,tsv.summary}
+featurecounts/*.featureCounts.tsv
+featurecounts/*.featureCounts.tsv.summary
 hmmer/*.tbl.gz
 hmmer/hits/*.faa.gz
 megahit/megahit_out/megahit_assembly.{contigs.fa.gz,log}
@@ -23,7 +26,11 @@ multiqc/multiqc_data/multiqc_sources.txt
 multiqc/multiqc_data/prokka_plot.txt
 multiqc/multiqc_plots/{svg,pdf,png}/*.{svg,pdf,png}
 multiqc/multiqc_report.html
+multiqc/multiqc_plots
+multiqc/multiqc_data/*.parquet
+multiqc/multiqc_plots/**
 multiqc/multiqc_data/multiqc.parquet
+results/multiqc/multiqc_data/*.parquet
 pipeline_info/*.{html,json,txt,yml}
 prodigal/*.gz
 prokka/*.gz
@@ -37,3 +44,10 @@ transrate/megahit_assemblies_mqc.csv
 transrate/spades_assemblies_mqc.csv
 trimgalore/fastqc/*.{html,zip}
 trimgalore/*trimming_report.txt
+pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml
+samtools/*.flagstat
+samtools/*.idxstats
+samtools/*.stats
+trimgalore/fastqc/*_fastqc.{html,zip}
+multiqc/multiqc_data/bbduk*.txt
+multiqc/multiqc_data/bbduk-filtered*.txt
