@@ -51,4 +51,3 @@ samtools/*.stats
 trimgalore/fastqc/*_fastqc.{html,zip}
 multiqc/multiqc_data/bbduk*.txt
 multiqc/multiqc_data/bbduk-filtered*.txt
-
