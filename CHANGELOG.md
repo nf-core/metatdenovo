@@ -15,6 +15,7 @@ Initial release of nf-core/metatdenovo, created with the [nf-core](https://nf-co
 - [#428](https://github.com/nf-core/metatdenovo/pull/428) - Template update to nf-core tools 3.5.2 (@danilodileo)
 - [#429](https://github.com/nf-core/metatdenovo/pull/429) - Module update to nf-core tools 3.5.2 (@danilodileo)
 - [#430](https://github.com/nf-core/metatdenovo/pull/430) - Nextlow lint (@danilodileo)
+- [#435](https://github.com/nf-core/metatdenovo/pull/435) - Template update 4.0.2 (@danilodileo)
 
 ### `Fixed`
 
