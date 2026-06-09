@@ -12,7 +12,7 @@ process TRANSRATE {
 
     output:
     tuple val(meta), path("*assemblies_mqc.csv") , emit: assembly_qc
-    path "versions.yml"                          , emit: versions
+    tuple val("${task.process}"), val('transrate'), eval('transrate --version'), emit: versions_transrate, topic: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -31,10 +31,6 @@ process TRANSRATE {
 
     mv ${prefix}_transrate/assemblies.csv ${prefix}_assemblies_mqc.csv
 
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        transrate: \$(transrate --version)
-    END_VERSIONS
     """
 
     stub:

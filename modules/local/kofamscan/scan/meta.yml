@@ -33,9 +33,16 @@ output:
       type: file
       description: Cleaned KofamScan output for summary tables
       pattern: "kofamscan.tsv.gz"
-  - versions:
-      type: file
-      description: File containing software versions
-      pattern: "versions.yml"
+topics:
+  versions:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - kofamscan:
+          type: string
+          description: The name of the tool
+      - exec_annotation --version 2>&1 | sed "s/^.*exec_annotation//"
+          type: eval
+          description: The expression to obtain the version of the tool
 authors:
   - "@danilodileo"

@@ -15,7 +15,7 @@ process KOFAMSCAN_SCAN {
     output:
     tuple val(meta), path("kofamscan_output.tsv.gz"), emit: kout
     tuple val(meta), path("kofamscan.tsv.gz")       , emit: kofamtsv
-    path "versions.yml"                             , emit: versions
+    tuple val("${task.process}"), val('kofamscan'), eval('exec_annotation --version 2>&1 | sed "s/^.*exec_annotation//"'), emit: versions_kofamscan, topic: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -41,10 +41,11 @@ process KOFAMSCAN_SCAN {
 
     # Gzip the original file
     gzip kofamscan_output.tsv
+    """
 
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        kofamscan: \$(echo \$(exec_annotation --version 2>&1) | sed 's/^.*exec_annotation//' )
-    END_VERSIONS
+    stub:
+    """
+    gzip -c /dev/null > kofamscan_output.tsv.gz
+    gzip -c /dev/null > kofamscan.tsv.gz
     """
 }

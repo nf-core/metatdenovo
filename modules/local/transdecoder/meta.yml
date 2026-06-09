@@ -32,9 +32,16 @@ output:
       type: file
       description: BED file with predicted coding regions
       pattern: "*.bed"
-  - versions:
-      type: file
-      description: File containing software versions
-      pattern: "versions.yml"
+topics:
+  versions:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - transdecoder:
+          type: string
+          description: The name of the tool
+      - TransDecoder.LongOrfs --version | sed -e "s/TransDecoder.LongOrfs //g"
+          type: eval
+          description: The expression to obtain the version of the tool
 authors:
   - "@danilodileo"

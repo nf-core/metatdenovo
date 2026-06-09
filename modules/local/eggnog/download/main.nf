@@ -13,7 +13,7 @@ process EGGNOG_DOWNLOAD {
     path "eggnog.taxa.db"             , emit: taxa_db
     path "eggnog.taxa.db.traverse.pkl", emit: pkl
     path "*"                          , emit: all
-    path "versions.yml"               , emit: versions
+    tuple val("${task.process}"), val("eggnog-mapper"), eval('emapper.py --version | sed "s/.* emapper-//" | sed "s/ \\/ Expected.*//"'), emit: versions_emapper, topic: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -25,11 +25,6 @@ process EGGNOG_DOWNLOAD {
         $args \\
         -y \\
         --data_dir .
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        eggnog: \$( echo \$(emapper.py --version 2>&1)| sed 's/.* emapper-//' | sed 's/ \\/ Expected.*//')
-    END_VERSIONS
     """
 
     stub:
@@ -39,10 +34,5 @@ process EGGNOG_DOWNLOAD {
     touch ./eggnog/eggnog.taxa.db
     touch ./eggnog/eggnog.taxa.db.traverse.pkl
     ln -s eggnog/* ./
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        eggnog: \$( echo \$(emapper.py --version 2>&1)| sed 's/.* emapper-//' | sed 's/ \\/ Expected.*//')
-    END_VERSIONS
     """
 }

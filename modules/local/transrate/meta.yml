@@ -21,9 +21,16 @@ output:
       type: file
       description: Transrate assembly quality assessment results
       pattern: "*assemblies_mqc.csv"
-  - versions:
-      type: file
-      description: File containing software versions
-      pattern: "versions.yml"
+topics:
+  versions:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - transrate:
+          type: string
+          description: The name of the tool
+      - transrate --version
+          type: eval
+          description: The expression to obtain the version of the tool
 authors:
   - "@danilodileo"

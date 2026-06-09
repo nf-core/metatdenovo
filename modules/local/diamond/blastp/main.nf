@@ -14,14 +14,14 @@ process DIAMOND_BLASTP {
     val blast_columns
 
     output:
-    tuple val(outmeta), path('*.blast*'), optional: true, emit: blast
-    tuple val(outmeta), path('*.xml*')  , optional: true, emit: xml
-    tuple val(outmeta), path('*.txt*')  , optional: true, emit: txt
-    tuple val(outmeta), path('*.daa')   , optional: true, emit: daa
-    tuple val(outmeta), path('*.sam*')  , optional: true, emit: sam
-    tuple val(outmeta), path('*.tsv*')  , optional: true, emit: tsv
-    tuple val(outmeta), path('*.paf*')  , optional: true, emit: paf
-    path "versions.yml"              , emit: versions
+    tuple val(outmeta), path('${prefix}.blast*'), optional: true, emit: blast
+    tuple val(outmeta), path('${prefix}.xml*')  , optional: true, emit: xml
+    tuple val(outmeta), path('${prefix}.txt*')  , optional: true, emit: txt
+    tuple val(outmeta), path('${prefix}.daa')   , optional: true, emit: daa
+    tuple val(outmeta), path('${prefix}.sam*')  , optional: true, emit: sam
+    tuple val(outmeta), path('${prefix}.tsv*')  , optional: true, emit: tsv
+    tuple val(outmeta), path('${prefix}.paf*')  , optional: true, emit: paf
+    tuple val("${task.process}"), val('diamond'), eval('diamond --version | tail -n 1 | sed "s/^diamond version //"'), emit: versions_diamond, topic: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -30,7 +30,7 @@ process DIAMOND_BLASTP {
     outmeta = meta + [ db: meta2.id ]
 
     def args = task.ext.args ?: ''
-    def prefix = task.ext.prefix ?: "${meta.id}.${meta2.id}"
+    prefix = task.ext.prefix ?: "${meta.id}.${meta2.id}"
     def columns = blast_columns ? "${blast_columns}" : ''
     if      ( outfmt == 0   ) { out_ext = "blast" }
     else if ( outfmt == 5   ) { out_ext = "xml"   }
@@ -54,15 +54,11 @@ process DIAMOND_BLASTP {
         --outfmt ${outfmt} ${columns} \\
         ${args} \\
         --out ${prefix}.${out_ext}
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        diamond: \$(diamond --version 2>&1 | tail -n 1 | sed 's/^diamond version //')
-    END_VERSIONS
     """
 
     stub:
-    def prefix = task.ext.prefix ?: "${meta.id}"
+    prefix = task.ext.prefix ?: "${meta.id}"
+
     """
     touch ${prefix}.${out_ext}
 

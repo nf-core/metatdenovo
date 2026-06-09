@@ -28,5 +28,16 @@ output:
       type: directory
       description: Directory containing all downloaded EggNOG files
       pattern: "*"
+topics:
+  versions:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - eggnog-mapper:
+          type: string
+          description: The name of the tool
+      - emapper.py --version | sed "s/.* emapper-//" | sed "s/ \\/ Expected.*//"
+          type: eval
+          description: The expression to obtain the version of the tool
 authors:
   - "@danilodileo"

@@ -343,7 +343,6 @@ workflow METATDENOVO {
             ch_pe_reads_to_assembly.toList(),
             ch_se_reads_to_assembly.toList()
         )
-        ch_versions    = ch_versions.mix(WRITESPADESYAML.out.versions)
 
         // 2. Call the module with a channel with all fastq files plus the yaml
         ch_spades = ch_pe_reads_to_assembly
@@ -362,7 +361,6 @@ workflow METATDENOVO {
 
         FORMATSPADES( ch_spades_assembly.first() )
         ch_assembly_contigs = FORMATSPADES.out.assembly
-        ch_versions = ch_versions.mix(FORMATSPADES.out.versions)
     } else if ( assembler == 'megahit' ) {
         MEGAHIT_INTERLEAVED(
             ch_pe_reads_to_assembly.toList(),
@@ -371,7 +369,6 @@ workflow METATDENOVO {
         )
         ch_assembly_contigs = MEGAHIT_INTERLEAVED.out.contigs
             .map { it -> [ [ id: assembly_name ], it ] }
-        ch_versions = ch_versions.mix(MEGAHIT_INTERLEAVED.out.versions)
     } else {
         error 'Assembler not specified!'
     }
@@ -380,7 +377,6 @@ workflow METATDENOVO {
     if ( params.min_contig_length > 0 ) {
         SEQTK_SEQ_CONTIG_FILTER ( ch_assembly_contigs )
         ch_assembly_contigs = SEQTK_SEQ_CONTIG_FILTER.out.fastx
-        ch_versions = ch_versions.mix(SEQTK_SEQ_CONTIG_FILTER.out.versions)
     }
 
     //
@@ -408,10 +404,8 @@ workflow METATDENOVO {
     if ( orf_caller == 'prodigal' ) {
         PRODIGAL( ch_assembly_contigs.map { _meta, contigs -> [ [id: "${assembly_name}.${orfs_name}"], contigs  ] } )
         ch_protein      = PRODIGAL.out.faa
-        ch_versions     = ch_versions.mix(PRODIGAL.out.versions)
         UNPIGZ_GFF(PRODIGAL.out.gff)
         ch_gff          = UNPIGZ_GFF.out.unzipped
-        ch_versions     = ch_versions.mix(UNPIGZ_GFF.out.versions)
     }
 
     //
@@ -421,7 +415,6 @@ workflow METATDENOVO {
         TRANSDECODER ( ch_assembly_contigs.map { _meta, contigs -> [ [id: "${assembly_name}.${orfs_name}" ], contigs ] } )
         ch_gff      = TRANSDECODER.out.gff
         ch_protein  = TRANSDECODER.out.pep
-        ch_versions = ch_versions.mix(TRANSDECODER.out.versions)
 
         PIGZ_TRANSDECODER_BED(TRANSDECODER.out.bed)
         PIGZ_TRANSDECODER_CDS(TRANSDECODER.out.cds)
@@ -452,7 +445,6 @@ workflow METATDENOVO {
         .combine(ch_protein)
         .map { hmm, _meta, protein ->[ [ id: "${assembly_name}.${orfs_name}" ], hmm, protein ] }
     HMMCLASSIFY ( ch_hmmclassify )
-    ch_versions = ch_versions.mix(HMMCLASSIFY.out.versions)
 
     //
     // MODULE: FeatureCounts. Create a table for each samples that provides raw counts as result of the alignment.
@@ -537,13 +529,11 @@ workflow METATDENOVO {
     // set up contig channel to use in TransRate
     UNPIGZ_CONTIGS(ch_assembly_contigs)
     ch_unzipped_contigs = UNPIGZ_CONTIGS.out.unzipped
-    ch_versions = ch_versions.mix(UNPIGZ_CONTIGS.out.versions)
 
     //
     // MODULE: Use TransRate to judge assembly quality, piped into MultiQC
     //
     TRANSRATE(ch_unzipped_contigs)
-    ch_versions = ch_versions.mix(TRANSRATE.out.versions)
 
     //
     // SUBWORKFLOW: Eukulele
@@ -569,7 +559,7 @@ workflow METATDENOVO {
             .map { meta, protein -> [ [ id:"${meta.id}" ], protein ] }
             .combine( ch_eukulele_db )
         SUB_EUKULELE( ch_eukulele, ch_fcs_for_summary )
-        ch_versions = ch_versions.mix(SUB_EUKULELE.out.versions)
+
         ch_merge_tables = ch_merge_tables.mix ( SUB_EUKULELE.out.taxonomy_summary.map { _meta, tsv -> tsv } )
     }
 
@@ -582,7 +572,6 @@ workflow METATDENOVO {
         102,
         []
     )
-    ch_versions     = ch_versions.mix(DIAMOND_TAXONOMY.out.versions)
 
     // Create a unified channel of the output from Diamond together with the diamond db info to
     // make sure the channels are synchronized before calling TAXONKIT_LINEAGE
@@ -596,7 +585,6 @@ workflow METATDENOVO {
         ch_taxonkit_lineage.map { it -> it[4] },
         ch_taxonkit_lineage.map { it -> it[5] }
     )
-    ch_versions     = ch_versions.mix(TAXONKIT_LINEAGE.out.versions)
 
     PIGZ_DIAMOND_LINEAGE(
         TAXONKIT_LINEAGE.out.tsv
@@ -608,7 +596,6 @@ workflow METATDENOVO {
             .join(ch_diamond_dbs)
             .map { it -> [ [ id: it[1].id - ".lineage" + ".diamond", db: it[1].db ], it[2], it[6] ] }
     )
-    ch_versions     = ch_versions.mix(FORMAT_DIAMOND_TAX_RANKLIST.out.versions)
 
     FORMAT_DIAMOND_TAX_TAXDUMP(
         PIGZ_DIAMOND_LINEAGE.out.archive
@@ -616,7 +603,6 @@ workflow METATDENOVO {
             .join(ch_diamond_dbs.filter { it -> it[5] })
             .map { it -> [ [ id: it[1].id - ".lineage" + ".diamond", db: it[1].db ], it[2], it[4], it[5], it[6] ] }
     )
-    ch_versions     = ch_versions.mix(FORMAT_DIAMOND_TAX_TAXDUMP.out.versions)
 
     SUM_DIAMONDTAX(
         FORMAT_DIAMOND_TAX_RANKLIST.out.taxonomy
@@ -624,7 +610,6 @@ workflow METATDENOVO {
         ch_fcs_for_summary,
         'diamondtax'
     )
-    ch_versions     = ch_versions.mix(SUM_DIAMONDTAX.out.versions)
 
     ch_merge_tables = ch_merge_tables.mix ( SUM_DIAMONDTAX.out.taxonomy_summary.map { _meta, tsv -> tsv } )
 
@@ -644,10 +629,8 @@ workflow METATDENOVO {
                 .mix ( MERGE_TABLES.out.merged_table.map { _meta, tblout -> [ tblout ] } )
                 .ifEmpty { [ [] ] }
         )
-    ch_versions     = ch_versions.mix(MERGE_TABLES.out.versions)
 
     COLLECT_STATS(ch_collect_stats)
-    ch_versions     = ch_versions.mix(COLLECT_STATS.out.versions)
 
     //
     // MODULE: MultiQC
