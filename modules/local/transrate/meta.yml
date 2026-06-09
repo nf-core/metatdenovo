@@ -29,7 +29,7 @@ topics:
       - transrate:
           type: string
           description: The name of the tool
-      - transrate --version
+      - "transrate --version":
           type: eval
           description: The expression to obtain the version of the tool
 authors:

@@ -24,7 +24,7 @@ topics:
       - wget:
           type: string
           description: The name of the tool
-      - wget --version 2>&1 | head -n 1 | awk "{print \$3}"
+      - 'wget --version 2>&1 | head -n 1 | awk "{print \$3}"':
           type: eval
           description: The expression to obtain the version of the tool
 authors:
