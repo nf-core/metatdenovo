@@ -563,7 +563,6 @@ workflow METATDENOVO {
         ch_merge_tables = ch_merge_tables.mix ( SUB_EUKULELE.out.taxonomy_summary.map { _meta, tsv -> tsv } )
     }
 
-    /** REMEMBER
     //
     // Call Diamond for taxonomy with amino acid sequences
     //
@@ -582,7 +581,6 @@ workflow METATDENOVO {
 
     TAXONKIT_LINEAGE(
         ch_taxonkit_lineage.map { it -> [ it[1], [], it[2] ] },
-        [],
         ch_taxonkit_lineage.map { it -> it[4] },
         ch_taxonkit_lineage.map { it -> it[5] }
     )
@@ -613,7 +611,6 @@ workflow METATDENOVO {
     )
 
     ch_merge_tables = ch_merge_tables.mix ( SUM_DIAMONDTAX.out.taxonomy_summary.map { _meta, tsv -> tsv } )
-    **/
 
     //
     // MODULE: Collect statistics from mapping analysis

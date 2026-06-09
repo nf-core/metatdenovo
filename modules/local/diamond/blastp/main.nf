@@ -1,5 +1,5 @@
 process DIAMOND_BLASTP {
-    tag "${meta.id}.${meta2.id}"
+    tag "${prefix}"
     label 'process_high'
 
     conda "${moduleDir}/environment.yml"
@@ -14,14 +14,14 @@ process DIAMOND_BLASTP {
     val blast_columns
 
     output:
-    tuple val(outmeta), path('${prefix}.blast*'), optional: true, emit: blast
-    tuple val(outmeta), path('${prefix}.xml*')  , optional: true, emit: xml
-    tuple val(outmeta), path('${prefix}.txt*')  , optional: true, emit: txt
-    tuple val(outmeta), path('${prefix}.daa')   , optional: true, emit: daa
-    tuple val(outmeta), path('${prefix}.sam*')  , optional: true, emit: sam
-    tuple val(outmeta), path('${prefix}.tsv*')  , optional: true, emit: tsv
-    tuple val(outmeta), path('${prefix}.paf*')  , optional: true, emit: paf
-    tuple val("${task.process}"), val('diamond'), eval('diamond --version | tail -n 1 | sed "s/^diamond version //"'), emit: versions_diamond, topic: versions
+    tuple val(outmeta), path('*.blast*'), optional: true, emit: blast
+    tuple val(outmeta), path('*.xml*')  , optional: true, emit: xml
+    tuple val(outmeta), path('*.txt*')  , optional: true, emit: txt
+    tuple val(outmeta), path('*.daa')   , optional: true, emit: daa
+    tuple val(outmeta), path('*.sam*')  , optional: true, emit: sam
+    tuple val(outmeta), path('*.tsv*')  , optional: true, emit: tsv
+    tuple val(outmeta), path('*.paf*')  , optional: true, emit: paf
+    tuple val("${task.process}"), val('diamond')  , eval('diamond --version | tail -n 1 | sed "s/^diamond version //"'), emit: versions_diamond, topic: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -42,7 +42,7 @@ process DIAMOND_BLASTP {
     else {
         outfmt  = 6
         out_ext = 'txt'
-        log.warn("Unknown output file format provided (${out_ext}): selecting DIAMOND default of tabular BLAST output (txt)")
+        log.warn("Unknown output file format provided (${outfmt}): selecting DIAMOND default of tabular BLAST output (txt)")
     }
     if ( args =~ /--compress\s+1/ ) out_ext += '.gz'
     """
@@ -58,6 +58,19 @@ process DIAMOND_BLASTP {
 
     stub:
     prefix = task.ext.prefix ?: "${meta.id}"
+    if      ( outfmt == 0   ) { out_ext = "blast" }
+    else if ( outfmt == 5   ) { out_ext = "xml"   }
+    else if ( outfmt == 6   ) { out_ext = "txt"   }
+    else if ( outfmt == 100 ) { out_ext = "daa"   }
+    else if ( outfmt == 101 ) { out_ext = "sam"   }
+    else if ( outfmt == 102 ) { out_ext = "tsv"   }
+    else if ( outfmt == 103 ) { out_ext = "paf"   }
+    else {
+        outfmt  = 6
+        out_ext = 'txt'
+        log.warn("Unknown output file format provided (${outfmt}): selecting DIAMOND default of tabular BLAST output (txt)")
+    }
+    if ( args =~ /--compress\s+1/ ) out_ext += '.gz'
 
     """
     touch ${prefix}.${out_ext}

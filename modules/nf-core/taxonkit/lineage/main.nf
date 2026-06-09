@@ -9,7 +9,8 @@ process TAXONKIT_LINEAGE {
 
     input:
     tuple val(meta), val(taxid), path(taxidfile)
-    path taxdb
+    path names, stageAs: 'taxdump/names.dmp'    // Path to names.dmp; alternative to taxdb
+    path nodes, stageAs: 'taxdump/nodes.dmp'    // Path to nodes.dmp; alternative to taxdb
 
     output:
     tuple val(meta), path("*.tsv"), emit: tsv
@@ -26,7 +27,7 @@ process TAXONKIT_LINEAGE {
     taxonkit \\
         lineage \\
         $args \\
-        --data-dir $taxdb \\
+        --data-dir taxdump/ \\
         --threads $task.cpus \\
         --out-file ${prefix}.tsv \\
         ${taxid? "<<< '$taxid'": taxidfile}
