@@ -122,7 +122,6 @@
                 },
                 "save_bbduk_fastq": {
                     "type": "boolean",
-                    "default": "false",
                     "description": "Save the resulting fastq files from filtering",
                     "fa_icon": "fas fa-align-center"
                 }
@@ -156,7 +155,6 @@
                 },
                 "save_bbnorm_fastq": {
                     "type": "boolean",
-                    "default": "false",
                     "description": "Save the resulting fastq files from normalization",
                     "fa_icon": "fas fa-align-center"
                 }
