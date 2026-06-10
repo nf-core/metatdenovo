@@ -11,7 +11,7 @@ process TRANSRATE {
     tuple val(meta), path(assembly)
 
     output:
-    tuple val(meta), path("*assemblies_mqc.csv") , emit: assembly_qc
+    tuple val(meta), path("${prefix}*assemblies_mqc.csv") , emit: assembly_qc
     tuple val("${task.process}"), val('transrate'), eval('transrate --version'), emit: versions_transrate, topic: versions
 
     when:
@@ -19,7 +19,7 @@ process TRANSRATE {
 
     script:
     def args = task.ext.args ?: ''
-    def prefix = task.ext.prefix ?: "${meta.id}"
+    prefix = task.ext.prefix ?: "${meta.id}"
 
     """
 
@@ -34,13 +34,8 @@ process TRANSRATE {
     """
 
     stub:
-    def prefix = task.ext.prefix ?: "${meta.id}"
+    prefix = task.ext.prefix ?: "${meta.id}"
     """
     touch ${prefix}_assemblies_mqc.csv
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        transrate: 1.0.3
-    END_VERSIONS
-"""
+    """
 }

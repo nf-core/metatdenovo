@@ -5,33 +5,43 @@ keywords:
   - transcripts
   - protein prediction
 input:
-  - meta:
+  meta:
       type: map
       description: Groovy Map containing sample information
-  - fasta:
+  fasta:
       type: file
       description: Input transcript FASTA file
       pattern: "*.{fa,fasta,fna}"
 output:
-  - meta:
+  meta:
       type: map
       description: Groovy Map containing sample information
-  - pep:
+  pep:
       type: file
       description: Predicted peptide sequences
       pattern: "*.pep"
-  - gff:
+  gff:
       type: file
       description: GFF3 file with predicted coding regions
       pattern: "*.gff3"
-  - cds:
+  cds:
       type: file
       description: Predicted coding sequences
       pattern: "*.cds"
-  - bed:
+  bed:
       type: file
       description: BED file with predicted coding regions
       pattern: "*.bed"
+  versions:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - transdecoder:
+          type: string
+          description: The name of the tool
+      - TransDecoder.LongOrfs --version | sed -e "s/TransDecoder.LongOrfs //g":
+          type: eval
+          description: The expression to obtain the version of the tool
 topics:
   versions:
     - - "${task.process}":
@@ -40,7 +50,7 @@ topics:
       - transdecoder:
           type: string
           description: The name of the tool
-      - 'TransDecoder.LongOrfs --version | sed -e "s/TransDecoder.LongOrfs //g"':
+      - TransDecoder.LongOrfs --version | sed -e "s/TransDecoder.LongOrfs //g":
           type: eval
           description: The expression to obtain the version of the tool
 authors:

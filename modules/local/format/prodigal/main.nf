@@ -12,7 +12,7 @@ process FORMAT_PRODIGAL_GFF {
 
     output:
     tuple val(meta), path("${prefix}_format.gff.gz"), emit: format_gff
-    tuple val("${task.process}"), val('<gzip>'), eval('gzip --version  2>&1 | grep "^gzip" | sed "s/^gzip \\([0-9.]\\+\\).*/\\1/"'), emit: versions_gzip, topic: versions
+    tuple val("${task.process}"), val('gzip'), eval('gzip --version  2>&1 | grep "^gzip" | sed "s/^gzip \\([0-9.]\\+\\).*/\\1/"'), emit: versions_gzip, topic: versions
 
     when:
     task.ext.when == null || task.ext.when

@@ -6,16 +6,26 @@ keywords:
   - orthology
   - download
 input:
-  - none
+  none
 output:
-  - ko_list:
+  ko_list:
       type: file
       description: KEGG Orthology (KO) list file
       pattern: "ko_list"
-  - koprofiles:
+  koprofiles:
       type: directory
       description: Directory containing KEGG Orthology profiles
       pattern: "profiles"
+  versions_kofamscan:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - wget:
+          type: string
+          description: The name of the tool
+      - wget --version 2>&1 | head -n 1 | awk "{print \$3}":
+          type: eval
+          description: The expression to obtain the version of the tool
 topics:
   versions:
     - - "${task.process}":
@@ -24,7 +34,7 @@ topics:
       - wget:
           type: string
           description: The name of the tool
-      - 'wget --version 2>&1 | head -n 1 | awk "{print \$3}"':
+      - wget --version 2>&1 | head -n 1 | awk "{print \$3}":
           type: eval
           description: The expression to obtain the version of the tool
 authors:

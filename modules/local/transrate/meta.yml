@@ -6,21 +6,31 @@ keywords:
   - assembly
   - quality assessment
 input:
-  - meta:
+  meta:
       type: map
       description: Groovy Map containing sample information
-  - assembly:
+  assembly:
       type: file
       description: Input transcriptome assembly file
       pattern: "*.{fa,fasta,fna}"
 output:
-  - meta:
+  meta:
       type: map
       description: Groovy Map containing sample information
-  - assembly_qc:
+  assembly_qc:
       type: file
       description: Transrate assembly quality assessment results
       pattern: "*assemblies_mqc.csv"
+  versions_transrate:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - transrate:
+          type: string
+          description: The name of the tool
+      - transrate --version:
+          type: eval
+          description: The expression to obtain the version of the tool
 topics:
   versions:
     - - "${task.process}":
@@ -29,7 +39,7 @@ topics:
       - transrate:
           type: string
           description: The name of the tool
-      - "transrate --version":
+      - transrate --version:
           type: eval
           description: The expression to obtain the version of the tool
 authors:

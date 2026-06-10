@@ -6,33 +6,43 @@ keywords:
   - orthology
   - annotation
 input:
-  - meta:
+  meta:
       type: map
       description: Groovy Map containing sample information
-  - fasta:
+  fasta:
       type: file
       description: Input protein FASTA file
       pattern: "*.{faa,fasta},{.gz,}"
-  - ko_list:
+  ko_list:
       type: file
       description: KEGG Orthology (KO) list file
       pattern: "ko_list"
-  - koprofiles:
+  koprofiles:
       type: directory
       description: Directory containing KEGG Orthology profiles
       pattern: "profiles"
 output:
-  - meta:
+  meta:
       type: map
       description: Groovy Map containing sample information
-  - kout:
+  kout:
       type: file
       description: KofamScan detailed output file
       pattern: "kofamscan_output.tsv.gz"
-  - kofamtsv:
+  kofamtsv:
       type: file
       description: Cleaned KofamScan output for summary tables
       pattern: "kofamscan.tsv.gz"
+  versions_kofamscan:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - kofamscan:
+          type: string
+          description: The name of the tool
+      - exec_annotation --version 2>&1 | sed "s/^.*exec_annotation//":
+          type: eval
+          description: The expression to obtain the version of the tool
 topics:
   versions:
     - - "${task.process}":
@@ -41,7 +51,7 @@ topics:
       - kofamscan:
           type: string
           description: The name of the tool
-      - 'exec_annotation --version 2>&1 | sed "s/^.*exec_annotation//"':
+      - exec_annotation --version 2>&1 | sed "s/^.*exec_annotation//":
           type: eval
           description: The expression to obtain the version of the tool
 authors:

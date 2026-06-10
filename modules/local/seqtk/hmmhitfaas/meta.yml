@@ -7,7 +7,7 @@ keywords:
   - seqtk
   - fasta
 tools:
-  - seqtk:
+  seqtk:
       description: Seqtk is a fast and lightweight tool for processing sequences in
         the FASTA or FASTQ format. The seqtk seq command enables common transformation
         operations on FASTA or FASTQ files.
@@ -17,23 +17,23 @@ tools:
       licence: ["MIT"]
       identifier: biotools:seqtk
 input:
-  - - meta:
+  - meta:
         type: map
         description: |
           Groovy Map containing sample information
           e.g. `[ id:'sample1', single_end:false ]`
 
-    - hmmrank:
+    hmmrank:
         type: file
         description: TSV file containing best ranked HMMER hits
         pattern: "*.tsv.gz"
-    - faa:
+    faa:
         type: file
         description: Amino acid fasta file
         pattern: "*.faa.gz"
 
 output:
-  - hitfaas:
+  hitfaas:
       - meta:
           type: map
           description: |
@@ -42,6 +42,16 @@ output:
       - "hits/*.faa.gz":
           type: file
           description: Subsets of the input fasta file corresponding to hits in the hmmrank file
+  versions:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - seqtk:
+          type: string
+          description: The name of the tool
+      - 'seqtk 2>&1 | grep Version | sed "s/^.*Version: //; s/ .*\$//"':
+          type: eval
+          description: The expression to obtain the version of the tool
 
 topics:
   versions:

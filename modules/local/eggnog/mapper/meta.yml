@@ -6,61 +6,71 @@ keywords:
   - functional annotation
   - orthology
 input:
-  - meta:
+  meta:
       type: map
       description: Groovy Map containing sample information
-  - fasta:
+  fasta:
       type: file
       description: Input FASTA file
       pattern: "*.{fa,fasta,fna}"
-  - eggnog_files:
+  eggnog_files:
       type: directory
       description: Directory containing EggNOG database files
       pattern: "eggnog/*"
 output:
-  - meta:
+  meta:
       type: map
       description: Groovy Map containing sample information
-  - hits:
+  hits:
       type: file
       description: EggNOG-mapper hits file
       pattern: "*.emapper.hits.gz"
-  - seed_orthologs:
+  seed_orthologs:
       type: file
       description: EggNOG-mapper seed orthologs file
       pattern: "*.emapper.seed_orthologs.gz"
-  - annotations:
+  annotations:
       type: file
       description: EggNOG-mapper annotations file
       pattern: "*.emapper.annotations.gz"
-  - emappertsv:
+  emappertsv:
       type: file
       description: EggNOG-mapper TSV file
       pattern: "*.emapper.tsv.gz"
-  - xlsx:
+  xlsx:
       type: file
       description: EggNOG-mapper annotations in Excel format
       pattern: "*.emapper.annotations.xlsx"
-  - orthologs:
+  orthologs:
       type: file
       description: EggNOG-mapper orthologs file
       pattern: "*.emapper.orthologs.gz"
-  - genepred:
+  genepred:
       type: file
       description: EggNOG-mapper gene prediction FASTA file
       pattern: "*.emapper.genepred.fasta.gz"
-  - gff:
+  gff:
       type: file
       description: EggNOG-mapper GFF file
       pattern: "*.emapper.gff.gz"
-  - no_anno:
+  no_anno:
       type: file
       description: FASTA file of sequences without annotations
       pattern: "*.emapper.no_annotations.fasta.gz"
-  - pfam:
+  pfam:
       type: file
       description: EggNOG-mapper Pfam annotations file
       pattern: "*.emapper.pfam.gz"
+  versions:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - eggnog-mapper:
+          type: string
+          description: The name of the tool
+      - emapper.py --version | sed "s/.* emapper-//" | sed "s/ \\/ Expected.*//":
+          type: eval
+          description: The expression to obtain the version of the tool
 topics:
   versions:
     - - "${task.process}":
@@ -69,7 +79,7 @@ topics:
       - eggnog-mapper:
           type: string
           description: The name of the tool
-      - 'emapper.py --version | sed "s/.* emapper-//" | sed "s/ \\/ Expected.*//"':
+      - emapper.py --version | sed "s/.* emapper-//" | sed "s/ \\/ Expected.*//":
           type: eval
           description: The expression to obtain the version of the tool
 authors:

@@ -26,11 +26,6 @@
                         "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",
                         "installed_by": ["modules"]
                     },
-                    "cat/cat": {
-                        "branch": "master",
-                        "git_sha": "eac429d4c67ac5114ce7d4287d460d8f05fd9fab",
-                        "installed_by": ["modules"]
-                    },
                     "cat/fastq": {
                         "branch": "master",
                         "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",
@@ -38,6 +33,11 @@
                         "patch": "modules/nf-core/cat/fastq/cat-fastq.diff"
                     },
                     "fastqc": {
+                        "branch": "master",
+                        "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",
+                        "installed_by": ["modules"]
+                    },
+                    "find/concatenate": {
                         "branch": "master",
                         "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",
                         "installed_by": ["modules"]
@@ -59,7 +59,7 @@
                     },
                     "prodigal": {
                         "branch": "master",
-                        "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",
+                        "git_sha": "9552f5a69a8149332b248ec9b1a7f1a2a292ec4c",
                         "installed_by": ["modules"]
                     },
                     "prokka": {

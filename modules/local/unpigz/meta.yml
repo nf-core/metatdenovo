@@ -6,21 +6,31 @@ keywords:
   - gunzip
   - pigz
 input:
-  - meta:
+  meta:
       type: map
       description: Groovy Map containing sample information
-  - file:
+  file:
       type: file
       description: Gzipped input file
       pattern: "*.gz"
 output:
-  - meta:
+  meta:
       type: map
       description: Groovy Map containing sample information
-  - unzipped:
+  unzipped:
       type: file
       description: Decompressed output file
       pattern: "*"
+  versions_pigz:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - pigz:
+          type: string
+          description: The name of the tool
+      - pigz --version 2>&1:
+          type: eval
+          description: The expression to obtain the version of the tool
 topics:
   versions:
     - - "${task.process}":
@@ -29,7 +39,7 @@ topics:
       - pigz:
           type: string
           description: The name of the tool
-      - 'pigz --version 2>&1':
+      - pigz --version 2>&1:
           type: eval
           description: The expression to obtain the version of the tool
 authors:

@@ -6,28 +6,38 @@ keywords:
   - database
   - functional annotation
 input:
-  - none
+  none
 output:
-  - eggnog_db:
+  eggnog_db:
       type: file
       description: EggNOG database file
       pattern: "eggnog.db"
-  - dmnd:
+  dmnd:
       type: file
       description: DIAMOND-formatted EggNOG protein database
       pattern: "eggnog_proteins.dmnd"
-  - taxa_db:
+  taxa_db:
       type: file
       description: EggNOG taxonomy database
       pattern: "eggnog.taxa.db"
-  - pkl:
+  pkl:
       type: file
       description: EggNOG taxonomy traverse pickle file
       pattern: "eggnog.taxa.db.traverse.pkl"
-  - all:
+  all:
       type: directory
       description: Directory containing all downloaded EggNOG files
       pattern: "*"
+  versions_emapper:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - eggnog-mapper:
+          type: string
+          description: The name of the tool
+      - emapper.py --version | sed "s/.* emapper-//" | sed "s/ \\/ Expected.*//":
+          type: eval
+          description: The expression to obtain the version of the tool
 topics:
   versions:
     - - "${task.process}":
@@ -36,7 +46,7 @@ topics:
       - eggnog-mapper:
           type: string
           description: The name of the tool
-      - 'emapper.py --version | sed "s/.* emapper-//" | sed "s/ \\/ Expected.*//"':
+      - emapper.py --version | sed "s/.* emapper-//" | sed "s/ \\/ Expected.*//":
           type: eval
           description: The expression to obtain the version of the tool
 authors:

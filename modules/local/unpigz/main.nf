@@ -12,7 +12,7 @@ process UNPIGZ {
 
     output:
     tuple val(meta), path("$gunzip") , emit: unzipped
-    tuple val("${task.process}"), val('pigz'), eval('pigz --version 2>&1'), emit: versions_pigz, topic: versions
+    tuple val("${task.process}"), val('pigz'), eval('pigz --version 2>&1 | sed "s/pigz *//"'), emit: versions_pigz, topic: versions
 
     when:
     task.ext.when == null || task.ext.when

@@ -17,6 +17,16 @@ output:
       type: file
       description: SPAdes YAML configuration file
       pattern: "*.yaml"
+  versions_writespadesyaml:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - bash:
+          type: string
+          description: The name of the tool
+      - bash --version | grep "GNU bash" | sed "s/.*version //" | sed "s/ .*//":
+          type: eval
+          description: The expression to obtain the version of the tool
 topics:
   versions:
     - - "${task.process}":
@@ -25,7 +35,7 @@ topics:
       - bash:
           type: string
           description: The name of the tool
-      - 'bash --version | grep "GNU bash" | sed "s/.*version //" | sed "s/ .*//"':
+      - bash --version | grep "GNU bash" | sed "s/.*version //" | sed "s/ .*//":
           type: eval
           description: The expression to obtain the version of the tool
 authors:

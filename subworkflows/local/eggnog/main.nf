@@ -12,27 +12,20 @@ workflow EGGNOG {
     collect_fcs
 
     main:
-    ch_versions = channel.empty()
 
     EGGNOG_DOWNLOAD()
-    ch_versions = ch_versions.mix(EGGNOG_DOWNLOAD.out.versions)
 
-    EGGNOG_DOWNLOAD.out.eggnog_db
+    ch_eggnog_database = EGGNOG_DOWNLOAD.out.eggnog_db
         .combine(EGGNOG_DOWNLOAD.out.dmnd)
         .combine(EGGNOG_DOWNLOAD.out.taxa_db)
         .combine(EGGNOG_DOWNLOAD.out.pkl)
-        .set{ ch_eggnog_database }
 
-    EGGNOG_MAPPER ( faa, ch_eggnog_database )
-    ch_versions = ch_versions.mix ( EGGNOG_MAPPER.out.versions )
+    EGGNOG_MAPPER(faa, ch_eggnog_database)
 
-    EGGNOG_SUM ( EGGNOG_MAPPER.out.emappertsv, collect_fcs )
-    ch_versions = ch_versions.mix ( EGGNOG_SUM.out.versions )
+    EGGNOG_SUM(EGGNOG_MAPPER.out.emappertsv, collect_fcs)
 
     emit:
     hits       = EGGNOG_MAPPER.out.hits
     emappertsv = EGGNOG_MAPPER.out.emappertsv
     sumtable   = EGGNOG_SUM.out.eggnog_summary
-    versions   = ch_versions
-
 }

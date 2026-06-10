@@ -19,7 +19,7 @@ process MEGAHIT_INTERLEAVED {
     path("megahit_out/intermediate_contigs/k*.addi.fa.gz")         , emit: addi_contigs
     path("megahit_out/intermediate_contigs/k*.local.fa.gz")        , emit: local_contigs
     path("megahit_out/intermediate_contigs/k*.final.contigs.fa.gz"), emit: kfinal_contigs
-    tuple val("${task.process}"), val('megahit'), eval('megahit -v 2&1 | sed "s/MEGAHIT v//"'), emit: versions_megahit, topic: versions
+    tuple val("${task.process}"), val('megahit_interleaved'), eval('megahit -v 2>&1 | sed "s/MEGAHIT v//"'), emit: versions_megahit, topic: versions
 
     script:
     def args = task.ext.args ?: ''

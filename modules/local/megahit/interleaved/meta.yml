@@ -6,42 +6,52 @@ keywords:
   - de novo
   - interleaved
 input:
-  - intl_pe_reads:
+  intl_pe_reads:
       type: file
       description: Interleaved paired-end read files
       pattern: "*.{fastq,fq,fastq.gz,fq.gz}"
-  - se_reads:
+  se_reads:
       type: file
       description: Single-end read files (optional)
       pattern: "*.{fastq,fq,fastq.gz,fq.gz}"
-  - assembly:
+  assembly:
       type: value
       description: Assembly name or identifier
 output:
-  - contigs:
+  contigs:
       type: file
       description: Final assembled contigs
       pattern: "megahit_out/*.contigs.fa.gz"
-  - log:
+  log:
       type: file
       description: MEGAHIT log file
       pattern: "megahit_out/*.log"
-  - k_contigs:
+  k_contigs:
       type: file
       description: Intermediate contigs for each k-mer size
       pattern: "megahit_out/intermediate_contigs/k*.contigs.fa.gz"
-  - addi_contigs:
+  addi_contigs:
       type: file
       description: Additional contigs for each k-mer size
       pattern: "megahit_out/intermediate_contigs/k*.addi.fa.gz"
-  - local_contigs:
+  local_contigs:
       type: file
       description: Local contigs for each k-mer size
       pattern: "megahit_out/intermediate_contigs/k*.local.fa.gz"
-  - kfinal_contigs:
+  kfinal_contigs:
       type: file
       description: Final contigs for each k-mer size
       pattern: "megahit_out/intermediate_contigs/k*.final.contigs.fa.gz"
+  versions_megahit:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - megahit:
+          type: string
+          description: The name of the tool
+      - megahit -v 2&1 | sed "s/MEGAHIT v//":
+          type: eval
+          description: The expression to obtain the version of the tool
 topics:
   versions:
     - - "${task.process}":
@@ -50,7 +60,7 @@ topics:
       - megahit:
           type: string
           description: The name of the tool
-      - 'megahit -v 2&1 | sed "s/MEGAHIT v//"':
+      - megahit -v 2&1 | sed "s/MEGAHIT v//":
           type: eval
           description: The expression to obtain the version of the tool
 authors:
