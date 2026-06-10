@@ -14,7 +14,6 @@ workflow PROKKA_SUBSETS {
     batchsize // channel: strings like '10.MB'. Usually from params.prokka_batchsize
 
     main:
-    ch_versions = channel.empty()
 
     PROKKA(
         contigs
