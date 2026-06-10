@@ -1,7 +1,9 @@
 lint:
   files_unchanged:
     - assets/nf-core-metatdenovo_logo_light.png
+    - assets/nf-core-metatdenovo_logo_dark.png
     - docs/images/nf-core-metatdenovo_logo_light.png
+    - docs/images/nf-core-metatdenovo_logo_dark.png
 nf_core_version: 4.0.2
 repository_type: pipeline
 template:
