@@ -174,6 +174,7 @@
                 },
                 "user_assembly": {
                     "type": "string",
+                    "default": null,
                     "format": "file-path",
                     "exists": true,
                     "mimetype": "text/plain",
@@ -248,6 +249,7 @@
                 },
                 "user_orfs_faa": {
                     "type": "string",
+                    "default": null,
                     "format": "file-path",
                     "exists": true,
                     "mimetype": "text/plain",
@@ -256,6 +258,7 @@
                 },
                 "user_orfs_gff": {
                     "type": "string",
+                    "default": null,
                     "format": "file-path",
                     "exists": true,
                     "mimetype": "text/plain",
@@ -274,9 +277,9 @@
                     "fa_icon": "fas fa-phone-volume"
                 },
                 "prokka_batchsize": {
-                    "type": "string",
+                    "type": "integer",
                     "description": "Size of individual files annotated by Prokka in one batch.",
-                    "default": "10 MB",
+                    "default": "10.MB",
                     "pattern": "^\\d+(\\.\\d+)?\\.?\\s*(K|M|G|T)?B$",
                     "hidden": true,
                     "help_text": "Prokka usually fails on very large input files. This parameter controls the size of smaller batches for which Prokka will be called. Should be a string in the format integer-unit e.g. `--prokka_batchsize '8.MB'`",
@@ -317,6 +320,7 @@
                 },
                 "hmmdir": {
                     "type": "string",
+                    "default": null,
                     "description": "Directory with hmm files which will be searched for among ORFs",
                     "pattern": "^\\S+",
                     "format": "directory-path",
@@ -324,6 +328,7 @@
                 },
                 "hmmfiles": {
                     "type": "string",
+                    "default": null,
                     "description": "Comma-separated list of hmm files which will be searched for among ORFs",
                     "pattern": "\\S+hmm(\\.gz)?",
                     "format": "file-path",
@@ -347,6 +352,7 @@
             "properties": {
                 "diamond_dbs": {
                     "type": "string",
+                    "default": null,
                     "format": "file-path",
                     "exists": true,
                     "schema": "assets/schema_diamond_dbs.json",
@@ -490,6 +496,7 @@
                 },
                 "multiqc_config": {
                     "type": "string",
+                    "default": null,
                     "format": "file-path",
                     "description": "Custom config file to supply to MultiQC.",
                     "fa_icon": "fas fa-cog",
