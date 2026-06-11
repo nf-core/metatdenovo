@@ -102,6 +102,7 @@ topics:
       - 'emapper.py --version 2>&1 | grep "^emapper-" | sed "s/emapper-//" | sed "s/ .*//"':
           type: eval
           description: The expression to obtain the version of the tool
+    - - "${task.process}":
           type: string
           description: The name of the process
       - diamond:
@@ -110,6 +111,7 @@ topics:
       - 'emapper.py --version 2>&1 | grep "^emapper-" | sed "s/.*diamond version //" | sed "s/ .*//"':
           type: eval
           description: The expression to obtain the version of the tool
+    - - "${task.process}":
           type: string
           description: The name of the process
       - mmseqs2:
