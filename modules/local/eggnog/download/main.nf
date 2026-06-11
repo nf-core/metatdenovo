@@ -20,10 +20,19 @@ process EGGNOG_DOWNLOAD {
     script:
     def args = task.ext.args ?: ''
     """
-    download_eggnog_data.py \\
-        $args \\
-        -y \\
-        --data_dir .
+    # This commented for the moment since the tool tries to access a domain that doesn't exist anymore
+    #download_eggnog_data.py \\
+    #    $args \\
+    #    -y \\
+    #    --data_dir .
+
+    # Temporary solution, until version 3 of the tool
+    wget http://eggnog6.embl.de/download/emapperdb-5.0.2/eggnog.db.gz
+    gunzip eggnog.db.gz
+    wget http://eggnog6.embl.de/download/emapperdb-5.0.2/eggnog_proteins.dmnd.gz
+    gunzip eggnog_proteins.dmnd.gz
+    wget http://eggnog6.embl.de/download/emapperdb-5.0.2/eggnog.taxa.tar.gz
+    tar xzf eggnog.taxa.tar.gz
     """
 
     stub:
