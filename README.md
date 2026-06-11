@@ -114,7 +114,13 @@ For further information or help, don't hesitate to get in touch on the [Slack `#
 
 ## Citations
 
-If you use nf-core/metatdenovo for your analysis, please cite it using the following doi: [10.5281/zenodo.10666590](https://doi.org/10.5281/zenodo.10666590)
+If you use nf-core/metatdenovo for your analysis, please cite it as follows:
+
+> **The Nextflow Nf-Core/Metatdenovo Pipeline for Reproducible Annotation of Metatranscriptomes, and More.**
+>
+> Di Leo, Danilo, Emelie Nilsson, Arianna Krinos, Jarone Pinhassi, and Daniel Lundin.
+>
+> PeerJ 13 (December 2025): e20328. https://doi.org/10.7717/peerj.20328.
 
 An extensive list of references for the tools used by the pipeline can be found in the [`CITATIONS.md`](CITATIONS.md) file.
 

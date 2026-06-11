@@ -1,5 +1,9 @@
 # nf-core/metatdenovo: Citations
 
+## [nf-core/metatdenovo](https://peerj.com/articles/20328/)
+
+> Di Leo, Danilo, Emelie Nilsson, Arianna Krinos, Jarone Pinhassi, and Daniel Lundin. 2025. “The Nextflow Nf-Core/Metatdenovo Pipeline for Reproducible Annotation of Metatranscriptomes, and More.” PeerJ 13 (December): e20328. https://doi.org/10.7717/peerj.20328.
+
 ## [nf-core](https://pubmed.ncbi.nlm.nih.gov/32055031/)
 
 > Ewels PA, Peltzer A, Fillinger S, Patel H, Alneberg J, Wilm A, Garcia MU, Di Tommaso P, Nahnsen S. The nf-core framework for community-curated bioinformatics pipelines. Nat Biotechnol. 2020 Mar;38(3):276-278. doi: 10.1038/s41587-020-0439-x. PubMed PMID: 32055031.
