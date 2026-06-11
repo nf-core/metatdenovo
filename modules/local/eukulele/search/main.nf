@@ -14,7 +14,7 @@ process EUKULELE_SEARCH {
     tuple val(meta), path("${prefix}/taxonomy_estimation/*.out.gz"), val("${dbname}"), emit: taxonomy_estimation
     tuple val(meta), path("${prefix}/taxonomy_counts/*.csv.gz")                      , emit: taxonomy_counts, optional: true
     tuple val(meta), path("${prefix}/mets_full/diamond/*")                           , emit: diamond
-    tuple val("${task.process}"), val('eukulele'), eval('EUKulele --version 2>&1')   , emit: versions_eukulele, topic: versions
+    tuple val("${task.process}"), val('eukulele'), eval('EUKulele --version 2>&1 | grep "current EUKulele version" | sed "s/The current EUKulele version is //"'), emit: versions_eukulele, topic: versions
 
     script:
     def args     = task.ext.args ?: ''
