@@ -10,7 +10,6 @@ process KOFAMSCAN_DOWNLOAD {
     output:
     path "ko_list"     , emit: ko_list
     path "profiles"    , emit: koprofiles
-    tuple val("${task.process}"), val('wget'), eval('wget --version 2>&1 | head -n 1 | awk "{print \$3}"'), emit: versions_wget, topic: versions
 
     when:
     task.ext.when == null || task.ext.when

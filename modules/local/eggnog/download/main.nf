@@ -13,7 +13,6 @@ process EGGNOG_DOWNLOAD {
     path "eggnog.taxa.db"             , emit: taxa_db
     path "eggnog.taxa.db.traverse.pkl", emit: pkl
     path "*"                          , emit: all
-    tuple val("${task.process}"), val("eggnog-mapper"), eval('emapper.py --version | sed "s/.* emapper-//" | sed "s/ \\/ Expected.*//"'), emit: versions_emapper, topic: versions
 
     when:
     task.ext.when == null || task.ext.when
