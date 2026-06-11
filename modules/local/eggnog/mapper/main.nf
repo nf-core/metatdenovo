@@ -22,7 +22,7 @@ process EGGNOG_MAPPER {
     tuple val(meta), path("${prefix}.emapper.gff.gz")                 , emit: gff,       optional: true
     tuple val(meta), path("${prefix}.emapper.no_annotations.fasta.gz"), emit: no_anno,   optional: true
     tuple val(meta), path("${prefix}.emapper.pfam.gz")                , emit: pfam,      optional: true
-    tuple val("${task.process}"), val("eggnog-mapper"), eval('emapper.py --version | sed "s/.* emapper-//" | sed "s/ \\/ Expected.*//"'), emit: versions_emapper, topic: versions
+    tuple val("${task.process}"), val("eggnog-mapper"), eval('emapper.py --version 2>&1 | grep "^emapper-" | sed "s/emapper-//" | sed "s/ .*//"'), emit: versions_emapper, topic: versions
 
     script:
     def args = task.ext.args   ?: ''
@@ -31,6 +31,7 @@ process EGGNOG_MAPPER {
     gunzip   = fasta =~ /\.gz$/ ? "gunzip -c ${fasta} > ${input}" : ""
 
     """
+
     $gunzip
 
     emapper.py \\
@@ -41,15 +42,19 @@ process EGGNOG_MAPPER {
         -i $input
 
     gzip ${prefix}.emapper.*
+
     zgrep -v '^##' ${prefix}.emapper.annotations | \\
         sed 's/^#// ; /^query/s/.*/\\L&/ ; s/query/orf/' | \\
         gzip -c > ${prefix}.emapper.tsv.gz
     """
 
     stub:
+    prefix   = task.ext.prefix ?: "${meta.id}"
+
     """
-    touch test.emapper.hits
-    touch test.emapper.seed_orthologs
-    touch test.emapper.annotations
+    gzip -c /dev/null > $prefix.emapper.hits.gz
+    gzip -c /dev/null > $prefix.emapper.seed_orthologs.gz
+    gzip -c /dev/null > $prefix.emapper.annotations.gz
+    gzip -c /dev/null > $prefix.emapper.tsv.gz
     """
 }
