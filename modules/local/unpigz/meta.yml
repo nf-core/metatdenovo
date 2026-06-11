@@ -7,20 +7,20 @@ keywords:
   - pigz
 input:
   meta:
-      type: map
-      description: Groovy Map containing sample information
+    type: map
+    description: Groovy Map containing sample information
   file:
-      type: file
-      description: Gzipped input file
-      pattern: "*.gz"
+    type: file
+    description: Gzipped input file
+    pattern: "*.gz"
 output:
   meta:
-      type: map
-      description: Groovy Map containing sample information
+    type: map
+    description: Groovy Map containing sample information
   unzipped:
-      type: file
-      description: Decompressed output file
-      pattern: "*"
+    type: file
+    description: Decompressed output file
+    pattern: "*"
   versions_pigz:
     - - "${task.process}":
           type: string

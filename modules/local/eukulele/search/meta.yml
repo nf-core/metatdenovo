@@ -7,34 +7,34 @@ keywords:
   - eukaryotes
 input:
   meta:
-      type: map
-      description: Groovy Map containing sample information
+    type: map
+    description: Groovy Map containing sample information
   fasta:
-      type: file
-      description: Input protein FASTA file
-      pattern: "*.{faa,fasta}"
+    type: file
+    description: Input protein FASTA file
+    pattern: "*.{faa,fasta}"
   dbname:
-      type: value
-      description: Name of the database to use for classification
+    type: value
+    description: Name of the database to use for classification
   eukdb:
-      type: directory
-      description: Directory containing EUKulele reference database
+    type: directory
+    description: Directory containing EUKulele reference database
 output:
   meta:
-      type: map
-      description: Groovy Map containing sample information
+    type: map
+    description: Groovy Map containing sample information
   taxonomy_estimation:
-      type: file
-      description: EUKulele taxonomy estimation output
-      pattern: "*/taxonomy_estimation/*.out.gz"
+    type: file
+    description: EUKulele taxonomy estimation output
+    pattern: "*/taxonomy_estimation/*.out.gz"
   taxonomy_counts:
-      type: file
-      description: EUKulele taxonomy counts output
-      pattern: "*/taxonomy_counts/*.csv.gz"
+    type: file
+    description: EUKulele taxonomy counts output
+    pattern: "*/taxonomy_counts/*.csv.gz"
   diamond:
-      type: directory
-      description: DIAMOND alignment results
-      pattern: "*/mets_full/diamond/*"
+    type: directory
+    description: DIAMOND alignment results
+    pattern: "*/mets_full/diamond/*"
   versions_eukulele:
     - - "${task.process}":
           type: string

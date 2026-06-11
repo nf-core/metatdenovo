@@ -279,7 +279,7 @@
                 "prokka_batchsize": {
                     "type": "integer",
                     "description": "Size of individual files annotated by Prokka in one batch.",
-                    "default": "10.MB",
+                    "default": "10485760",
                     "pattern": "^\\d+(\\.\\d+)?\\.?\\s*(K|M|G|T)?B$",
                     "hidden": true,
                     "help_text": "Prokka usually fails on very large input files. This parameter controls the size of smaller batches for which Prokka will be called. Should be a string in the format integer-unit e.g. `--prokka_batchsize '8.MB'`",

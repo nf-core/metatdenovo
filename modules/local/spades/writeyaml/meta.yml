@@ -5,18 +5,18 @@ keywords:
   - yaml
 input:
   pe:
-      type: file
-      description: Paired-end read files (optional)
-      pattern: "*.{fastq,fq,fastq.gz,fq.gz}"
+    type: file
+    description: Paired-end read files (optional)
+    pattern: "*.{fastq,fq,fastq.gz,fq.gz}"
   se:
-      type: file
-      description: Single-end read files (optional)
-      pattern: "*.{fastq,fq,fastq.gz,fq.gz}"
+    type: file
+    description: Single-end read files (optional)
+    pattern: "*.{fastq,fq,fastq.gz,fq.gz}"
 output:
   yaml:
-      type: file
-      description: SPAdes YAML configuration file
-      pattern: "*.yaml"
+    type: file
+    description: SPAdes YAML configuration file
+    pattern: "*.yaml"
   versions_writespadesyaml:
     - - "${task.process}":
           type: string

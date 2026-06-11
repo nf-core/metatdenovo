@@ -7,32 +7,32 @@ keywords:
   - annotation
 input:
   meta:
-      type: map
-      description: Groovy Map containing sample information
+    type: map
+    description: Groovy Map containing sample information
   fasta:
-      type: file
-      description: Input protein FASTA file
-      pattern: "*.{faa,fasta},{.gz,}"
+    type: file
+    description: Input protein FASTA file
+    pattern: "*.{faa,fasta},{.gz,}"
   ko_list:
-      type: file
-      description: KEGG Orthology (KO) list file
-      pattern: "ko_list"
+    type: file
+    description: KEGG Orthology (KO) list file
+    pattern: "ko_list"
   koprofiles:
-      type: directory
-      description: Directory containing KEGG Orthology profiles
-      pattern: "profiles"
+    type: directory
+    description: Directory containing KEGG Orthology profiles
+    pattern: "profiles"
 output:
   meta:
-      type: map
-      description: Groovy Map containing sample information
+    type: map
+    description: Groovy Map containing sample information
   kout:
-      type: file
-      description: KofamScan detailed output file
-      pattern: "kofamscan_output.tsv.gz"
+    type: file
+    description: KofamScan detailed output file
+    pattern: "kofamscan_output.tsv.gz"
   kofamtsv:
-      type: file
-      description: Cleaned KofamScan output for summary tables
-      pattern: "kofamscan.tsv.gz"
+    type: file
+    description: Cleaned KofamScan output for summary tables
+    pattern: "kofamscan.tsv.gz"
   versions_kofamscan:
     - - "${task.process}":
           type: string
