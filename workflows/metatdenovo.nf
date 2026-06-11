@@ -512,7 +512,6 @@ workflow METATDENOVO {
     //
     if ( ! params.skip_eggnog ) {
         EGGNOG(ch_protein, ch_fcs_for_summary)
-        ch_versions = ch_versions.mix(EGGNOG.out.versions)
         ch_merge_tables = ch_merge_tables.mix ( EGGNOG.out.sumtable.map { _meta, tsv -> tsv } )
     }
 
@@ -522,7 +521,6 @@ workflow METATDENOVO {
     if( !params.skip_kofamscan ) {
         ch_kofamscan = ch_protein.map { meta, protein -> [ meta, protein ] }
         KOFAMSCAN( ch_kofamscan, ch_fcs_for_summary)
-        ch_versions = ch_versions.mix(KOFAMSCAN.out.versions)
         ch_merge_tables = ch_merge_tables.mix ( KOFAMSCAN.out.kofamscan_summary.map { _meta, tsv -> tsv } )
     }
 
