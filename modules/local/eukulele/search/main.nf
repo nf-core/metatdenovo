@@ -13,7 +13,7 @@ process EUKULELE_SEARCH {
     output:
     tuple val(meta), path("*/taxonomy_estimation/*.out.gz"), val("${dbname}") , emit: taxonomy_estimation
     tuple val(meta), path("*/taxonomy_counts/*.csv.gz")                       , emit: taxonomy_counts    , optional: true
-    tuple val(meta), path("*/mets_full/diamond/*")                            , emit: diamond
+    tuple val(meta), path("*/*_full/diamond/*")                               , emit: diamond
 
     path "versions.yml"                                                       , emit: versions
 
@@ -37,7 +37,7 @@ process EUKULELE_SEARCH {
         -s \\
         contigs || rc=\$?
 
-    gzip ${prefix}/mets_full/diamond/*.out
+    gzip ${prefix}/*_full/diamond/*.out
     find ${prefix}/ -name "*.csv" | xargs gzip
     gzip ${prefix}/taxonomy_estimation/*.out
 
