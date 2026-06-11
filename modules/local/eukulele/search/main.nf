@@ -14,7 +14,7 @@ process EUKULELE_SEARCH {
     tuple val(meta), path("${prefix}/taxonomy_estimation/*.out.gz"), val("${dbname}"), emit: taxonomy_estimation
     tuple val(meta), path("${prefix}/taxonomy_counts/*.csv.gz")                      , emit: taxonomy_counts, optional: true
     tuple val(meta), path("${prefix}/mets_full/diamond/*")                           , emit: diamond
-    tuple val("${task.process}"), val('eukulele'), eval('EUKulele --version 2>&1 | grep "current EUKulele version" | sed "s/The current EUKulele version is //"'), emit: versions_eukulele, topic: versions
+    path("versions.yml"), emit: versions, topic: versions
 
     script:
     def args     = task.ext.args ?: ''
@@ -40,6 +40,11 @@ process EUKULELE_SEARCH {
     find ${prefix}/ -name "*.csv" | xargs gzip
     gzip ${prefix}/taxonomy_estimation/*.out
 
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        eukulele: \$(EUKulele --version 2>&1 | grep "current EUKulele version" | sed "s/The current EUKulele version is //")
+    END_VERSIONS
+
     if [ \$rc -le 1 ]; then
         exit 0
     else
@@ -50,8 +55,13 @@ process EUKULELE_SEARCH {
     stub:
     prefix   = task.ext.prefix ?: ("${dbname}" ? "${meta.id}_${dbname}" : "${meta.id}")
     """
-    cat /dev/null | gzip -c > ${prefix}/taxonomy_estimation/empty.out.gz
-    cat /dev/null | gzip -c > ${prefix}/taxonomy_counts/empty.csv.gz
-    cat /dev/null | gzip -c > ${prefix}/mets_full/diamond/empty
+    gzip -c /dev/null > ${prefix}/taxonomy_estimation/empty.out.gz
+    gzip -c /dev/null > ${prefix}/taxonomy_counts/empty.csv.gz
+    gzip -c /dev/null > ${prefix}/mets_full/diamond/empty
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        eukulele: 2.1.2
+    END_VERSIONS
     """
 }
