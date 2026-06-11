@@ -84,7 +84,7 @@
                     "pigz": "2.3.4"
                 },
                 "Workflow": {
-                    "nf-core/metatdenovo": "v1.3.1"
+                    "nf-core/metatdenovo": "v1.3.1dev"
                 }
             },
             [
@@ -173,7 +173,7 @@
                 "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count"
             ]
         ],
-        "timestamp": "2026-06-10T11:04:04.64110662",
+        "timestamp": "2026-06-11T19:54:30.821144522",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.3"

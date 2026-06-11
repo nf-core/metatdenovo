@@ -98,7 +98,7 @@
                     "pigz": "2.3.4"
                 },
                 "Workflow": {
-                    "nf-core/metatdenovo": "v1.3.1"
+                    "nf-core/metatdenovo": "v1.3.1dev"
                 }
             },
             [
@@ -193,7 +193,7 @@
                 "orf\tcontig\tgene_caller\tfeature\tstart\tend\tstrand\tdb_xref\tec_number\tgene\tinference\tlocus_tag\tname\tnote\tproduct"
             ]
         ],
-        "timestamp": "2026-06-10T11:55:45.608412878",
+        "timestamp": "2026-06-11T19:51:42.670394989",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.3"
