@@ -3,21 +3,23 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v1.3.1 - [17-03-2026]
-
-Initial release of nf-core/metatdenovo, created with the [nf-core](https://nf-co.re/) template.
+## v1.3.1 - [YYYY-mm-dd]
 
 ### `Added`
 
 ### `Changed`
 
-- [#416](https://github.com/nf-core/metatdenovo/pull/416) - Better content pipeline integration tests
-- [#428](https://github.com/nf-core/metatdenovo/pull/428) - Template update to nf-core tools 3.5.2 (@danilodileo)
-- [#429](https://github.com/nf-core/metatdenovo/pull/429) - Module update to nf-core tools 3.5.2 (@danilodileo)
-- [#430](https://github.com/nf-core/metatdenovo/pull/430) - Nextlow lint (@danilodileo)
+- [#439](https://github.com/nf-core/metatdenovo/pull/439) - Update software versions (@erikrikarddaniel)
 - [#435](https://github.com/nf-core/metatdenovo/pull/435) - Template update 4.0.2 (@danilodileo)
+- [#430](https://github.com/nf-core/metatdenovo/pull/430) - Nextflow lint (@danilodileo)
+- [#429](https://github.com/nf-core/metatdenovo/pull/429) - Module update to nf-core tools 3.5.2 (@danilodileo)
+- [#428](https://github.com/nf-core/metatdenovo/pull/428) - Template update to nf-core tools 3.5.2 (@danilodileo)
+- [#416](https://github.com/nf-core/metatdenovo/pull/416) - Better content pipeline integration tests (@danilodileo)
 
 ### `Fixed`
+
+- [#439](https://github.com/nf-core/metatdenovo/pull/439) - Fix download of eggnog database as mentioned in [#423](https://github.com/nf-core/metatdenovo/issues/423) (@erikrikarddaniel)
+- [#439](https://github.com/nf-core/metatdenovo/pull/439) - Remove dependency of `versions.yml` presence for eggnog and kofamscan databases (@erikrikarddaniel)
 
 ### `Dependencies`
 
@@ -30,7 +32,7 @@ Initial release of nf-core/metatdenovo, created with the [nf-core](https://nf-co
 
 ### `Deprecated`
 
-## v1.3.0 - [29-08-2025]
+## v1.3.0 - [2025-08-29]
 
 ### `Added`
 
