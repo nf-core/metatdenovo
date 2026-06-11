@@ -7,60 +7,60 @@ keywords:
   - orthology
 input:
   meta:
-      type: map
-      description: Groovy Map containing sample information
+    type: map
+    description: Groovy Map containing sample information
   fasta:
-      type: file
-      description: Input FASTA file
-      pattern: "*.{fa,fasta,fna}"
+    type: file
+    description: Input FASTA file
+    pattern: "*.{fa,fasta,fna}"
   eggnog_files:
-      type: directory
-      description: Directory containing EggNOG database files
-      pattern: "eggnog/*"
+    type: directory
+    description: Directory containing EggNOG database files
+    pattern: "eggnog/*"
 output:
   meta:
-      type: map
-      description: Groovy Map containing sample information
+    type: map
+    description: Groovy Map containing sample information
   hits:
-      type: file
-      description: EggNOG-mapper hits file
-      pattern: "*.emapper.hits.gz"
+    type: file
+    description: EggNOG-mapper hits file
+    pattern: "*.emapper.hits.gz"
   seed_orthologs:
-      type: file
-      description: EggNOG-mapper seed orthologs file
-      pattern: "*.emapper.seed_orthologs.gz"
+    type: file
+    description: EggNOG-mapper seed orthologs file
+    pattern: "*.emapper.seed_orthologs.gz"
   annotations:
-      type: file
-      description: EggNOG-mapper annotations file
-      pattern: "*.emapper.annotations.gz"
+    type: file
+    description: EggNOG-mapper annotations file
+    pattern: "*.emapper.annotations.gz"
   emappertsv:
-      type: file
-      description: EggNOG-mapper TSV file
-      pattern: "*.emapper.tsv.gz"
+    type: file
+    description: EggNOG-mapper TSV file
+    pattern: "*.emapper.tsv.gz"
   xlsx:
-      type: file
-      description: EggNOG-mapper annotations in Excel format
-      pattern: "*.emapper.annotations.xlsx"
+    type: file
+    description: EggNOG-mapper annotations in Excel format
+    pattern: "*.emapper.annotations.xlsx"
   orthologs:
-      type: file
-      description: EggNOG-mapper orthologs file
-      pattern: "*.emapper.orthologs.gz"
+    type: file
+    description: EggNOG-mapper orthologs file
+    pattern: "*.emapper.orthologs.gz"
   genepred:
-      type: file
-      description: EggNOG-mapper gene prediction FASTA file
-      pattern: "*.emapper.genepred.fasta.gz"
+    type: file
+    description: EggNOG-mapper gene prediction FASTA file
+    pattern: "*.emapper.genepred.fasta.gz"
   gff:
-      type: file
-      description: EggNOG-mapper GFF file
-      pattern: "*.emapper.gff.gz"
+    type: file
+    description: EggNOG-mapper GFF file
+    pattern: "*.emapper.gff.gz"
   no_anno:
-      type: file
-      description: FASTA file of sequences without annotations
-      pattern: "*.emapper.no_annotations.fasta.gz"
+    type: file
+    description: FASTA file of sequences without annotations
+    pattern: "*.emapper.no_annotations.fasta.gz"
   pfam:
-      type: file
-      description: EggNOG-mapper Pfam annotations file
-      pattern: "*.emapper.pfam.gz"
+    type: file
+    description: EggNOG-mapper Pfam annotations file
+    pattern: "*.emapper.pfam.gz"
   versions_emapper:
     - - "${task.process}":
           type: string
