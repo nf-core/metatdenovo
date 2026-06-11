@@ -23,6 +23,8 @@ process EGGNOG_MAPPER {
     tuple val(meta), path("${prefix}.emapper.no_annotations.fasta.gz"), emit: no_anno,   optional: true
     tuple val(meta), path("${prefix}.emapper.pfam.gz")                , emit: pfam,      optional: true
     tuple val("${task.process}"), val("eggnog-mapper"), eval('emapper.py --version 2>&1 | grep "^emapper-" | sed "s/emapper-//" | sed "s/ .*//"'), emit: versions_emapper, topic: versions
+    tuple val("${task.process}"), val("diamond"), eval('emapper.py --version 2>&1 | grep "^emapper-" | sed "s/.*diamond version //" | sed "s/ .*//"'), emit: versions_emapper_diamond, topic: versions
+    tuple val("${task.process}"), val("MMseqs2"), eval('emapper.py --version 2>&1 | grep "^emapper-" | sed "s/.*MMseqs2 version found: //" | sed "s/ .*//"'), emit: versions_emapper_mmseqs2, topic: versions
 
     script:
     def args = task.ext.args   ?: ''

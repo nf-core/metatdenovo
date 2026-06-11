@@ -61,14 +61,34 @@ output:
       type: file
       description: EggNOG-mapper Pfam annotations file
       pattern: "*.emapper.pfam.gz"
-  versions:
+  versions_emapper:
     - - "${task.process}":
           type: string
           description: The name of the process
       - eggnog-mapper:
           type: string
           description: The name of the tool
-      - emapper.py --version | sed "s/.* emapper-//" | sed "s/ \\/ Expected.*//":
+      - emapper.py --version 2>&1 | grep "^emapper-" | sed "s/emapper-//" | sed "s/ .*//":
+          type: eval
+          description: The expression to obtain the version of the tool
+  versions_emapper_diamond:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - diamond:
+          type: string
+          description: The name of the tool
+      - emapper.py --version 2>&1 | grep "^emapper-" | sed "s/.*diamond version //" | sed "s/ .*//":
+          type: eval
+          description: The expression to obtain the version of the tool
+  versions_emapper_mmseqs2:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - mmseqs2:
+          type: string
+          description: The name of the tool
+      - emapper.py --version 2>&1 | grep "^emapper-" | sed "s/.*MMseqs2 version found: //" | sed "s/ .*//":
           type: eval
           description: The expression to obtain the version of the tool
 topics:
@@ -79,7 +99,23 @@ topics:
       - eggnog-mapper:
           type: string
           description: The name of the tool
-      - emapper.py --version | sed "s/.* emapper-//" | sed "s/ \\/ Expected.*//":
+      - emapper.py --version 2>&1 | grep "^emapper-" | sed "s/emapper-//" | sed "s/ .*//":
+          type: eval
+          description: The expression to obtain the version of the tool
+          type: string
+          description: The name of the process
+      - diamond:
+          type: string
+          description: The name of the tool
+      - emapper.py --version 2>&1 | grep "^emapper-" | sed "s/.*diamond version //" | sed "s/ .*//":
+          type: eval
+          description: The expression to obtain the version of the tool
+          type: string
+          description: The name of the process
+      - mmseqs2:
+          type: string
+          description: The name of the tool
+      - emapper.py --version 2>&1 | grep "^emapper-" | sed "s/.*MMseqs2 version found: //" | sed "s/ .*//":
           type: eval
           description: The expression to obtain the version of the tool
 authors:
