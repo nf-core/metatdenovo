@@ -13,14 +13,15 @@ process SUMTAXONOMY {
     val  taxname
 
     output:
-    tuple val(meta), path("*_summary.tsv.gz") , emit: taxonomy_summary
-    path "versions.yml"                       , emit: versions
+    tuple val(meta), path("${prefix}_summary.tsv.gz"), emit: taxonomy_summary
+    path "versions.yml"                              , emit: versions, topic: versions
 
     when:
     task.ext.when == null || task.ext.when
 
     script:
-    def prefix = task.ext.prefix ?: "${meta.id}"
+    prefix = task.ext.prefix ?: "${meta.id}"
+
     """
     #!/usr/bin/env Rscript
 
@@ -49,5 +50,18 @@ process SUMTAXONOMY {
         ),
         "versions.yml"
     )
+    """
+
+    stub:
+    prefix = task.ext.prefix ?: "${meta.id}"
+
+    """
+    gzip -c /dev/null > ${prefix}_summary.tsv.gz
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        R: 4.0,
+        tidyverse: 2.0
+    END_VERSIONS
     """
 }

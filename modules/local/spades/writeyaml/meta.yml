@@ -4,22 +4,39 @@ keywords:
   - spades
   - yaml
 input:
-  - pe:
-      type: file
-      description: Paired-end read files (optional)
-      pattern: "*.{fastq,fq,fastq.gz,fq.gz}"
-  - se:
-      type: file
-      description: Single-end read files (optional)
-      pattern: "*.{fastq,fq,fastq.gz,fq.gz}"
+  pe:
+    type: file
+    description: Paired-end read files (optional)
+    pattern: "*.{fastq,fq,fastq.gz,fq.gz}"
+  se:
+    type: file
+    description: Single-end read files (optional)
+    pattern: "*.{fastq,fq,fastq.gz,fq.gz}"
 output:
-  - yaml:
-      type: file
-      description: SPAdes YAML configuration file
-      pattern: "*.yaml"
-  - versions:
-      type: file
-      description: File containing software versions
-      pattern: "versions.yml"
+  yaml:
+    type: file
+    description: SPAdes YAML configuration file
+    pattern: "*.yaml"
+  versions_writespadesyaml:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - bash:
+          type: string
+          description: The name of the tool
+      - bash --version | grep "GNU bash" | sed "s/.*version //" | sed "s/ .*//":
+          type: eval
+          description: The expression to obtain the version of the tool
+topics:
+  versions:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - bash:
+          type: string
+          description: The name of the tool
+      - bash --version | grep "GNU bash" | sed "s/.*version //" | sed "s/ .*//":
+          type: eval
+          description: The expression to obtain the version of the tool
 authors:
   - "@danilodileo"

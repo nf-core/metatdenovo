@@ -13,7 +13,7 @@ process KOFAMSCAN_SUM {
 
     output:
     tuple val(meta), path("${meta.id}.kofamscan_summary.tsv.gz") , emit: kofamscan_summary
-    path "versions.yml"                                          , emit: versions
+    path "versions.yml"                                          , emit: versions, topic: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -62,5 +62,16 @@ process KOFAMSCAN_SUM {
         ),
         "versions.yml"
     )
+    """
+
+    stub:
+
+    """
+    gzip -c /dev/null > ${meta.id}.kofamscan_summary.tsv.gz
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        R: 4.0
+    END_VERSIONS
     """
 }

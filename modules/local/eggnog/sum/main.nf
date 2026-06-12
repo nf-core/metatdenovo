@@ -15,7 +15,7 @@ process EGGNOG_SUM {
     output:
 
     tuple val(meta), path("${meta.id}.eggnog_summary.tsv.gz") , emit: eggnog_summary
-    path "versions.yml"                                       , emit: versions
+    path "versions.yml"                                       , emit: versions, topic: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -60,5 +60,15 @@ process EGGNOG_SUM {
             paste0("    stringr: ", packageVersion('stringr'))
         ),
         "versions.yml")
+    """
+
+    stub:
+    """
+    cat /dev/null | gzip -c > ${meta.id}.eggnog_summary.tsv.gz
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        R: 4.0
+    END_VERSIONS
     """
 }

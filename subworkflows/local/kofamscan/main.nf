@@ -14,24 +14,18 @@ workflow KOFAMSCAN {
     fcs       // featureCounts output
 
     main:
-    ch_versions = channel.empty()
 
     KOFAMSCAN_DOWNLOAD()
-    ch_versions = ch_versions.mix(KOFAMSCAN_DOWNLOAD.out.versions)
 
-    KOFAMSCAN_SCAN( kofamscan, KOFAMSCAN_DOWNLOAD.out.ko_list, KOFAMSCAN_DOWNLOAD.out.koprofiles )
-    ch_versions = ch_versions.mix(KOFAMSCAN_SCAN.out.versions)
+    KOFAMSCAN_SCAN(kofamscan, KOFAMSCAN_DOWNLOAD.out.ko_list, KOFAMSCAN_DOWNLOAD.out.koprofiles)
 
     KOFAMSCAN_UNIQUE(KOFAMSCAN_SCAN.out.kofamtsv)
-    ch_versions = ch_versions.mix(KOFAMSCAN_UNIQUE.out.versions)
 
-    KOFAMSCAN_SUM( KOFAMSCAN_SCAN.out.kout, fcs )
-    ch_versions = ch_versions.mix(KOFAMSCAN_SUM.out.versions)
+    KOFAMSCAN_SUM(KOFAMSCAN_SCAN.out.kout, fcs)
 
     emit:
     kofam_table_out   = KOFAMSCAN_SCAN.out.kout
     kofam_table_tsv   = KOFAMSCAN_SCAN.out.kofamtsv
     kofam_table_uniq  = KOFAMSCAN_UNIQUE.out.kofamuniq
     kofamscan_summary = KOFAMSCAN_SUM.out.kofamscan_summary
-    versions          = ch_versions
 }

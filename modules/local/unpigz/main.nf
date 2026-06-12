@@ -12,7 +12,7 @@ process UNPIGZ {
 
     output:
     tuple val(meta), path("$gunzip") , emit: unzipped
-    path "versions.yml"              , emit: versions
+    tuple val("${task.process}"), val('pigz'), eval('pigz --version 2>&1 | sed "s/pigz *//"'), emit: versions_pigz, topic: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -26,19 +26,12 @@ process UNPIGZ {
         -c \\
         -p $task.cpus \\
         ${file} > $gunzip
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        pigz: \$( echo \$(pigz --version 2>&1) | sed 's/pigz //')
-    END_VERSIONS
     """
 
     stub:
     gunzip = file.toString() - '.gz'
+
     """
     touch ${gunzip}
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        pigz: 2.3.4
-    END_VERSIONS
     """
 }

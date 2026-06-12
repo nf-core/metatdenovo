@@ -12,7 +12,7 @@ process KOFAMSCAN_UNIQUE {
 
     output:
     tuple val(meta), path("*-uniq.tsv.gz"), emit: kofamuniq
-    path "versions.yml"                   , emit: versions
+    path "versions.yml"                   , emit: versions, topic: versions
 
     script:
     def prefix = task.ext.prefix ?: "${meta.id}"

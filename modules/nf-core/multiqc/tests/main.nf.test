@@ -69,7 +69,6 @@ nextflow_process {
                 """
             }
         }
-    }
 
         then {
             assert process.success

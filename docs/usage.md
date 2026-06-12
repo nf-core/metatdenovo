@@ -147,7 +147,8 @@ to the root directory of the EUKulele databases.
 
 > Please, check the [EUKulele documentation](https://eukulele.readthedocs.io/en/latest/#) for more information about the databases.
 
-> :warning: There is currently a bug in the EUKulele program so that some databases properly do not download properly, check [EUKulele issue](https://github.com/AlexanderLabWHOI/EUKulele/issues/60). Until the developers have fixed this bug, we recommend downloading the database manually. To do so, follow these steps:
+> :warning: There is currently a bug in the EUKulele program so that some databases properly do not download properly, check [EUKulele issue](https://github.com/AlexanderLabWHOI/EUKulele/issues/60).
+> Until the developers have fixed this bug, we recommend downloading the database manually. To do so, follow these steps:
 
 - Create conda environment:
 
@@ -255,6 +256,11 @@ Both are suitable for both prokaryotic and eukaryotic genes and both are run by 
 The tools use large databases which are downloaded automatically but paths can be provided by the user through the `--eggnog_dbpath directory`
 and `--kofam_dir dir` parameters respectively.
 It is practical to let the pipeline download the files on the first run, and then reuse the data by setting the parameters.
+
+:::note
+Currently, the standard download procedure for the eggNOG database using the `download_eggnog_data.py` tool doesn't work because the domain it tries to download from doesn't exist.
+The pipeline therefore uses `wget` to fetch files from [the current download site](http://eggnog6.embl.de/download/emapperdb-5.0.2) since release 1.3.1 and until this is fixed in the tool.
+:::
 
 A more targeted annotation option offered by the workflow is the possibility for the user to provide a set of
 [HMMER HMM profiles](http://eddylab.org/software/hmmer/Userguide.pdf) through the `--hmmdir dir` or `hmmfiles file0.hmm,file1.hmm,...,filen.hmm`

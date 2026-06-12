@@ -1,95 +1,29 @@
 Changes in component 'nf-core/taxonkit/lineage'
-'modules/nf-core/taxonkit/lineage/meta.yml' is unchanged
 Changes in 'taxonkit/lineage/main.nf':
 --- modules/nf-core/taxonkit/lineage/main.nf
 +++ modules/nf-core/taxonkit/lineage/main.nf
-@@ -9,7 +9,9 @@
+@@ -9,7 +9,8 @@
  
      input:
      tuple val(meta), val(taxid), path(taxidfile)
 -    path taxdb
-+    path taxdb, stageAs: 'taxdump/'              // Path to a directory containing names.dmp and nodes.dmp; use this or the below two
 +    path names, stageAs: 'taxdump/names.dmp'    // Path to names.dmp; alternative to taxdb
 +    path nodes, stageAs: 'taxdump/nodes.dmp'    // Path to nodes.dmp; alternative to taxdb
  
      output:
      tuple val(meta), path("*.tsv"), emit: tsv
-@@ -26,7 +28,7 @@
+@@ -26,7 +27,7 @@
      taxonkit \\
          lineage \\
          $args \\
 -        --data-dir $taxdb \\
-+        --data-dir taxdump \\
++        --data-dir taxdump/ \\
          --threads $task.cpus \\
          --out-file ${prefix}.tsv \\
          ${taxid? "<<< '$taxid'": taxidfile}
 
+'modules/nf-core/taxonkit/lineage/meta.yml' is unchanged
 'modules/nf-core/taxonkit/lineage/environment.yml' is unchanged
 'modules/nf-core/taxonkit/lineage/tests/main.nf.test' is unchanged
-Changes in 'taxonkit/lineage/tests/main.nf.test.snap':
---- modules/nf-core/taxonkit/lineage/tests/main.nf.test.snap
-+++ modules/nf-core/taxonkit/lineage/tests/main.nf.test.snap
-@@ -8,7 +8,7 @@
-                             "id": "test",
-                             "single_end": false
-                         },
--                        "test.tsv:md5,da0998a741219814ae2cfad153f0ecc2"
-+                        "test.tsv:md5,e77031f8b6f6865d9fa9525c55b7b4be"
-                     ]
-                 ],
-                 "1": [
-@@ -20,7 +20,7 @@
-                             "id": "test",
-                             "single_end": false
-                         },
--                        "test.tsv:md5,da0998a741219814ae2cfad153f0ecc2"
-+                        "test.tsv:md5,e77031f8b6f6865d9fa9525c55b7b4be"
-                     ]
-                 ],
-                 "versions": [
-@@ -29,10 +29,10 @@
-             }
-         ],
-         "meta": {
--            "nf-test": "0.9.3",
--            "nextflow": "25.10.3"
-+            "nf-test": "0.9.2",
-+            "nextflow": "24.10.3"
-         },
--        "timestamp": "2026-02-17T17:36:42.019665785"
-+        "timestamp": "2025-01-14T15:44:11.506619"
-     },
-     "sarscov2 - taxid - stub": {
-         "content": [
-@@ -78,7 +78,7 @@
-                             "id": "test",
-                             "single_end": false
-                         },
--                        "test.tsv:md5,da0998a741219814ae2cfad153f0ecc2"
-+                        "test.tsv:md5,e77031f8b6f6865d9fa9525c55b7b4be"
-                     ]
-                 ],
-                 "1": [
-@@ -90,7 +90,7 @@
-                             "id": "test",
-                             "single_end": false
-                         },
--                        "test.tsv:md5,da0998a741219814ae2cfad153f0ecc2"
-+                        "test.tsv:md5,e77031f8b6f6865d9fa9525c55b7b4be"
-                     ]
-                 ],
-                 "versions": [
-@@ -99,9 +99,9 @@
-             }
-         ],
-         "meta": {
--            "nf-test": "0.9.3",
--            "nextflow": "25.10.3"
-+            "nf-test": "0.9.2",
-+            "nextflow": "24.10.3"
-         },
--        "timestamp": "2026-02-17T17:36:19.715327441"
-+        "timestamp": "2025-01-14T15:43:31.166225"
-     }
- }
+'modules/nf-core/taxonkit/lineage/tests/main.nf.test.snap' is unchanged
 ************************************************************
