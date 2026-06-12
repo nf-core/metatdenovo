@@ -11,15 +11,14 @@ process FORMAT_DIAMOND_TAX_TAXDUMP {
     tuple val(meta), path(taxfile), path(names), path(nodes), val(ranks)
 
     output:
-    tuple val(meta), path("*.taxonomy-taxdump.tsv.gz"), emit: taxonomy
-    path "versions.yml"                               , emit: versions
+    tuple val(meta), path("${prefix}.taxonomy-taxdump.tsv.gz"), emit: taxonomy
+    path "versions.yml"                               , emit: versions, topic: versions
 
     when:
     task.ext.when == null || task.ext.when
 
     script:
-    def args = task.ext.args ?: ''
-    def prefix = task.ext.prefix ?: "${meta.id}"
+    prefix = task.ext.prefix ?: "${meta.id}"
 
     ranks_to_consider = "c('domain', 'superkingdom', 'kingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species')"
     if ( ranks ) {
@@ -76,5 +75,16 @@ process FORMAT_DIAMOND_TAX_TAXDUMP {
         ),
         "versions.yml"
     )
+    """
+
+    stub:
+
+    """
+    gzip -c /dev/null > ${prefix}.taxonomy-taxdump.tsv.gz
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        R: 4.0
+    END_VERSIONS
     """
 }

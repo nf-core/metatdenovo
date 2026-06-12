@@ -1,5 +1,5 @@
 process DIAMOND_BLASTP {
-    tag "${meta.id}.${meta2.id}"
+    tag "${prefix}"
     label 'process_high'
 
     conda "${moduleDir}/environment.yml"
@@ -21,7 +21,7 @@ process DIAMOND_BLASTP {
     tuple val(outmeta), path('*.sam*')  , optional: true, emit: sam
     tuple val(outmeta), path('*.tsv*')  , optional: true, emit: tsv
     tuple val(outmeta), path('*.paf*')  , optional: true, emit: paf
-    path "versions.yml"              , emit: versions
+    tuple val("${task.process}"), val('diamond')  , eval('diamond --version | tail -n 1 | sed "s/^diamond version //"'), emit: versions_diamond, topic: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -30,21 +30,19 @@ process DIAMOND_BLASTP {
     outmeta = meta + [ db: meta2.id ]
 
     def args = task.ext.args ?: ''
-    def prefix = task.ext.prefix ?: "${meta.id}.${meta2.id}"
+    prefix = task.ext.prefix ?: "${meta.id}.${meta2.id}"
     def columns = blast_columns ? "${blast_columns}" : ''
-    switch ( outfmt ) {
-        case 0:   out_ext = "blast"; break
-        case 5:   out_ext = "xml";   break
-        case 6:   out_ext = "txt";   break
-        case 100: out_ext = "daa";   break
-        case 101: out_ext = "sam";   break
-        case 102: out_ext = "tsv";   break
-        case 103: out_ext = "paf";   break
-        default:
-            outfmt = 6;
-            out_ext = 'txt';
-            log.warn("Unknown output file format provided (${out_ext}): selecting DIAMOND default of tabular BLAST output (txt)");
-            break
+    if      ( outfmt == 0   ) { out_ext = "blast" }
+    else if ( outfmt == 5   ) { out_ext = "xml"   }
+    else if ( outfmt == 6   ) { out_ext = "txt"   }
+    else if ( outfmt == 100 ) { out_ext = "daa"   }
+    else if ( outfmt == 101 ) { out_ext = "sam"   }
+    else if ( outfmt == 102 ) { out_ext = "tsv"   }
+    else if ( outfmt == 103 ) { out_ext = "paf"   }
+    else {
+        outfmt  = 6
+        out_ext = 'txt'
+        log.warn("Unknown output file format provided (${outfmt}): selecting DIAMOND default of tabular BLAST output (txt)")
     }
     if ( args =~ /--compress\s+1/ ) out_ext += '.gz'
     """
@@ -56,16 +54,24 @@ process DIAMOND_BLASTP {
         --outfmt ${outfmt} ${columns} \\
         ${args} \\
         --out ${prefix}.${out_ext}
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        diamond: \$(diamond --version 2>&1 | tail -n 1 | sed 's/^diamond version //')
-    END_VERSIONS
     """
 
     stub:
-    def args = task.ext.args ?: ''
-    def prefix = task.ext.prefix ?: "${meta.id}"
+    prefix = task.ext.prefix ?: "${meta.id}"
+    if      ( outfmt == 0   ) { out_ext = "blast" }
+    else if ( outfmt == 5   ) { out_ext = "xml"   }
+    else if ( outfmt == 6   ) { out_ext = "txt"   }
+    else if ( outfmt == 100 ) { out_ext = "daa"   }
+    else if ( outfmt == 101 ) { out_ext = "sam"   }
+    else if ( outfmt == 102 ) { out_ext = "tsv"   }
+    else if ( outfmt == 103 ) { out_ext = "paf"   }
+    else {
+        outfmt  = 6
+        out_ext = 'txt'
+        log.warn("Unknown output file format provided (${outfmt}): selecting DIAMOND default of tabular BLAST output (txt)")
+    }
+    if ( args =~ /--compress\s+1/ ) out_ext += '.gz'
+
     """
     touch ${prefix}.${out_ext}
 

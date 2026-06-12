@@ -12,13 +12,12 @@ process FORMAT_EUKULELE_TAX {
 
     output:
     tuple val(meta), path("*.taxonomy_classification.tsv.gz"), emit: tax
-    path "versions.yml"                                      , emit: versions
+    path "versions.yml"                                      , emit: versions, topic: versions
 
     when:
     task.ext.when == null || task.ext.when
 
     script:
-    def args   = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
 
     """

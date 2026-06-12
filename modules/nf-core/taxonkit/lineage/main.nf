@@ -3,13 +3,12 @@ process TAXONKIT_LINEAGE {
     label 'process_low'
 
     conda "${moduleDir}/environment.yml"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+    container "${ workflow.containerEngine in ['singularity', 'apptainer'] && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/taxonkit:0.18.0--h9ee0642_0':
-        'biocontainers/taxonkit:0.18.0--h9ee0642_0' }"
+        'quay.io/biocontainers/taxonkit:0.18.0--h9ee0642_0' }"
 
     input:
     tuple val(meta), val(taxid), path(taxidfile)
-    path taxdb, stageAs: 'taxdump/'              // Path to a directory containing names.dmp and nodes.dmp; use this or the below two
     path names, stageAs: 'taxdump/names.dmp'    // Path to names.dmp; alternative to taxdb
     path nodes, stageAs: 'taxdump/nodes.dmp'    // Path to nodes.dmp; alternative to taxdb
 
@@ -28,7 +27,7 @@ process TAXONKIT_LINEAGE {
     taxonkit \\
         lineage \\
         $args \\
-        --data-dir taxdump \\
+        --data-dir taxdump/ \\
         --threads $task.cpus \\
         --out-file ${prefix}.tsv \\
         ${taxid? "<<< '$taxid'": taxidfile}
@@ -40,7 +39,6 @@ process TAXONKIT_LINEAGE {
     """
 
     stub:
-    def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
     touch ${prefix}.tsv

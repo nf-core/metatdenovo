@@ -11,18 +11,18 @@ process TRANSDECODER {
     tuple val(meta), path(fasta)
 
     output:
-    tuple val(meta), path("${meta.id}/*.pep") , emit: pep
-    tuple val(meta), path("${meta.id}/*.gff3"), emit: gff
-    tuple val(meta), path("${meta.id}/*.cds") , emit: cds
-    tuple val(meta), path("${meta.id}/*.bed") , emit: bed
-    path "versions.yml"                       , emit: versions
+    tuple val(meta), path("${prefix}/*.pep") , emit: pep
+    tuple val(meta), path("${prefix}/*.gff3"), emit: gff
+    tuple val(meta), path("${prefix}/*.cds") , emit: cds
+    tuple val(meta), path("${prefix}/*.bed") , emit: bed
+    tuple val("${task.process}"), val('transdecoder'), eval('TransDecoder.LongOrfs --version | sed -e "s/TransDecoder.LongOrfs //g"'), emit: versions_transdecoder, topic: versions
 
     when:
     task.ext.when == null || task.ext.when
 
     script:
     def args = task.ext.args ?: ''
-    def prefix = task.ext.prefix ?: "${meta.id}"
+    prefix = task.ext.prefix ?: "${meta.id}"
 
     """
     TransDecoder.LongOrfs \\
@@ -36,10 +36,15 @@ process TRANSDECODER {
         -O $prefix \\
         -t \\
         $fasta
+    """
 
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        transdecoder: \$(echo \$(TransDecoder.LongOrfs --version) | sed -e "s/TransDecoder.LongOrfs //g")
-    END_VERSIONS
+    stub:
+    prefix = task.ext.prefix ?: "${meta.id}"
+
+    """
+    touch ${prefix}/empty.pep
+    touch ${prefix}/empty.gff3
+    touch ${prefix}/empty.cds
+    touch ${prefix}/empty.bed
     """
 }

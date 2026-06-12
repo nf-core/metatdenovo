@@ -13,26 +13,20 @@ workflow SUB_EUKULELE {
     feature_counts
 
     main:
-    ch_versions = Channel.empty()
 
-    EUKULELE_SEARCH( eukulele )
-    ch_versions = ch_versions.mix ( EUKULELE_SEARCH.out.versions )
+    EUKULELE_SEARCH(eukulele)
 
-    FORMAT_EUKULELE_TAX( EUKULELE_SEARCH.out.taxonomy_estimation.map { meta, taxonomy, dbname -> [ meta, taxonomy ] } )
-    ch_versions = ch_versions.mix ( FORMAT_EUKULELE_TAX.out.versions )
+    FORMAT_EUKULELE_TAX(EUKULELE_SEARCH.out.taxonomy_estimation.map { meta, taxonomy, _dbname -> [ meta, taxonomy ] })
 
-    FORMAT_EUKULELE_TAX.out.tax
+    ch_sum_taxonomy = FORMAT_EUKULELE_TAX.out.tax
         .join(eukulele)
-        .map { meta, taxonomy, protein, dbname, database -> [ meta, dbname, taxonomy ] }
-        .set { ch_sum_taxonomy }
+        .map { meta, taxonomy, _protein, dbname, _database -> [ meta, dbname, taxonomy ] }
 
-    SUM_EUKULELE_TAXONOMY ( ch_sum_taxonomy, feature_counts, 'eukulele' )
-    ch_versions = ch_versions.mix ( SUM_EUKULELE_TAXONOMY.out.versions )
+    SUM_EUKULELE_TAXONOMY(ch_sum_taxonomy, feature_counts, 'eukulele')
 
     emit:
     taxonomy_summary    = SUM_EUKULELE_TAXONOMY.out.taxonomy_summary
     taxonomy_estimation = EUKULELE_SEARCH.out.taxonomy_estimation
     taxonomy_counts     = EUKULELE_SEARCH.out.taxonomy_counts
     diamond             = EUKULELE_SEARCH.out.diamond
-    versions            = ch_versions
 }

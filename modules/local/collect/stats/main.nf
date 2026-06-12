@@ -12,14 +12,12 @@ process COLLECT_STATS {
 
     output:
     path "${meta.id}.overall_stats.tsv.gz", emit: overall_stats
-    path "versions.yml"                   , emit: versions
+    path "versions.yml"                   , emit: versions, topic: versions
 
     when:
     task.ext.when == null || task.ext.when
 
     script:
-    def args = task.ext.args ?: ''
-    def prefix = task.ext.prefix ?: "${meta.id}"
 
     def read_trimlogs = ""
     if ( trimlogs ) {

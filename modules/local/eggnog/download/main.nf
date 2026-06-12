@@ -7,43 +7,40 @@ process EGGNOG_DOWNLOAD {
         'https://depot.galaxyproject.org/singularity/eggnog-mapper:2.1.9--pyhdfd78af_0':
         'biocontainers/eggnog-mapper:2.1.9--pyhdfd78af_0' }"
 
-    input:
-
     output:
     path "eggnog.db"                  , emit: eggnog_db
     path "eggnog_proteins.dmnd"       , emit: dmnd
     path "eggnog.taxa.db"             , emit: taxa_db
     path "eggnog.taxa.db.traverse.pkl", emit: pkl
     path "*"                          , emit: all
-    path "versions.yml"               , emit: versions
+
+    when:
+    task.ext.when == null || task.ext.when
 
     script:
     def args = task.ext.args ?: ''
-
     """
-    download_eggnog_data.py \\
-        $args \\
-        -y \\
-        --data_dir .
+    # This commented for the moment since the tool tries to access a domain that doesn't exist anymore
+    #download_eggnog_data.py \\
+    #    $args \\
+    #    -y \\
+    #    --data_dir .
 
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        eggnog: \$( echo \$(emapper.py --version 2>&1)| sed 's/.* emapper-//' | sed 's/ \\/ Expected.*//')
-    END_VERSIONS
+    # Temporary solution, until version 3 of the tool
+    wget http://eggnog6.embl.de/download/emapperdb-5.0.2/eggnog.db.gz
+    gunzip eggnog.db.gz
+    wget http://eggnog6.embl.de/download/emapperdb-5.0.2/eggnog_proteins.dmnd.gz
+    gunzip eggnog_proteins.dmnd.gz
+    wget http://eggnog6.embl.de/download/emapperdb-5.0.2/eggnog.taxa.tar.gz
+    tar xzf eggnog.taxa.tar.gz
     """
 
     stub:
-
     """
     mkdir eggnog
     touch ./eggnog/eggnog.db
     touch ./eggnog/eggnog.taxa.db
     touch ./eggnog/eggnog.taxa.db.traverse.pkl
     ln -s eggnog/* ./
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        eggnog: \$( echo \$(emapper.py --version 2>&1)| sed 's/.* emapper-//' | sed 's/ \\/ Expected.*//')
-    END_VERSIONS
     """
 }

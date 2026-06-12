@@ -40,7 +40,11 @@ workflow NFCORE_METATDENOVO {
     //
     METATDENOVO (
         samplesheet,
-        diamond_dbs
+        diamond_dbs,
+        params.multiqc_config,
+        params.multiqc_logo,
+        params.multiqc_methods_description,
+        params.outdir
     )
     emit:
     multiqc_report = METATDENOVO.out.multiqc_report // channel: /path/to/multiqc_report.html
@@ -64,7 +68,10 @@ workflow {
         args,
         params.outdir,
         params.input,
-        params.diamond_dbs
+        params.diamond_dbs,
+        params.help,
+        params.help_full,
+        params.show_hidden
     )
 
     //
@@ -84,7 +91,6 @@ workflow {
         params.plaintext_email,
         params.outdir,
         params.monochrome_logs,
-        params.hook_url,
         NFCORE_METATDENOVO.out.multiqc_report
     )
 }
