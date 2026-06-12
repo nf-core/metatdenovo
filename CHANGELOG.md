@@ -3,7 +3,7 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v1.3.1 - [YYYY-mm-dd]
+## v1.3.1dev - [YYYY-mm-dd]
 
 ### `Added`
 
@@ -28,7 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 | cat         | 2.3.4            | 2.8         |
 | sometools   | 1.21             | 1.23        |
 | subread     | 2.0.6            | 2.1.1       |
-| trim-galore |                  | 0.6.10      |
+| trim-galore | 0.6.10           | 2.1.0       |
 
 ### `Deprecated`
 
