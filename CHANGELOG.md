@@ -7,9 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Added`
 
+- [#439](https://github.com/nf-core/metatdenovo/pull/439) - Add paper citation(@erikrikarddaniel)
+
 ### `Changed`
 
-- [#439](https://github.com/nf-core/metatdenovo/pull/439) - Update software versions (@erikrikarddaniel)
+- [#439](https://github.com/nf-core/metatdenovo/pull/439) - Update more software versions (@erikrikarddaniel)
+- [#439](https://github.com/nf-core/metatdenovo/pull/439) - Move pipeline to topic channels for versions and better syntax compliance (almost "strict") (@erikrikarddaniel)
 - [#435](https://github.com/nf-core/metatdenovo/pull/435) - Template update 4.0.2 (@danilodileo)
 - [#430](https://github.com/nf-core/metatdenovo/pull/430) - Nextflow lint (@danilodileo)
 - [#429](https://github.com/nf-core/metatdenovo/pull/429) - Module update to nf-core tools 3.5.2 (@danilodileo)
