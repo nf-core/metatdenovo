@@ -36,7 +36,7 @@ process EUKULELE_SEARCH {
         -s \\
         contigs || rc=\$?
 
-    gzip ${prefix}/mets_full/diamond/*.out
+    gzip ${prefix}/*_full/diamond/*.out
     find ${prefix}/ -name "*.csv" | xargs gzip
     gzip ${prefix}/taxonomy_estimation/*.out
 
