@@ -1,4 +1,4 @@
-name: "sub_eukulele"
+name: "eukulele"
 description: Runs EUKulele for taxonomic classification of eukaryotic sequences and summarizes the results
 keywords:
   - eukulele
