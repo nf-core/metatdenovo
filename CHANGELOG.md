@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Fixed`
 
+- [#NNN](https://github.com/nf-core/metatdenovo/pull/NNN) - Make sure FastQC output is included in the MultiQC report, closes issue [#422](https://github.com/nf-core/metatdenovo/issues/422) (@erikrikarddaniel)
 - [#NNN](https://github.com/nf-core/metatdenovo/pull/NNN) - Improve documentation of input samplesheet fields (@erikrikarddaniel)
 - [#439](https://github.com/nf-core/metatdenovo/pull/439) - Fix download of eggnog database as mentioned in [#423](https://github.com/nf-core/metatdenovo/issues/423) (@erikrikarddaniel)
 - [#439](https://github.com/nf-core/metatdenovo/pull/439) - Remove dependency of `versions.yml` presence for eggnog and kofamscan databases (@erikrikarddaniel)
