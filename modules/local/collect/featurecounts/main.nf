@@ -43,7 +43,7 @@ process COLLECT_FEATURECOUNTS {
                             sample = str_remove(sample, '.sorted.bam'),
                             r = count/Length
                         ) %>%
-                        rename( orf = Geneid, chr = Chr, start = Start, end = End, strand = Strand, length = Length ) %>%
+                        rename(orf = Geneid, chr = Chr, start = Start, end = End, strand = Strand, length = Length) %>%
                         group_by(sample) %>%
                         mutate(tpm = r/sum(r) * 1e6) %>% ungroup() %>%
                         select(-r) %>%
@@ -52,6 +52,8 @@ process COLLECT_FEATURECOUNTS {
             )
         ) %>%
         tidyr::unnest(d) %>%
+        # Transdecoder appends "cds." to ORF IDs in the gff file, but does not in the fasta file. Remove to make compatible between tables.
+        mutate(orf = str_remove(orf, '^cds\\\\.')) %>%
         select(-f) %>%
         write_tsv("${prefix}.counts.tsv.gz")
 
