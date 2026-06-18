@@ -11,6 +11,7 @@ components:
   - prokka
   - cat/cat
   - prokkagff2tsv
+  - find/concatenate
 input:
   - contigs:
       type: tuple
