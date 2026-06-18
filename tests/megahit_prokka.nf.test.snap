@@ -191,8 +191,7 @@
                 "trimgalore/fastqc/SAMPLE3_PE_1_2_val_2_fastqc.zip"
             ],
             [
-                "multiqc_citations.txt:md5,d59b1beea6256a7bf5f599da543910db",
-                "multiqc_fastqc.txt:md5,0d3970fe5d555dbb2d258e655005164f"
+                "multiqc_citations.txt:md5,d59b1beea6256a7bf5f599da543910db"
             ],
             16,
             [
@@ -207,7 +206,7 @@
                 "orf\tcontig\tgene_caller\tfeature\tstart\tend\tstrand\tdb_xref\tec_number\tgene\tinference\tlocus_tag\tname\tnote\tproduct"
             ]
         ],
-        "timestamp": "2026-06-18T20:25:11.106977091",
+        "timestamp": "2026-06-18T20:59:07.33500754",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.4"

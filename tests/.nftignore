@@ -18,6 +18,7 @@ multiqc/multiqc_data/multiqc.log
 multiqc/multiqc_data/multiqc_data.json
 multiqc/multiqc_data/BETA-multiqc.parquet
 multiqc/multiqc_data/bbduk*.txt
+multiqc/multiqc_data/multiqc_fastqc.txt
 multiqc/multiqc_data/multiqc_general_stats.txt
 multiqc/multiqc_data/multiqc.log
 multiqc/multiqc_data/multiqc_prokka.txt

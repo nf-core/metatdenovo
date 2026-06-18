@@ -199,8 +199,7 @@
                 "trimgalore/fastqc/SAMPLE5_PE_2_val_2_fastqc.zip"
             ],
             [
-                "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f",
-                "multiqc_fastqc.txt:md5,c1ed2a3ab9caac28f5cf565c5689662f"
+                "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f"
             ],
             16,
             [
@@ -212,7 +211,7 @@
                 "sample\tn_post_trimming\tn_non_contaminated\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count"
             ]
         ],
-        "timestamp": "2026-06-18T20:31:50.196926748",
+        "timestamp": "2026-06-18T21:05:29.132051419",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.4"
