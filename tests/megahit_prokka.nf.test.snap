@@ -13,18 +13,18 @@
                     "cat": 9.5
                 },
                 "COLLECT_FEATURECOUNTS": {
-                    "R": "4.2.3",
-                    "dplyr": "1.1.2",
-                    "dtplyr": "1.3.1",
-                    "data.table": "1.14.8"
+                    "R": "4.5.3",
+                    "dplyr": "1.2.1",
+                    "dtplyr": "1.3.3",
+                    "data.table": "1.17.8"
                 },
                 "COLLECT_STATS": {
-                    "R": "4.2.3",
-                    "dplyr": "1.1.2",
-                    "readr": "2.1.4",
-                    "purrr": "1.0.1",
-                    "tidyr": "1.3.0",
-                    "stringr": "1.5.0"
+                    "R": "4.5.3",
+                    "dplyr": "1.2.1",
+                    "readr": "2.2.0",
+                    "purrr": "1.2.2",
+                    "tidyr": "1.3.2",
+                    "stringr": "1.6.0"
                 },
                 "FAA_CAT": {
                     "coreutils": 9.4,
@@ -60,12 +60,12 @@
                     "prokka": "1.14.6"
                 },
                 "PROKKAGFF2TSV": {
-                    "R": "4.2.3",
-                    "data.table": "1.14.8",
-                    "dtplyr": "1.3.1",
-                    "dplyr": "1.1.2",
-                    "tidyr": "1.3.0",
-                    "readr": "2.1.4"
+                    "R": "4.5.3",
+                    "data.table": "1.17.8",
+                    "dtplyr": "1.3.3",
+                    "dplyr": "1.2.1",
+                    "tidyr": "1.3.2",
+                    "readr": "2.2.0"
                 },
                 "SAMTOOLS_FLAGSTAT": {
                     "samtools": "1.23.1"
@@ -202,11 +202,9 @@
             [
                 "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count"
             ],
-            [
-                "orf\tcontig\tgene_caller\tfeature\tstart\tend\tstrand\tdb_xref\tec_number\tgene\tinference\tlocus_tag\tname\tnote\tproduct"
-            ]
+            1
         ],
-        "timestamp": "2026-06-18T20:59:07.33500754",
+        "timestamp": "2026-06-23T13:13:02.330378062",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.4"

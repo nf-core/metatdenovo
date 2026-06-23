@@ -4,8 +4,8 @@ process PROKKAGFF2TSV {
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/mulled-v2-b2ec1fea5791d428eebb8c8ea7409c350d31dada:a447f6b7a6afde38352b24c30ae9cd6e39df95c4-1' :
-        'biocontainers/mulled-v2-b2ec1fea5791d428eebb8c8ea7409c350d31dada:a447f6b7a6afde38352b24c30ae9cd6e39df95c4-1' }"
+        'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/3e/3ed83e91da7958208822b05560fd65002a14ae670285e69acd75b252b436efe0/data' :
+        'community.wave.seqera.io/library/r-base_r-r.utils_r-dplyr_r-readr_pruned:b59bb1a4cfb1196e' }"
 
     input:
     tuple val(meta), path(gff)
