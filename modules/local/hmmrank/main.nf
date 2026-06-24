@@ -4,7 +4,7 @@ process HMMRANK {
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/3e/3ed83e91da7958208822b05560fd65002a14ae670285e69acd75b252b436efe0/data' :
+        'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/4b/4b997e8d619c30e5ea23a08d9fb7e4b0c9b441f3187b64d65ff1c0df5e12bba0/data' :
         'community.wave.seqera.io/library/r-base_r-r.utils_r-dplyr_r-readr_pruned:b59bb1a4cfb1196e' }"
 
     input:
@@ -47,10 +47,10 @@ process HMMRANK {
     writeLines(
         c(
             "\\"${task.process}\\":",
-            paste0("      R: ", paste0(R.Version()[c("major","minor")], collapse = ".")),
-            paste0("  dplyr: ", packageVersion('dplyr'))
-            paste0("  readr: ", packageVersion('readr'))
-            paste0("stringr: ", packageVersion('stringr'))
+            paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")),
+            paste0("    dplyr: ", packageVersion('dplyr')),
+            paste0("    readr: ", packageVersion('readr')),
+            paste0("    stringr: ", packageVersion('stringr'))
         ),
         "versions.yml"
     )
