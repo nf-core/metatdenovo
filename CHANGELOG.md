@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Changed`
 
+- [#440](https://github.com/nf-core/metatdenovo/pull/440) - Remove "uncl." from taxon names in EUKulele `summary_tables` output (@erikrikarddaniel)
+- [#440](https://github.com/nf-core/metatdenovo/pull/440) - Make R-package versions specific and move containers to Seqera-hosted (@erikrikarddaniel)
 - [#439](https://github.com/nf-core/metatdenovo/pull/439) - Update more software versions (@erikrikarddaniel)
 - [#439](https://github.com/nf-core/metatdenovo/pull/439) - Move pipeline to topic channels for versions and better syntax compliance (almost "strict") (@erikrikarddaniel)
 - [#435](https://github.com/nf-core/metatdenovo/pull/435) - Template update 4.0.2 (@danilodileo)
@@ -30,12 +32,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Dependencies`
 
-| Tool        | Previous version | New version |
-| ----------- | ---------------- | ----------- |
-| cat         | 2.3.4            | 2.8         |
-| sometools   | 1.21             | 1.23        |
-| subread     | 2.0.6            | 2.1.1       |
-| trim-galore | 0.6.10           | 2.1.0       |
+| Tool         | Previous version | New version |
+| ------------ | ---------------- | ----------- |
+| cat          | 2.3.4            | 2.8         |
+| samtools     | 1.21             | 1.23        |
+| subread      | 2.0.6            | 2.1.1       |
+| trim-galore  | 0.6.10           | 2.1.0       |
+| r-base       |                  | 4.5.3       |
+| r-dplyr      |                  | 1.2.1       |
+| r-readr      |                  | 2.2.0       |
+| r-purrr      |                  | 1.2.2       |
+| r-tidyr      |                  | 1.3.2       |
+| r-stringi    |                  | 1.8.7       |
+| r-stringr    |                  | 1.6.0       |
+| r-data.table | 1.14.8           | 1.17.8      |
+| r-dtplyr     | 1.3.1            | 1.3.3       |
+
+(R packages without previous versions above were used but did not have specified versions as they were used as dependencies of r-tidyverse 2.0.0 which led to drifts in versions.)
 
 ### `Deprecated`
 
