@@ -39,15 +39,6 @@ process FORMAT_EUKULELE_TAX {
             c("domain","phylum", "class", "order", "family", "genus", "species"),
             sep = "\\\\s*;\\\\s*"
         ) %>%
-        mutate(
-            domain  = ifelse(is.na(domain)  | domain  == '', 'Uncl.',                     domain),
-            phylum  = ifelse(is.na(phylum)  | phylum  == '', sprintf("%s uncl.", domain), phylum),
-            class   = ifelse(is.na(class)   | class   == '', sprintf("%s uncl.", phylum), class),
-            order   = ifelse(is.na(order)   | order   == '', sprintf("%s uncl.", class),  order),
-            family  = ifelse(is.na(family)  | family  == '', sprintf("%s uncl.", order),  family),
-            genus   = ifelse(is.na(genus)   | genus   == '', sprintf("%s uncl.", family), genus),
-            species = ifelse(is.na(species) | species == '', sprintf("%s uncl.", genus),  species)
-        ) %>%
         write_tsv("${prefix}.taxonomy_classification.tsv.gz")
 
     writeLines(

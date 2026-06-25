@@ -2,11 +2,11 @@
 // Run EUKULELE on protein fasta from orf_caller output
 //
 
-include { EUKULELE_SEARCH                      } from '../../../modules/local/eukulele/search/main'
-include { FORMAT_EUKULELE_TAX                  } from '../../../modules/local/eukulele/format_tax/main'
+include { EUKULELE_SEARCH                      } from '../../../modules/local/eukulele/search'
+include { FORMAT_EUKULELE_TAX                  } from '../../../modules/local/eukulele/format_tax'
 include { SUMTAXONOMY as SUM_EUKULELE_TAXONOMY } from '../../../modules/local/sumtaxonomy'
 
-workflow SUB_EUKULELE {
+workflow EUKULELE {
 
     take:
     eukulele // Channel: val(meta), path(fasta), val(database), path(directory)

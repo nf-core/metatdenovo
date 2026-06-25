@@ -35,7 +35,7 @@ nextflow_pipeline {
                     path("${params.outdir}/summary_tables/megahit.prokka.counts.tsv.gz").csv(sep: '\t', decompress: true, header: true).columns["tpm"].sum().round(),
                     path("${params.outdir}/summary_tables/megahit.prokka.overall_stats.tsv.gz").linesGzip.size(),
                     path("${params.outdir}/summary_tables/megahit.prokka.overall_stats.tsv.gz").linesGzip.findAll { l -> l.contains('n_feature_count') },
-                    path("${params.outdir}/summary_tables/megahit.prokka.prokka-annotations.tsv.gz").linesGzip.findAll { l -> l.contains('orf') },
+                    path("${params.outdir}/summary_tables/megahit.prokka.prokka-annotations.tsv.gz").linesGzip.findAll { l -> l.contains('orf') }.size(),
                 ).match() },
                 { assert path("${params.outdir}/megahit/megahit_out/megahit_assembly.log").readLines().any { l -> l.contains('ALL DONE') } },
                 { assert path("${params.outdir}/megahit/megahit_out/megahit_assembly.contigs.fa.gz").linesGzip.size() > 3000 },

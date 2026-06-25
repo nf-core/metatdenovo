@@ -13,7 +13,6 @@ process WRITESPADESYAML {
 
     output:
     path("*.yaml")     , emit: yaml
-    tuple val("${task.process}"), val("writespadesyaml"), eval('bash --version | grep "GNU bash" | sed "s/.*version //" | sed "s/ .*//"'), emit: versions_writespadesyaml, topic: versions
 
     when:
     task.ext.when == null || task.ext.when

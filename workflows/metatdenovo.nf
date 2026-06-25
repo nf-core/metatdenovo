@@ -32,7 +32,7 @@ include { validateInputSamplesheet       } from '../subworkflows/local/utils_nfc
 // SUBWORKFLOW: Consisting of local modules
 //
 include { EGGNOG                  } from '../subworkflows/local/eggnog/main'
-include { SUB_EUKULELE            } from '../subworkflows/local/eukulele/main'
+include { EUKULELE                } from '../subworkflows/local/eukulele/main'
 include { HMMCLASSIFY             } from '../subworkflows/local/hmmclassify/main'
 include { PROKKA_SUBSETS          } from '../subworkflows/local/prokka/subsets/main'
 include { FASTQC_TRIMGALORE       } from '../subworkflows/local/fastqc/trimgalore/main'
@@ -277,6 +277,10 @@ workflow METATDENOVO {
     //
     // MODULE: Run BBDuk to clean out whatever sequences the user supplied via params.sequence_filter
     //
+    ch_multiqc_files = ch_multiqc_files.mix(FASTQC_TRIMGALORE.out.fastqc_zip.collect { _meta, zip -> zip })
+    ch_multiqc_files = ch_multiqc_files.mix(FASTQC_TRIMGALORE.out.trim_log.collect { _meta, log -> log })
+    ch_multiqc_files = ch_multiqc_files.mix(FASTQC_TRIMGALORE.out.trim_zip.collect { _meta, zip -> zip })
+
     if ( params.sequence_filter ) {
         BBMAP_BBDUK ( FASTQC_TRIMGALORE.out.reads, channel.fromPath(params.sequence_filter).first() )
         ch_clean_reads  = BBMAP_BBDUK.out.reads
@@ -536,8 +540,7 @@ workflow METATDENOVO {
     //
     // SUBWORKFLOW: Eukulele
     //
-    ch_eukulele_db = channel.empty()
-    if( ! params.skip_eukulele ) {
+    if ( ! params.skip_eukulele ) {
         // Make sure the eukulele_dbpath exists
         d = new File("${params.eukulele_dbpath}")
         if ( ! d.exists() ) {
@@ -545,6 +548,7 @@ workflow METATDENOVO {
         }
 
         // Create a channel for EUKulele either with a named database or not. The latter means a user-provided database in a directory.
+        ch_eukulele_db = channel.empty()
         if ( params.eukulele_db ) {
             ch_eukulele_db = channel
                 .of ( params.eukulele_db )
@@ -556,9 +560,10 @@ workflow METATDENOVO {
         ch_eukulele = ch_protein
             .map { meta, protein -> [ [ id:"${meta.id}" ], protein ] }
             .combine( ch_eukulele_db )
-        SUB_EUKULELE( ch_eukulele, ch_fcs_for_summary )
+            .map { meta, fasta, database, directory -> [ [ id: "${meta.id}.${database}" ], fasta, database, directory ] }
+        EUKULELE(ch_eukulele, ch_fcs_for_summary)
 
-        ch_merge_tables = ch_merge_tables.mix ( SUB_EUKULELE.out.taxonomy_summary.map { _meta, tsv -> tsv } )
+        ch_merge_tables = ch_merge_tables.mix(EUKULELE.out.taxonomy_summary.map { _meta, tsv -> tsv })
     }
 
     //
