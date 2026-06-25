@@ -11,7 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Changed`
 
-- [#439](https://github.com/nf-core/metatdenovo/pull/439) - Make R-package versions specific and move containers to Seqera-hosted (@erikrikarddaniel)
+- [#440](https://github.com/nf-core/metatdenovo/pull/440) - Remove "uncl." from taxon names in EUKulele `summary_tables` output (@erikrikarddaniel)
+- [#440](https://github.com/nf-core/metatdenovo/pull/440) - Make R-package versions specific and move containers to Seqera-hosted (@erikrikarddaniel)
 - [#439](https://github.com/nf-core/metatdenovo/pull/439) - Update more software versions (@erikrikarddaniel)
 - [#439](https://github.com/nf-core/metatdenovo/pull/439) - Move pipeline to topic channels for versions and better syntax compliance (almost "strict") (@erikrikarddaniel)
 - [#435](https://github.com/nf-core/metatdenovo/pull/435) - Template update 4.0.2 (@danilodileo)
