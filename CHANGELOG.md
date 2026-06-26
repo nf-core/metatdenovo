@@ -3,7 +3,7 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v1.3.1 - [YYYY-mm-dd]
+## v1.4.0 - [2026-06-26]
 
 ### `Added`
 
@@ -36,7 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 | Tool         | Previous version | New version |
 | ------------ | ---------------- | ----------- |
 | cat          | 2.3.4            | 2.8         |
-| samtools     | 1.21             | 1.23        |
+| samtools     | 1.21             | 1.23.1      |
 | subread      | 2.0.6            | 2.1.1       |
 | trim-galore  | 0.6.10           | 2.1.0       |
 | r-base       |                  | 4.5.3       |
@@ -48,6 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 | r-stringr    |                  | 1.6.0       |
 | r-data.table | 1.14.8           | 1.17.8      |
 | r-dtplyr     | 1.3.1            | 1.3.3       |
+| multiqc      | 1.3.0            | 1.3.5       |
 
 (R packages without previous versions above were used but did not have specified versions as they were used as dependencies of r-tidyverse 2.0.0 which led to drifts in versions.)
 

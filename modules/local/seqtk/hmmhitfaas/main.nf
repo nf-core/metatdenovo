@@ -12,7 +12,7 @@ process SEQTK_HMMHITFAAS {
 
     output:
     tuple val(meta), path("hits/*.faa.gz"), emit: faas
-    tuple val("${task.process}"), val('<seqtk>'), eval('seqtk 2>&1 | grep Version | sed "s/^.*Version: //; s/ .*\$//"'), emit: versions_seqtk, topic: versions
+    tuple val("${task.process}"), val('seqtk'), eval('seqtk 2>&1 | grep Version | sed "s/^.*Version: //; s/ .*\$//"'), emit: versions_seqtk, topic: versions
 
     when:
     task.ext.when == null || task.ext.when

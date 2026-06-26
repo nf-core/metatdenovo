@@ -32,6 +32,11 @@
                         "installed_by": ["modules"],
                         "patch": "modules/nf-core/cat/fastq/cat-fastq.diff"
                     },
+                    "diamond/blastp": {
+                        "branch": "master",
+                        "git_sha": "83ce9b314157a24d9a92f17a07ed5d55f30b78f9",
+                        "installed_by": ["modules"]
+                    },
                     "fastqc": {
                         "branch": "master",
                         "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",

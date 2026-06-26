@@ -53,7 +53,8 @@ process PROKKAGFF2TSV {
             paste0("    dtplyr: "    , packageVersion("dtplyr")),
             paste0("    dplyr: "     , packageVersion("dplyr")),
             paste0("    tidyr: "     , packageVersion("tidyr")),
-            paste0("    readr: "     , packageVersion("readr"))
+            paste0("    readr: "     , packageVersion("readr")),
+            paste0("    stringr: "   , packageVersion("stringr"))
         ),
         "versions.yml"
     )
