@@ -9,7 +9,6 @@
 //
 include { COLLECT_FEATURECOUNTS              } from '../modules/local/collect/featurecounts/main'
 include { COLLECT_STATS                      } from '../modules/local/collect/stats/main'
-include { DIAMOND_BLASTP as DIAMOND_TAXONOMY } from '../modules/local/diamond/blastp/main'
 include { FORMATSPADES                       } from '../modules/local/format/spades/main'
 include { MEGAHIT_INTERLEAVED                } from '../modules/local/megahit/interleaved/main'
 include { MERGE_TABLES                       } from '../modules/local/merge/summary/main'
@@ -55,6 +54,7 @@ include { BBMAP_BBDUK                                } from '../modules/nf-core/
 include { BBMAP_BBNORM                               } from '../modules/nf-core/bbmap/bbnorm/main'
 include { BBMAP_INDEX                                } from '../modules/nf-core/bbmap/index/main'
 include { CAT_FASTQ            	                     } from '../modules/nf-core/cat/fastq/main'
+include { DIAMOND_BLASTP as DIAMOND_TAXONOMY         } from '../modules/nf-core/diamond/blastp/main'
 include { FASTQC                                     } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                                    } from '../modules/nf-core/multiqc/main'
 include { PIGZ_COMPRESS as PIGZ_ASSEMBLY             } from '../modules/nf-core/pigz/compress/main'
