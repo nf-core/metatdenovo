@@ -48,6 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 | r-stringr    |                  | 1.6.0       |
 | r-data.table | 1.14.8           | 1.17.8      |
 | r-dtplyr     | 1.3.1            | 1.3.3       |
+| multiqc      | 1.3.0            | 1.3.5       |
 
 (R packages without previous versions above were used but did not have specified versions as they were used as dependencies of r-tidyverse 2.0.0 which led to drifts in versions.)
 
