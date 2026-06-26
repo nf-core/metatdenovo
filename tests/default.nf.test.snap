@@ -95,7 +95,7 @@
                     "pigz": "2.3.4"
                 },
                 "Workflow": {
-                    "nf-core/metatdenovo": "v1.4.0"
+                    "nf-core/metatdenovo": "v1.5.0dev"
                 }
             },
             [
