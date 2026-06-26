@@ -7,7 +7,7 @@ lint:
 nf_core_version: 4.0.2
 repository_type: pipeline
 template:
-  author: Danilo Di Leo, Emelie Nilsson & Daniel Lundin
+  author: Danilo Di Leo, Emelie Nilsson, & Daniel Lundin
   description: Assembly and annotation of metatranscriptomic data, both prokaryotic and eukaryotic
   force: false
   is_nfcore: true
