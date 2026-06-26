@@ -37,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 | ------------ | ---------------- | ----------- |
 | cat          | 2.3.4            | 2.8         |
 | samtools     | 1.21             | 1.23.1      |
+| nf-schema    | 2.4.2            | 2.7.2       |
 | subread      | 2.0.6            | 2.1.1       |
 | trim-galore  | 0.6.10           | 2.1.0       |
 | r-base       |                  | 4.5.3       |
