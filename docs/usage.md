@@ -147,38 +147,6 @@ to the root directory of the EUKulele databases.
 
 > Please, check the [EUKulele documentation](https://eukulele.readthedocs.io/en/latest/#) for more information about the databases.
 
-> :warning: There is currently a bug in the EUKulele program so that some databases properly do not download properly, check [EUKulele issue](https://github.com/AlexanderLabWHOI/EUKulele/issues/60).
-> Until the developers have fixed this bug, we recommend downloading the database manually. To do so, follow these steps:
-
-- Create conda environment:
-
-```bash
-conda create -n eukulele -c akrinos -c bioconda -c conda-forge EUKulele
-conda activate EUKulele
-```
-
-- Download the database you need:
-
-```bash
-mkdir eukulele
-cd eukulele
-EUKulele download --database mmetsp
-EUKulele download --database gtdb
-```
-
-- Sometimes after the download, EUKulele doesn't produce the correct files. In these cases you will end up with the `reference.pep.fa` file only. To fix the problematic database tables follow this instruction (this example is made with mmetsp but you can check EUKulele documentation for other databases since it can be slightly different!):
-
-```bash
-mkdir mmetsp
-cd mmetsp
-mv reference.pep.fa reference.pep.fa.gz
-gunzip reference.pep.fa.gz
-create_protein_table.py --infile_peptide reference.pep.fa \
-    --infile_taxonomy taxonomy-table.txt --outfile_json prot-map.json \
-    --output tax-table.txt --delim "/" --col_source_id Source_ID \
-    --taxonomy_col_id taxonomy --column SOURCE_ID
-```
-
 #### Taxonomic annotation with Diamond
 
 The Diamond taxonomy-annotation process uses Diamond database files (`.dmnd` files) that have been prepared with taxonomy information.
