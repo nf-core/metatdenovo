@@ -226,8 +226,8 @@ and `--kofam_dir dir` parameters respectively.
 It is practical to let the pipeline download the files on the first run, and then reuse the data by setting the parameters.
 
 :::note
-Currently, the standard download procedure for the eggNOG database using the `download_eggnog_data.py` tool doesn't work because the domain it tries to download from doesn't exist.
-The pipeline therefore uses `wget` to fetch files from [the current download site](http://eggnog6.embl.de/download/emapperdb-5.0.2) since release 1.3.1 and until this is fixed in the tool.
+Currently, the standard download procedure for the eggNOG database using the `download_eggnog_data.py` tool (v.2.1.9) doesn't work because the domain it tries to download from doesn't exist.
+Since release 1.4.0, this pipeline therefore uses `wget` to fetch files from [the current download site](http://eggnog6.embl.de/download/emapperdb-5.0.2).
 :::
 
 A more targeted annotation option offered by the workflow is the possibility for the user to provide a set of
