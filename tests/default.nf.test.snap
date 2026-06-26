@@ -77,7 +77,7 @@
                     "samtools": "1.23.1"
                 },
                 "SEQTK_HMMHITFAAS": {
-                    "<seqtk>": "1.4-r122"
+                    "seqtk": "1.4-r122"
                 },
                 "SEQTK_MERGEPE": {
                     "seqtk": "1.4-r122"
