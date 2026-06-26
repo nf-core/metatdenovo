@@ -12,36 +12,23 @@ process FORMAT_PRODIGAL_GFF {
 
     output:
     tuple val(meta), path("${prefix}_format.gff.gz"), emit: format_gff
-    path "versions.yml"                             , emit: versions
+    tuple val("${task.process}"), val('gzip'), eval('gzip --version  2>&1 | grep "^gzip" | sed "s/^gzip \\([0-9.]\\+\\).*/\\1/"'), emit: versions_gzip, topic: versions
 
     when:
     task.ext.when == null || task.ext.when
 
     script:
-    def args = task.ext.args   ?: ''
     prefix   = task.ext.prefix ?: "${meta.id}"
     cat_input = gff =~ /\.gz$/ ? "gunzip -c ${gff}" : "cat ${gff}"
 
     """
     $cat_input | sed 's/^\\([^\\t]\\+\\)\\(.*ID=\\)[0-9]\\+\\(_[0-9]\\+\\)/\\1\\2\\1\\3/' | gzip -c > ${prefix}_format.gff.gz
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        gzip: "\$(gzip --version 2>&1 | grep '^gzip' | sed 's/^gzip \\([0-9.]\\+\\).*/\\1/')"
-    END_VERSIONS
     """
 
     stub:
-    def args = task.ext.args   ?: ''
     prefix   = task.ext.prefix ?: "${meta.id}"
 
     """
-    touch ${prefix}_format.gff
-    gzip ${prefix}_format.gff
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        gzip: 1.11
-    END_VERSIONS
+    gzip -c /dev/null > ${prefix}_format.gff.gz
     """
 }

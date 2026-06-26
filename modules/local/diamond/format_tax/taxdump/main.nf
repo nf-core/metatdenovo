@@ -11,15 +11,14 @@ process FORMAT_DIAMOND_TAX_TAXDUMP {
     tuple val(meta), path(taxfile), path(names), path(nodes), val(ranks)
 
     output:
-    tuple val(meta), path("*.taxonomy-taxdump.tsv.gz"), emit: taxonomy
-    path "versions.yml"                               , emit: versions
+    tuple val(meta), path("${prefix}.taxonomy-taxdump.tsv.gz"), emit: taxonomy
+    path "versions.yml"                               , emit: versions, topic: versions
 
     when:
     task.ext.when == null || task.ext.when
 
     script:
-    def args = task.ext.args ?: ''
-    def prefix = task.ext.prefix ?: "${meta.id}"
+    prefix = task.ext.prefix ?: "${meta.id}"
 
     ranks_to_consider = "c('domain', 'superkingdom', 'kingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species')"
     if ( ranks ) {
@@ -29,7 +28,10 @@ process FORMAT_DIAMOND_TAX_TAXDUMP {
     """
     #!/usr/bin/env Rscript
 
-    library(tidyverse)
+    library(readr)
+    library(dplyr)
+    library(tidyr)
+    library(stringr)
 
     names <- read_tsv(
         pipe("grep 'scientific name' $names | sed 's/\\t|\\t/\\t/g' | sed 's/\\t|\$/\\t/' | cut -f 1,2"),
@@ -72,9 +74,28 @@ process FORMAT_DIAMOND_TAX_TAXDUMP {
         c(
             "\\"${task.process}\\":",
             paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")),
-            paste0("    tidyverse: ", packageVersion('tidyverse'))
+            paste0("    dplyr: "     , packageVersion("dplyr")),
+            paste0("    tidyr: "     , packageVersion("tidyr")),
+            paste0("    readr: "     , packageVersion("readr")),
+            paste0("    stringr: "   , packageVersion("stringr"))
         ),
         "versions.yml"
     )
+    """
+
+    stub:
+
+    """
+    gzip -c /dev/null > ${prefix}.taxonomy-taxdump.tsv.gz
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        R: 4.5.3
+        data.table: 1.17.8
+        dtplyr: 1.3.3
+        dplyr: 1.2.1
+        tidyr: 1.3.2
+        readr: 2.2.0
+    END_VERSIONS
     """
 }

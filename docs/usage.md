@@ -147,37 +147,6 @@ to the root directory of the EUKulele databases.
 
 > Please, check the [EUKulele documentation](https://eukulele.readthedocs.io/en/latest/#) for more information about the databases.
 
-> :warning: There is currently a bug in the EUKulele program so that some databases properly do not download properly, check [EUKulele issue](https://github.com/AlexanderLabWHOI/EUKulele/issues/60). Until the developers have fixed this bug, we recommend downloading the database manually. To do so, follow these steps:
-
-- Create conda environment:
-
-```bash
-conda create -n eukulele -c akrinos -c bioconda -c conda-forge EUKulele
-conda activate EUKulele
-```
-
-- Download the database you need:
-
-```bash
-mkdir eukulele
-cd eukulele
-EUKulele download --database mmetsp
-EUKulele download --database gtdb
-```
-
-- Sometimes after the download, EUKulele doesn't produce the correct files. In these cases you will end up with the `reference.pep.fa` file only. To fix the problematic database tables follow this instruction (this example is made with mmetsp but you can check EUKulele documentation for other databases since it can be slightly different!):
-
-```bash
-mkdir mmetsp
-cd mmetsp
-mv reference.pep.fa reference.pep.fa.gz
-gunzip reference.pep.fa.gz
-create_protein_table.py --infile_peptide reference.pep.fa \
-    --infile_taxonomy taxonomy-table.txt --outfile_json prot-map.json \
-    --output tax-table.txt --delim "/" --col_source_id Source_ID \
-    --taxonomy_col_id taxonomy --column SOURCE_ID
-```
-
 #### Taxonomic annotation with Diamond
 
 The Diamond taxonomy-annotation process uses Diamond database files (`.dmnd` files) that have been prepared with taxonomy information.
@@ -255,6 +224,11 @@ Both are suitable for both prokaryotic and eukaryotic genes and both are run by 
 The tools use large databases which are downloaded automatically but paths can be provided by the user through the `--eggnog_dbpath directory`
 and `--kofam_dir dir` parameters respectively.
 It is practical to let the pipeline download the files on the first run, and then reuse the data by setting the parameters.
+
+:::note
+Currently, the standard download procedure for the eggNOG database using the `download_eggnog_data.py` tool (v.2.1.9) doesn't work because the domain it tries to download from doesn't exist.
+Since release 1.4.0, this pipeline therefore uses `wget` to fetch files from [the current download site](http://eggnog6.embl.de/download/emapperdb-5.0.2).
+:::
 
 A more targeted annotation option offered by the workflow is the possibility for the user to provide a set of
 [HMMER HMM profiles](http://eddylab.org/software/hmmer/Userguide.pdf) through the `--hmmdir dir` or `hmmfiles file0.hmm,file1.hmm,...,filen.hmm`
@@ -394,7 +368,7 @@ If `-profile` is not specified, the pipeline will run locally and expect all sof
 - `shifter`
   - A generic configuration profile to be used with [Shifter](https://nersc.gitlab.io/development/shifter/how-to-use/)
 - `charliecloud`
-  - A generic configuration profile to be used with [Charliecloud](https://hpc.github.io/charliecloud/)
+  - A generic configuration profile to be used with [Charliecloud](https://charliecloud.io/)
 - `apptainer`
   - A generic configuration profile to be used with [Apptainer](https://apptainer.org/)
 - `wave`
@@ -418,19 +392,19 @@ Specify the path to a specific config file (this is a core Nextflow command). Se
 
 Whilst the default requirements set within the pipeline will hopefully work for most people and with most input data, you may find that you want to customise the compute resources that the pipeline requests. Each step in the pipeline has a default set of requirements for number of CPUs, memory and time. For most of the pipeline steps, if the job exits with any of the error codes specified [here](https://github.com/nf-core/rnaseq/blob/4c27ef5610c87db00c3c5a3eed10b1d161abf575/conf/base.config#L18) it will automatically be resubmitted with higher resources request (2 x original, then 3 x original). If it still fails after the third attempt then the pipeline execution is stopped.
 
-To change the resource requests, please see the [max resources](https://nf-co.re/docs/usage/configuration#max-resources) and [tuning workflow resources](https://nf-co.re/docs/usage/configuration#tuning-workflow-resources) section of the nf-core website.
+To change the resource requests, please see the [max resources](https://nf-co.re/docs/running/configuration/nextflow-for-your-system#set-max-resources) and [customise process resources](https://nf-co.re/docs/running/configuration/nextflow-for-your-system#customize-process-resources) section of the nf-core website.
 
 ### Custom Containers
 
 In some cases, you may wish to change the container or conda environment used by a pipeline steps for a particular tool. By default, nf-core pipelines use containers and software from the [biocontainers](https://biocontainers.pro/) or [bioconda](https://bioconda.github.io/) projects. However, in some cases the pipeline specified version maybe out of date.
 
-To use a different container from the default container or conda environment specified in a pipeline, please see the [updating tool versions](https://nf-co.re/docs/usage/configuration#updating-tool-versions) section of the nf-core website.
+To use a different container from the default container or conda environment specified in a pipeline, please see the [updating tool versions](https://nf-co.re/docs/running/configuration/nextflow-for-your-system#update-tool-versions) section of the nf-core website.
 
 ### Custom Tool Arguments
 
 A pipeline might not always support every possible argument or option of a particular tool used in pipeline. Fortunately, nf-core pipelines provide some freedom to users to insert additional parameters that the pipeline does not include by default.
 
-To learn how to provide additional arguments to a particular tool of the pipeline, please see the [customising tool arguments](https://nf-co.re/docs/usage/configuration#customising-tool-arguments) section of the nf-core website.
+To learn how to provide additional arguments to a particular tool of the pipeline, please see the [customising tool arguments](https://nf-co.re/docs/running/configuration/nextflow-for-your-system#modifying-tool-arguments) section of the nf-core website.
 
 ### nf-core/configs
 

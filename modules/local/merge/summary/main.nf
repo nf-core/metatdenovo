@@ -11,15 +11,14 @@ process MERGE_TABLES {
     tuple val(meta), path(tables)
 
     output:
-    tuple val(meta), path("${meta.id}_merged_table.tsv.gz") , emit: merged_table
-    path "versions.yml"                                     , emit: versions
+    tuple val(meta), path("${prefix}_merged_table.tsv.gz") , emit: merged_table
+    path "versions.yml"                                     , emit: versions, topic: versions
 
     when:
     task.ext.when == null || task.ext.when
 
     script:
-    def args = task.ext.args ?: ''
-    def prefix = task.ext.prefix ?: "${meta.id}"
+    prefix = task.ext.prefix ?: "${meta.id}"
 
     """
     #!/usr/bin/env Rscript
@@ -52,5 +51,17 @@ process MERGE_TABLES {
         ),
         "versions.yml"
     )
+    """
+
+    stub:
+    prefix = task.ext.prefix ?: "${meta.id}"
+
+    """
+    gzip -c /dev/null > ${prefix}_merged_table.tsv.gz
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        R: 4.0
+    END_VERSIONS
     """
 }

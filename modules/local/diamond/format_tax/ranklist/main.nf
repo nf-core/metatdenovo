@@ -12,13 +12,12 @@ process FORMAT_DIAMOND_TAX_RANKLIST {
 
     output:
     tuple val(meta), path("*.taxonomy.tsv.gz"), emit: taxonomy
-    path "versions.yml"                       , emit: versions
+    path "versions.yml"                       , emit: versions, topic: versions
 
     when:
     task.ext.when == null || task.ext.when
 
     script:
-    def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
 
     // Call separate if we have a list of ranks

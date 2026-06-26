@@ -12,13 +12,12 @@ process SEQTK_HMMHITFAAS {
 
     output:
     tuple val(meta), path("hits/*.faa.gz"), emit: faas
-    path "versions.yml"                   , emit: versions
+    tuple val("${task.process}"), val('seqtk'), eval('seqtk 2>&1 | grep Version | sed "s/^.*Version: //; s/ .*\$//"'), emit: versions_seqtk, topic: versions
 
     when:
     task.ext.when == null || task.ext.when
 
     script:
-    def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
     mkdir hits/
@@ -27,23 +26,12 @@ process SEQTK_HMMHITFAAS {
     for profile in \$(gunzip -c $hmmrank | grep -v '^profile' | cut -f 1 | sort -u); do
         seqtk subseq $faa <(gunzip -c $hmmrank | grep "^\${profile}" | cut -f 2) | gzip -c > hits/${prefix}.\${profile}.faa.gz
     done
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        seqtk: \$(echo \$(seqtk 2>&1) | sed 's/^.*Version: //; s/ .*\$//')
-    END_VERSIONS
     """
 
     stub:
-    def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
     mkdir hits/
-    echo "" | gzip -c > hits/${prefix}.faa.gz
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        seqtk: \$(echo \$(seqtk 2>&1) | sed 's/^.*Version: //; s/ .*\$//')
-    END_VERSIONS
+    gzip -c /dev/null > hits/${prefix}.faa.gz
     """
 }

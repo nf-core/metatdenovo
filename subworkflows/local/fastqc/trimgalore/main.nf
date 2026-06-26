@@ -12,27 +12,24 @@ workflow FASTQC_TRIMGALORE {
     skip_trimming // boolean: true/false
 
     main:
-    ch_versions    = Channel.empty()
-    fastqc_html    = Channel.empty()
-    fastqc_zip     = Channel.empty()
+    fastqc_html    = channel.empty()
+    fastqc_zip     = channel.empty()
 
     if (!skip_fastqc) {
-        FASTQC ( reads ).html.set { fastqc_html }
+        FASTQC(reads).html.set { fastqc_html }
         fastqc_zip     = FASTQC.out.zip
-        ch_versions = ch_versions.mix(FASTQC.out.versions.first())
     }
 
     trim_reads = reads
-    trim_html  = Channel.empty()
-    trim_zip   = Channel.empty()
-    trim_log   = Channel.empty()
+    trim_html  = channel.empty()
+    trim_zip   = channel.empty()
+    trim_log   = channel.empty()
 
-    if (!skip_trimming) {
-        TRIMGALORE ( reads ).reads.set { trim_reads }
+    if ( !skip_trimming ) {
+        trim_reads = TRIMGALORE(reads).reads
         trim_html   = TRIMGALORE.out.html
         trim_zip    = TRIMGALORE.out.zip
         trim_log    = TRIMGALORE.out.log
-        ch_versions = ch_versions.mix(TRIMGALORE.out.versions.first())
     }
 
     emit:
@@ -42,5 +39,4 @@ workflow FASTQC_TRIMGALORE {
     trim_html          // channel: [ val(meta), [ html ] ]
     trim_zip           // channel: [ val(meta), [ zip ] ]
     trim_log           // channel: [ val(meta), [ txt ] ]
-    versions = ch_versions // channel: [ versions.yml ]
 }

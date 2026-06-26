@@ -20,7 +20,7 @@
                     "mimetype": "text/csv",
                     "pattern": "^\\S+\\.csv$",
                     "description": "Path to comma-separated file containing information about the samples in the experiment.",
-                    "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row.",
+                    "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns (`sample`, `fastq_1` and `fastq_2`), and a header row.",
                     "fa_icon": "fas fa-file-csv"
                 },
                 "outdir": {
@@ -122,7 +122,6 @@
                 },
                 "save_bbduk_fastq": {
                     "type": "boolean",
-                    "default": "false",
                     "description": "Save the resulting fastq files from filtering",
                     "fa_icon": "fas fa-align-center"
                 }
@@ -156,7 +155,6 @@
                 },
                 "save_bbnorm_fastq": {
                     "type": "boolean",
-                    "default": "false",
                     "description": "Save the resulting fastq files from normalization",
                     "fa_icon": "fas fa-align-center"
                 }
@@ -176,6 +174,7 @@
                 },
                 "user_assembly": {
                     "type": "string",
+                    "default": null,
                     "format": "file-path",
                     "exists": true,
                     "mimetype": "text/plain",
@@ -250,6 +249,7 @@
                 },
                 "user_orfs_faa": {
                     "type": "string",
+                    "default": null,
                     "format": "file-path",
                     "exists": true,
                     "mimetype": "text/plain",
@@ -258,6 +258,7 @@
                 },
                 "user_orfs_gff": {
                     "type": "string",
+                    "default": null,
                     "format": "file-path",
                     "exists": true,
                     "mimetype": "text/plain",
@@ -276,9 +277,9 @@
                     "fa_icon": "fas fa-phone-volume"
                 },
                 "prokka_batchsize": {
-                    "type": "string",
+                    "type": "integer",
                     "description": "Size of individual files annotated by Prokka in one batch.",
-                    "default": "10 MB",
+                    "default": "10485760",
                     "pattern": "^\\d+(\\.\\d+)?\\.?\\s*(K|M|G|T)?B$",
                     "hidden": true,
                     "help_text": "Prokka usually fails on very large input files. This parameter controls the size of smaller batches for which Prokka will be called. Should be a string in the format integer-unit e.g. `--prokka_batchsize '8.MB'`",
@@ -319,6 +320,7 @@
                 },
                 "hmmdir": {
                     "type": "string",
+                    "default": null,
                     "description": "Directory with hmm files which will be searched for among ORFs",
                     "pattern": "^\\S+",
                     "format": "directory-path",
@@ -326,6 +328,7 @@
                 },
                 "hmmfiles": {
                     "type": "string",
+                    "default": null,
                     "description": "Comma-separated list of hmm files which will be searched for among ORFs",
                     "pattern": "\\S+hmm(\\.gz)?",
                     "format": "file-path",
@@ -349,6 +352,7 @@
             "properties": {
                 "diamond_dbs": {
                     "type": "string",
+                    "default": null,
                     "format": "file-path",
                     "exists": true,
                     "schema": "assets/schema_diamond_dbs.json",
@@ -490,15 +494,9 @@
                     "fa_icon": "fas fa-palette",
                     "hidden": true
                 },
-                "hook_url": {
-                    "type": "string",
-                    "description": "Incoming hook URL for messaging service",
-                    "fa_icon": "fas fa-people-group",
-                    "help_text": "Incoming hook URL for messaging service. Currently, MS Teams and Slack are supported.",
-                    "hidden": true
-                },
                 "multiqc_config": {
                     "type": "string",
+                    "default": null,
                     "format": "file-path",
                     "description": "Custom config file to supply to MultiQC.",
                     "fa_icon": "fas fa-cog",
@@ -534,6 +532,18 @@
                     "fa_icon": "far calendar",
                     "description": "Suffix to add to the trace report filename. Default is the date and time in the format yyyy-MM-dd_HH-mm-ss.",
                     "hidden": true
+                },
+                "help": {
+                    "type": ["boolean", "string"],
+                    "description": "Display the help message."
+                },
+                "help_full": {
+                    "type": "boolean",
+                    "description": "Display the full detailed help message."
+                },
+                "show_hidden": {
+                    "type": "boolean",
+                    "description": "Display hidden parameters in the help message (only works when --help or --help_full are provided)."
                 }
             }
         }

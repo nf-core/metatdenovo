@@ -1,4 +1,5 @@
 Changes in component 'nf-core/bbmap/bbnorm'
+'modules/nf-core/bbmap/bbnorm/environment.yml' is unchanged
 'modules/nf-core/bbmap/bbnorm/meta.yml' is unchanged
 Changes in 'bbmap/bbnorm/main.nf':
 --- modules/nf-core/bbmap/bbnorm/main.nf
@@ -13,8 +14,7 @@ Changes in 'bbmap/bbnorm/main.nf':
  
      """
 
-'modules/nf-core/bbmap/bbnorm/environment.yml' is unchanged
 'modules/nf-core/bbmap/bbnorm/tests/nextflow.config' is unchanged
-'modules/nf-core/bbmap/bbnorm/tests/main.nf.test.snap' is unchanged
 'modules/nf-core/bbmap/bbnorm/tests/main.nf.test' is unchanged
+'modules/nf-core/bbmap/bbnorm/tests/main.nf.test.snap' is unchanged
 ************************************************************

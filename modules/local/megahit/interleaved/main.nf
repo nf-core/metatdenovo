@@ -1,6 +1,6 @@
 process MEGAHIT_INTERLEAVED {
     tag "$assembly"
-    label 'process_high'
+    label 'process_high_memory'
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
@@ -13,18 +13,17 @@ process MEGAHIT_INTERLEAVED {
     val  assembly
 
     output:
-    path("megahit_out/*.contigs.fa.gz")                            , emit: contigs
-    path("megahit_out/*.log")                                      , emit: log
+    path("megahit_out/${assembly}.contigs.fa.gz")                  , emit: contigs
+    path("megahit_out/${assembly}.log")                            , emit: log
     path("megahit_out/intermediate_contigs/k*.contigs.fa.gz")      , emit: k_contigs
     path("megahit_out/intermediate_contigs/k*.addi.fa.gz")         , emit: addi_contigs
     path("megahit_out/intermediate_contigs/k*.local.fa.gz")        , emit: local_contigs
     path("megahit_out/intermediate_contigs/k*.final.contigs.fa.gz"), emit: kfinal_contigs
-    path "versions.yml"                                            , emit: versions
+    tuple val("${task.process}"), val('megahit_interleaved'), eval('megahit -v 2>&1 | sed "s/MEGAHIT v//"'), emit: versions_megahit, topic: versions
 
     script:
     def args = task.ext.args ?: ''
     def args2 = task.ext.args2 ?: ''
-    def prefix = task.ext.prefix ?: ''
     single_ends = se_reads ? "--read ${se_reads.join(',')}" : ""
     pair_ends = intl_pe_reads ? "--12 ${intl_pe_reads.join(',')}" : ""
 
@@ -43,26 +42,17 @@ process MEGAHIT_INTERLEAVED {
         $args2 \\
         megahit_out/*.fa \\
         megahit_out/intermediate_contigs/*.fa
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        megahit_interleaved: \$(echo \$(megahit -v 2>&1) | sed 's/MEGAHIT v//')
-    END_VERSIONS
     """
+
     stub:
-    def prefix = task.ext.prefix ?: ''
+
     """
     mkdir -p megahit_out/intermediate_contigs
-    echo "" | gzip > megahit_out/${assembly}.contigs.fa.gz
+    gzip -c /dev/null > megahit_out/${assembly}.contigs.fa.gz
     touch megahit_out/${assembly}.log
-    echo "" | gzip > megahit_out/intermediate_contigs/k21.contigs.fa.gz
-    echo "" | gzip > megahit_out/intermediate_contigs/k21.addi.fa.gz
-    echo "" | gzip > megahit_out/intermediate_contigs/k21.local.fa.gz
-    echo "" | gzip > megahit_out/intermediate_contigs/k21.final.contigs.fa.gz
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        megahit_interleaved: 1.2.9
-    END_VERSIONS
+    gzip -c /dev/null > megahit_out/intermediate_contigs/k21.contigs.fa.gz
+    gzip -c /dev/null > megahit_out/intermediate_contigs/k21.addi.fa.gz
+    gzip -c /dev/null > megahit_out/intermediate_contigs/k21.local.fa.gz
+    gzip -c /dev/null > megahit_out/intermediate_contigs/k21.final.contigs.fa.gz
     """
 }

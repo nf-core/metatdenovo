@@ -12,13 +12,12 @@ process FORMAT_EUKULELE_TAX {
 
     output:
     tuple val(meta), path("*.taxonomy_classification.tsv.gz"), emit: tax
-    path "versions.yml"                                      , emit: versions
+    path "versions.yml"                                      , emit: versions, topic: versions
 
     when:
     task.ext.when == null || task.ext.when
 
     script:
-    def args   = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
 
     """
@@ -39,15 +38,6 @@ process FORMAT_EUKULELE_TAX {
             full_classification,
             c("domain","phylum", "class", "order", "family", "genus", "species"),
             sep = "\\\\s*;\\\\s*"
-        ) %>%
-        mutate(
-            domain  = ifelse(is.na(domain)  | domain  == '', 'Uncl.',                     domain),
-            phylum  = ifelse(is.na(phylum)  | phylum  == '', sprintf("%s uncl.", domain), phylum),
-            class   = ifelse(is.na(class)   | class   == '', sprintf("%s uncl.", phylum), class),
-            order   = ifelse(is.na(order)   | order   == '', sprintf("%s uncl.", class),  order),
-            family  = ifelse(is.na(family)  | family  == '', sprintf("%s uncl.", order),  family),
-            genus   = ifelse(is.na(genus)   | genus   == '', sprintf("%s uncl.", family), genus),
-            species = ifelse(is.na(species) | species == '', sprintf("%s uncl.", genus),  species)
         ) %>%
         write_tsv("${prefix}.taxonomy_classification.tsv.gz")
 

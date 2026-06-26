@@ -3,7 +3,59 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v1.3.0 - [29-08-2025]
+## v1.4.0 - [2026-06-26]
+
+### `Added`
+
+- [#439](https://github.com/nf-core/metatdenovo/pull/439) - Add paper citation(@erikrikarddaniel)
+
+### `Changed`
+
+- [#442](https://github.com/nf-core/metatdenovo/pull/442) - Increase default memory for Megahit process (@erikrikarddaniel)
+- [#440](https://github.com/nf-core/metatdenovo/pull/440) - Remove "uncl." from taxon names in EUKulele `summary_tables` output (@erikrikarddaniel)
+- [#440](https://github.com/nf-core/metatdenovo/pull/440) - Make R-package versions specific and move containers to Seqera-hosted (@erikrikarddaniel)
+- [#439](https://github.com/nf-core/metatdenovo/pull/439) - Update more software versions (@erikrikarddaniel)
+- [#439](https://github.com/nf-core/metatdenovo/pull/439) - Move pipeline to topic channels for versions and better syntax compliance (almost "strict") (@erikrikarddaniel)
+- [#435](https://github.com/nf-core/metatdenovo/pull/435) - Template update 4.0.2 (@danilodileo)
+- [#430](https://github.com/nf-core/metatdenovo/pull/430) - Nextflow lint (@danilodileo)
+- [#429](https://github.com/nf-core/metatdenovo/pull/429) - Module update to nf-core tools 3.5.2 (@danilodileo)
+- [#428](https://github.com/nf-core/metatdenovo/pull/428) - Template update to nf-core tools 3.5.2 (@danilodileo)
+- [#416](https://github.com/nf-core/metatdenovo/pull/416) - Better content pipeline integration tests (@danilodileo)
+
+### `Fixed`
+
+- [#440](https://github.com/nf-core/metatdenovo/pull/440) - Add database name to eukulele process labels, closes issue [#417](https://github.com/nf-core/metatdenovo/issues/417) (@erikrikarddaniel)
+- [#440](https://github.com/nf-core/metatdenovo/pull/440) - Remove "cds." from transdecoder orf names in counts summary table, closes issue [#418](https://github.com/nf-core/metatdenovo/issues/418) (@erikrikarddaniel)
+- [#440](https://github.com/nf-core/metatdenovo/pull/440) - Make sure FastQC output is included in the MultiQC report, closes issue [#422](https://github.com/nf-core/metatdenovo/issues/422) (@erikrikarddaniel)
+- [#440](https://github.com/nf-core/metatdenovo/pull/440) - Improve documentation of input samplesheet fields (@erikrikarddaniel)
+- [#439](https://github.com/nf-core/metatdenovo/pull/439) - Fix download of eggnog database as mentioned in [#423](https://github.com/nf-core/metatdenovo/issues/423) (@erikrikarddaniel)
+- [#439](https://github.com/nf-core/metatdenovo/pull/439) - Remove dependency of `versions.yml` presence for eggnog and kofamscan databases (@erikrikarddaniel)
+
+### `Dependencies`
+
+| Tool         | Previous version | New version |
+| ------------ | ---------------- | ----------- |
+| cat          | 2.3.4            | 2.8         |
+| samtools     | 1.21             | 1.23.1      |
+| nf-schema    | 2.4.2            | 2.7.2       |
+| subread      | 2.0.6            | 2.1.1       |
+| trim-galore  | 0.6.10           | 2.1.0       |
+| r-base       |                  | 4.5.3       |
+| r-dplyr      |                  | 1.2.1       |
+| r-readr      |                  | 2.2.0       |
+| r-purrr      |                  | 1.2.2       |
+| r-tidyr      |                  | 1.3.2       |
+| r-stringi    |                  | 1.8.7       |
+| r-stringr    |                  | 1.6.0       |
+| r-data.table | 1.14.8           | 1.17.8      |
+| r-dtplyr     | 1.3.1            | 1.3.3       |
+| multiqc      | 1.3.0            | 1.3.5       |
+
+(R packages without previous versions above were used but did not have specified versions as they were used as dependencies of r-tidyverse 2.0.0 which led to drifts in versions.)
+
+### `Deprecated`
+
+## v1.3.0 - [2025-08-29]
 
 ### `Added`
 
