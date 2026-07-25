@@ -1,7 +1,6 @@
 {
     "-profile test": {
         "content": [
-            53,
             {
                 "BBMAP_ALIGN": {
                     "bbmap": 39.18
@@ -62,19 +61,19 @@
                     "prodigal": "2.6.3"
                 },
                 "SAMTOOLS_FLAGSTAT": {
-                    "samtools": "1.24"
+                    "samtools": 1.24
                 },
                 "SAMTOOLS_IDXSTATS": {
-                    "samtools": "1.24"
+                    "samtools": 1.24
                 },
                 "SAMTOOLS_INDEX": {
-                    "samtools": "1.24"
+                    "samtools": 1.24
                 },
                 "SAMTOOLS_SORT": {
-                    "samtools": "1.24"
+                    "samtools": 1.24
                 },
                 "SAMTOOLS_STATS": {
-                    "samtools": "1.24"
+                    "samtools": 1.24
                 },
                 "SEQTK_HMMHITFAAS": {
                     "seqtk": "1.4-r122"
@@ -218,10 +217,10 @@
                 "sample\tn_post_trimming\tn_non_contaminated\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count"
             ]
         ],
-        "timestamp": "2026-06-25T12:02:35.633278539",
+        "timestamp": "2026-07-25T20:24:35.764990286",
         "meta": {
             "nf-test": "0.9.5",
-            "nextflow": "26.04.4"
+            "nextflow": "26.04.6"
         }
     }
 }

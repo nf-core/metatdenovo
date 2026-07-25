@@ -7,12 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Added`
 
+### `Changed`
+
+- [#NN](https://github.com/nf-core/metatdenovo/pull/NN) - Template sync to nf-core/tools 4.0.3, update all vendored modules/subworkflows (@erikrikarddaniel)
+
 ### `Fixed`
 
 ### `Dependencies`
 
-| Tool | Previous version | New version |
-| ---- | ---------------- | ----------- |
+| Tool        | Previous version | New version |
+| ----------- | ---------------- | ----------- |
+| samtools    | 1.23.1           | 1.24        |
+| multiqc     | 1.34             | 1.35        |
+| trim-galore | 2.1.0            | 2.3.0       |
 
 ### `Deprecated`
 
