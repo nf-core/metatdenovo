@@ -9,3 +9,7 @@ testing*
 null/
 .lineage/
 .nf-test*
+/eukulele/
+/modules/local/diamond/blastp/main.nf.old
+/more_memory.config
+/tmp/
