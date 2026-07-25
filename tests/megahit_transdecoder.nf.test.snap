@@ -56,19 +56,19 @@
                     "pigz": 2.8
                 },
                 "SAMTOOLS_FLAGSTAT": {
-                    "samtools": "1.24"
+                    "samtools": 1.24
                 },
                 "SAMTOOLS_IDXSTATS": {
-                    "samtools": "1.24"
+                    "samtools": 1.24
                 },
                 "SAMTOOLS_INDEX": {
-                    "samtools": "1.24"
+                    "samtools": 1.24
                 },
                 "SAMTOOLS_SORT": {
-                    "samtools": "1.24"
+                    "samtools": 1.24
                 },
                 "SAMTOOLS_STATS": {
-                    "samtools": "1.24"
+                    "samtools": 1.24
                 },
                 "SEQTK_MERGEPE": {
                     "seqtk": "1.4-r122"
