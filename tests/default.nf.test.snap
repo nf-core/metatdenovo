@@ -46,8 +46,8 @@
                 "HMMER_HMMSEARCH": {
                     "hmmer": 3.4
                 },
-                "MEGAHIT_INTERLEAVED": {
-                    "megahit_interleaved": "1.2.9"
+                "MEGAHIT": {
+                    "megahit": "1.2.9"
                 },
                 "PIGZ_PE_READS_FWD": {
                     "pigz": 2.8
@@ -121,9 +121,8 @@
                 "hmmer/megahit.prodigal.PF03477.tbl.gz",
                 "hmmer/megahit.prodigal.PF13597.tbl.gz",
                 "megahit",
-                "megahit/megahit_out",
-                "megahit/megahit_out/megahit_assembly.contigs.fa.gz",
-                "megahit/megahit_out/megahit_assembly.log",
+                "megahit/megahit_assembly.contigs.fa.gz",
+                "megahit/megahit_assembly.log",
                 "multiqc",
                 "multiqc/multiqc_data",
                 "multiqc/multiqc_data/bbduk-filtered-barplot_Bases.txt",
@@ -215,7 +214,7 @@
                 "sample\tn_post_trimming\tn_non_contaminated\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count"
             ]
         ],
-        "timestamp": "2026-07-26T11:40:04.261172099",
+        "timestamp": "2026-07-26T17:57:57.235789647",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

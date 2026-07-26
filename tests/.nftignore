@@ -12,7 +12,7 @@ featurecounts/*.featureCounts.tsv.summary
 hmmer/*.tbl.gz
 hmmer/hits/*.faa.gz
 kofamscan/*.tsv.gz
-megahit/megahit_out/megahit_assembly.{contigs.fa.gz,log}
+megahit/megahit_assembly.{contigs.fa.gz,log}
 multiqc/multiqc_data/fastqc*.txt
 multiqc/multiqc_data/BETA-multiqc.parquet
 multiqc/multiqc_data/llms-full.txt

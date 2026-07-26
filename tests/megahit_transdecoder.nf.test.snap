@@ -34,8 +34,8 @@
                 "FEATURECOUNTS_CDS": {
                     "subread": "2.1.1"
                 },
-                "MEGAHIT_INTERLEAVED": {
-                    "megahit_interleaved": "1.2.9"
+                "MEGAHIT": {
+                    "megahit": "1.2.9"
                 },
                 "PIGZ_PE_READS_FWD": {
                     "pigz": 2.8
@@ -106,9 +106,8 @@
                 "featurecounts/SAMPLE3_PE_1.featureCounts.tsv",
                 "featurecounts/SAMPLE3_PE_1.featureCounts.tsv.summary",
                 "megahit",
-                "megahit/megahit_out",
-                "megahit/megahit_out/megahit_assembly.contigs.fa.gz",
-                "megahit/megahit_out/megahit_assembly.log",
+                "megahit/megahit_assembly.contigs.fa.gz",
+                "megahit/megahit_assembly.log",
                 "multiqc",
                 "multiqc/multiqc_data",
                 "multiqc/multiqc_data/fastqc-status-check-heatmap.txt",
@@ -192,7 +191,7 @@
                 "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count"
             ]
         ],
-        "timestamp": "2026-07-26T13:00:53.182441374",
+        "timestamp": "2026-07-26T19:50:28.92149059",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

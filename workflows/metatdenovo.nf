@@ -10,7 +10,6 @@
 include { COLLECT_FEATURECOUNTS              } from '../modules/local/collect/featurecounts/'
 include { COLLECT_STATS                      } from '../modules/local/collect/stats/'
 include { FORMATSPADES                       } from '../modules/local/format/spades/'
-include { MEGAHIT_INTERLEAVED                } from '../modules/local/megahit/interleaved/'
 include { MERGE_TABLES                       } from '../modules/local/merge/summary/'
 include { FORMAT_DIAMOND_TAX_RANKLIST        } from '../modules/local/diamond/format_tax/ranklist/'
 include { FORMAT_DIAMOND_TAX_TAXDUMP         } from '../modules/local/diamond/format_tax/taxdump/'
@@ -54,6 +53,7 @@ include { BBMAP_INDEX                                } from '../modules/nf-core/
 include { CAT_FASTQ            	                     } from '../modules/nf-core/cat/fastq/'
 include { DIAMOND_BLASTP as DIAMOND_TAXONOMY         } from '../modules/nf-core/diamond/blastp/'
 include { FASTQC                                     } from '../modules/nf-core/fastqc/'
+include { MEGAHIT                                    } from '../modules/nf-core/megahit/'
 include { MULTIQC                                    } from '../modules/nf-core/multiqc/'
 include { PIGZ_COMPRESS as PIGZ_ASSEMBLY             } from '../modules/nf-core/pigz/compress/'
 include { PIGZ_COMPRESS as PIGZ_DIAMOND_LINEAGE      } from '../modules/nf-core/pigz/compress/'
@@ -366,13 +366,15 @@ workflow METATDENOVO {
         FORMATSPADES( ch_spades_assembly.first() )
         ch_assembly_contigs = FORMATSPADES.out.assembly
     } else if ( assembler == 'megahit' ) {
-        MEGAHIT_INTERLEAVED(
-            ch_pe_reads_to_assembly.toList(),
-            ch_se_reads_to_assembly.toList(),
-            'megahit_assembly'
+        ch_megahit_reads = ch_se_reads_to_assembly.toList()
+            .map { se_reads -> [ [ id: 'megahit_assembly', single_end: true ], se_reads, [] ] }
+
+        MEGAHIT(
+            ch_megahit_reads,
+            ch_pe_reads_to_assembly.toList()
         )
-        ch_assembly_contigs = MEGAHIT_INTERLEAVED.out.contigs
-            .map { it -> [ [ id: assembly_name ], it ] }
+        ch_assembly_contigs = MEGAHIT.out.contigs
+            .map { _meta, contigs -> [ [ id: assembly_name ], contigs ] }
     } else {
         error 'Assembler not specified!'
     }
