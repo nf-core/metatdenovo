@@ -57,6 +57,11 @@
                         "git_sha": "3a42d4fbb69436f53e0f06d2fe65b48f9d0085cc",
                         "installed_by": ["modules"]
                     },
+                    "kofamscan": {
+                        "branch": "master",
+                        "git_sha": "9d675a431e1fcd9dc4043edcc9b1c26b5c2377c0",
+                        "installed_by": ["modules"]
+                    },
                     "multiqc": {
                         "branch": "master",
                         "git_sha": "98403d15b0e50edae1f3fec5eae5e24982f1fade",

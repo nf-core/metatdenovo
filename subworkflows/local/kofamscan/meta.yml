@@ -6,10 +6,13 @@ keywords:
   - orthology
   - functional annotation
 components:
-  - kofamscan/scan
+  - kofamscan
   - kofamscan/download
+  - kofamscan/format
   - kofamscan/sum
   - kofamscan/unique
+  - pigz/compress
+  - pigz/uncompress
 input:
   - kofamscan:
       type: tuple
