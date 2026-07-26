@@ -127,36 +127,7 @@
                 "featurecounts/SAMPLE2_PE.featureCounts.tsv.summary",
                 "featurecounts/SAMPLE3_PE_1.featureCounts.tsv",
                 "featurecounts/SAMPLE3_PE_1.featureCounts.tsv.summary",
-                [
-                    "ko_list:md5,19c8cd2e3bdf864ba9bd821e0efa4c40",
-                    "kofamscan_directory.lslR:md5,16015d3e249d26c1cee0519f719f5e15",
-                    "megahit.prodigal.faa.gz:md5,feeedcf12ea1e3384ed7353b15bf7bdb",
-                    "megahit.prodigal.kofamscan.besthit.tsv.gz:md5,a49ece0b363ea500d45989fd10bbd30f",
-                    "megahit.prodigal.kofamscan.tsv.gz:md5,b4fed84eb2ac5fe508e6b221ce4e4820",
-                    [
-                        "K01546.hmm:md5,1fcb33a4dbca8efdca4ff64080efdb54",
-                        "K02968.hmm:md5,787c6c27e76b7e2f52427fe658508e8b",
-                        "K03531.hmm:md5,a1797ce96d71f64cc838d91b92924e4b",
-                        "K03590.hmm:md5,a4f2d2a4ef2b4cb00cb2c832d4b63e26",
-                        "K04079.hmm:md5,4c264d38dc3628e87bb694214b8fbfdd",
-                        "K06142.hmm:md5,32813c05f1d89243d345b8af49c98dd5",
-                        "K07042.hmm:md5,b830aea767b70d540216587871059587",
-                        "K07126.hmm:md5,051aa0adbfe62c1470c2b3a63af6d112",
-                        "K07165.hmm:md5,f5c047d108cde2491a7dd0aa697d6556",
-                        "K07407.hmm:md5,bfc1d6f3601f1d67875e86d53b175b01",
-                        "K07480.hmm:md5,af82d7313c3a73cbb3c2dceb71c3b357",
-                        "K07483.hmm:md5,fe61b427431c1006ae10163052a25a70",
-                        "K07497.hmm:md5,9c864e9d35cdd0d2657eaf069e658d0e",
-                        "K08218.hmm:md5,cf66904c0c3bf59f9ba5e132634ba7f6",
-                        "K09955.hmm:md5,129c627233447b4664eee0903227ecc8",
-                        "K15633.hmm:md5,36d1866b83e9b486bd32e64ac2cd80c8",
-                        "K21572.hmm:md5,86d0d87059a93ab9f9ca6f89f1440129",
-                        "K21573.hmm:md5,878245104b0a92b8193dcf45d665181c",
-                        "K23514.hmm:md5,4e05bef7eb68da152f32ccdade19ee46",
-                        "K24119.hmm:md5,6d84c4d32e20293cc82878994ae5cf1c"
-                    ],
-                    "wanted_profiles.txt:md5,3d186538e55e42d8eeffefafed49b0d2"
-                ],
+                "kofamscan",
                 "kofamscan/megahit.prodigal.kofamscan_output.tsv.gz",
                 "megahit",
                 "megahit/megahit_out",
@@ -239,7 +210,7 @@
                 "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f"
             ]
         ],
-        "timestamp": "2026-07-26T09:59:43.198436567",
+        "timestamp": "2026-07-26T23:07:06.339633625",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"
