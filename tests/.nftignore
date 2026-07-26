@@ -5,6 +5,7 @@ bbmap/bbnorm/all_samples.bbnorm.log
 bbmap/bbmap/*.log
 bbmap/logs/*.log
 fastqc/*_fastqc.{html,zip}
+diamond_taxonomy/*.tsv.gz
 featurecounts/*.{tsv,tsv.summary}
 featurecounts/*.featureCounts.tsv
 featurecounts/*.featureCounts.tsv.summary

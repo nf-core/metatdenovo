@@ -1,0 +1,45 @@
+nextflow_pipeline {
+
+    name "Test pipeline"
+    script "../main.nf"
+    tag "pipeline"
+    profile "test_diamond"
+
+    test("-profile test_diamond") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+        }
+
+        then {
+            // stable_name: All files + folders in ${params.outdir}/ with a stable name
+            def stable_name = getAllFilesFromDir(params.outdir, relative: true, includeDir: true, ignore: ['pipeline_info/*.{html,json,txt}', 'multiqc/multiqc_plots', 'multiqc/multiqc_plots/**' ])
+            // stable_path: All files in ${params.outdir}/ with stable content
+            def stable_path = getAllFilesFromDir(params.outdir, ignoreFile: 'tests/.nftignore')
+            assertAll(
+                { assert workflow.success },
+                { assert snapshot(
+                    // Number of successful tasks
+                    workflow.trace.succeeded().size(),
+                    // pipeline versions.yml file for multiqc from which Nextflow version is removed because we test pipelines on multiple Nextflow versions
+                    removeNextflowVersion("$outputDir/pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml"),
+                    // All stable path name, with a relative path
+                    stable_name,
+                    // All files with stable contents
+                    stable_path,
+                ).match() },
+                // The two diamond dbs are tiny fixtures built from this test's own ORFs, tagged
+                // with real (ncbi-refseq-test) resp. surrogate (gtdb-r220-test) taxids -- see
+                // https://github.com/nf-core/test-datasets/blob/metatdenovo/test_data/diamond_taxonomy/README.md
+                { assert path("${params.outdir}/diamond_taxonomy/megahit.prodigal.ncbi-refseq-test.tsv.gz").linesGzip.size() > 0 },
+                { assert path("${params.outdir}/diamond_taxonomy/megahit.prodigal.gtdb-r220-test.tsv.gz").linesGzip.size() > 0 },
+                // parse_with_taxdump is set for ncbi-refseq-test: confirm the real NCBI taxon name comes through
+                { assert path("${params.outdir}/summary_tables/megahit.prodigal.ncbi-refseq-test.diamond.taxonomy-taxdump.tsv.gz").linesGzip.findAll { l -> l.contains('Escherichia coli') || l.contains('cerevisiae') }.size() > 0 },
+                // ranks is set for gtdb-r220-test: confirm the ranked lineage columns are populated
+                { assert path("${params.outdir}/summary_tables/megahit.prodigal.gtdb-r220-test.diamond.taxonomy.tsv.gz").linesGzip.findAll { l -> l.contains('Acinetobacter') || l.contains('Bacteroides') }.size() > 0 },
+            )
+        }
+    }
+}

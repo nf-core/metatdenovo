@@ -13,3 +13,5 @@ null/
 /modules/local/diamond/blastp/main.nf.old
 /more_memory.config
 /tmp/
+/diamond/
+/gtdb_r220_taxdump/
