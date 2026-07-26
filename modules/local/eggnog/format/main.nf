@@ -22,7 +22,7 @@ process EGGNOG_FORMAT {
 
     """
     zgrep -v '^##' ${annotations} | \\
-        sed 's/^#// ; /^query/s/.*/\\L&/ ; s/query/orf/' | \\
+        sed 's/^#// ; s/^query/orf/' | \\
         gzip -c > ${prefix}.emapper.tsv.gz
     """
 
