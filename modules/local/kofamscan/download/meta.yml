@@ -5,7 +5,13 @@ keywords:
   - kegg
   - orthology
   - download
-input: none
+input:
+  - ko_list_url:
+      type: string
+      description: URL to download the KOfam ko_list file from
+  - profiles_url:
+      type: string
+      description: URL to download the KOfam HMM profiles archive from
 output:
   ko_list:
     type: file

@@ -19,6 +19,12 @@ input:
       type: file
       description: Feature count files from featureCounts output
       pattern: "*.counts.tsv.gz"
+  - ko_list_url:
+      type: string
+      description: URL to download the KOfam ko_list file from
+  - profiles_url:
+      type: string
+      description: URL to download the KOfam HMM profiles archive from
 output:
   - kofam_table_out:
       type: file
