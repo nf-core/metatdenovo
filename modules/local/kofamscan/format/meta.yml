@@ -22,8 +22,8 @@ input:
           e.g. `[ id:'sample1' ]`
     - kofamscan_tsv:
         type: file
-        description: Raw KofamScan detail-tsv output
-        pattern: "*.tsv"
+        description: Raw, gzipped KofamScan detail-tsv output
+        pattern: "*.tsv.gz"
 
 output:
   kofamtsv:

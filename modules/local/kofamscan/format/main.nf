@@ -23,7 +23,7 @@ process KOFAMSCAN_FORMAT {
     """
     echo "orf	ko	thrshld	score	evalue	ko_definition" | gzip -c > ${prefix}.kofamscan.tsv.gz
 
-    grep -v '#' ${kofamscan_tsv} | cut -f 2-7 | sed 's/\\t"/\\t/' | sed 's/"\$//' | gzip -c >> ${prefix}.kofamscan.tsv.gz
+    zgrep -v '#' ${kofamscan_tsv} | cut -f 2-7 | sed 's/\\t"/\\t/' | sed 's/"\$//' | gzip -c >> ${prefix}.kofamscan.tsv.gz
     """
 
     stub:

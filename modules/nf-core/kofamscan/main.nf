@@ -13,8 +13,8 @@ process KOFAMSCAN {
     path ko_list
 
     output:
-    tuple val(meta), path('*.txt'), optional: true, emit: txt
-    tuple val(meta), path('*.tsv'), optional: true, emit: tsv
+    tuple val(meta), path('*.txt.gz'), optional: true, emit: txt
+    tuple val(meta), path('*.tsv.gz'), optional: true, emit: tsv
     tuple val("${task.process}"), val('kofamscan'), eval("exec_annotation --version 2>&1 | sed 's/exec_annotation //;'"), topic: versions, emit: versions_kofamscan
 
     when:
@@ -25,14 +25,24 @@ process KOFAMSCAN {
     def prefix = task.ext.prefix ?: "${meta.id}"
     def extension = args.contains("--format detail-tsv") ? "tsv" :
                     "txt"
+    def is_compressed = fasta.toString().endsWith('.gz')
+    def fasta_name     = is_compressed ? fasta.toString() - '.gz' : "$fasta"
+    def gunzip         = is_compressed ? "gunzip -c ${fasta} > ${fasta_name}" : ''
+    def cleanup        = is_compressed ? "rm -f ${fasta_name}" : ''
     """
+    $gunzip
+
     exec_annotation \\
         -p $profiles \\
         -k $ko_list \\
         $args \\
         --cpu $task.cpus \\
         -o ${prefix}.${extension} \\
-        $fasta
+        ${fasta_name}
+
+    gzip ${prefix}.${extension}
+
+    $cleanup
     """
 
     stub:
@@ -42,5 +52,7 @@ process KOFAMSCAN {
                     "txt"
     """
     touch ${prefix}.${extension}
+
+    gzip ${prefix}.${extension}
     """
 }

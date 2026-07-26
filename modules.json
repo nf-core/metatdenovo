@@ -60,7 +60,8 @@
                     "kofamscan": {
                         "branch": "master",
                         "git_sha": "9d675a431e1fcd9dc4043edcc9b1c26b5c2377c0",
-                        "installed_by": ["modules"]
+                        "installed_by": ["modules"],
+                        "patch": "modules/nf-core/kofamscan/kofamscan.diff"
                     },
                     "multiqc": {
                         "branch": "master",
