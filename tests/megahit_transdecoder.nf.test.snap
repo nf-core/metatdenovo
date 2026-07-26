@@ -1,7 +1,7 @@
 {
     "-profile test_megahit_transdecoder": {
         "content": [
-            46,
+            47,
             {
                 "BBMAP_ALIGN": {
                     "bbmap": 39.18
@@ -73,7 +73,10 @@
                 "SEQTK_MERGEPE": {
                     "seqtk": "1.4-r122"
                 },
-                "TRANSDECODER": {
+                "TRANSDECODER_LONGORF": {
+                    "transdecoder": "5.7.1"
+                },
+                "TRANSDECODER_PREDICT": {
                     "transdecoder": "5.7.1"
                 },
                 "TRANSRATE": {
@@ -83,7 +86,7 @@
                     "trimgalore": "2.3.0"
                 },
                 "UNPIGZ_CONTIGS": {
-                    "pigz": "2.3.4"
+                    "pigz": 2.8
                 },
                 "Workflow": {
                     "nf-core/metatdenovo": "v1.5.0dev"
@@ -189,10 +192,10 @@
                 "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count"
             ]
         ],
-        "timestamp": "2026-06-24T16:42:32.361596026",
+        "timestamp": "2026-07-26T13:00:53.182441374",
         "meta": {
             "nf-test": "0.9.5",
-            "nextflow": "26.04.4"
+            "nextflow": "26.04.6"
         }
     }
 }

@@ -15,7 +15,6 @@ include { MERGE_TABLES                       } from '../modules/local/merge/summ
 include { FORMAT_DIAMOND_TAX_RANKLIST        } from '../modules/local/diamond/format_tax/ranklist/'
 include { FORMAT_DIAMOND_TAX_TAXDUMP         } from '../modules/local/diamond/format_tax/taxdump/'
 include { SUMTAXONOMY as SUM_DIAMONDTAX      } from '../modules/local/sumtaxonomy/'
-include { TRANSDECODER                       } from '../modules/local/transdecoder/'
 include { TRANSRATE                          } from '../modules/local/transrate/'
 include { WRITESPADESYAML                    } from '../modules/local/spades/writeyaml/'
 
@@ -35,6 +34,7 @@ include { PROKKA_SUBSETS          } from '../subworkflows/local/prokka/subsets/'
 include { FASTQC_TRIMGALORE       } from '../subworkflows/local/fastqc/trimgalore/'
 include { PRODIGAL                } from '../subworkflows/local/prodigal/'
 include { KOFAMSCAN               } from '../subworkflows/local/kofamscan/'
+include { TRANSDECODER            } from '../subworkflows/local/transdecoder/'
 include { PIPELINE_INITIALISATION } from '../subworkflows/local/utils_nfcore_metatdenovo_pipeline'
 include { PIPELINE_COMPLETION     } from '../subworkflows/local/utils_nfcore_metatdenovo_pipeline'
 
