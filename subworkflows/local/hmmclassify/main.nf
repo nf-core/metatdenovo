@@ -1,5 +1,5 @@
 include { HMMER_HMMSEARCH  } from '../../../modules/nf-core/hmmer/hmmsearch/main'
-include { HMMRANK          } from '../../../modules/local/hmmrank/main'
+include { HMMER_HMMRANK    } from '../../../modules/nf-core/hmmer/hmmrank/main'
 include { SEQTK_HMMHITFAAS } from '../../../modules/local/seqtk/hmmhitfaas/main'
 
 workflow HMMCLASSIFY {
@@ -14,7 +14,7 @@ workflow HMMCLASSIFY {
             .map { meta, hmm, seqdb -> [ [ id: "${meta.id}.${hmm.baseName}" ], hmm, seqdb, false, true, false ] }
     )
 
-    HMMRANK (
+    HMMER_HMMRANK (
         ch_hmmclassify
             .map { meta, _hmm, _seqdb -> meta }
             .distinct()
@@ -23,12 +23,12 @@ workflow HMMCLASSIFY {
     )
 
     SEQTK_HMMHITFAAS(
-        HMMRANK.out.hmmrank
+        HMMER_HMMRANK.out.hmmrank
             .join(ch_hmmclassify)
             .map { meta, hmmrank, _hmms, faa -> [ meta, hmmrank, faa ] }
     )
 
     emit:
-    hmmrank  = HMMRANK.out.hmmrank
+    hmmrank  = HMMER_HMMRANK.out.hmmrank
     faas     = SEQTK_HMMHITFAAS.out.faas
 }

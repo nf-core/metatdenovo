@@ -39,14 +39,12 @@
                 "FORMAT_PRODIGAL_GFF": {
                     "gzip": 1.11
                 },
+                "HMMER_HMMRANK": {
+                    "r-base": "4.2.3",
+                    "r-tidyverse": "2.0.0"
+                },
                 "HMMER_HMMSEARCH": {
                     "hmmer": 3.4
-                },
-                "HMMRANK": {
-                    "R": "4.5.3",
-                    "dplyr": "1.2.1",
-                    "readr": "2.2.0",
-                    "stringr": "1.6.0"
                 },
                 "MEGAHIT_INTERLEAVED": {
                     "megahit_interleaved": "1.2.9"
@@ -88,10 +86,10 @@
                     "trimgalore": "2.3.0"
                 },
                 "UNPIGZ_CONTIGS": {
-                    "pigz": "2.3.4"
+                    "pigz": 2.8
                 },
                 "UNPIGZ_GFF": {
-                    "pigz": "2.3.4"
+                    "pigz": 2.8
                 },
                 "Workflow": {
                     "nf-core/metatdenovo": "v1.5.0dev"
@@ -217,7 +215,7 @@
                 "sample\tn_post_trimming\tn_non_contaminated\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count"
             ]
         ],
-        "timestamp": "2026-07-25T20:24:35.764990286",
+        "timestamp": "2026-07-26T11:40:04.261172099",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

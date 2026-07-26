@@ -17,8 +17,6 @@ include { FORMAT_DIAMOND_TAX_TAXDUMP         } from '../modules/local/diamond/fo
 include { SUMTAXONOMY as SUM_DIAMONDTAX      } from '../modules/local/sumtaxonomy/'
 include { TRANSDECODER                       } from '../modules/local/transdecoder/'
 include { TRANSRATE                          } from '../modules/local/transrate/'
-include { UNPIGZ as UNPIGZ_CONTIGS           } from '../modules/local/unpigz/'
-include { UNPIGZ as UNPIGZ_GFF               } from '../modules/local/unpigz/'
 include { WRITESPADESYAML                    } from '../modules/local/spades/writeyaml/'
 
 
@@ -66,6 +64,8 @@ include { PIGZ_COMPRESS as PIGZ_TRANSDECODER_BED     } from '../modules/nf-core/
 include { PIGZ_COMPRESS as PIGZ_TRANSDECODER_CDS     } from '../modules/nf-core/pigz/compress/'
 include { PIGZ_COMPRESS as PIGZ_TRANSDECODER_GFF     } from '../modules/nf-core/pigz/compress/'
 include { PIGZ_COMPRESS as PIGZ_TRANSDECODER_PEP     } from '../modules/nf-core/pigz/compress/'
+include { PIGZ_UNCOMPRESS as UNPIGZ_CONTIGS          } from '../modules/nf-core/pigz/uncompress/'
+include { PIGZ_UNCOMPRESS as UNPIGZ_GFF              } from '../modules/nf-core/pigz/uncompress/'
 include { SEQTK_MERGEPE                              } from '../modules/nf-core/seqtk/mergepe/'
 include { SEQTK_SEQ as SEQTK_SEQ_CONTIG_FILTER       } from '../modules/nf-core/seqtk/seq/'
 include { SPADES                                     } from '../modules/nf-core/spades/'
@@ -399,7 +399,7 @@ workflow METATDENOVO {
 
         //UNPIGZ_GFF(PROKKA_SUBSETS.out.gff.map { meta, gff -> [ [id: "${orfs_name}.${meta.id}"], gff ] })
         UNPIGZ_GFF(PROKKA_SUBSETS.out.gff)
-        ch_gff           = UNPIGZ_GFF.out.unzipped
+        ch_gff           = UNPIGZ_GFF.out.file
     }
 
     //
@@ -409,7 +409,7 @@ workflow METATDENOVO {
         PRODIGAL( ch_assembly_contigs.map { _meta, contigs -> [ [id: "${assembly_name}.${orfs_name}"], contigs  ] } )
         ch_protein      = PRODIGAL.out.faa
         UNPIGZ_GFF(PRODIGAL.out.gff)
-        ch_gff          = UNPIGZ_GFF.out.unzipped
+        ch_gff          = UNPIGZ_GFF.out.file
     }
 
     //
@@ -530,7 +530,7 @@ workflow METATDENOVO {
 
     // set up contig channel to use in TransRate
     UNPIGZ_CONTIGS(ch_assembly_contigs)
-    ch_unzipped_contigs = UNPIGZ_CONTIGS.out.unzipped
+    ch_unzipped_contigs = UNPIGZ_CONTIGS.out.file
 
     //
     // MODULE: Use TransRate to judge assembly quality, piped into MultiQC
