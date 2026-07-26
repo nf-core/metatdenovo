@@ -53,8 +53,12 @@ Changes in 'eggnogmapper/meta.yml':
 Changes in 'eggnogmapper/main.nf':
 --- modules/nf-core/eggnogmapper/main.nf
 +++ modules/nf-core/eggnogmapper/main.nf
-@@ -13,9 +13,9 @@
-     path(eggnog_data_dir)
+@@ -10,12 +10,12 @@
+     input:
+     tuple val(meta), path(fasta)
+     tuple val(search_mode), path(db)
+-    path(eggnog_data_dir)
++    path(eggnog_data_dir), stageAs: 'eggnog_data/*'
  
      output:
 -    tuple val(meta), path("*.emapper.annotations")   , emit: annotations
@@ -75,7 +79,13 @@ Changes in 'eggnogmapper/main.nf':
      def fasta_name    = is_compressed ? fasta.baseName : "$fasta"
      def db_flags = ['diamond': '--dmnd_db', 'novel_fams': '--dmnd_db', 'mmseqs': '--mmseqs_db', 'hmmer': '--database', 'no_search': '--annotate_hits_table', 'cache': '--cache']
      def db_path  = (db instanceof Path && db.isDirectory()) ? "${db}/${db.name}"                    : "$db"
-@@ -44,6 +44,12 @@
+@@ -39,11 +39,17 @@
+         $args \\
+         --cpu ${task.cpus} \\
+         -i ${fasta_name} \\
+-        --data_dir ${eggnog_data_dir} \\
++        --data_dir eggnog_data \\
+         -m ${search_mode} \\
          $db_arg \\
          ${dbmem} \\
          --output ${prefix}

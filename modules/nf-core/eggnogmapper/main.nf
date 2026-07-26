@@ -10,7 +10,7 @@ process EGGNOGMAPPER {
     input:
     tuple val(meta), path(fasta)
     tuple val(search_mode), path(db)
-    path(eggnog_data_dir)
+    path(eggnog_data_dir), stageAs: 'eggnog_data/*'
 
     output:
     tuple val(meta), path("*.emapper.annotations.gz")   , emit: annotations
@@ -39,7 +39,7 @@ process EGGNOGMAPPER {
         $args \\
         --cpu ${task.cpus} \\
         -i ${fasta_name} \\
-        --data_dir ${eggnog_data_dir} \\
+        --data_dir eggnog_data \\
         -m ${search_mode} \\
         $db_arg \\
         ${dbmem} \\

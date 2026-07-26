@@ -18,7 +18,15 @@ workflow EGGNOG {
 
     ch_search_mode_db = EGGNOG_DOWNLOAD.out.dmnd.map { dmnd -> [ 'diamond', dmnd ] }
 
-    EGGNOG_MAPPER(faa, ch_search_mode_db, EGGNOG_DOWNLOAD.out.eggnog_data_dir)
+    // The official module wants a single "eggnog_data" directory (--data_dir); stage the
+    // db/taxa/pkl files into one at task-staging time only, via the module's own stageAs,
+    // rather than restructuring EGGNOG_DOWNLOAD's own (storeDir-cached, so expensive to
+    // invalidate) flat output layout.
+    ch_eggnog_data_dir = EGGNOG_DOWNLOAD.out.eggnog_db
+        .combine(EGGNOG_DOWNLOAD.out.taxa_db)
+        .combine(EGGNOG_DOWNLOAD.out.pkl)
+
+    EGGNOG_MAPPER(faa, ch_search_mode_db, ch_eggnog_data_dir)
 
     EGGNOG_FORMAT(EGGNOG_MAPPER.out.annotations)
 
