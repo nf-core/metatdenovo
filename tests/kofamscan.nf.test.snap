@@ -1,12 +1,9 @@
 {
-    "-profile test_single": {
+    "-profile test_kofamscan": {
         "content": [
-            69,
+            49,
             {
                 "BBMAP_ALIGN": {
-                    "bbmap": 39.18
-                },
-                "BBMAP_BBDUK": {
                     "bbmap": 39.18
                 },
                 "BBMAP_INDEX": {
@@ -40,13 +37,44 @@
                 "FORMAT_PRODIGAL_GFF": {
                     "gzip": 1.11
                 },
+                "KOFAMSCAN_SCAN": {
+                    "kofamscan": "1.3.0"
+                },
+                "KOFAMSCAN_SUM": {
+                    "R": "4.2.3",
+                    "dplyr": "1.1.2",
+                    "dtplyr": "1.3.1",
+                    "data.table": "1.14.8",
+                    "readr": "2.1.4",
+                    "purrr": "1.0.1",
+                    "tidyr": "1.3.0",
+                    "stringr": "1.5.0"
+                },
+                "KOFAMSCAN_UNIQUE": {
+                    "R": "4.2.3",
+                    "dplyr": "1.1.2",
+                    "readr": "2.1.4",
+                    "purrr": "1.0.1",
+                    "tidyr": "1.3.0",
+                    "stringr": "1.5.0"
+                },
                 "MEGAHIT_INTERLEAVED": {
                     "megahit_interleaved": "1.2.9"
                 },
-                "PIGZ_PE_READS_REV": {
+                "MERGE_TABLES": {
+                    "R": "4.2.3",
+                    "dplyr": "1.1.2",
+                    "dtplyr": "1.3.1",
+                    "data.table": "1.14.8",
+                    "readr": "2.1.4",
+                    "purrr": "1.0.1",
+                    "tidyr": "1.3.0",
+                    "stringr": "1.5.0"
+                },
+                "PIGZ_PE_READS_FWD": {
                     "pigz": 2.8
                 },
-                "PIGZ_SE_READS": {
+                "PIGZ_PE_READS_REV": {
                     "pigz": 2.8
                 },
                 "PRODIGAL_MODULE": {
@@ -88,38 +116,25 @@
             },
             [
                 "bbmap",
-                "bbmap/bbduk",
-                "bbmap/bbduk/SAMPLE1_SE.bbduk.log",
-                "bbmap/bbduk/SAMPLE2_SE.bbduk.log",
-                "bbmap/bbduk/SAMPLE3_SE.bbduk.log",
-                "bbmap/bbduk/SAMPLE4_PE_1.bbduk.log",
-                "bbmap/bbduk/SAMPLE5_PE.bbduk.log",
                 "bbmap/bbmap",
-                "bbmap/bbmap/SAMPLE1_SE.bbmap.log",
-                "bbmap/bbmap/SAMPLE2_SE.bbmap.log",
-                "bbmap/bbmap/SAMPLE3_SE.bbmap.log",
-                "bbmap/bbmap/SAMPLE4_PE_1.bbmap.log",
-                "bbmap/bbmap/SAMPLE5_PE.bbmap.log",
+                "bbmap/bbmap/SAMPLE1_PE.bbmap.log",
+                "bbmap/bbmap/SAMPLE2_PE.bbmap.log",
+                "bbmap/bbmap/SAMPLE3_PE_1.bbmap.log",
                 "featurecounts",
-                "featurecounts/SAMPLE1_SE.featureCounts.tsv",
-                "featurecounts/SAMPLE1_SE.featureCounts.tsv.summary",
-                "featurecounts/SAMPLE2_SE.featureCounts.tsv",
-                "featurecounts/SAMPLE2_SE.featureCounts.tsv.summary",
-                "featurecounts/SAMPLE3_SE.featureCounts.tsv",
-                "featurecounts/SAMPLE3_SE.featureCounts.tsv.summary",
-                "featurecounts/SAMPLE4_PE_1.featureCounts.tsv",
-                "featurecounts/SAMPLE4_PE_1.featureCounts.tsv.summary",
-                "featurecounts/SAMPLE5_PE.featureCounts.tsv",
-                "featurecounts/SAMPLE5_PE.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE1_PE.featureCounts.tsv",
+                "featurecounts/SAMPLE1_PE.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE2_PE.featureCounts.tsv",
+                "featurecounts/SAMPLE2_PE.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE3_PE_1.featureCounts.tsv",
+                "featurecounts/SAMPLE3_PE_1.featureCounts.tsv.summary",
+                "kofamscan",
+                "kofamscan/megahit.prodigal.kofamscan_output.tsv.gz",
                 "megahit",
                 "megahit/megahit_out",
                 "megahit/megahit_out/megahit_assembly.contigs.fa.gz",
                 "megahit/megahit_out/megahit_assembly.log",
                 "multiqc",
                 "multiqc/multiqc_data",
-                "multiqc/multiqc_data/bbduk-filtered-barplot_Bases.txt",
-                "multiqc/multiqc_data/bbduk-filtered-barplot_Reads.txt",
-                "multiqc/multiqc_data/bbduk.txt",
                 "multiqc/multiqc_data/fastqc-status-check-heatmap.txt",
                 "multiqc/multiqc_data/fastqc_adapter_content_plot.txt",
                 "multiqc/multiqc_data/fastqc_overrepresented_sequences_plot.txt",
@@ -151,72 +166,54 @@
                 "prodigal/megahit.prodigal_all.txt.gz",
                 "prodigal/megahit.prodigal_format.gff.gz",
                 "samtools",
-                "samtools/SAMPLE1_SE.sorted.bam",
-                "samtools/SAMPLE1_SE.sorted.bam.bai",
-                "samtools/SAMPLE2_SE.sorted.bam",
-                "samtools/SAMPLE2_SE.sorted.bam.bai",
-                "samtools/SAMPLE3_SE.sorted.bam",
-                "samtools/SAMPLE3_SE.sorted.bam.bai",
-                "samtools/SAMPLE4_PE_1.sorted.bam",
-                "samtools/SAMPLE4_PE_1.sorted.bam.bai",
-                "samtools/SAMPLE5_PE.sorted.bam",
-                "samtools/SAMPLE5_PE.sorted.bam.bai",
-                "samtools/megahit.SAMPLE1_SE.flagstat",
-                "samtools/megahit.SAMPLE1_SE.idxstats",
-                "samtools/megahit.SAMPLE2_SE.flagstat",
-                "samtools/megahit.SAMPLE2_SE.idxstats",
-                "samtools/megahit.SAMPLE3_SE.flagstat",
-                "samtools/megahit.SAMPLE3_SE.idxstats",
-                "samtools/megahit.SAMPLE4_PE_1.flagstat",
-                "samtools/megahit.SAMPLE4_PE_1.idxstats",
-                "samtools/megahit.SAMPLE5_PE.flagstat",
-                "samtools/megahit.SAMPLE5_PE.idxstats",
+                "samtools/SAMPLE1_PE.sorted.bam",
+                "samtools/SAMPLE1_PE.sorted.bam.bai",
+                "samtools/SAMPLE2_PE.sorted.bam",
+                "samtools/SAMPLE2_PE.sorted.bam.bai",
+                "samtools/SAMPLE3_PE_1.sorted.bam",
+                "samtools/SAMPLE3_PE_1.sorted.bam.bai",
+                "samtools/megahit.SAMPLE1_PE.flagstat",
+                "samtools/megahit.SAMPLE1_PE.idxstats",
+                "samtools/megahit.SAMPLE2_PE.flagstat",
+                "samtools/megahit.SAMPLE2_PE.idxstats",
+                "samtools/megahit.SAMPLE3_PE_1.flagstat",
+                "samtools/megahit.SAMPLE3_PE_1.idxstats",
                 "summary_tables",
                 "summary_tables/megahit.prodigal.counts.tsv.gz",
+                "summary_tables/megahit.prodigal.kofamscan-uniq.tsv.gz",
+                "summary_tables/megahit.prodigal.kofamscan.tsv.gz",
                 "summary_tables/megahit.prodigal.overall_stats.tsv.gz",
                 "transrate",
                 "transrate/megahit_assemblies_mqc.csv",
                 "trimgalore",
-                "trimgalore/SAMPLE1_SE.fastq.gz_trimming_report.txt",
-                "trimgalore/SAMPLE2_SE.fastq.gz_trimming_report.txt",
-                "trimgalore/SAMPLE3_SE.fastq.gz_trimming_report.txt",
-                "trimgalore/SAMPLE4_PE_1_1.fastq.gz_trimming_report.txt",
-                "trimgalore/SAMPLE4_PE_1_2.fastq.gz_trimming_report.txt",
-                "trimgalore/SAMPLE5_PE_1.fastq.gz_trimming_report.txt",
-                "trimgalore/SAMPLE5_PE_2.fastq.gz_trimming_report.txt",
+                "trimgalore/SAMPLE1_PE_1.fastq.gz_trimming_report.txt",
+                "trimgalore/SAMPLE1_PE_2.fastq.gz_trimming_report.txt",
+                "trimgalore/SAMPLE2_PE_1.fastq.gz_trimming_report.txt",
+                "trimgalore/SAMPLE2_PE_2.fastq.gz_trimming_report.txt",
+                "trimgalore/SAMPLE3_PE_1_1.fastq.gz_trimming_report.txt",
+                "trimgalore/SAMPLE3_PE_1_2.fastq.gz_trimming_report.txt",
                 "trimgalore/fastqc",
-                "trimgalore/fastqc/SAMPLE1_SE_trimmed_fastqc.html",
-                "trimgalore/fastqc/SAMPLE1_SE_trimmed_fastqc.zip",
-                "trimgalore/fastqc/SAMPLE2_SE_trimmed_fastqc.html",
-                "trimgalore/fastqc/SAMPLE2_SE_trimmed_fastqc.zip",
-                "trimgalore/fastqc/SAMPLE3_SE_trimmed_fastqc.html",
-                "trimgalore/fastqc/SAMPLE3_SE_trimmed_fastqc.zip",
-                "trimgalore/fastqc/SAMPLE4_PE_1_1_val_1_fastqc.html",
-                "trimgalore/fastqc/SAMPLE4_PE_1_1_val_1_fastqc.zip",
-                "trimgalore/fastqc/SAMPLE4_PE_1_2_val_2_fastqc.html",
-                "trimgalore/fastqc/SAMPLE4_PE_1_2_val_2_fastqc.zip",
-                "trimgalore/fastqc/SAMPLE5_PE_1_val_1_fastqc.html",
-                "trimgalore/fastqc/SAMPLE5_PE_1_val_1_fastqc.zip",
-                "trimgalore/fastqc/SAMPLE5_PE_2_val_2_fastqc.html",
-                "trimgalore/fastqc/SAMPLE5_PE_2_val_2_fastqc.zip"
+                "trimgalore/fastqc/SAMPLE1_PE_1_val_1_fastqc.html",
+                "trimgalore/fastqc/SAMPLE1_PE_1_val_1_fastqc.zip",
+                "trimgalore/fastqc/SAMPLE1_PE_2_val_2_fastqc.html",
+                "trimgalore/fastqc/SAMPLE1_PE_2_val_2_fastqc.zip",
+                "trimgalore/fastqc/SAMPLE2_PE_1_val_1_fastqc.html",
+                "trimgalore/fastqc/SAMPLE2_PE_1_val_1_fastqc.zip",
+                "trimgalore/fastqc/SAMPLE2_PE_2_val_2_fastqc.html",
+                "trimgalore/fastqc/SAMPLE2_PE_2_val_2_fastqc.zip",
+                "trimgalore/fastqc/SAMPLE3_PE_1_1_val_1_fastqc.html",
+                "trimgalore/fastqc/SAMPLE3_PE_1_1_val_1_fastqc.zip",
+                "trimgalore/fastqc/SAMPLE3_PE_1_2_val_2_fastqc.html",
+                "trimgalore/fastqc/SAMPLE3_PE_1_2_val_2_fastqc.zip"
             ],
             [
                 "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f"
-            ],
-            16,
-            [
-                "orf\tchr\tstart\tend\tstrand\tlength\tsample\tcount\ttpm"
-            ],
-            5000000,
-            6,
-            [
-                "sample\tn_post_trimming\tn_non_contaminated\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count"
             ]
         ],
-        "timestamp": "2026-06-24T16:46:12.429088386",
+        "timestamp": "2026-07-26T23:07:06.339633625",
         "meta": {
             "nf-test": "0.9.5",
-            "nextflow": "26.04.4"
+            "nextflow": "26.04.6"
         }
     }
 }

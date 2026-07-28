@@ -1,0 +1,41 @@
+nextflow_pipeline {
+
+    name "Test pipeline"
+    script "../main.nf"
+    tag "pipeline"
+    profile "test_kofamscan"
+
+    test("-profile test_kofamscan") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+        }
+
+        then {
+            // stable_name: All files + folders in ${params.outdir}/ with a stable name
+            def stable_name = getAllFilesFromDir(params.outdir, relative: true, includeDir: true, ignore: ['pipeline_info/*.{html,json,txt}', 'multiqc/multiqc_plots', 'multiqc/multiqc_plots/**' ])
+            // stable_path: All files in ${params.outdir}/ with stable content
+            def stable_path = getAllFilesFromDir(params.outdir, ignoreFile: 'tests/.nftignore')
+            assertAll(
+                { assert workflow.success },
+                { assert snapshot(
+                    // Number of successful tasks
+                    workflow.trace.succeeded().size(),
+                    // pipeline versions.yml file for multiqc from which Nextflow version is removed because we test pipelines on multiple Nextflow versions
+                    removeNextflowVersion("$outputDir/pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml"),
+                    // All stable path name, with a relative path
+                    stable_name,
+                    // All files with stable contents
+                    stable_path,
+                ).match() },
+                // The tiny KOfam database is 20 real KEGG-curated HMM profiles, chosen for the
+                // most significant hits against this test's own ORFs -- see
+                // https://github.com/nf-core/test-datasets/blob/metatdenovo/test_data/kofamscan/README.md
+                { assert path("${params.outdir}/summary_tables/megahit.prodigal.kofamscan.tsv.gz").linesGzip.size() > 1 },
+                { assert path("${params.outdir}/summary_tables/megahit.prodigal.kofamscan.tsv.gz").linesGzip.findAll { l -> l.contains('K21572') || l.contains('K21573') }.size() > 0 },
+            )
+        }
+    }
+}

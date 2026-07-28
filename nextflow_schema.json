@@ -318,6 +318,20 @@
                     "help_text": "If a `ko_list` file and/or `profiles` does not exist, they will be downloaded.",
                     "fa_icon": "fas fa-folder-open"
                 },
+                "kofam_ko_list_url": {
+                    "type": "string",
+                    "default": "https://www.genome.jp/ftp/db/kofam/ko_list.gz",
+                    "description": "URL to download the KOfam ko_list file from.",
+                    "fa_icon": "fas fa-link",
+                    "hidden": true
+                },
+                "kofam_profiles_url": {
+                    "type": "string",
+                    "default": "https://www.genome.jp/ftp/db/kofam/profiles.tar.gz",
+                    "description": "URL to download the KOfam HMM profiles archive from.",
+                    "fa_icon": "fas fa-link",
+                    "hidden": true
+                },
                 "hmmdir": {
                     "type": "string",
                     "default": null,
