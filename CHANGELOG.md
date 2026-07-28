@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### `Fixed`
 
 - [#NN](https://github.com/nf-core/metatdenovo/pull/NN) - Fix `EGGNOG_FORMAT` renaming the `query` column to `Lorf` instead of `orf`, which broke `EGGNOG_SUM` (@erikrikarddaniel)
+- [#NN](https://github.com/nf-core/metatdenovo/pull/NN) - Revert `setup-apptainer` digest in `nf-test` CI action to `3f706d898` (`v2`), undoing a faulty change introduced by the nf-core/tools 4.0.3 template that pointed it back to the stale 2022 `v2.0.0` release and could cause namespace errors under Singularity/Apptainer (@erikrikarddaniel)
 
 ### `Dependencies`
 
