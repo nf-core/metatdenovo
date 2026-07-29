@@ -77,10 +77,10 @@
                     "trimgalore": "2.3.0"
                 },
                 "UNPIGZ_CONTIGS": {
-                    "pigz": "2.3.4"
+                    "pigz": 2.8
                 },
                 "UNPIGZ_GFF": {
-                    "pigz": "2.3.4"
+                    "pigz": 2.8
                 },
                 "Workflow": {
                     "nf-core/metatdenovo": "v1.5.0dev"
