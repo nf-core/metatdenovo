@@ -12,8 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### `Changed`
 
 - [#NN](https://github.com/nf-core/metatdenovo/pull/NN) - Template sync to nf-core/tools 4.0.3, update all vendored modules/subworkflows (@erikrikarddaniel)
-- [#NN](https://github.com/nf-core/metatdenovo/pull/NN) - Swap local modules for official nf-core/modules equivalents, closes [#445](https://github.com/nf-core/metatdenovo/issues/445): `HMMRANK`→`hmmer/hmmrank`, `UNPIGZ`→`pigz/uncompress`, `TRANSDECODER`→official `transdecoder/longorf`+`transdecoder/predict` (wrapped in a new local subworkflow), `KOFAMSCAN`→official `kofamscan` module (patched to gzip/gunzip inline), `EGGNOGMAPPER`→official `eggnogmapper` module (patched to gzip/gunzip inline and stage the database directory via `stageAs`), `MEGAHIT`→official `megahit` module (patched to add `--12` interleaved-read support) (@erikrikarddaniel)
-- [#NN](https://github.com/nf-core/metatdenovo/pull/NN) - Update `prokka` module to 1.15.6, dropping the now-obsolete `--prodigal` flag it no longer accepts (@erikrikarddaniel)
+- [#NN](https://github.com/nf-core/metatdenovo/pull/NN) - Replace several local modules (`HMMRANK`, `UNPIGZ`, `TRANSDECODER`, `KOFAMSCAN`, `EGGNOGMAPPER`, `MEGAHIT`) with official nf-core/modules equivalents, closes [#445](https://github.com/nf-core/metatdenovo/issues/445) (@erikrikarddaniel)
 
 ### `Fixed`
 
