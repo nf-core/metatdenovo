@@ -59,7 +59,7 @@
                     "pigz": 2.8
                 },
                 "PROKKA": {
-                    "prokka": "1.14.6"
+                    "prokka": "1.15.6"
                 },
                 "PROKKAGFF2TSV": {
                     "R": "4.5.3",
