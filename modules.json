@@ -161,6 +161,11 @@
                         "git_sha": "f9b05e226409f21226a46d95d2d26c58d68958e6",
                         "installed_by": ["modules"]
                     },
+                    "transrate": {
+                        "branch": "master",
+                        "git_sha": "e7ee4ca0f1117ef440fe65a5038eecfd8fe5810e",
+                        "installed_by": ["modules"]
+                    },
                     "trimgalore": {
                         "branch": "master",
                         "git_sha": "2a30bfb6a1b4667692d734e33e000a3bd1d74a0d",

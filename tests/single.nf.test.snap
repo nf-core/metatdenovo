@@ -138,6 +138,7 @@
                 "multiqc/multiqc_data/multiqc_data.json",
                 "multiqc/multiqc_data/multiqc_fastqc.txt",
                 "multiqc/multiqc_data/multiqc_general_stats.txt",
+                "multiqc/multiqc_data/multiqc_megahit_assemblies.txt",
                 "multiqc/multiqc_data/multiqc_software_versions.txt",
                 "multiqc/multiqc_data/multiqc_sources.txt",
                 "multiqc/multiqc_report.html",
@@ -174,7 +175,8 @@
                 "summary_tables/megahit.prodigal.counts.tsv.gz",
                 "summary_tables/megahit.prodigal.overall_stats.tsv.gz",
                 "transrate",
-                "transrate/megahit_assemblies_mqc.csv",
+                "transrate/megahit.assemblies.csv",
+                "transrate/megahit.contigs.csv",
                 "trimgalore",
                 "trimgalore/SAMPLE1_SE.fastq.gz_trimming_report.txt",
                 "trimgalore/SAMPLE2_SE.fastq.gz_trimming_report.txt",
@@ -200,7 +202,10 @@
                 "trimgalore/fastqc/SAMPLE5_PE_2_val_2_fastqc.zip"
             ],
             [
-                "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f"
+                "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f",
+                "multiqc_megahit_assemblies.txt:md5,d70e5c58c0112f71feed82353a533ded",
+                "megahit.assemblies.csv:md5,1b715230275521b7257fde3c4479d651",
+                "megahit.contigs.csv:md5,3eba814e4757883fabd0a7394107b991"
             ],
             16,
             [
@@ -212,7 +217,7 @@
                 "sample\tn_post_trimming\tn_non_contaminated\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count"
             ]
         ],
-        "timestamp": "2026-07-26T18:17:36.323393296",
+        "timestamp": "2026-07-31T13:48:54.769375233",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

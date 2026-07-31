@@ -141,6 +141,7 @@
                 "multiqc/multiqc_data/multiqc_data.json",
                 "multiqc/multiqc_data/multiqc_fastqc.txt",
                 "multiqc/multiqc_data/multiqc_general_stats.txt",
+                "multiqc/multiqc_data/multiqc_megahit_assemblies.txt",
                 "multiqc/multiqc_data/multiqc_prokka.txt",
                 "multiqc/multiqc_data/multiqc_software_versions.txt",
                 "multiqc/multiqc_data/multiqc_sources.txt",
@@ -170,7 +171,8 @@
                 "summary_tables/megahit.prokka.overall_stats.tsv.gz",
                 "summary_tables/megahit.prokka.prokka-annotations.tsv.gz",
                 "transrate",
-                "transrate/megahit_assemblies_mqc.csv",
+                "transrate/megahit.assemblies.csv",
+                "transrate/megahit.contigs.csv",
                 "trimgalore",
                 "trimgalore/SAMPLE1_PE_1.fastq.gz_trimming_report.txt",
                 "trimgalore/SAMPLE1_PE_2.fastq.gz_trimming_report.txt",
@@ -193,7 +195,10 @@
                 "trimgalore/fastqc/SAMPLE3_PE_1_2_val_2_fastqc.zip"
             ],
             [
-                "multiqc_citations.txt:md5,d59b1beea6256a7bf5f599da543910db"
+                "multiqc_citations.txt:md5,d59b1beea6256a7bf5f599da543910db",
+                "multiqc_megahit_assemblies.txt:md5,470f41467f747217d5b13aabec2a7f5c",
+                "megahit.assemblies.csv:md5,f6dc7d68ef3b8cd1ced671cb4ad13bc8",
+                "megahit.contigs.csv:md5,36382b26c1e6e7d0b4f30d69f665afa1"
             ],
             16,
             [
@@ -206,7 +211,7 @@
             ],
             1
         ],
-        "timestamp": "2026-07-26T18:57:29.57516229",
+        "timestamp": "2026-07-31T14:11:02.291325415",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

@@ -122,6 +122,7 @@
                 "multiqc/multiqc_data/multiqc_general_stats.txt",
                 "multiqc/multiqc_data/multiqc_software_versions.txt",
                 "multiqc/multiqc_data/multiqc_sources.txt",
+                "multiqc/multiqc_data/multiqc_spades_assemblies.txt",
                 "multiqc/multiqc_report.html",
                 "pipeline_info",
                 "pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml",
@@ -153,7 +154,8 @@
                 "summary_tables/spades.prodigal.counts.tsv.gz",
                 "summary_tables/spades.prodigal.overall_stats.tsv.gz",
                 "transrate",
-                "transrate/spades_assemblies_mqc.csv",
+                "transrate/spades.assemblies.csv",
+                "transrate/spades.contigs.csv",
                 "trimgalore",
                 "trimgalore/SAMPLE1_PE_1.fastq.gz_trimming_report.txt",
                 "trimgalore/SAMPLE1_PE_2.fastq.gz_trimming_report.txt",
@@ -176,7 +178,10 @@
                 "trimgalore/fastqc/SAMPLE3_PE_1_2_val_2_fastqc.zip"
             ],
             [
-                "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f"
+                "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f",
+                "multiqc_spades_assemblies.txt:md5,86e9cef5a6dc30fecd2d05148b5c79c3",
+                "spades.assemblies.csv:md5,fedf044d593bc13e15c80c07af5a1273",
+                "spades.contigs.csv:md5,f15490792063fd4143f9f88f6914a74b"
             ],
             16,
             [
@@ -188,10 +193,10 @@
                 "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count"
             ]
         ],
-        "timestamp": "2026-06-24T16:49:29.024494959",
+        "timestamp": "2026-07-31T13:54:28.154498012",
         "meta": {
             "nf-test": "0.9.5",
-            "nextflow": "26.04.4"
+            "nextflow": "26.04.6"
         }
     }
 }

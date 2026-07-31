@@ -14,7 +14,7 @@ include { MERGE_TABLES                       } from '../modules/local/merge/summ
 include { FORMAT_DIAMOND_TAX_RANKLIST        } from '../modules/local/diamond/format_tax/ranklist/'
 include { FORMAT_DIAMOND_TAX_TAXDUMP         } from '../modules/local/diamond/format_tax/taxdump/'
 include { SUMTAXONOMY as SUM_DIAMONDTAX      } from '../modules/local/sumtaxonomy/'
-include { TRANSRATE                          } from '../modules/local/transrate/'
+include { TRANSRATE                          } from '../modules/nf-core/transrate/'
 include { WRITESPADESYAML                    } from '../modules/local/spades/writeyaml/'
 
 
@@ -537,7 +537,10 @@ workflow METATDENOVO {
     //
     // MODULE: Use TransRate to judge assembly quality, piped into MultiQC
     //
-    TRANSRATE(ch_unzipped_contigs)
+    TRANSRATE(ch_unzipped_contigs.map { meta, contigs -> [ meta, contigs, [] ] })
+    ch_multiqc_files = ch_multiqc_files.mix(
+        TRANSRATE.out.assemblies.collectFile { meta, csv -> [ "${meta.id}_assemblies_mqc.csv", csv.text ] }
+    )
 
     //
     // SUBWORKFLOW: Eukulele
