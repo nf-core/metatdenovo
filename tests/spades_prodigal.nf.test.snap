@@ -178,10 +178,7 @@
                 "trimgalore/fastqc/SAMPLE3_PE_1_2_val_2_fastqc.zip"
             ],
             [
-                "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f",
-                "multiqc_spades_assemblies.txt:md5,86e9cef5a6dc30fecd2d05148b5c79c3",
-                "spades.assemblies.csv:md5,fedf044d593bc13e15c80c07af5a1273",
-                "spades.contigs.csv:md5,f15490792063fd4143f9f88f6914a74b"
+                "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f"
             ],
             16,
             [

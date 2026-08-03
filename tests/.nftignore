@@ -45,8 +45,10 @@ spades/spades.yaml
 spades/*.gz
 summary_tables/*.tsv.gz
 transdecoder/*.gz
-transrate/megahit_assemblies_mqc.csv
-transrate/spades_assemblies_mqc.csv
+transrate/*.assemblies.csv
+transrate/*.contigs.csv
+multiqc/multiqc_data/multiqc_megahit_assemblies.txt
+multiqc/multiqc_data/multiqc_spades_assemblies.txt
 trimgalore/fastqc/*.{html,zip}
 trimgalore/*trimming_report.txt
 pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml

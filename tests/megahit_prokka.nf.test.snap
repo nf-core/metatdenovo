@@ -195,10 +195,7 @@
                 "trimgalore/fastqc/SAMPLE3_PE_1_2_val_2_fastqc.zip"
             ],
             [
-                "multiqc_citations.txt:md5,d59b1beea6256a7bf5f599da543910db",
-                "multiqc_megahit_assemblies.txt:md5,470f41467f747217d5b13aabec2a7f5c",
-                "megahit.assemblies.csv:md5,f6dc7d68ef3b8cd1ced671cb4ad13bc8",
-                "megahit.contigs.csv:md5,36382b26c1e6e7d0b4f30d69f665afa1"
+                "multiqc_citations.txt:md5,d59b1beea6256a7bf5f599da543910db"
             ],
             16,
             [
