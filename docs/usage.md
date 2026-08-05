@@ -1,4 +1,4 @@
-﻿# nf-core/metatdenovo: Usage
+# nf-core/metatdenovo: Usage
 
 ## :warning: Please read this documentation on the nf-core website: [https://nf-co.re/metatdenovo/usage](https://nf-co.re/metatdenovo/usage)
 
