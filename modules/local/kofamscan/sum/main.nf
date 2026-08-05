@@ -30,7 +30,7 @@ process KOFAMSCAN_SUM {
     library(tidyverse)
 
     # call the tables into variables
-    kofams <- read_tsv("kofamscan_output.tsv.gz", show_col_types = FALSE ) %>%
+    kofams <- read_tsv("$kofmascan", show_col_types = FALSE ) %>%
         select(-"#") %>%
         slice(-1) %>%
         rename(orf = "gene name") %>%

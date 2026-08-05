@@ -7,7 +7,8 @@ keywords:
   - protein sequences
 components:
   - eggnog/download
-  - eggnog/mapper
+  - eggnogmapper
+  - eggnog/format
   - eggnog/sum
 input:
   - faa:

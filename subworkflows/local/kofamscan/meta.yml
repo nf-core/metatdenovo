@@ -6,8 +6,9 @@ keywords:
   - orthology
   - functional annotation
 components:
-  - kofamscan/scan
+  - kofamscan
   - kofamscan/download
+  - kofamscan/format
   - kofamscan/sum
   - kofamscan/unique
 input:

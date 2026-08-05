@@ -7,13 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Added`
 
-- [#NN](https://github.com/nf-core/metatdenovo/pull/NN) - Add `--diamond_dbs` and kofamscan nf-test coverage (`test_diamond`/`test_kofamscan` profiles) using new small reference datasets (@erikrikarddaniel)
+- [#452](https://github.com/nf-core/metatdenovo/pull/452) - Add `--diamond_dbs` and kofamscan nf-test coverage (`test_diamond`/`test_kofamscan` profiles) using new small reference datasets (@erikrikarddaniel)
 
 ### `Changed`
 
-- [#NN](https://github.com/nf-core/metatdenovo/pull/NN) - Template sync to nf-core/tools 4.0.3, update all vendored modules/subworkflows (@erikrikarddaniel)
+- [#452](https://github.com/nf-core/metatdenovo/pull/452) - Template sync to nf-core/tools 4.0.3, update all vendored modules/subworkflows (@erikrikarddaniel)
+- [#452](https://github.com/nf-core/metatdenovo/pull/452) - Replace several local modules (`HMMRANK`, `UNPIGZ`, `TRANSDECODER`, `KOFAMSCAN`, `EGGNOGMAPPER`, `MEGAHIT`, `TRANSRATE`) with official nf-core/modules equivalents, addresses [#445](https://github.com/nf-core/metatdenovo/issues/445) (@erikrikarddaniel)
 
 ### `Fixed`
+
+- [#452](https://github.com/nf-core/metatdenovo/pull/452) - Fix `EGGNOG_FORMAT` renaming the `query` column to `Lorf` instead of `orf`, which broke `EGGNOG_SUM` (@erikrikarddaniel)
 
 ### `Dependencies`
 
@@ -22,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 | samtools    | 1.23.1           | 1.24        |
 | multiqc     | 1.34             | 1.35        |
 | trim-galore | 2.1.0            | 2.3.0       |
+| prokka      | 1.14.6           | 1.15.6      |
 
 ### `Deprecated`
 

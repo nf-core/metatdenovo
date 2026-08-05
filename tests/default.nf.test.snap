@@ -39,17 +39,15 @@
                 "FORMAT_PRODIGAL_GFF": {
                     "gzip": 1.11
                 },
+                "HMMER_HMMRANK": {
+                    "r-base": "4.2.3",
+                    "r-tidyverse": "2.0.0"
+                },
                 "HMMER_HMMSEARCH": {
                     "hmmer": 3.4
                 },
-                "HMMRANK": {
-                    "R": "4.5.3",
-                    "dplyr": "1.2.1",
-                    "readr": "2.2.0",
-                    "stringr": "1.6.0"
-                },
-                "MEGAHIT_INTERLEAVED": {
-                    "megahit_interleaved": "1.2.9"
+                "MEGAHIT": {
+                    "megahit": "1.2.9"
                 },
                 "PIGZ_PE_READS_FWD": {
                     "pigz": 2.8
@@ -88,10 +86,10 @@
                     "trimgalore": "2.3.0"
                 },
                 "UNPIGZ_CONTIGS": {
-                    "pigz": "2.3.4"
+                    "pigz": 2.8
                 },
                 "UNPIGZ_GFF": {
-                    "pigz": "2.3.4"
+                    "pigz": 2.8
                 },
                 "Workflow": {
                     "nf-core/metatdenovo": "v1.5.0dev"
@@ -123,9 +121,8 @@
                 "hmmer/megahit.prodigal.PF03477.tbl.gz",
                 "hmmer/megahit.prodigal.PF13597.tbl.gz",
                 "megahit",
-                "megahit/megahit_out",
-                "megahit/megahit_out/megahit_assembly.contigs.fa.gz",
-                "megahit/megahit_out/megahit_assembly.log",
+                "megahit/megahit_assembly.contigs.fa.gz",
+                "megahit/megahit_assembly.log",
                 "multiqc",
                 "multiqc/multiqc_data",
                 "multiqc/multiqc_data/bbduk-filtered-barplot_Bases.txt",
@@ -150,6 +147,7 @@
                 "multiqc/multiqc_data/multiqc_data.json",
                 "multiqc/multiqc_data/multiqc_fastqc.txt",
                 "multiqc/multiqc_data/multiqc_general_stats.txt",
+                "multiqc/multiqc_data/multiqc_megahit_assemblies.txt",
                 "multiqc/multiqc_data/multiqc_software_versions.txt",
                 "multiqc/multiqc_data/multiqc_sources.txt",
                 "multiqc/multiqc_report.html",
@@ -179,7 +177,8 @@
                 "summary_tables/megahit.prodigal.hmmrank.tsv.gz",
                 "summary_tables/megahit.prodigal.overall_stats.tsv.gz",
                 "transrate",
-                "transrate/megahit_assemblies_mqc.csv",
+                "transrate/megahit.assemblies.csv",
+                "transrate/megahit.contigs.csv",
                 "trimgalore",
                 "trimgalore/SAMPLE1_PE_1.fastq.gz_trimming_report.txt",
                 "trimgalore/SAMPLE1_PE_2.fastq.gz_trimming_report.txt",
@@ -217,7 +216,7 @@
                 "sample\tn_post_trimming\tn_non_contaminated\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count"
             ]
         ],
-        "timestamp": "2026-07-25T20:24:35.764990286",
+        "timestamp": "2026-07-31T13:36:43.713122719",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

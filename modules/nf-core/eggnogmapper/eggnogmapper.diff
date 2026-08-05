@@ -1,0 +1,113 @@
+Changes in component 'nf-core/eggnogmapper'
+Changes in 'eggnogmapper/meta.yml':
+--- modules/nf-core/eggnogmapper/meta.yml
++++ modules/nf-core/eggnogmapper/meta.yml
+@@ -75,11 +75,11 @@
+           description: |
+             Groovy Map containing sample information
+             e.g. `[ id:'sample1' ]`
+-      - "*.emapper.annotations":
++      - "*.emapper.annotations.gz":
+           type: file
+-          description: TSV file with the results from the annotation phase, including
+-            functional annotations, GO terms, KEGG pathways, and COG categories
+-          pattern: "*.emapper.annotations"
++          description: Gzipped TSV file with the results from the annotation phase,
++            including functional annotations, GO terms, KEGG pathways, and COG categories
++          pattern: "*.emapper.annotations.gz"
+           ontologies:
+             - edam: http://edamontology.org/format_3475 # TSV
+   orthologs:
+@@ -88,11 +88,11 @@
+           description: |
+             Groovy Map containing sample information
+             e.g. `[ id:'sample1' ]`
+-      - "*.emapper.seed_orthologs":
++      - "*.emapper.seed_orthologs.gz":
+           type: file
+-          description: TSV file with the results from parsing the hits, linking queries
+-            with their best seed orthologs (includes commented metadata header)
+-          pattern: "*.emapper.seed_orthologs"
++          description: Gzipped TSV file with the results from parsing the hits, linking
++            queries with their best seed orthologs (includes commented metadata header)
++          pattern: "*.emapper.seed_orthologs.gz"
+           ontologies:
+             - edam: http://edamontology.org/format_3475 # TSV
+   hits:
+@@ -101,11 +101,11 @@
+           description: |
+             Groovy Map containing sample information
+             e.g. `[ id:'sample1' ]`
+-      - "*.emapper.hits":
++      - "*.emapper.hits.gz":
+           type: file
+-          description: TSV file with the raw search hits from the Diamond/MMseqs2/HMMER
++          description: Gzipped TSV file with the raw search hits from the Diamond/MMseqs2/HMMER
+             search phase before annotation
+-          pattern: "*.emapper.hits"
++          pattern: "*.emapper.hits.gz"
+           ontologies:
+             - edam: http://edamontology.org/format_3475 # TSV
+   versions_eggnogmapper:
+
+Changes in 'eggnogmapper/main.nf':
+--- modules/nf-core/eggnogmapper/main.nf
++++ modules/nf-core/eggnogmapper/main.nf
+@@ -10,12 +10,12 @@
+     input:
+     tuple val(meta), path(fasta)
+     tuple val(search_mode), path(db)
+-    path(eggnog_data_dir)
++    path(eggnog_data_dir), stageAs: 'eggnog_data/*'
+ 
+     output:
+-    tuple val(meta), path("*.emapper.annotations")   , emit: annotations
+-    tuple val(meta), path("*.emapper.seed_orthologs"), emit: orthologs, optional: true
+-    tuple val(meta), path("*.emapper.hits")          , emit: hits     , optional: true
++    tuple val(meta), path("*.emapper.annotations.gz")   , emit: annotations
++    tuple val(meta), path("*.emapper.seed_orthologs.gz"), emit: orthologs, optional: true
++    tuple val(meta), path("*.emapper.hits.gz")          , emit: hits     , optional: true
+     tuple val("${task.process}"), val('eggnog-mapper'), eval("emapper.py --version 2>&1 | grep -o 'emapper-[0-9]\\+\\.[0-9]\\+\\.[0-9]\\+' | sed 's/emapper-//'"), topic: versions, emit: versions_eggnogmapper
+ 
+     when:
+@@ -24,7 +24,7 @@
+     script:
+     def args          = task.ext.args   ?: ''
+     def prefix        = task.ext.prefix ?: "${meta.id}"
+-    def is_compressed = fasta.extension == '.gz'
++    def is_compressed = fasta.extension == 'gz'
+     def fasta_name    = is_compressed ? fasta.baseName : "$fasta"
+     def db_flags = ['diamond': '--dmnd_db', 'novel_fams': '--dmnd_db', 'mmseqs': '--mmseqs_db', 'hmmer': '--database', 'no_search': '--annotate_hits_table', 'cache': '--cache']
+     def db_path  = (db instanceof Path && db.isDirectory()) ? "${db}/${db.name}"                    : "$db"
+@@ -39,11 +39,17 @@
+         $args \\
+         --cpu ${task.cpus} \\
+         -i ${fasta_name} \\
+-        --data_dir ${eggnog_data_dir} \\
++        --data_dir eggnog_data \\
+         -m ${search_mode} \\
+         $db_arg \\
+         ${dbmem} \\
+         --output ${prefix}
++
++    gzip ${prefix}.emapper.*
++
++    if [ "$is_compressed" == "true" ]; then
++        rm -f $fasta_name
++    fi
+     """
+ 
+     stub:
+@@ -54,5 +60,7 @@
+     touch ${prefix}.emapper.annotations
+     touch ${prefix}.emapper.seed_orthologs
+     touch ${prefix}.emapper.hits
++
++    gzip ${prefix}.emapper.annotations ${prefix}.emapper.seed_orthologs ${prefix}.emapper.hits
+     """
+ }
+
+'modules/nf-core/eggnogmapper/environment.yml' is unchanged
+'modules/nf-core/eggnogmapper/tests/main.nf.test.snap' is unchanged
+'modules/nf-core/eggnogmapper/tests/main.nf.test' is unchanged
+************************************************************

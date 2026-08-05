@@ -3,7 +3,8 @@
 //
 
 include { EGGNOG_DOWNLOAD } from '../../../modules/local/eggnog/download/main'
-include { EGGNOG_MAPPER   } from '../../../modules/local/eggnog/mapper/main'
+include { EGGNOGMAPPER    } from '../../../modules/nf-core/eggnogmapper/main'
+include { EGGNOG_FORMAT   } from '../../../modules/local/eggnog/format/main'
 include { EGGNOG_SUM      } from '../../../modules/local/eggnog/sum/main'
 
 workflow EGGNOG {
@@ -15,17 +16,24 @@ workflow EGGNOG {
 
     EGGNOG_DOWNLOAD()
 
-    ch_eggnog_database = EGGNOG_DOWNLOAD.out.eggnog_db
-        .combine(EGGNOG_DOWNLOAD.out.dmnd)
+    ch_search_mode_db = EGGNOG_DOWNLOAD.out.dmnd.map { dmnd -> [ 'diamond', dmnd ] }
+
+    // The official module wants a single "eggnog_data" directory (--data_dir); stage the
+    // db/taxa/pkl files into one at task-staging time only, via the module's own stageAs,
+    // rather than restructuring EGGNOG_DOWNLOAD's own (storeDir-cached, so expensive to
+    // invalidate) flat output layout.
+    ch_eggnog_data_dir = EGGNOG_DOWNLOAD.out.eggnog_db
         .combine(EGGNOG_DOWNLOAD.out.taxa_db)
         .combine(EGGNOG_DOWNLOAD.out.pkl)
 
-    EGGNOG_MAPPER(faa, ch_eggnog_database)
+    EGGNOGMAPPER(faa, ch_search_mode_db, ch_eggnog_data_dir)
 
-    EGGNOG_SUM(EGGNOG_MAPPER.out.emappertsv, collect_fcs)
+    EGGNOG_FORMAT(EGGNOGMAPPER.out.annotations)
+
+    EGGNOG_SUM(EGGNOG_FORMAT.out.emappertsv, collect_fcs)
 
     emit:
-    hits       = EGGNOG_MAPPER.out.hits
-    emappertsv = EGGNOG_MAPPER.out.emappertsv
+    hits       = EGGNOGMAPPER.out.hits
+    emappertsv = EGGNOG_FORMAT.out.emappertsv
     sumtable   = EGGNOG_SUM.out.eggnog_summary
 }

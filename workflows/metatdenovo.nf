@@ -10,15 +10,11 @@
 include { COLLECT_FEATURECOUNTS              } from '../modules/local/collect/featurecounts/'
 include { COLLECT_STATS                      } from '../modules/local/collect/stats/'
 include { FORMATSPADES                       } from '../modules/local/format/spades/'
-include { MEGAHIT_INTERLEAVED                } from '../modules/local/megahit/interleaved/'
 include { MERGE_TABLES                       } from '../modules/local/merge/summary/'
 include { FORMAT_DIAMOND_TAX_RANKLIST        } from '../modules/local/diamond/format_tax/ranklist/'
 include { FORMAT_DIAMOND_TAX_TAXDUMP         } from '../modules/local/diamond/format_tax/taxdump/'
 include { SUMTAXONOMY as SUM_DIAMONDTAX      } from '../modules/local/sumtaxonomy/'
-include { TRANSDECODER                       } from '../modules/local/transdecoder/'
-include { TRANSRATE                          } from '../modules/local/transrate/'
-include { UNPIGZ as UNPIGZ_CONTIGS           } from '../modules/local/unpigz/'
-include { UNPIGZ as UNPIGZ_GFF               } from '../modules/local/unpigz/'
+include { TRANSRATE                          } from '../modules/nf-core/transrate/'
 include { WRITESPADESYAML                    } from '../modules/local/spades/writeyaml/'
 
 
@@ -37,6 +33,7 @@ include { PROKKA_SUBSETS          } from '../subworkflows/local/prokka/subsets/'
 include { FASTQC_TRIMGALORE       } from '../subworkflows/local/fastqc/trimgalore/'
 include { PRODIGAL                } from '../subworkflows/local/prodigal/'
 include { KOFAMSCAN               } from '../subworkflows/local/kofamscan/'
+include { TRANSDECODER            } from '../subworkflows/local/transdecoder/'
 include { PIPELINE_INITIALISATION } from '../subworkflows/local/utils_nfcore_metatdenovo_pipeline'
 include { PIPELINE_COMPLETION     } from '../subworkflows/local/utils_nfcore_metatdenovo_pipeline'
 
@@ -56,6 +53,7 @@ include { BBMAP_INDEX                                } from '../modules/nf-core/
 include { CAT_FASTQ            	                     } from '../modules/nf-core/cat/fastq/'
 include { DIAMOND_BLASTP as DIAMOND_TAXONOMY         } from '../modules/nf-core/diamond/blastp/'
 include { FASTQC                                     } from '../modules/nf-core/fastqc/'
+include { MEGAHIT                                    } from '../modules/nf-core/megahit/'
 include { MULTIQC                                    } from '../modules/nf-core/multiqc/'
 include { PIGZ_COMPRESS as PIGZ_ASSEMBLY             } from '../modules/nf-core/pigz/compress/'
 include { PIGZ_COMPRESS as PIGZ_DIAMOND_LINEAGE      } from '../modules/nf-core/pigz/compress/'
@@ -66,6 +64,8 @@ include { PIGZ_COMPRESS as PIGZ_TRANSDECODER_BED     } from '../modules/nf-core/
 include { PIGZ_COMPRESS as PIGZ_TRANSDECODER_CDS     } from '../modules/nf-core/pigz/compress/'
 include { PIGZ_COMPRESS as PIGZ_TRANSDECODER_GFF     } from '../modules/nf-core/pigz/compress/'
 include { PIGZ_COMPRESS as PIGZ_TRANSDECODER_PEP     } from '../modules/nf-core/pigz/compress/'
+include { PIGZ_UNCOMPRESS as UNPIGZ_CONTIGS          } from '../modules/nf-core/pigz/uncompress/'
+include { PIGZ_UNCOMPRESS as UNPIGZ_GFF              } from '../modules/nf-core/pigz/uncompress/'
 include { SEQTK_MERGEPE                              } from '../modules/nf-core/seqtk/mergepe/'
 include { SEQTK_SEQ as SEQTK_SEQ_CONTIG_FILTER       } from '../modules/nf-core/seqtk/seq/'
 include { SPADES                                     } from '../modules/nf-core/spades/'
@@ -366,13 +366,15 @@ workflow METATDENOVO {
         FORMATSPADES( ch_spades_assembly.first() )
         ch_assembly_contigs = FORMATSPADES.out.assembly
     } else if ( assembler == 'megahit' ) {
-        MEGAHIT_INTERLEAVED(
-            ch_pe_reads_to_assembly.toList(),
-            ch_se_reads_to_assembly.toList(),
-            'megahit_assembly'
+        ch_megahit_reads = ch_se_reads_to_assembly.toList()
+            .map { se_reads -> [ [ id: 'megahit_assembly', single_end: true ], se_reads, [] ] }
+
+        MEGAHIT(
+            ch_megahit_reads,
+            ch_pe_reads_to_assembly.toList()
         )
-        ch_assembly_contigs = MEGAHIT_INTERLEAVED.out.contigs
-            .map { it -> [ [ id: assembly_name ], it ] }
+        ch_assembly_contigs = MEGAHIT.out.contigs
+            .map { _meta, contigs -> [ [ id: assembly_name ], contigs ] }
     } else {
         error 'Assembler not specified!'
     }
@@ -399,7 +401,7 @@ workflow METATDENOVO {
 
         //UNPIGZ_GFF(PROKKA_SUBSETS.out.gff.map { meta, gff -> [ [id: "${orfs_name}.${meta.id}"], gff ] })
         UNPIGZ_GFF(PROKKA_SUBSETS.out.gff)
-        ch_gff           = UNPIGZ_GFF.out.unzipped
+        ch_gff           = UNPIGZ_GFF.out.file
     }
 
     //
@@ -409,7 +411,7 @@ workflow METATDENOVO {
         PRODIGAL( ch_assembly_contigs.map { _meta, contigs -> [ [id: "${assembly_name}.${orfs_name}"], contigs  ] } )
         ch_protein      = PRODIGAL.out.faa
         UNPIGZ_GFF(PRODIGAL.out.gff)
-        ch_gff          = UNPIGZ_GFF.out.unzipped
+        ch_gff          = UNPIGZ_GFF.out.file
     }
 
     //
@@ -530,12 +532,15 @@ workflow METATDENOVO {
 
     // set up contig channel to use in TransRate
     UNPIGZ_CONTIGS(ch_assembly_contigs)
-    ch_unzipped_contigs = UNPIGZ_CONTIGS.out.unzipped
+    ch_unzipped_contigs = UNPIGZ_CONTIGS.out.file
 
     //
     // MODULE: Use TransRate to judge assembly quality, piped into MultiQC
     //
-    TRANSRATE(ch_unzipped_contigs)
+    TRANSRATE(ch_unzipped_contigs.map { meta, contigs -> [ meta, contigs, [] ] })
+    ch_multiqc_files = ch_multiqc_files.mix(
+        TRANSRATE.out.assemblies.collectFile { meta, csv -> [ "${meta.id}_assemblies_mqc.csv", csv.text ] }
+    )
 
     //
     // SUBWORKFLOW: Eukulele

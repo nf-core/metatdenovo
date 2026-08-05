@@ -37,6 +37,12 @@
                         "git_sha": "83ce9b314157a24d9a92f17a07ed5d55f30b78f9",
                         "installed_by": ["modules"]
                     },
+                    "eggnogmapper": {
+                        "branch": "master",
+                        "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",
+                        "installed_by": ["modules"],
+                        "patch": "modules/nf-core/eggnogmapper/eggnogmapper.diff"
+                    },
                     "fastqc": {
                         "branch": "master",
                         "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",
@@ -47,10 +53,27 @@
                         "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",
                         "installed_by": ["modules"]
                     },
+                    "hmmer/hmmrank": {
+                        "branch": "master",
+                        "git_sha": "f2bed902e13076698e7d59d1fedf5c083f6f17c0",
+                        "installed_by": ["modules"]
+                    },
                     "hmmer/hmmsearch": {
                         "branch": "master",
                         "git_sha": "3a42d4fbb69436f53e0f06d2fe65b48f9d0085cc",
                         "installed_by": ["modules"]
+                    },
+                    "kofamscan": {
+                        "branch": "master",
+                        "git_sha": "9d675a431e1fcd9dc4043edcc9b1c26b5c2377c0",
+                        "installed_by": ["modules"],
+                        "patch": "modules/nf-core/kofamscan/kofamscan.diff"
+                    },
+                    "megahit": {
+                        "branch": "master",
+                        "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",
+                        "installed_by": ["modules"],
+                        "patch": "modules/nf-core/megahit/megahit.diff"
                     },
                     "multiqc": {
                         "branch": "master",
@@ -62,14 +85,19 @@
                         "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",
                         "installed_by": ["modules"]
                     },
+                    "pigz/uncompress": {
+                        "branch": "master",
+                        "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",
+                        "installed_by": ["modules"]
+                    },
                     "prodigal": {
                         "branch": "master",
-                        "git_sha": "9552f5a69a8149332b248ec9b1a7f1a2a292ec4c",
+                        "git_sha": "04adc8db7363044250f2acb95a785df40b27ea40",
                         "installed_by": ["modules"]
                     },
                     "prokka": {
                         "branch": "master",
-                        "git_sha": "2dc23692bd1c3a23a12cfd959808a8fe7e3c6557",
+                        "git_sha": "a0fe96944016c6cb69d8b64ffc635c71b76310ae",
                         "installed_by": ["modules"]
                     },
                     "samtools/flagstat": {
@@ -122,6 +150,21 @@
                         "git_sha": "d1c40d399d0d4d54b5a55708e68594429017dbb2",
                         "installed_by": ["modules"],
                         "patch": "modules/nf-core/taxonkit/lineage/taxonkit-lineage.diff"
+                    },
+                    "transdecoder/longorf": {
+                        "branch": "master",
+                        "git_sha": "f9b05e226409f21226a46d95d2d26c58d68958e6",
+                        "installed_by": ["modules"]
+                    },
+                    "transdecoder/predict": {
+                        "branch": "master",
+                        "git_sha": "f9b05e226409f21226a46d95d2d26c58d68958e6",
+                        "installed_by": ["modules"]
+                    },
+                    "transrate": {
+                        "branch": "master",
+                        "git_sha": "e7ee4ca0f1117ef440fe65a5038eecfd8fe5810e",
+                        "installed_by": ["modules"]
                     },
                     "trimgalore": {
                         "branch": "master",

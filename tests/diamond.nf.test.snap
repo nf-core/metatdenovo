@@ -51,8 +51,8 @@
                 "FORMAT_PRODIGAL_GFF": {
                     "gzip": 1.11
                 },
-                "MEGAHIT_INTERLEAVED": {
-                    "megahit_interleaved": "1.2.9"
+                "MEGAHIT": {
+                    "megahit": "1.2.9"
                 },
                 "MERGE_TABLES": {
                     "R": "4.2.3",
@@ -108,10 +108,10 @@
                     "trimgalore": "2.3.0"
                 },
                 "UNPIGZ_CONTIGS": {
-                    "pigz": "2.3.4"
+                    "pigz": 2.8
                 },
                 "UNPIGZ_GFF": {
-                    "pigz": "2.3.4"
+                    "pigz": 2.8
                 },
                 "Workflow": {
                     "nf-core/metatdenovo": "v1.5.0dev"
@@ -136,9 +136,8 @@
                 "featurecounts/SAMPLE3_PE_1.featureCounts.tsv",
                 "featurecounts/SAMPLE3_PE_1.featureCounts.tsv.summary",
                 "megahit",
-                "megahit/megahit_out",
-                "megahit/megahit_out/megahit_assembly.contigs.fa.gz",
-                "megahit/megahit_out/megahit_assembly.log",
+                "megahit/megahit_assembly.contigs.fa.gz",
+                "megahit/megahit_assembly.log",
                 "multiqc",
                 "multiqc/multiqc_data",
                 "multiqc/multiqc_data/fastqc-status-check-heatmap.txt",
@@ -160,6 +159,7 @@
                 "multiqc/multiqc_data/multiqc_data.json",
                 "multiqc/multiqc_data/multiqc_fastqc.txt",
                 "multiqc/multiqc_data/multiqc_general_stats.txt",
+                "multiqc/multiqc_data/multiqc_megahit_assemblies.txt",
                 "multiqc/multiqc_data/multiqc_software_versions.txt",
                 "multiqc/multiqc_data/multiqc_sources.txt",
                 "multiqc/multiqc_report.html",
@@ -191,7 +191,8 @@
                 "summary_tables/megahit.prodigal.ncbi-refseq-test.diamond.taxonomy.tsv.gz",
                 "summary_tables/megahit.prodigal.overall_stats.tsv.gz",
                 "transrate",
-                "transrate/megahit_assemblies_mqc.csv",
+                "transrate/megahit.assemblies.csv",
+                "transrate/megahit.contigs.csv",
                 "trimgalore",
                 "trimgalore/SAMPLE1_PE_1.fastq.gz_trimming_report.txt",
                 "trimgalore/SAMPLE1_PE_2.fastq.gz_trimming_report.txt",
@@ -217,7 +218,7 @@
                 "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f"
             ]
         ],
-        "timestamp": "2026-07-26T07:52:22.965970412",
+        "timestamp": "2026-07-31T14:00:21.58701844",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

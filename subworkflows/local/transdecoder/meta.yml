@@ -1,0 +1,52 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "transdecoder"
+description: Calls ORFs on assembled transcripts with TransDecoder (LongOrfs then Predict)
+keywords:
+  - transdecoder
+  - orf
+  - eukaryotes
+components:
+  - transdecoder/longorf
+  - transdecoder/predict
+input:
+  - fasta:
+      type: file
+      description: |
+        Channel containing metadata and an assembly fasta file
+        Structure: [ val(meta), path(fasta) ]
+      pattern: "*.{fa,fasta,fa.gz,fasta.gz}"
+output:
+  - pep:
+      type: file
+      description: |
+        All ORFs meeting the minimum length criteria, regardless of coding potential
+        Structure: [ val(meta), path(pep) ]
+      pattern: "*.transdecoder.pep"
+  - gff:
+      type: file
+      description: |
+        Positions of all ORFs as found in the target transcripts
+        Structure: [ val(meta), path(gff3) ]
+      pattern: "*.transdecoder.gff3"
+  - cds:
+      type: file
+      description: |
+        The nucleotide coding sequence for all detected ORFs
+        Structure: [ val(meta), path(cds) ]
+      pattern: "*.transdecoder.cds"
+  - bed:
+      type: file
+      description: |
+        Bed file of detected ORFs
+        Structure: [ val(meta), path(bed) ]
+      pattern: "*.transdecoder.bed"
+  - versions:
+      type: file
+      description: |
+        File containing software versions
+        Structure: [ path(versions.yml) ]
+      pattern: "versions.yml"
+authors:
+  - "@danilodileo"
+maintainers:
+  - "@danilodileo"
