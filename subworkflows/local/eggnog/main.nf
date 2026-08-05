@@ -2,10 +2,10 @@
 // Run eggnog-mapper on called ORFs, first optionally downloading the required databases
 //
 
-include { EGGNOG_DOWNLOAD }              from '../../../modules/local/eggnog/download/main'
-include { EGGNOGMAPPER as EGGNOG_MAPPER } from '../../../modules/nf-core/eggnogmapper/main'
-include { EGGNOG_FORMAT }                from '../../../modules/local/eggnog/format/main'
-include { EGGNOG_SUM }                   from '../../../modules/local/eggnog/sum/main'
+include { EGGNOG_DOWNLOAD } from '../../../modules/local/eggnog/download/main'
+include { EGGNOGMAPPER    } from '../../../modules/nf-core/eggnogmapper/main'
+include { EGGNOG_FORMAT   } from '../../../modules/local/eggnog/format/main'
+include { EGGNOG_SUM      } from '../../../modules/local/eggnog/sum/main'
 
 workflow EGGNOG {
     take:
@@ -26,14 +26,14 @@ workflow EGGNOG {
         .combine(EGGNOG_DOWNLOAD.out.taxa_db)
         .combine(EGGNOG_DOWNLOAD.out.pkl)
 
-    EGGNOG_MAPPER(faa, ch_search_mode_db, ch_eggnog_data_dir)
+    EGGNOGMAPPER(faa, ch_search_mode_db, ch_eggnog_data_dir)
 
-    EGGNOG_FORMAT(EGGNOG_MAPPER.out.annotations)
+    EGGNOG_FORMAT(EGGNOGMAPPER.out.annotations)
 
     EGGNOG_SUM(EGGNOG_FORMAT.out.emappertsv, collect_fcs)
 
     emit:
-    hits       = EGGNOG_MAPPER.out.hits
+    hits       = EGGNOGMAPPER.out.hits
     emappertsv = EGGNOG_FORMAT.out.emappertsv
     sumtable   = EGGNOG_SUM.out.eggnog_summary
 }
