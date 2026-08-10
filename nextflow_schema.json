@@ -205,6 +205,41 @@
                     "type": "boolean",
                     "description": "Save the formatted spades fasta file",
                     "fa_icon": "fas fa-download"
+                },
+                "megahit_k_min": {
+                    "type": "integer",
+                    "description": "Minimum k-mer size for MEGAHIT, must be odd and <=255.",
+                    "help_text": "Coarser (larger) minimum k-mer sizes reduce the memory needed for the earliest, most memory-hungry MEGAHIT iterations, at the cost of sensitivity to low-coverage or short reads. Useful as a last resort when MEGAHIT runs out of memory on very large datasets. Cannot be combined with `--megahit_k_list`.",
+                    "fa_icon": "fas fa-ruler-horizontal",
+                    "hidden": true
+                },
+                "megahit_k_max": {
+                    "type": "integer",
+                    "description": "Maximum k-mer size for MEGAHIT, must be odd and <=255.",
+                    "help_text": "Cannot be combined with `--megahit_k_list`.",
+                    "fa_icon": "fas fa-ruler-horizontal",
+                    "hidden": true
+                },
+                "megahit_k_step": {
+                    "type": "integer",
+                    "description": "Increment of k-mer size of each iteration for MEGAHIT, must be even and <=28.",
+                    "help_text": "Cannot be combined with `--megahit_k_list`.",
+                    "fa_icon": "fas fa-ruler-horizontal",
+                    "hidden": true
+                },
+                "megahit_k_list": {
+                    "type": "string",
+                    "description": "Comma-separated list of k-mer sizes for MEGAHIT, all must be odd, in the range 15-255, increment <=28.",
+                    "help_text": "Overrides the default automatic k-mer stepping. Cannot be combined with `--megahit_k_min`, `--megahit_k_max` or `--megahit_k_step`.",
+                    "fa_icon": "fas fa-ruler-horizontal",
+                    "hidden": true
+                },
+                "megahit_min_count": {
+                    "type": "integer",
+                    "description": "Minimum multiplicity for filtering k-mers in MEGAHIT.",
+                    "help_text": "Raising this prunes low-frequency (often erroneous) k-mers before graph construction, reducing memory use. Usually a safer first lever than raising `--megahit_k_min` on very large datasets.",
+                    "fa_icon": "fas fa-filter",
+                    "hidden": true
                 }
             },
             "fa_icon": "fas fa-bezier-curve"
