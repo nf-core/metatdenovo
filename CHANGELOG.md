@@ -11,8 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Changed`
 
-- [#452](https://github.com/nf-core/metatdenovo/pull/452) - Template sync to nf-core/tools 4.0.3, update all vendored modules/subworkflows (@erikrikarddaniel)
+- [#454](https://github.com/nf-core/metatdenovo/pull/454) - Template sync to nf-core/tools 4.1.0, update all vendored modules/subworkflows (@erikrikarddaniel)
 - [#452](https://github.com/nf-core/metatdenovo/pull/452) - Replace several local modules (`HMMRANK`, `UNPIGZ`, `TRANSDECODER`, `KOFAMSCAN`, `EGGNOGMAPPER`, `MEGAHIT`, `TRANSRATE`) with official nf-core/modules equivalents, addresses [#445](https://github.com/nf-core/metatdenovo/issues/445) (@erikrikarddaniel)
+- [#450](https://github.com/nf-core/metatdenovo/pull/450) - Template sync to nf-core/tools 4.0.3, update all vendored modules/subworkflows (@erikrikarddaniel)
 
 ### `Fixed`
 
