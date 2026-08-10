@@ -99,10 +99,20 @@ To turn on digital normalization, use the `--bbnorm` parameter and, if required,
 
 > Please, check the [bbnorm](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbnorm-guide/) documentation for further information about these programs and how digital normalization works. Remember to check [Parameters](https://nf-co.re/metatdenovo/parameters) page for the all options that can be used for this step.
 
+See also [Assembler options](#assembler-options) below for further ways to reduce Megahit's memory usage on very large datasets.
+
 ### Assembler options
 
 By default, the pipeline uses Megahit (`--assembler megahit`) to assemble the cleaned and trimmed reads to create the reference contigs.
 Megahit is fast and it does not require a lot of memory to run, making it ideal for large sets of samples.
+
+If Megahit still runs out of memory on very large datasets, a few hidden parameters let you tune its k-mer graph construction: `--megahit_min_count`, `--megahit_k_min`, `--megahit_k_max` and `--megahit_k_step` (or `--megahit_k_list` instead of the min/max/step triplet).
+Raising `--megahit_min_count` prunes low-frequency, often erroneous k-mers before the graph is built, and is usually the safest first lever to try.
+Raising `--megahit_k_min` skips the smallest, most memory-hungry k-mer iterations, but at the cost of sensitivity to low-coverage or short reads -- treat it more as a last resort.
+None of these parameters have a pipeline default; when left unset, Megahit uses its own built-in defaults, which are recorded in its own log file (under `megahit/`) for each run.
+See the [Megahit documentation](https://github.com/voutcn/megahit) for the full meaning of these options.
+Combining these with [digital normalization](#digital-normalization) above is another way to cope with very large datasets.
+
 The workflow also supports Spades (`--assembler spades` ) as an alternative.
 The default "flavour" of Spades is set to RNA, but this can be changed using the `--spades_flavor` parameter (see [parameter documentation](/metatdenovo/parameters/#spades_flavor))
 
