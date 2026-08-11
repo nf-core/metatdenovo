@@ -1,7 +1,5 @@
 # nf-core/metatdenovo: Coping with large datasets
 
-## :warning: Please read this documentation on the nf-core website: [https://nf-co.re/metatdenovo/usage](https://nf-co.re/metatdenovo/usage)
-
 ## Introduction
 
 Large projects -- many samples, deep sequencing, or both -- can push Megahit past the memory available on a given system.
