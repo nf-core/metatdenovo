@@ -9,7 +9,14 @@ nextflow_pipeline {
 
         when {
             params {
-                outdir = "$outputDir"
+                outdir         = "$outputDir"
+                // Non-default values, just to prove these params actually reach Megahit's
+                // command line (see the 'k list' log assertion below). k_min == k_max would
+                // be simpler but Megahit only emits 'intermediate_contigs/k*.local.fa.gz'
+                // (a required module output) when iterating across more than one k value.
+                megahit_k_min  = 25
+                megahit_k_max  = 49
+                megahit_k_step = 12
             }
         }
 
@@ -38,6 +45,7 @@ nextflow_pipeline {
                     path("${params.outdir}/summary_tables/megahit.prodigal.overall_stats.tsv.gz").linesGzip.findAll { l -> l.contains('n_feature_count') },
                 ).match() },
                 { assert path("${params.outdir}/megahit/megahit_assembly.log").readLines().any { l -> l.contains('ALL DONE') } },
+                { assert path("${params.outdir}/megahit/megahit_assembly.log").readLines().any { l -> l.contains('k list: 25,37,49') } },
                 { assert path("${params.outdir}/megahit/megahit_assembly.contigs.fa.gz").linesGzip.size() > 3000 },
                 { assert path("${params.outdir}/samtools/megahit.SAMPLE1_PE.idxstats").readLines().size() > 1600 },
                 { assert path("${params.outdir}/prodigal/megahit.prodigal.gff.gz").linesGzip.findAll { l -> l.contains('CDS') }.size() > 3000 },

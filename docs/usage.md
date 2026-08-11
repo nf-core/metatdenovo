@@ -15,6 +15,8 @@ While the rationale for writing the workflow was metatranscriptomes, there is no
 communities nor genomes rather than transcriptomes.
 Instead, the workflow should be usable for any project in which a de novo assembly followed by quantification and annotation is suitable.
 
+If you're working with a large project -- many samples, deep sequencing, or both -- and expect (or hit) memory problems during assembly, see [Coping with large datasets](large_datasets.md) for concrete params to try, and in which order.
+
 ## Running the workflow
 
 ### Quickstart
@@ -97,12 +99,26 @@ This is normally used if the data set is too large to assemble but can potential
 N.B. digitally normalized reads are used only for the assembly and the full set of sequences will be used for quantification.
 To turn on digital normalization, use the `--bbnorm` parameter and, if required, adjust the `--bbnorm_target` and `--bbnorm_min` parameters.
 
+Digital normalization directly and predictably shrinks the assembler's memory and time footprint, since that scales with the size of the k-mer graph, which in turn scales with the (normalized) k-mer diversity and depth.
+It's a coverage-flattening transform, though, so it comes with a real trade-off: k-mers from low-abundance organisms can fall below `--bbnorm_min` and get discarded outright, which means those organisms can be missing from the assembly entirely, not just under-represented in it.
+It can also distort strain-level variation for the same reason.
+Since normalized reads are only used for the assembly (see the note above), this risk is contained to "what gets assembled" -- it does not bias the abundance counts of whatever does make it into the assembly.
+
 > Please, check the [bbnorm](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbnorm-guide/) documentation for further information about these programs and how digital normalization works. Remember to check [Parameters](https://nf-co.re/metatdenovo/parameters) page for the all options that can be used for this step.
+
+See [Coping with large datasets](large_datasets.md) for concrete `--bbnorm_target`/`--bbnorm_min` starting values, how this combines with the [Assembler options](#assembler-options) below, and in which order to try them.
 
 ### Assembler options
 
 By default, the pipeline uses Megahit (`--assembler megahit`) to assemble the cleaned and trimmed reads to create the reference contigs.
 Megahit is fast and it does not require a lot of memory to run, making it ideal for large sets of samples.
+
+If Megahit still runs out of memory on very large datasets, a few hidden parameters let you tune its k-mer graph construction: `--megahit_min_count`, `--megahit_k_min`, `--megahit_k_max` and `--megahit_k_step` (or `--megahit_k_list` instead of the min/max/step triplet).
+Raising `--megahit_min_count` prunes low-frequency, often erroneous k-mers before the graph is built, and is a more surgical adjustment than the k-mer options.
+Raising `--megahit_k_min` skips the smallest, most memory-hungry k-mer iterations, but at the cost of sensitivity to low-coverage or short reads -- treat it more as a last resort.
+None of these parameters have a pipeline default; when left unset, Megahit uses its own built-in defaults, which are recorded in its own log file (under `megahit/`) for each run.
+See the [Megahit documentation](https://github.com/voutcn/megahit) for the full meaning of these options, and [Coping with large datasets](large_datasets.md) for concrete starting values and where these fit relative to [digital normalization](#digital-normalization) above.
+
 The workflow also supports Spades (`--assembler spades` ) as an alternative.
 The default "flavour" of Spades is set to RNA, but this can be changed using the `--spades_flavor` parameter (see [parameter documentation](/metatdenovo/parameters/#spades_flavor))
 

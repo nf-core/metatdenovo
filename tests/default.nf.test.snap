@@ -208,15 +208,15 @@
                 "orf\tchr\tstart\tend\tstrand\tlength\tsample\tcount\ttpm"
             ],
             3000000,
-            4,
-            1,
+            5,
+            2,
             4,
             349986,
             [
                 "sample\tn_post_trimming\tn_non_contaminated\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count"
             ]
         ],
-        "timestamp": "2026-07-31T13:36:43.713122719",
+        "timestamp": "2026-08-10T20:25:26.121633505",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"
