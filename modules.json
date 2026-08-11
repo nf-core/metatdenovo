@@ -100,6 +100,17 @@
                         "git_sha": "a0fe96944016c6cb69d8b64ffc635c71b76310ae",
                         "installed_by": ["modules"]
                     },
+                    "rundbcan/cazymeannotation": {
+                        "branch": "master",
+                        "git_sha": "5e0b34c7ad0841e3e160b15a0180bf2b9be0e3bf",
+                        "installed_by": ["modules"]
+                    },
+                    "rundbcan/database": {
+                        "branch": "master",
+                        "git_sha": "5e0b34c7ad0841e3e160b15a0180bf2b9be0e3bf",
+                        "installed_by": ["modules"],
+                        "patch": "modules/nf-core/rundbcan/database/rundbcan-database.diff"
+                    },
                     "samtools/flagstat": {
                         "branch": "master",
                         "git_sha": "9339809fcb90af8a8b7051e6cd914894d5c52002",

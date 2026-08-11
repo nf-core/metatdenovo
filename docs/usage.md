@@ -246,6 +246,13 @@ Currently, the standard download procedure for the eggNOG database using the `do
 Since release 1.4.0, this pipeline therefore uses `wget` to fetch files from [the current download site](http://eggnog6.embl.de/download/emapperdb-5.0.2).
 :::
 
+A third functional annotation option is CAZyme annotation using [dbCAN](https://bcb.unl.edu/dbCAN2/) (`run_dbcan`), which is also run by
+default and can be skipped with `--skip_dbcan`.
+Its database is downloaded automatically, with the path settable through `--dbcan_dbpath directory` (the same "let the pipeline download it
+once, then reuse the data" advice above applies here too).
+Since the pipeline only runs dbCAN's protein-mode CAZyme annotation (not its gene-cluster/CGC analysis), the download skips the CGC-related
+database assets to save space and time.
+
 A more targeted annotation option offered by the workflow is the possibility for the user to provide a set of
 [HMMER HMM profiles](http://eddylab.org/software/hmmer/Userguide.pdf) through the `--hmmdir dir` or `hmmfiles file0.hmm,file1.hmm,...,filen.hmm`
 parameters.
@@ -254,7 +261,7 @@ which each ORF-HMM combination will be ranked according to score and E-value.
 
 #### How to manually download the databases for functional annotation
 
-There are some cases (e.g. offline run) where you prefer to download the databases before running the pipeline. Currently, `eggnog-mapper` and `kofamscan` use databases that can be downloaded.
+There are some cases (e.g. offline run) where you prefer to download the databases before running the pipeline. Currently, `eggnog-mapper`, `kofamscan` and `dbcan` use databases that can be downloaded.
 
 ##### Eggnog databases
 
@@ -286,6 +293,16 @@ gunzip ko_list.gz
 
 wget https://www.genome.jp/ftp/db/kofam/profiles.tar.gz
 tar -zxf profiles.tar.gz
+```
+
+##### dbCAN database
+
+You can use `run_dbcan` itself (installed alongside the pipeline's dbCAN container, or via `pip install run-dbcan`) to download the database
+into a directory that will be used with `--dbcan_dbpath`.
+The `--no-cgc` flag matches what the pipeline itself uses, since only protein-mode CAZyme annotation is run, not gene-cluster analysis:
+
+```bash
+run_dbcan database --db_dir dbcan --aws_s3 --no-cgc
 ```
 
 ## Example pipeline command with some common features

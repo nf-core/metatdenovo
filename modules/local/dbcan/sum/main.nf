@@ -1,0 +1,73 @@
+process DBCAN_SUM {
+    tag "$meta.id"
+    label 'process_low'
+
+    conda "${moduleDir}/environment.yml"
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'https://depot.galaxyproject.org/singularity/mulled-v2-b2ec1fea5791d428eebb8c8ea7409c350d31dada:a447f6b7a6afde38352b24c30ae9cd6e39df95c4-1' :
+        'biocontainers/mulled-v2-b2ec1fea5791d428eebb8c8ea7409c350d31dada:a447f6b7a6afde38352b24c30ae9cd6e39df95c4-1' }"
+
+    input:
+    tuple val(meta), path(dbcan)
+    path(fcs)
+
+    output:
+    tuple val(meta), path("${meta.id}.dbcan_summary.tsv.gz") , emit: dbcan_summary
+    path "versions.yml"                                      , emit: versions, topic: versions
+
+    when:
+    task.ext.when == null || task.ext.when
+
+    script:
+
+    """
+    #!/usr/bin/env Rscript
+
+    library(dplyr)
+    library(readr)
+    library(tidyr)
+    library(stringr)
+    library(tidyverse)
+
+    # call the tables into variables
+    dbcan <- read_tsv("${dbcan}", show_col_types = FALSE )
+
+    counts <- list.files(pattern = "*.counts.tsv.gz") %>%
+        map_df(~read_tsv(.,  show_col_types  = FALSE)) %>%
+        mutate(sample = as.character(sample))
+
+    counts %>%
+        inner_join(dbcan, by = 'orf') %>%
+        group_by(sample) %>%
+        summarise(value = sum(count), .groups = 'drop') %>%
+        add_column(database = "dbcan", field = "n") %>%
+        relocate(value, .after = last_col()) %>%
+        write_tsv('${meta.id}.dbcan_summary.tsv.gz')
+
+    writeLines(
+        c(
+            "\\"${task.process}\\":",
+            paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")),
+            paste0("    dplyr: ", packageVersion('dplyr')),
+            paste0("    dtplyr: ", packageVersion('dtplyr')),
+            paste0("    data.table: ", packageVersion('data.table')),
+            paste0("    readr: ", packageVersion('readr')),
+            paste0("    purrr: ", packageVersion('purrr')),
+            paste0("    tidyr: ", packageVersion('tidyr')),
+            paste0("    stringr: ", packageVersion('stringr'))
+        ),
+        "versions.yml"
+    )
+    """
+
+    stub:
+
+    """
+    gzip -c /dev/null > ${meta.id}.dbcan_summary.tsv.gz
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        R: 4.0
+    END_VERSIONS
+    """
+}

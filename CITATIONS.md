@@ -76,6 +76,12 @@
 
 - [Kofamscan](https://github.com/takaram/kofam_scan)
 
+- [dbCAN](https://bcb.unl.edu/dbCAN2/)
+
+  > Zheng J, Ge Q, Yan Y, Zhang X, Huang L, Yin Y. dbCAN3: automated
+  > carbohydrate-active enzyme and substrate annotation. Nucleic Acids
+  > Research, 51(W1):W115-W121, 2023. doi: 10.1093/nar/gkad328
+
 - [HMMsearch](https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch)
 
 - [EUKulele](https://github.com/AlexanderLabWHOI/EUKulele)

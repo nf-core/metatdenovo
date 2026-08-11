@@ -33,6 +33,7 @@ include { PROKKA_SUBSETS          } from '../subworkflows/local/prokka/subsets/'
 include { FASTQC_TRIMGALORE       } from '../subworkflows/local/fastqc/trimgalore/'
 include { PRODIGAL                } from '../subworkflows/local/prodigal/'
 include { KOFAMSCAN               } from '../subworkflows/local/kofamscan/'
+include { DBCAN                   } from '../subworkflows/local/dbcan/'
 include { TRANSDECODER            } from '../subworkflows/local/transdecoder/'
 include { PIPELINE_INITIALISATION } from '../subworkflows/local/utils_nfcore_metatdenovo_pipeline'
 include { PIPELINE_COMPLETION     } from '../subworkflows/local/utils_nfcore_metatdenovo_pipeline'
@@ -528,6 +529,14 @@ workflow METATDENOVO {
         ch_kofamscan = ch_protein.map { meta, protein -> [ meta, protein ] }
         KOFAMSCAN( ch_kofamscan, ch_fcs_for_summary, params.kofam_ko_list_url, params.kofam_profiles_url )
         ch_merge_tables = ch_merge_tables.mix ( KOFAMSCAN.out.kofamscan_summary.map { _meta, tsv -> tsv } )
+    }
+
+    //
+    // SUBWORKFLOW: run dbCAN CAZyme annotation on the ORF-called amino acid sequences
+    //
+    if( !params.skip_dbcan ) {
+        DBCAN( ch_protein, ch_fcs_for_summary )
+        ch_merge_tables = ch_merge_tables.mix ( DBCAN.out.sumtable.map { _meta, tsv -> tsv } )
     }
 
     // set up contig channel to use in TransRate
