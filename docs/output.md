@@ -31,6 +31,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and the results
   - [Functional and taxonomic annotation](#functional-and-taxonomic-annotation) - Predict the function and the taxonomy of ORFs
     - [EggNOG](#eggnog) - Output from EggNOG-mapper (default; optional)
     - [KOfamSCAN](#kofamscan) - Output KOfamSCAN (optional)
+    - [dbCAN](#dbcan) - Output from dbCAN CAZyme annotation (default; optional)
     - [EUKulele](#eukulele) - Output from EUKulele taxonomy annotation (default; optional)
     - [Diamond taxonomy](#diamond-taxonomy) - Output from the Diamond-based taxonomy processing (optional)
     - [Hmmsearch](#hmmsearch) - Output from HMMER run with user-supplied HMM profiles (optional)
@@ -268,6 +269,19 @@ Quantification of CDS features with `featureCounts` from the [subread](https://s
 
 </details>
 
+#### dbCAN
+
+[dbCAN](https://bcb.unl.edu/dbCAN2/) (`run_dbcan`) will perform CAZyme (carbohydrate-active enzyme) annotation on the ORFs, combining HMM and Diamond search results into a single overview table.
+Only ORFs with at least one hit from any of the underlying tools appear in the output.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `summary_tables/`
+  - `<assembly_name>.<orfcaller_name>.dbcan.tsv.gz`: reformatted dbCAN CAZyme annotation overview table
+
+</details>
+
 #### EUKulele
 
 [EUKulele](https://github.com/AlexanderLabWHOI/EUKulele) will perform an analysis to assign taxonomy to the ORFs.
@@ -337,6 +351,7 @@ Filenames start with assembly program and ORF caller, to allow reruns of the pip
   - `<assembly_name>.<orfcaller_name>.emapper.tsv.gz`: reformatted output from EggNOG-mapper.
   - `<assembly_name>.<orfcaller_name>.kofamscan.tsv.gz`: reformatted output from Kofamscan.
   - `<assembly_name>.<orfcaller_name>.kofamscan-uniq.tsv.gz`: reformatted output from Kofamscan with a _single_ row per ORF in contrast to the above.
+  - `<assembly_name>.<orfcaller_name>.dbcan.tsv.gz`: reformatted CAZyme annotation overview table from dbCAN.
   - `<assembly_name>.<orfcaller_name>.{db}_eukulele.tsv.gz`: taxonomic annotation per ORF for specific database.
   - `<assembly_name>.<orfcaller_name>.prokka-annotations.tsv.gz`: reformatted annotation output from Prokka.
   - `<assembly_name>.<orfcaller_name>.<database>.diamond.taxonomy.tsv.gz`: diamond taxonomy parsed into individual taxa

@@ -367,6 +367,18 @@
                     "fa_icon": "fas fa-link",
                     "hidden": true
                 },
+                "skip_dbcan": {
+                    "type": "boolean",
+                    "description": "If enabled, skips dbCAN CAZyme annotation.",
+                    "fa_icon": "fas fa-forward"
+                },
+                "dbcan_dbpath": {
+                    "type": "string",
+                    "default": "dbcan",
+                    "description": "Specify the dbCAN database path.",
+                    "fa_icon": "far fa-file-code",
+                    "help_text": "The dbCAN CAZyme database will be downloaded to this directory if it doesn't already exist there."
+                },
                 "hmmdir": {
                     "type": "string",
                     "default": null,
