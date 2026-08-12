@@ -24,7 +24,40 @@ workflow PROKKA_SUBSETS {
         []
     )
 
-    ch_log  = PROKKA.out.txt.map { _meta, log -> log }.collect()
+    // PROKKA runs once per contig batch (see splitFasta above), so on any assembly larger
+    // than params.prokka_batchsize there are multiple *.txt summaries, each with the same
+    // literal "organism: Genus species strain " line (no --genus/--species/--strain is
+    // passed to PROKKA). MultiQC's prokka module derives the sample name from that line, so
+    // feeding the raw per-batch files in directly makes every batch collide under the same
+    // "strain" sample name. Sum the numeric fields across all batches into a single
+    // per-assembly summary instead, with a real sample name.
+    ch_log = contigs
+        .map { meta, _contigs -> meta.id }
+        .combine(PROKKA.out.txt.map { _meta, txt -> txt }.collect().map { txts -> [ txts ] })
+        .map { assembly_id, txts ->
+            def totals = [:]
+            def order  = []
+            txts.each { txt ->
+                txt.readLines().each { line ->
+                    def parts = line.split(':', 2)
+                    if (parts.size() == 2) {
+                        def key   = parts[0].trim()
+                        def value = parts[1].trim()
+                        if (key != 'organism' && value.isInteger()) {
+                            if (!totals.containsKey(key)) { order << key }
+                            totals[key] = (totals[key] ?: 0) + value.toInteger()
+                        }
+                    }
+                }
+            }
+            def content = "organism: Genus species ${assembly_id}_prokka\n" +
+                order.collect { key -> "${key}: ${totals[key]}" }.join('\n') + '\n'
+            // No "_mqc" in this filename: that suffix routes a file into MultiQC's separate
+            // custom-content mechanism instead of the normal per-module log search that the
+            // native prokka module uses (which detects files by content, not filename).
+            [ "${assembly_id}.prokka_summary.txt", content ]
+        }
+        .collectFile()
 
     ch_gff = contigs.map{ meta, _contigs -> [ id:"${meta.id}.prokka" ] }
         .combine(PROKKA.out.gff.collect { _meta, gff -> gff }.map { gff -> [ gff ] })

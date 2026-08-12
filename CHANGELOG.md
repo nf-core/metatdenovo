@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Fixed`
 
+- [#NN](https://github.com/nf-core/metatdenovo/pull/NN) - Fix Prokka stats in the MultiQC report colliding under a single "strain" sample name on any assembly with more than one `prokka_batchsize` chunk, addresses part of [#456](https://github.com/nf-core/metatdenovo/issues/456) (@erikrikarddaniel)
 - [#452](https://github.com/nf-core/metatdenovo/pull/452) - Fix `EGGNOG_FORMAT` renaming the `query` column to `Lorf` instead of `orf`, which broke `EGGNOG_SUM` (@erikrikarddaniel)
 
 ### `Dependencies`
