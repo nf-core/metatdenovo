@@ -413,6 +413,29 @@ workflow METATDENOVO {
         ch_protein      = PRODIGAL.out.faa
         UNPIGZ_GFF(PRODIGAL.out.gff)
         ch_gff          = UNPIGZ_GFF.out.file
+        // No MultiQC-native module for Prodigal (unlike Prokka, handled via
+        // PROKKA_SUBSETS.out.prokka_log above), so build a small custom-content CSV of basic
+        // ORF/protein stats from its amino-acid FASTA output.
+        ch_multiqc_files = ch_multiqc_files.mix(
+            ch_protein.collectFile { meta, faa ->
+                def n_orfs   = 0
+                def total_aa = 0
+                def reader   = faa.name.endsWith('.gz') ?
+                    new java.util.zip.GZIPInputStream(faa.newInputStream()).newReader() :
+                    faa.newReader()
+                reader.eachLine { line ->
+                    if (line.startsWith('>')) {
+                        n_orfs = n_orfs + 1
+                    } else {
+                        total_aa = total_aa + line.trim().length()
+                    }
+                }
+                reader.close()
+                def mean_aa = n_orfs > 0 ? (total_aa / n_orfs) : 0
+                def content = "Sample,n_orfs,total_aa,mean_aa_length\n${meta.id},${n_orfs},${total_aa},${String.format(Locale.ROOT, '%.1f', mean_aa)}\n"
+                [ 'prodigal_stats_mqc.csv', content ]
+            }
+        )
     }
 
     //
@@ -427,6 +450,29 @@ workflow METATDENOVO {
         PIGZ_TRANSDECODER_CDS(TRANSDECODER.out.cds)
         PIGZ_TRANSDECODER_GFF(TRANSDECODER.out.gff)
         PIGZ_TRANSDECODER_PEP(TRANSDECODER.out.pep)
+
+        // No MultiQC-native module for TransDecoder either -- same custom-content approach as
+        // the Prodigal branch above.
+        ch_multiqc_files = ch_multiqc_files.mix(
+            ch_protein.collectFile { meta, pep ->
+                def n_orfs   = 0
+                def total_aa = 0
+                def reader   = pep.name.endsWith('.gz') ?
+                    new java.util.zip.GZIPInputStream(pep.newInputStream()).newReader() :
+                    pep.newReader()
+                reader.eachLine { line ->
+                    if (line.startsWith('>')) {
+                        n_orfs = n_orfs + 1
+                    } else {
+                        total_aa = total_aa + line.trim().length()
+                    }
+                }
+                reader.close()
+                def mean_aa = n_orfs > 0 ? (total_aa / n_orfs) : 0
+                def content = "Sample,n_orfs,total_aa,mean_aa_length\n${meta.id},${n_orfs},${total_aa},${String.format(Locale.ROOT, '%.1f', mean_aa)}\n"
+                [ 'transdecoder_stats_mqc.csv', content ]
+            }
+        )
     }
 
     // Populate channels if the user provided the orfs

@@ -158,6 +158,7 @@ BBnorm is a BBmap tool.
 #### Prodigal
 
 As default, [Prodigal](https://github.com/hyattpd/Prodigal) is used to identify ORFs in the assembly.
+Basic ORF statistics (number of ORFs, total and mean amino acid length) are included in the MultiQC report.
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -176,6 +177,7 @@ As default, [Prodigal](https://github.com/hyattpd/Prodigal) is used to identify 
 As one alternative, you can use [Prokka](https://github.com/tseemann/prokka) to identify ORFs in the assembly.
 In addition to calling ORFs (done with Prodigal) Prokka will filter ORFs to only retain quality ORFs and will functionally annotate the ORFs.
 NB: Prodigal or Prokka are recomended for prokaryotic samples
+Basic annotation statistics (contigs, CDS, rRNA, tRNA counts) are included in the MultiQC report.
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -193,6 +195,7 @@ NB: Prodigal or Prokka are recomended for prokaryotic samples
 
 Another alternative is [TransDecoder](https://github.com/sghignone/TransDecoder) to find ORFs in the assembly.
 N.B. TransDecoder is recommended for eukaryotic samples
+Basic ORF statistics (number of ORFs, total and mean amino acid length) are included in the MultiQC report.
 
 <details markdown="1">
 <summary>Output files</summary>
