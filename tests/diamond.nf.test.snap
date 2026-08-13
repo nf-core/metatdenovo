@@ -216,11 +216,10 @@
                 "trimgalore/fastqc/SAMPLE3_PE_1_2_val_2_fastqc.zip"
             ],
             [
-                "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f",
-                "multiqc_prodigal_stats.txt:md5,5679a7ccc93810d2e1359046f823bddf"
+                "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f"
             ]
         ],
-        "timestamp": "2026-08-13T07:39:37.861548289",
+        "timestamp": "2026-08-13T08:23:32.521917771",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"
