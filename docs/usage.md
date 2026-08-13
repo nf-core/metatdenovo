@@ -172,6 +172,56 @@ We hope to add more later.
 
 To make your own database, you will need to collect four files: a protein fasta file, the `names.dmp` and `nodes.dmp` files from an
 NCBI-style taxon dump plus a mapping file in which protein accessions are translated into taxon ids.
+
+##### Building a database with nf-core/createtaxdb
+
+The recommended way to build your own taxonomy-aware Diamond database is with [nf-core/createtaxdb](https://nf-co.re/createtaxdb), which wraps `diamond makedb` and its taxonomy inputs into a reproducible pipeline of its own.
+Below is a worked example that builds and validates a database from [MarFERReT](https://zenodo.org/records/10170983) v1.1, a curated marine microbial eukaryote protein reference -- useful if your community has a substantial eukaryotic fraction not well represented in NCBI RefSeq/GTDB (see also [Coping with large datasets](large_datasets.md) and [issue #459](https://github.com/nf-core/metatdenovo/issues/459) for related eukaryote-focused work).
+
+A minimal `samplesheet.csv`:
+
+```csv title="samplesheet.csv"
+id,taxid,fasta_dna,fasta_aa
+MarFERReT_v1_1,1,,https://zenodo.org/records/10170983/files/MarFERReT.v1.proteins.faa.gz
+```
+
+`taxid` is a required samplesheet column but doesn't matter for Diamond -- the actual per-protein taxonomy comes from `--prot2taxid` below, not this column.
+`fasta_dna` can be left empty; the schema only requires one of `fasta_dna`/`fasta_aa`.
+
+A minimal `params.yml`:
+
+```yaml title="params.yml"
+input: samplesheet.csv
+outdir: results
+dbname: marferret_v1.1
+build_diamond: true
+prot2taxid: https://zenodo.org/records/10170983/files/MarFERReT.v1.taxonomies.tab.gz
+nodesdmp: /path/to/nodes.dmp
+namesdmp: /path/to/names.dmp
+```
+
+Then run:
+
+```bash
+nextflow run nf-core/createtaxdb -r dev -profile docker -params-file params.yml
+```
+
+A few gotchas worth knowing before you try this:
+
+1. Zenodo's `/api/records/<id>/files/<name>/content` URLs fail `schema_input.json`'s filename regex (it must end in `.fasta`/`.fa`/`.faa`, optionally `.gz`, with nothing after).
+   Use the plain `zenodo.org/records/<id>/files/<name>` form instead -- same content, correct extension at the end.
+2. `nodesdmp`/`namesdmp` need pre-extracted `.dmp` files -- there's no tar.gz auto-extraction for these two, unlike the FASTA/`prot2taxid` inputs, which Nextflow happily streams straight from a URL.
+   Download and extract an [NCBI taxonomy dump](ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz) first.
+3. The 4-column accession2taxid-format file (accession, accession.version, taxid, gi) goes in via `--prot2taxid`, which is what actually reaches `DIAMOND_MAKEDB`'s `taxonmap` input.
+4. `--taxonmap`/`--taxonnodes`/`--taxonnames` are build-time only.
+   Querying the resulting `.dmnd` with `diamond blastp --outfmt 102` doesn't need them again, but also only emits `qseqid taxid evalue`, not a human-readable lineage string.
+   The taxid-to-full-lineage expansion is a metatdenovo-side step (`parse_with_taxdump` in `diamond_dbs.csv`, see below), not something createtaxdb/Diamond itself produces.
+
+Once you have a `.dmnd` plus the `names.dmp`/`nodes.dmp` you used to build it, wire them into `diamond_dbs.csv` exactly as described below -- createtaxdb's job ends at producing the database, not at configuring metatdenovo to use it.
+
+##### Building a database manually
+
+Alternatively, you can run `diamond makedb` yourself without createtaxdb.
 As an example, you can download the [NCBI NR database in fasta format](ftp://ftp.ncbi.nih.gov/blast/db/FASTA/nr.gz), the
 [taxonomy dump](ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz) and the [mapping file](ftp://ftp.ncbi.nih.gov/pub/taxonomy/accession2taxid/).
 (_Note_ that the mapping file is actually several files that need to be first downloaded, the concatenated into one.)
