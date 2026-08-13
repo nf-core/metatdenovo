@@ -219,6 +219,42 @@ A few gotchas worth knowing before you try this:
 
 Once you have a `.dmnd` plus the `names.dmp`/`nodes.dmp` you used to build it, wire them into `diamond_dbs.csv` exactly as described below -- createtaxdb's job ends at producing the database, not at configuring metatdenovo to use it.
 
+##### Building an NCBI NR/RefSeq database with nf-core/createtaxdb
+
+> [!WARNING]
+> Unlike the MarFERReT example above, this one has **not** been run end-to-end -- it's the createtaxdb equivalent of the manual NCBI NR procedure in the next section below, built by direct analogy, not validated in practice.
+> NR is a much larger database than MarFERReT (the manual procedure's own comment says the FASTA download alone "takes a loooong time"), so expect a correspondingly long build and high memory use if you try this.
+> One thing this example can't confirm without actually running it: the manual procedure below pipes the FASTA through `sed '/^>/s/ .*//'` to strip descriptive text after each accession before `diamond makedb` sees it, because the taxonmap lookup needs to match on the bare accession.
+> It's not verified here whether createtaxdb's own `DIAMOND_MAKEDB` wrapping does that same stripping internally or expects pre-cleaned input -- if the taxonmap join comes out empty or wrong, that header-cleaning step is the first thing to check.
+
+Using the same NCBI sources as the manual procedure below, a `samplesheet.csv`:
+
+```csv title="samplesheet.csv"
+id,taxid,fasta_dna,fasta_aa
+ncbi_nr,1,,ftp://ftp.ncbi.nih.gov/blast/db/FASTA/nr.gz
+```
+
+and `params.yml`:
+
+```yaml title="params.yml"
+input: samplesheet.csv
+outdir: results
+dbname: refseq
+build_diamond: true
+prot2taxid: ftp://ftp.ncbi.nih.gov/pub/taxonomy/accession2taxid/prot.accession2taxid.FULL.gz
+nodesdmp: /path/to/nodes.dmp
+namesdmp: /path/to/names.dmp
+```
+
+then, same as above:
+
+```bash
+nextflow run nf-core/createtaxdb -r dev -profile docker -params-file params.yml
+```
+
+`nodesdmp`/`namesdmp` still need pre-extracting from the [taxonomy dump](ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz) first, same as gotcha 2 above.
+`dbname: refseq` matches the naming already used for this database in the `diamond_dbs.csv` example below, though note that NCBI NR and NCBI RefSeq are not literally the same underlying data -- this follows the manual procedure's own choice of source, not a claim that NR is a perfect stand-in for RefSeq specifically.
+
 ##### Building a database manually
 
 Alternatively, you can run `diamond makedb` yourself without createtaxdb.
