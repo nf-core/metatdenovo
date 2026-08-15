@@ -47,6 +47,10 @@
 
 - [TransDecoder](https://github.com/TransDecoder/TransDecoder)
 
+- [MetaEuk](https://github.com/soedinglab/metaeuk)
+
+  > Levy Karin E, Mirdita M, Söding J. MetaEuk—sensitive, high-throughput gene discovery, and annotation for large-scale eukaryotic metagenomics. Microbiome 8, 48 (2020). doi: 10.1186/s40168-020-00808-x [PMID: 32245390].
+
 - [Prokka](https://github.com/tseemann/prokka)
 
   > Seemann T Prokka: rapid prokaryotic genome annotation Bioinformatics 2014 Jul 15;30(14):2068-9. PMID:24642063

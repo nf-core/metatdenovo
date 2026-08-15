@@ -134,6 +134,11 @@ It also performs functional annotation of ORFs.
 
 For eukaryotic genes, we recommend users to use Transdecoder (`--orf_caller transdecoder`) to call ORFs.
 
+MetaEuk (`--orf_caller metaeuk`) is a second eukaryote-targeted alternative.
+Unlike Transdecoder, which calls ORFs directly on the assembled contigs/transcripts, MetaEuk is splice-aware: it aligns contigs against a reference protein database and can call a single gene model spanning an intron, which matters for assemblies that include intron-containing genomic sequence alongside spliced transcripts.
+It requires a reference protein database, set with `--metaeuk_db` -- either a protein fasta file or a directory containing an mmseqs2-formatted database.
+There's no default, so `--metaeuk_db` must be set whenever `--orf_caller metaeuk` is used.
+
 You can provide a set of ORFs to the pipeline using the `--user_orfs_faa orfs.faa.gz` and `--user_orfs_gff orfs.gff.gz`
 for an amino acid fasta file and a gff file respectively.
 The name used in filenames for user provided ORFs can be set using `--user_orfs_name` parameter.

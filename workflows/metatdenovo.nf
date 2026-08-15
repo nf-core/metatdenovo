@@ -35,6 +35,7 @@ include { PRODIGAL                } from '../subworkflows/local/prodigal/'
 include { KOFAMSCAN               } from '../subworkflows/local/kofamscan/'
 include { DBCAN                   } from '../subworkflows/local/dbcan/'
 include { TRANSDECODER            } from '../subworkflows/local/transdecoder/'
+include { METAEUK                 } from '../subworkflows/local/metaeuk/'
 include { PIPELINE_INITIALISATION } from '../subworkflows/local/utils_nfcore_metatdenovo_pipeline'
 include { PIPELINE_COMPLETION     } from '../subworkflows/local/utils_nfcore_metatdenovo_pipeline'
 
@@ -121,6 +122,11 @@ workflow METATDENOVO {
     // Exit if the user set params.assembler plus any of params.user_orfs_*
     if ( params.assembler && ( params.user_orfs_gff || params.user_orfs_faa ) ) {
         error "You can't input your own ORFs (`--user_orfs_*`) if you call for assembly with `--assembler`."
+    }
+
+    // Exit if the user asked for metaeuk without also providing a reference database
+    if ( params.orf_caller == 'metaeuk' && ! params.metaeuk_db ) {
+        error "When using `--orf_caller metaeuk`, you must also specify `--metaeuk_db`!"
     }
 
     // Deal with user-supplied assembly to make sure output names are correct
@@ -473,6 +479,20 @@ workflow METATDENOVO {
                 [ 'transdecoder_stats_mqc.csv', content ]
             }
         )
+    }
+
+    //
+    // SUBWORKFLOW: run METAEUK. Splice-aware ORF caller alternative for eukaryotes.
+    //
+    if ( orf_caller == 'metaeuk' ) {
+        METAEUK (
+            ch_assembly_contigs.map { _meta, contigs -> [ [id: "${assembly_name}.${orfs_name}" ], contigs ] },
+            file(params.metaeuk_db, checkIfExists: true)
+        )
+        ch_protein = METAEUK.out.faa
+
+        UNPIGZ_GFF(METAEUK.out.gff)
+        ch_gff     = UNPIGZ_GFF.out.file
     }
 
     // Populate channels if the user provided the orfs
