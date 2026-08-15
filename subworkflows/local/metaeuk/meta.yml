@@ -9,7 +9,7 @@ keywords:
   - gene prediction
 components:
   - metaeuk/easypredict
-  - format/metaeuk
+  - format/metaeuk/gff
 input:
   - fasta:
       type: file
