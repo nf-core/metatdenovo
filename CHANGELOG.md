@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Added`
 
-- [#NN](https://github.com/nf-core/metatdenovo/pull/NN) - Add MetaEuk as a splice-aware `--orf_caller` alternative for eukaryotes (`--metaeuk_db`), addresses [#459](https://github.com/nf-core/metatdenovo/issues/459) (@erikrikarddaniel)
+- [#465](https://github.com/nf-core/metatdenovo/pull/465) - Add MetaEuk as a splice-aware `--orf_caller` alternative for eukaryotes (`--metaeuk_db`), addresses [#459](https://github.com/nf-core/metatdenovo/issues/459) (@erikrikarddaniel)
 - [#NN](https://github.com/nf-core/metatdenovo/pull/NN) - Add basic ORF/protein statistics from Prodigal and TransDecoder to the MultiQC report (custom content, since neither has a MultiQC-native module), addresses the rest of [#456](https://github.com/nf-core/metatdenovo/issues/456) (@erikrikarddaniel)
 - [#457](https://github.com/nf-core/metatdenovo/pull/457) - Add dbCAN CAZyme annotation (`--skip_dbcan`, `--dbcan_dbpath`), addresses [#60](https://github.com/nf-core/metatdenovo/issues/60)/[#430](https://github.com/nf-core/metatdenovo/issues/430) (@erikrikarddaniel)
 - [#455](https://github.com/nf-core/metatdenovo/pull/455) - Expose `--megahit_k_min`, `--megahit_k_max`, `--megahit_k_step`, `--megahit_k_list` and `--megahit_min_count` as hidden params for coping with large datasets, addresses [#453](https://github.com/nf-core/metatdenovo/issues/453) (@erikrikarddaniel)
