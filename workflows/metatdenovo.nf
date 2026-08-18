@@ -493,6 +493,29 @@ workflow METATDENOVO {
 
         UNPIGZ_GFF(METAEUK.out.gff)
         ch_gff     = UNPIGZ_GFF.out.file
+
+        // No MultiQC-native module for MetaEuk either -- same custom-content approach as
+        // the Prodigal/TransDecoder branches above.
+        ch_multiqc_files = ch_multiqc_files.mix(
+            ch_protein.collectFile { meta, faa ->
+                def n_orfs   = 0
+                def total_aa = 0
+                def reader   = faa.name.endsWith('.gz') ?
+                    new java.util.zip.GZIPInputStream(faa.newInputStream()).newReader() :
+                    faa.newReader()
+                reader.eachLine { line ->
+                    if (line.startsWith('>')) {
+                        n_orfs = n_orfs + 1
+                    } else {
+                        total_aa = total_aa + line.trim().length()
+                    }
+                }
+                reader.close()
+                def mean_aa = n_orfs > 0 ? (total_aa / n_orfs) : 0
+                def content = "Sample,n_orfs,total_aa,mean_aa_length\n${meta.id},${n_orfs},${total_aa},${String.format(Locale.ROOT, '%.1f', mean_aa)}\n"
+                [ 'metaeuk_stats_mqc.csv', content ]
+            }
+        )
     }
 
     // Populate channels if the user provided the orfs

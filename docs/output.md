@@ -210,8 +210,9 @@ Basic ORF statistics (number of ORFs, total and mean amino acid length) are incl
 
 #### MetaEuk
 
-A third eukaryote-targeted alternative is [MetaEuk](https://github.com/soedinglab/metaeuk), a splice-aware ORF caller that aligns contigs against a reference protein database (`--metaeuk_db`) and can call a single gene model spanning an intron.
+Another eukaryote-targeted alternative is [MetaEuk](https://github.com/soedinglab/metaeuk), a splice-aware ORF caller that aligns contigs against a reference protein database (`--metaeuk_db`) and can call a single gene model spanning an intron.
 N.B. MetaEuk is recommended for eukaryotic samples that mix intron-containing genomic sequence with spliced transcripts.
+Basic ORF statistics (number of ORFs, total and mean amino acid length) are included in the MultiQC report.
 
 <details markdown="1">
 <summary>Output files</summary>

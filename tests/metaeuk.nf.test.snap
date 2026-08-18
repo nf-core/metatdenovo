@@ -117,6 +117,7 @@
                 "multiqc/multiqc_data/multiqc_fastqc.txt",
                 "multiqc/multiqc_data/multiqc_general_stats.txt",
                 "multiqc/multiqc_data/multiqc_megahit_assemblies.txt",
+                "multiqc/multiqc_data/multiqc_metaeuk_stats.txt",
                 "multiqc/multiqc_data/multiqc_software_versions.txt",
                 "multiqc/multiqc_data/multiqc_sources.txt",
                 "multiqc/multiqc_report.html",
@@ -168,7 +169,8 @@
                 "megahit.metaeuk.gff:md5,f5ceef9a3b9917aeb174e1374d566e28",
                 "megahit.metaeuk.headersMap.tsv:md5,5ec29818faeff6db35900f11e8e55738",
                 "megahit.metaeuk_format.gff.gz:md5,9f4ba2f29292871fb361b621124cb2b2",
-                "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f"
+                "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f",
+                "multiqc_metaeuk_stats.txt:md5,be6038955478f96fdcaaa12d04c6d4a9"
             ],
             16,
             [
@@ -178,7 +180,7 @@
                 "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count"
             ]
         ],
-        "timestamp": "2026-08-15T10:07:23.616434977",
+        "timestamp": "2026-08-18T11:15:59.17763482",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"
