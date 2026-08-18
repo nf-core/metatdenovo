@@ -24,6 +24,9 @@ custom_data:
   transdecoder_stats:
     description: "ORF/protein counts and lengths from TransDecoder."
     plot_type: table
+  metaeuk_stats:
+    description: "ORF/protein counts and lengths from MetaEuk."
+    plot_type: table
 
 custom_plot_config:
   megahit_assemblies-plot:

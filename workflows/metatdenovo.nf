@@ -35,6 +35,7 @@ include { PRODIGAL                } from '../subworkflows/local/prodigal/'
 include { KOFAMSCAN               } from '../subworkflows/local/kofamscan/'
 include { DBCAN                   } from '../subworkflows/local/dbcan/'
 include { TRANSDECODER            } from '../subworkflows/local/transdecoder/'
+include { METAEUK                 } from '../subworkflows/local/metaeuk/'
 include { PIPELINE_INITIALISATION } from '../subworkflows/local/utils_nfcore_metatdenovo_pipeline'
 include { PIPELINE_COMPLETION     } from '../subworkflows/local/utils_nfcore_metatdenovo_pipeline'
 
@@ -121,6 +122,11 @@ workflow METATDENOVO {
     // Exit if the user set params.assembler plus any of params.user_orfs_*
     if ( params.assembler && ( params.user_orfs_gff || params.user_orfs_faa ) ) {
         error "You can't input your own ORFs (`--user_orfs_*`) if you call for assembly with `--assembler`."
+    }
+
+    // Exit if the user asked for metaeuk without also providing a reference database
+    if ( params.orf_caller == 'metaeuk' && ! params.metaeuk_db ) {
+        error "When using `--orf_caller metaeuk`, you must also specify `--metaeuk_db`!"
     }
 
     // Deal with user-supplied assembly to make sure output names are correct
@@ -471,6 +477,43 @@ workflow METATDENOVO {
                 def mean_aa = n_orfs > 0 ? (total_aa / n_orfs) : 0
                 def content = "Sample,n_orfs,total_aa,mean_aa_length\n${meta.id},${n_orfs},${total_aa},${String.format(Locale.ROOT, '%.1f', mean_aa)}\n"
                 [ 'transdecoder_stats_mqc.csv', content ]
+            }
+        )
+    }
+
+    //
+    // SUBWORKFLOW: run METAEUK. Splice-aware ORF caller alternative for eukaryotes.
+    //
+    if ( orf_caller == 'metaeuk' ) {
+        METAEUK (
+            ch_assembly_contigs.map { _meta, contigs -> [ [id: "${assembly_name}.${orfs_name}" ], contigs ] },
+            file(params.metaeuk_db, checkIfExists: true)
+        )
+        ch_protein = METAEUK.out.faa
+
+        UNPIGZ_GFF(METAEUK.out.gff)
+        ch_gff     = UNPIGZ_GFF.out.file
+
+        // No MultiQC-native module for MetaEuk either -- same custom-content approach as
+        // the Prodigal/TransDecoder branches above.
+        ch_multiqc_files = ch_multiqc_files.mix(
+            ch_protein.collectFile { meta, faa ->
+                def n_orfs   = 0
+                def total_aa = 0
+                def reader   = faa.name.endsWith('.gz') ?
+                    new java.util.zip.GZIPInputStream(faa.newInputStream()).newReader() :
+                    faa.newReader()
+                reader.eachLine { line ->
+                    if (line.startsWith('>')) {
+                        n_orfs = n_orfs + 1
+                    } else {
+                        total_aa = total_aa + line.trim().length()
+                    }
+                }
+                reader.close()
+                def mean_aa = n_orfs > 0 ? (total_aa / n_orfs) : 0
+                def content = "Sample,n_orfs,total_aa,mean_aa_length\n${meta.id},${n_orfs},${total_aa},${String.format(Locale.ROOT, '%.1f', mean_aa)}\n"
+                [ 'metaeuk_stats_mqc.csv', content ]
             }
         )
     }
