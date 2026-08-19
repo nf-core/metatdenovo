@@ -11,7 +11,7 @@ process SEQTK_HMMHITFAAS {
     tuple val(meta), path(hmmrank), path(faa)
 
     output:
-    tuple val(meta), path("hits/*.faa.gz"), emit: faas
+    tuple val(meta), path("hits/*.faa.gz"), emit: faas, optional: true
     tuple val("${task.process}"), val('seqtk'), eval('seqtk 2>&1 | grep Version | sed "s/^.*Version: //; s/ .*\$//"'), emit: versions_seqtk, topic: versions
 
     when:
