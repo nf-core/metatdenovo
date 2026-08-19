@@ -1,7 +1,7 @@
 {
-    "-profile test_megahit_prokka_transdecoder": {
+    "-profile test_megahit_prokka_prodigal_transdecoder": {
         "content": [
-            99,
+            127,
             {
                 "BBMAP_ALIGN": {
                     "bbmap": 39.18
@@ -57,6 +57,9 @@
                     "tidyr": "1.3.0",
                     "readr": "2.1.4",
                     "stringr": "1.5.0"
+                },
+                "FORMAT_PRODIGAL_GFF": {
+                    "gzip": 1.11
                 },
                 "GFF_CAT": {
                     "coreutils": 9.4,
@@ -128,6 +131,9 @@
                 "PIGZ_TRANSDECODER_PEP": {
                     "pigz": 2.8
                 },
+                "PRODIGAL_MODULE": {
+                    "prodigal": "2.6.3"
+                },
                 "PROKKA": {
                     "prokka": "1.15.6"
                 },
@@ -197,6 +203,10 @@
                 "bbmap/bbmap/SAMPLE2_PE.bbmap.log",
                 "bbmap/bbmap/SAMPLE3_PE_1.bbmap.log",
                 "diamond_taxonomy",
+                "diamond_taxonomy/megahit.prodigal.gtdb-r220-test.lineage.tsv.gz",
+                "diamond_taxonomy/megahit.prodigal.gtdb-r220-test.tsv.gz",
+                "diamond_taxonomy/megahit.prodigal.ncbi-refseq-test.lineage.tsv.gz",
+                "diamond_taxonomy/megahit.prodigal.ncbi-refseq-test.tsv.gz",
                 "diamond_taxonomy/megahit.prokka.gtdb-r220-test.lineage.tsv.gz",
                 "diamond_taxonomy/megahit.prokka.gtdb-r220-test.tsv.gz",
                 "diamond_taxonomy/megahit.prokka.ncbi-refseq-test.lineage.tsv.gz",
@@ -206,26 +216,36 @@
                 "diamond_taxonomy/megahit.transdecoder.ncbi-refseq-test.lineage.tsv.gz",
                 "diamond_taxonomy/megahit.transdecoder.ncbi-refseq-test.tsv.gz",
                 "featurecounts",
+                "featurecounts/SAMPLE1_PE.prodigal.featureCounts.tsv",
+                "featurecounts/SAMPLE1_PE.prodigal.featureCounts.tsv.summary",
                 "featurecounts/SAMPLE1_PE.prokka.featureCounts.tsv",
                 "featurecounts/SAMPLE1_PE.prokka.featureCounts.tsv.summary",
                 "featurecounts/SAMPLE1_PE.transdecoder.featureCounts.tsv",
                 "featurecounts/SAMPLE1_PE.transdecoder.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE2_PE.prodigal.featureCounts.tsv",
+                "featurecounts/SAMPLE2_PE.prodigal.featureCounts.tsv.summary",
                 "featurecounts/SAMPLE2_PE.prokka.featureCounts.tsv",
                 "featurecounts/SAMPLE2_PE.prokka.featureCounts.tsv.summary",
                 "featurecounts/SAMPLE2_PE.transdecoder.featureCounts.tsv",
                 "featurecounts/SAMPLE2_PE.transdecoder.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE3_PE_1.prodigal.featureCounts.tsv",
+                "featurecounts/SAMPLE3_PE_1.prodigal.featureCounts.tsv.summary",
                 "featurecounts/SAMPLE3_PE_1.prokka.featureCounts.tsv",
                 "featurecounts/SAMPLE3_PE_1.prokka.featureCounts.tsv.summary",
                 "featurecounts/SAMPLE3_PE_1.transdecoder.featureCounts.tsv",
                 "featurecounts/SAMPLE3_PE_1.transdecoder.featureCounts.tsv.summary",
                 "hmmer",
                 "hmmer/hits",
+                "hmmer/hits/megahit.prodigal.PF00848.faa.gz",
                 "hmmer/hits/megahit.transdecoder.PF00848.faa.gz",
+                "hmmer/megahit.prodigal.PF00317.tbl.gz",
+                "hmmer/megahit.prodigal.PF00848.tbl.gz",
                 "hmmer/megahit.prokka.PF00317.tbl.gz",
                 "hmmer/megahit.prokka.PF00848.tbl.gz",
                 "hmmer/megahit.transdecoder.PF00317.tbl.gz",
                 "hmmer/megahit.transdecoder.PF00848.tbl.gz",
                 "kofamscan",
+                "kofamscan/megahit.prodigal.kofamscan_output.tsv.gz",
                 "kofamscan/megahit.prokka.kofamscan_output.tsv.gz",
                 "kofamscan/megahit.transdecoder.kofamscan_output.tsv.gz",
                 "megahit",
@@ -253,6 +273,7 @@
                 "multiqc/multiqc_data/multiqc_fastqc.txt",
                 "multiqc/multiqc_data/multiqc_general_stats.txt",
                 "multiqc/multiqc_data/multiqc_megahit_assemblies.txt",
+                "multiqc/multiqc_data/multiqc_prodigal_stats.txt",
                 "multiqc/multiqc_data/multiqc_prokka.txt",
                 "multiqc/multiqc_data/multiqc_software_versions.txt",
                 "multiqc/multiqc_data/multiqc_sources.txt",
@@ -261,6 +282,12 @@
                 "multiqc/multiqc_report.html",
                 "pipeline_info",
                 "pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml",
+                "prodigal",
+                "prodigal/megahit.prodigal.faa.gz",
+                "prodigal/megahit.prodigal.fna.gz",
+                "prodigal/megahit.prodigal.gff.gz",
+                "prodigal/megahit.prodigal_all.txt.gz",
+                "prodigal/megahit.prodigal_format.gff.gz",
                 "prokka",
                 "prokka/prokka.faa.gz",
                 "prokka/prokka.ffn.gz",
@@ -279,6 +306,14 @@
                 "samtools/megahit.SAMPLE3_PE_1.flagstat",
                 "samtools/megahit.SAMPLE3_PE_1.idxstats",
                 "summary_tables",
+                "summary_tables/megahit.prodigal.counts.tsv.gz",
+                "summary_tables/megahit.prodigal.gtdb-r220-test.diamond.taxonomy.tsv.gz",
+                "summary_tables/megahit.prodigal.hmmrank.tsv.gz",
+                "summary_tables/megahit.prodigal.kofamscan-uniq.tsv.gz",
+                "summary_tables/megahit.prodigal.kofamscan.tsv.gz",
+                "summary_tables/megahit.prodigal.ncbi-refseq-test.diamond.taxonomy-taxdump.tsv.gz",
+                "summary_tables/megahit.prodigal.ncbi-refseq-test.diamond.taxonomy.tsv.gz",
+                "summary_tables/megahit.prodigal.overall_stats.tsv.gz",
                 "summary_tables/megahit.prokka.counts.tsv.gz",
                 "summary_tables/megahit.prokka.gtdb-r220-test.diamond.taxonomy.tsv.gz",
                 "summary_tables/megahit.prokka.hmmrank.tsv.gz",
@@ -341,9 +376,16 @@
             3000000,
             [
                 "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count\tdiamondtax_gtdb-r220-test\tdiamondtax_ncbi-refseq-test\tn_kofamscan"
+            ],
+            [
+                "orf\tchr\tstart\tend\tstrand\tlength\tsample\tcount\ttpm"
+            ],
+            3000000,
+            [
+                "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count\tdiamondtax_gtdb-r220-test\tdiamondtax_ncbi-refseq-test\tn_kofamscan"
             ]
         ],
-        "timestamp": "2026-08-18T22:36:40.530875453",
+        "timestamp": "2026-08-19T08:04:01.91567858",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

@@ -125,7 +125,7 @@ workflow METATDENOVO {
     }
 
     // Split --orf_caller into a list and make sure every entry is a caller we know about
-    orf_callers = params.orf_caller ? params.orf_caller.tokenize(',') : []
+    orf_callers = params.orf_caller ? params.orf_caller.tokenize(',').collect { caller -> caller.trim() } : []
     def valid_orf_callers = ['prodigal', 'prokka', 'transdecoder', 'metaeuk']
     orf_callers.each { caller ->
         if ( ! (caller in valid_orf_callers) ) {
@@ -405,6 +405,12 @@ workflow METATDENOVO {
     //
     ch_gff      = channel.empty()
     ch_protein  = channel.empty()
+    // PROKKA_SUBSETS/PRODIGAL/METAEUK all emit gzipped GFFs that need UNPIGZ_GFF -- accumulated here
+    // and unzipped in ONE call after all three `if` blocks below, rather than one UNPIGZ_GFF call per
+    // block: Nextflow doesn't allow the same unaliased process to be invoked more than once in the
+    // same workflow context, which broke as soon as two of these callers were active simultaneously
+    // (e.g. --orf_caller prokka,prodigal) even though it worked fine for any single caller alone.
+    ch_gff_gz   = channel.empty()
 
     //
     // SUBWORKFLOW: Run PROKKA_SUBSETS on assmebly output, but split the fasta file in chunks of 10 MB, then concatenate and compress output.
@@ -414,8 +420,7 @@ workflow METATDENOVO {
         ch_protein       = ch_protein.mix( PROKKA_SUBSETS.out.faa.map { meta, faa -> [ meta + [caller: 'prokka'], faa ] } )
         ch_multiqc_files = ch_multiqc_files.mix(PROKKA_SUBSETS.out.prokka_log)
 
-        UNPIGZ_GFF(PROKKA_SUBSETS.out.gff)
-        ch_gff           = ch_gff.mix( UNPIGZ_GFF.out.file.map { meta, gff -> [ meta + [caller: 'prokka'], gff ] } )
+        ch_gff_gz = ch_gff_gz.mix( PROKKA_SUBSETS.out.gff.map { meta, gff -> [ meta + [caller: 'prokka'], gff ] } )
     }
 
     //
@@ -424,8 +429,7 @@ workflow METATDENOVO {
     if ( 'prodigal' in orf_callers ) {
         PRODIGAL( ch_assembly_contigs.map { _meta, contigs -> [ [id: "${assembly_name}.prodigal", caller: 'prodigal'], contigs  ] } )
         ch_protein      = ch_protein.mix(PRODIGAL.out.faa)
-        UNPIGZ_GFF(PRODIGAL.out.gff)
-        ch_gff          = ch_gff.mix(UNPIGZ_GFF.out.file)
+        ch_gff_gz       = ch_gff_gz.mix(PRODIGAL.out.gff)
         // No MultiQC-native module for Prodigal (unlike Prokka, handled via
         // PROKKA_SUBSETS.out.prokka_log above), so build a small custom-content CSV of basic
         // ORF/protein stats from its amino-acid FASTA output.
@@ -498,8 +502,7 @@ workflow METATDENOVO {
         )
         ch_protein = ch_protein.mix(METAEUK.out.faa)
 
-        UNPIGZ_GFF(METAEUK.out.gff)
-        ch_gff     = ch_gff.mix(UNPIGZ_GFF.out.file)
+        ch_gff_gz  = ch_gff_gz.mix(METAEUK.out.gff)
 
         // No MultiQC-native module for MetaEuk either -- same custom-content approach as
         // the Prodigal/TransDecoder branches above.
@@ -524,6 +527,11 @@ workflow METATDENOVO {
             }
         )
     }
+
+    // Single UNPIGZ_GFF call covering every gzipped-GFF caller active this run -- see the ch_gff_gz
+    // comment above for why this can't be one call per caller branch.
+    UNPIGZ_GFF(ch_gff_gz)
+    ch_gff = ch_gff.mix(UNPIGZ_GFF.out.file)
 
     // Populate channels if the user provided the orfs
     if ( params.user_orfs_faa && params.user_orfs_gff ) {

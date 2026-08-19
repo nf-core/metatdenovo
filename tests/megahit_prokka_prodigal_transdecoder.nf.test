@@ -3,9 +3,9 @@ nextflow_pipeline {
     name "Test pipeline"
     script "../main.nf"
     tag "pipeline"
-    profile "test_megahit_prokka_transdecoder"
+    profile "test_megahit_prokka_prodigal_transdecoder"
 
-    test("-profile test_megahit_prokka_transdecoder") {
+    test("-profile test_megahit_prokka_prodigal_transdecoder") {
 
         when {
             params {
@@ -29,14 +29,17 @@ nextflow_pipeline {
                     stable_name,
                     // All files with stable contents
                     stable_path,
-                    // Per-caller values, in the same style as the existing solo prokka/transdecoder
-                    // tests (tests/megahit_prokka.nf.test, tests/megahit_transdecoder.nf.test) -- since
-                    // this test runs on the exact same input samplesheet/assembler, these should be
+                    // Per-caller values, in the same style as the existing solo prokka/prodigal/transdecoder
+                    // tests (tests/megahit_prokka.nf.test, tests/default.nf.test, tests/megahit_transdecoder.nf.test)
+                    // -- since this test runs on the exact same input samplesheet/assembler, these should be
                     // directly comparable to the values recorded in those tests' own .snap files as
-                    // independent confirmation that one caller's results aren't contaminated by the other.
+                    // independent confirmation that no caller's results are contaminated by another's.
                     path("${params.outdir}/summary_tables/megahit.prokka.counts.tsv.gz").linesGzip.findAll { l -> l.contains('orf') },
                     path("${params.outdir}/summary_tables/megahit.prokka.counts.tsv.gz").csv(sep: '\t', decompress: true, header: true).columns["tpm"].sum().round(),
                     path("${params.outdir}/summary_tables/megahit.prokka.overall_stats.tsv.gz").linesGzip.findAll { l -> l.contains('n_feature_count') },
+                    path("${params.outdir}/summary_tables/megahit.prodigal.counts.tsv.gz").linesGzip.findAll { l -> l.contains('orf') },
+                    path("${params.outdir}/summary_tables/megahit.prodigal.counts.tsv.gz").csv(sep: '\t', decompress: true, header: true).columns["tpm"].sum().round(),
+                    path("${params.outdir}/summary_tables/megahit.prodigal.overall_stats.tsv.gz").linesGzip.findAll { l -> l.contains('n_feature_count') },
                     path("${params.outdir}/summary_tables/megahit.transdecoder.counts.tsv.gz").linesGzip.findAll { l -> l.contains('orf') },
                     path("${params.outdir}/summary_tables/megahit.transdecoder.counts.tsv.gz").csv(sep: '\t', decompress: true, header: true).columns["tpm"].sum().round(),
                     path("${params.outdir}/summary_tables/megahit.transdecoder.overall_stats.tsv.gz").linesGzip.findAll { l -> l.contains('n_feature_count') },
@@ -45,33 +48,56 @@ nextflow_pipeline {
                 { assert path("${params.outdir}/megahit/megahit_assembly.contigs.fa.gz").linesGzip.size() > 3000 },
                 { assert path("${params.outdir}/prokka/prokka.gff.gz").linesGzip.size() > 2000 },
                 { assert path("${params.outdir}/summary_tables/megahit.prokka.counts.tsv.gz").linesGzip.size() > 2000 },
+                { assert path("${params.outdir}/summary_tables/megahit.prodigal.counts.tsv.gz").linesGzip.size() > 2000 },
                 { assert path("${params.outdir}/summary_tables/megahit.transdecoder.counts.tsv.gz").linesGzip.size() > 1000 },
 
-                // === Caller-suffixed featureCounts naming (commit 2): one file per sample per caller,
-                // not a single file collided/overwritten between the two active callers. ===
+                // === Caller-suffixed featureCounts naming: one file per sample per caller, not a single
+                // file collided/overwritten between simultaneously-active callers. Prokka and Prodigal
+                // both route their GFF through the shared UNPIGZ_GFF process, which used to be invoked
+                // from one `if` block per caller -- fatal once more than one of those blocks ran in the
+                // same execution (Nextflow doesn't allow the same unaliased process to be invoked twice
+                // in one workflow context). Fixed by unzipping every active caller's GFF through a single
+                // UNPIGZ_GFF call; prokka+prodigal together is what actually exercises that fix. ===
                 { assert path("${params.outdir}/featurecounts/SAMPLE1_PE.prokka.featureCounts.tsv").exists() },
+                { assert path("${params.outdir}/featurecounts/SAMPLE1_PE.prodigal.featureCounts.tsv").exists() },
                 { assert path("${params.outdir}/featurecounts/SAMPLE1_PE.transdecoder.featureCounts.tsv").exists() },
                 { assert path("${params.outdir}/featurecounts/SAMPLE2_PE.prokka.featureCounts.tsv").exists() },
+                { assert path("${params.outdir}/featurecounts/SAMPLE2_PE.prodigal.featureCounts.tsv").exists() },
                 { assert path("${params.outdir}/featurecounts/SAMPLE2_PE.transdecoder.featureCounts.tsv").exists() },
                 // SAMPLE3_PE has two rows in the samplesheet, so CAT_FASTQ concatenates them under a
                 // "_1"-suffixed id -- a pre-existing pipeline naming convention, not caller-related.
                 { assert path("${params.outdir}/featurecounts/SAMPLE3_PE_1.prokka.featureCounts.tsv").exists() },
+                { assert path("${params.outdir}/featurecounts/SAMPLE3_PE_1.prodigal.featureCounts.tsv").exists() },
                 { assert path("${params.outdir}/featurecounts/SAMPLE3_PE_1.transdecoder.featureCounts.tsv").exists() },
 
-                // === Contamination checks: no existing test has two simultaneous callers to
-                // contaminate, so these are new. ===
-                // 1. Zero overlap between the two callers' ORF-ID namespaces (Prokka locus tags vs.
-                //    TransDecoder contig-derived IDs are disjoint by construction).
+                // === Contamination checks: no existing solo-caller test has multiple simultaneous
+                // callers to contaminate, so these are new. ===
+                // 1. Zero overlap between any pair of callers' ORF-ID namespaces (Prokka locus tags,
+                //    Prodigal contig-derived IDs, and TransDecoder contig-derived IDs are all disjoint
+                //    by construction).
+                { assert (
+                    path("${params.outdir}/summary_tables/megahit.prokka.counts.tsv.gz").csv(sep: '\t', decompress: true, header: true).columns["orf"].toSet()
+                    .intersect(
+                        path("${params.outdir}/summary_tables/megahit.prodigal.counts.tsv.gz").csv(sep: '\t', decompress: true, header: true).columns["orf"].toSet()
+                    )
+                ).isEmpty() },
                 { assert (
                     path("${params.outdir}/summary_tables/megahit.prokka.counts.tsv.gz").csv(sep: '\t', decompress: true, header: true).columns["orf"].toSet()
                     .intersect(
                         path("${params.outdir}/summary_tables/megahit.transdecoder.counts.tsv.gz").csv(sep: '\t', decompress: true, header: true).columns["orf"].toSet()
                     )
                 ).isEmpty() },
-                // 2. Both callers' hmm-classification outputs exist independently, each keyed by its
-                //    own caller name (commit 8 -- HMMER_HMMRANK grouped by caller, not one shared
-                //    ranking blending both callers' hmm-search summaries together).
+                { assert (
+                    path("${params.outdir}/summary_tables/megahit.prodigal.counts.tsv.gz").csv(sep: '\t', decompress: true, header: true).columns["orf"].toSet()
+                    .intersect(
+                        path("${params.outdir}/summary_tables/megahit.transdecoder.counts.tsv.gz").csv(sep: '\t', decompress: true, header: true).columns["orf"].toSet()
+                    )
+                ).isEmpty() },
+                // 2. Every active caller's hmm-classification output exists independently, each keyed by
+                //    its own caller name (HMMER_HMMRANK grouped by caller, not one shared ranking
+                //    blending every active caller's hmm-search summaries together).
                 { assert path("${params.outdir}/summary_tables/megahit.prokka.hmmrank.tsv.gz").exists() },
+                { assert path("${params.outdir}/summary_tables/megahit.prodigal.hmmrank.tsv.gz").exists() },
                 { assert path("${params.outdir}/summary_tables/megahit.transdecoder.hmmrank.tsv.gz").exists() },
             )
         }
