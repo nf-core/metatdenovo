@@ -1,7 +1,7 @@
 {
-    "-profile test_diamond": {
+    "-profile test_megahit_prokka_transdecoder": {
         "content": [
-            56,
+            99,
             {
                 "BBMAP_ALIGN": {
                     "bbmap": 39.18
@@ -31,11 +31,21 @@
                 "DIAMOND_TAXONOMY": {
                     "diamond": "2.2.1"
                 },
+                "FAA_CAT": {
+                    "coreutils": 9.4,
+                    "find": "4.6.0",
+                    "pigz": 2.8
+                },
                 "FASTQC": {
                     "fastqc": "0.12.1"
                 },
                 "FEATURECOUNTS_CDS": {
                     "subread": "2.1.1"
+                },
+                "FFN_CAT": {
+                    "coreutils": 9.4,
+                    "find": "4.6.0",
+                    "pigz": 2.8
                 },
                 "FORMAT_DIAMOND_TAX_RANKLIST": {
                     "R": "4.2.3",
@@ -48,8 +58,41 @@
                     "readr": "2.1.4",
                     "stringr": "1.5.0"
                 },
-                "FORMAT_PRODIGAL_GFF": {
+                "GFF_CAT": {
+                    "coreutils": 9.4,
+                    "find": "4.6.0",
+                    "pigz": 2.8
+                },
+                "HMMER_HMMRANK": {
+                    "r-base": "4.2.3",
+                    "r-tidyverse": "2.0.0"
+                },
+                "HMMER_HMMSEARCH": {
+                    "hmmer": 3.4
+                },
+                "KOFAMSCAN_FORMAT": {
                     "gzip": 1.11
+                },
+                "KOFAMSCAN_SCAN": {
+                    "kofamscan": "1.3.0"
+                },
+                "KOFAMSCAN_SUM": {
+                    "R": "4.2.3",
+                    "dplyr": "1.1.2",
+                    "dtplyr": "1.3.1",
+                    "data.table": "1.14.8",
+                    "readr": "2.1.4",
+                    "purrr": "1.0.1",
+                    "tidyr": "1.3.0",
+                    "stringr": "1.5.0"
+                },
+                "KOFAMSCAN_UNIQUE": {
+                    "R": "4.2.3",
+                    "dplyr": "1.1.2",
+                    "readr": "2.1.4",
+                    "purrr": "1.0.1",
+                    "tidyr": "1.3.0",
+                    "stringr": "1.5.0"
                 },
                 "MEGAHIT": {
                     "megahit": "1.2.9"
@@ -73,8 +116,29 @@
                 "PIGZ_PE_READS_REV": {
                     "pigz": 2.8
                 },
-                "PRODIGAL_MODULE": {
-                    "prodigal": "2.6.3"
+                "PIGZ_TRANSDECODER_BED": {
+                    "pigz": 2.8
+                },
+                "PIGZ_TRANSDECODER_CDS": {
+                    "pigz": 2.8
+                },
+                "PIGZ_TRANSDECODER_GFF": {
+                    "pigz": 2.8
+                },
+                "PIGZ_TRANSDECODER_PEP": {
+                    "pigz": 2.8
+                },
+                "PROKKA": {
+                    "prokka": "1.15.6"
+                },
+                "PROKKAGFF2TSV": {
+                    "R": "4.5.3",
+                    "data.table": "1.17.8",
+                    "dtplyr": "1.3.3",
+                    "dplyr": "1.2.1",
+                    "tidyr": "1.3.2",
+                    "readr": "2.2.0",
+                    "stringr": "1.6.0"
                 },
                 "SAMTOOLS_FLAGSTAT": {
                     "samtools": 1.24
@@ -91,6 +155,9 @@
                 "SAMTOOLS_STATS": {
                     "samtools": 1.24
                 },
+                "SEQTK_HMMHITFAAS": {
+                    "seqtk": "1.4-r122"
+                },
                 "SEQTK_MERGEPE": {
                     "seqtk": "1.4-r122"
                 },
@@ -100,6 +167,12 @@
                 },
                 "TAXONKIT_LINEAGE": {
                     "taxonkit": "0.18.0"
+                },
+                "TRANSDECODER_LONGORF": {
+                    "transdecoder": "5.7.1"
+                },
+                "TRANSDECODER_PREDICT": {
+                    "transdecoder": "5.7.1"
                 },
                 "TRANSRATE": {
                     "transrate": "1.0.3"
@@ -124,17 +197,37 @@
                 "bbmap/bbmap/SAMPLE2_PE.bbmap.log",
                 "bbmap/bbmap/SAMPLE3_PE_1.bbmap.log",
                 "diamond_taxonomy",
-                "diamond_taxonomy/megahit.prodigal.gtdb-r220-test.lineage.tsv.gz",
-                "diamond_taxonomy/megahit.prodigal.gtdb-r220-test.tsv.gz",
-                "diamond_taxonomy/megahit.prodigal.ncbi-refseq-test.lineage.tsv.gz",
-                "diamond_taxonomy/megahit.prodigal.ncbi-refseq-test.tsv.gz",
+                "diamond_taxonomy/megahit.prokka.gtdb-r220-test.lineage.tsv.gz",
+                "diamond_taxonomy/megahit.prokka.gtdb-r220-test.tsv.gz",
+                "diamond_taxonomy/megahit.prokka.ncbi-refseq-test.lineage.tsv.gz",
+                "diamond_taxonomy/megahit.prokka.ncbi-refseq-test.tsv.gz",
+                "diamond_taxonomy/megahit.transdecoder.gtdb-r220-test.lineage.tsv.gz",
+                "diamond_taxonomy/megahit.transdecoder.gtdb-r220-test.tsv.gz",
+                "diamond_taxonomy/megahit.transdecoder.ncbi-refseq-test.lineage.tsv.gz",
+                "diamond_taxonomy/megahit.transdecoder.ncbi-refseq-test.tsv.gz",
                 "featurecounts",
-                "featurecounts/SAMPLE1_PE.prodigal.featureCounts.tsv",
-                "featurecounts/SAMPLE1_PE.prodigal.featureCounts.tsv.summary",
-                "featurecounts/SAMPLE2_PE.prodigal.featureCounts.tsv",
-                "featurecounts/SAMPLE2_PE.prodigal.featureCounts.tsv.summary",
-                "featurecounts/SAMPLE3_PE_1.prodigal.featureCounts.tsv",
-                "featurecounts/SAMPLE3_PE_1.prodigal.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE1_PE.prokka.featureCounts.tsv",
+                "featurecounts/SAMPLE1_PE.prokka.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE1_PE.transdecoder.featureCounts.tsv",
+                "featurecounts/SAMPLE1_PE.transdecoder.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE2_PE.prokka.featureCounts.tsv",
+                "featurecounts/SAMPLE2_PE.prokka.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE2_PE.transdecoder.featureCounts.tsv",
+                "featurecounts/SAMPLE2_PE.transdecoder.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE3_PE_1.prokka.featureCounts.tsv",
+                "featurecounts/SAMPLE3_PE_1.prokka.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE3_PE_1.transdecoder.featureCounts.tsv",
+                "featurecounts/SAMPLE3_PE_1.transdecoder.featureCounts.tsv.summary",
+                "hmmer",
+                "hmmer/hits",
+                "hmmer/hits/megahit.transdecoder.PF00848.faa.gz",
+                "hmmer/megahit.prokka.PF00317.tbl.gz",
+                "hmmer/megahit.prokka.PF00848.tbl.gz",
+                "hmmer/megahit.transdecoder.PF00317.tbl.gz",
+                "hmmer/megahit.transdecoder.PF00848.tbl.gz",
+                "kofamscan",
+                "kofamscan/megahit.prokka.kofamscan_output.tsv.gz",
+                "kofamscan/megahit.transdecoder.kofamscan_output.tsv.gz",
                 "megahit",
                 "megahit/megahit_assembly.contigs.fa.gz",
                 "megahit/megahit_assembly.log",
@@ -160,18 +253,18 @@
                 "multiqc/multiqc_data/multiqc_fastqc.txt",
                 "multiqc/multiqc_data/multiqc_general_stats.txt",
                 "multiqc/multiqc_data/multiqc_megahit_assemblies.txt",
-                "multiqc/multiqc_data/multiqc_prodigal_stats.txt",
+                "multiqc/multiqc_data/multiqc_prokka.txt",
                 "multiqc/multiqc_data/multiqc_software_versions.txt",
                 "multiqc/multiqc_data/multiqc_sources.txt",
+                "multiqc/multiqc_data/multiqc_transdecoder_stats.txt",
+                "multiqc/multiqc_data/prokka_plot.txt",
                 "multiqc/multiqc_report.html",
                 "pipeline_info",
                 "pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml",
-                "prodigal",
-                "prodigal/megahit.prodigal.faa.gz",
-                "prodigal/megahit.prodigal.fna.gz",
-                "prodigal/megahit.prodigal.gff.gz",
-                "prodigal/megahit.prodigal_all.txt.gz",
-                "prodigal/megahit.prodigal_format.gff.gz",
+                "prokka",
+                "prokka/prokka.faa.gz",
+                "prokka/prokka.ffn.gz",
+                "prokka/prokka.gff.gz",
                 "samtools",
                 "samtools/SAMPLE1_PE.sorted.bam",
                 "samtools/SAMPLE1_PE.sorted.bam.bai",
@@ -186,11 +279,28 @@
                 "samtools/megahit.SAMPLE3_PE_1.flagstat",
                 "samtools/megahit.SAMPLE3_PE_1.idxstats",
                 "summary_tables",
-                "summary_tables/megahit.prodigal.counts.tsv.gz",
-                "summary_tables/megahit.prodigal.gtdb-r220-test.diamond.taxonomy.tsv.gz",
-                "summary_tables/megahit.prodigal.ncbi-refseq-test.diamond.taxonomy-taxdump.tsv.gz",
-                "summary_tables/megahit.prodigal.ncbi-refseq-test.diamond.taxonomy.tsv.gz",
-                "summary_tables/megahit.prodigal.overall_stats.tsv.gz",
+                "summary_tables/megahit.prokka.counts.tsv.gz",
+                "summary_tables/megahit.prokka.gtdb-r220-test.diamond.taxonomy.tsv.gz",
+                "summary_tables/megahit.prokka.hmmrank.tsv.gz",
+                "summary_tables/megahit.prokka.kofamscan-uniq.tsv.gz",
+                "summary_tables/megahit.prokka.kofamscan.tsv.gz",
+                "summary_tables/megahit.prokka.ncbi-refseq-test.diamond.taxonomy-taxdump.tsv.gz",
+                "summary_tables/megahit.prokka.ncbi-refseq-test.diamond.taxonomy.tsv.gz",
+                "summary_tables/megahit.prokka.overall_stats.tsv.gz",
+                "summary_tables/megahit.prokka.prokka-annotations.tsv.gz",
+                "summary_tables/megahit.transdecoder.counts.tsv.gz",
+                "summary_tables/megahit.transdecoder.gtdb-r220-test.diamond.taxonomy.tsv.gz",
+                "summary_tables/megahit.transdecoder.hmmrank.tsv.gz",
+                "summary_tables/megahit.transdecoder.kofamscan-uniq.tsv.gz",
+                "summary_tables/megahit.transdecoder.kofamscan.tsv.gz",
+                "summary_tables/megahit.transdecoder.ncbi-refseq-test.diamond.taxonomy-taxdump.tsv.gz",
+                "summary_tables/megahit.transdecoder.ncbi-refseq-test.diamond.taxonomy.tsv.gz",
+                "summary_tables/megahit.transdecoder.overall_stats.tsv.gz",
+                "transdecoder",
+                "transdecoder/megahit_assembly.contigs.fa.transdecoder.bed.gz",
+                "transdecoder/megahit_assembly.contigs.fa.transdecoder.cds.gz",
+                "transdecoder/megahit_assembly.contigs.fa.transdecoder.gff3.gz",
+                "transdecoder/megahit_assembly.contigs.fa.transdecoder.pep.gz",
                 "transrate",
                 "transrate/megahit.assemblies.csv",
                 "transrate/megahit.contigs.csv",
@@ -216,10 +326,24 @@
                 "trimgalore/fastqc/SAMPLE3_PE_1_2_val_2_fastqc.zip"
             ],
             [
-                "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f"
+                "multiqc_citations.txt:md5,d59b1beea6256a7bf5f599da543910db"
+            ],
+            [
+                "orf\tchr\tstart\tend\tstrand\tlength\tsample\tcount\ttpm"
+            ],
+            3000000,
+            [
+                "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count\tdiamondtax_gtdb-r220-test\tdiamondtax_ncbi-refseq-test\tn_kofamscan"
+            ],
+            [
+                "orf\tchr\tstart\tend\tstrand\tlength\tsample\tcount\ttpm"
+            ],
+            3000000,
+            [
+                "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count\tdiamondtax_gtdb-r220-test\tdiamondtax_ncbi-refseq-test\tn_kofamscan"
             ]
         ],
-        "timestamp": "2026-08-19T02:01:44.646186519",
+        "timestamp": "2026-08-18T22:36:40.530875453",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

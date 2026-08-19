@@ -9,8 +9,8 @@ include { DBCAN_SUM                 } from '../../../modules/local/dbcan/sum/mai
 
 workflow DBCAN {
     take:
-    faa
-    collect_fcs
+    faa            // channel: [ val(meta), path(faa) ]
+    feature_counts // channel: [ val(meta), path(fcs) ] -- meta.caller must match faa's
 
     main:
 
@@ -20,7 +20,12 @@ workflow DBCAN {
 
     DBCAN_FORMAT(RUNDBCAN_CAZYMEANNOTATION.out.cazyme_annotation)
 
-    DBCAN_SUM(DBCAN_FORMAT.out.dbcantsv, collect_fcs)
+    ch_dbcan_sum_input = DBCAN_FORMAT.out.dbcantsv
+        .map { meta, tsv -> [ meta.caller, meta, tsv ] }
+        .join( feature_counts.map { meta, fcs -> [ meta.caller, fcs ] } )
+        .map { _caller, meta, tsv, fcs -> [ meta, tsv, fcs ] }
+
+    DBCAN_SUM(ch_dbcan_sum_input)
 
     emit:
     cazyme_annotation = DBCAN_FORMAT.out.dbcantsv

@@ -9,8 +9,8 @@ include { SUMTAXONOMY as SUM_EUKULELE_TAXONOMY } from '../../../modules/local/su
 workflow EUKULELE {
 
     take:
-    eukulele // Channel: val(meta), path(fasta), val(database), path(directory)
-    feature_counts
+    eukulele       // Channel: val(meta), path(fasta), val(database), path(directory)
+    feature_counts // channel: [ val(meta), path(fcs) ] -- meta.caller must match eukulele's
 
     main:
 
@@ -20,9 +20,11 @@ workflow EUKULELE {
 
     ch_sum_taxonomy = FORMAT_EUKULELE_TAX.out.tax
         .join(eukulele)
-        .map { meta, taxonomy, _protein, dbname, _database -> [ meta, dbname, taxonomy ] }
+        .map { meta, taxonomy, _protein, dbname, _database -> [ meta.caller, meta, dbname, taxonomy ] }
+        .join( feature_counts.map { meta, fcs -> [ meta.caller, fcs ] } )
+        .map { _caller, meta, dbname, taxonomy, fcs -> [ meta, dbname, taxonomy, fcs ] }
 
-    SUM_EUKULELE_TAXONOMY(ch_sum_taxonomy, feature_counts, 'eukulele')
+    SUM_EUKULELE_TAXONOMY(ch_sum_taxonomy, 'eukulele')
 
     emit:
     taxonomy_summary    = SUM_EUKULELE_TAXONOMY.out.taxonomy_summary

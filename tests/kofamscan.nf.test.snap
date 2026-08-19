@@ -124,12 +124,12 @@
                 "bbmap/bbmap/SAMPLE2_PE.bbmap.log",
                 "bbmap/bbmap/SAMPLE3_PE_1.bbmap.log",
                 "featurecounts",
-                "featurecounts/SAMPLE1_PE.featureCounts.tsv",
-                "featurecounts/SAMPLE1_PE.featureCounts.tsv.summary",
-                "featurecounts/SAMPLE2_PE.featureCounts.tsv",
-                "featurecounts/SAMPLE2_PE.featureCounts.tsv.summary",
-                "featurecounts/SAMPLE3_PE_1.featureCounts.tsv",
-                "featurecounts/SAMPLE3_PE_1.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE1_PE.prodigal.featureCounts.tsv",
+                "featurecounts/SAMPLE1_PE.prodigal.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE2_PE.prodigal.featureCounts.tsv",
+                "featurecounts/SAMPLE2_PE.prodigal.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE3_PE_1.prodigal.featureCounts.tsv",
+                "featurecounts/SAMPLE3_PE_1.prodigal.featureCounts.tsv.summary",
                 "kofamscan",
                 "kofamscan/megahit.prodigal.kofamscan_output.tsv.gz",
                 "megahit",
@@ -215,7 +215,7 @@
                 "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f"
             ]
         ],
-        "timestamp": "2026-08-13T08:26:16.529252392",
+        "timestamp": "2026-08-19T02:09:02.595401711",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

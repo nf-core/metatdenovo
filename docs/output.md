@@ -155,6 +155,9 @@ BBnorm is a BBmap tool.
 
 ### ORF caller step
 
+`--orf_caller` accepts a comma-separated list of callers (e.g. `--orf_caller prokka,transdecoder`) to run more than one in the same execution.
+Each active caller's output below is produced independently, under its own `<caller>` name -- there is currently no consolidation across callers.
+
 #### Prodigal
 
 As default, [Prodigal](https://github.com/hyattpd/Prodigal) is used to identify ORFs in the assembly.

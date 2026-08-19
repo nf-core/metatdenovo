@@ -124,8 +124,17 @@ workflow METATDENOVO {
         error "You can't input your own ORFs (`--user_orfs_*`) if you call for assembly with `--assembler`."
     }
 
+    // Split --orf_caller into a list and make sure every entry is a caller we know about
+    orf_callers = params.orf_caller ? params.orf_caller.tokenize(',') : []
+    def valid_orf_callers = ['prodigal', 'prokka', 'transdecoder', 'metaeuk']
+    orf_callers.each { caller ->
+        if ( ! (caller in valid_orf_callers) ) {
+            error "Unknown --orf_caller value '${caller}'. Valid values: ${valid_orf_callers.join(', ')}"
+        }
+    }
+
     // Exit if the user asked for metaeuk without also providing a reference database
-    if ( params.orf_caller == 'metaeuk' && ! params.metaeuk_db ) {
+    if ( 'metaeuk' in orf_callers && ! params.metaeuk_db ) {
         error "When using `--orf_caller metaeuk`, you must also specify `--metaeuk_db`!"
     }
 
@@ -133,8 +142,7 @@ workflow METATDENOVO {
     assembler     = params.assembler
     assembly_name = params.assembler ?: params.user_assembly_name
 
-    // Deal with params from user-supplied ORFs, and set orf_caller correctly
-    orf_caller = params.orf_caller
+    // Deal with params from user-supplied ORFs
     orfs_name  = params.orf_caller ?: params.user_orfs_name
 
 
@@ -401,29 +409,28 @@ workflow METATDENOVO {
     //
     // SUBWORKFLOW: Run PROKKA_SUBSETS on assmebly output, but split the fasta file in chunks of 10 MB, then concatenate and compress output.
     //
-    if ( params.orf_caller == 'prokka' ) {
+    if ( 'prokka' in orf_callers ) {
         PROKKA_SUBSETS(ch_assembly_contigs, params.prokka_batchsize)
-        ch_protein       = PROKKA_SUBSETS.out.faa
+        ch_protein       = ch_protein.mix( PROKKA_SUBSETS.out.faa.map { meta, faa -> [ meta + [caller: 'prokka'], faa ] } )
         ch_multiqc_files = ch_multiqc_files.mix(PROKKA_SUBSETS.out.prokka_log)
 
-        //UNPIGZ_GFF(PROKKA_SUBSETS.out.gff.map { meta, gff -> [ [id: "${orfs_name}.${meta.id}"], gff ] })
         UNPIGZ_GFF(PROKKA_SUBSETS.out.gff)
-        ch_gff           = UNPIGZ_GFF.out.file
+        ch_gff           = ch_gff.mix( UNPIGZ_GFF.out.file.map { meta, gff -> [ meta + [caller: 'prokka'], gff ] } )
     }
 
     //
     // MODULE: Run PRODIGAL on assembly output.
     //
-    if ( orf_caller == 'prodigal' ) {
-        PRODIGAL( ch_assembly_contigs.map { _meta, contigs -> [ [id: "${assembly_name}.${orfs_name}"], contigs  ] } )
-        ch_protein      = PRODIGAL.out.faa
+    if ( 'prodigal' in orf_callers ) {
+        PRODIGAL( ch_assembly_contigs.map { _meta, contigs -> [ [id: "${assembly_name}.prodigal", caller: 'prodigal'], contigs  ] } )
+        ch_protein      = ch_protein.mix(PRODIGAL.out.faa)
         UNPIGZ_GFF(PRODIGAL.out.gff)
-        ch_gff          = UNPIGZ_GFF.out.file
+        ch_gff          = ch_gff.mix(UNPIGZ_GFF.out.file)
         // No MultiQC-native module for Prodigal (unlike Prokka, handled via
         // PROKKA_SUBSETS.out.prokka_log above), so build a small custom-content CSV of basic
         // ORF/protein stats from its amino-acid FASTA output.
         ch_multiqc_files = ch_multiqc_files.mix(
-            ch_protein.collectFile { meta, faa ->
+            PRODIGAL.out.faa.collectFile { meta, faa ->
                 def n_orfs   = 0
                 def total_aa = 0
                 def reader   = faa.name.endsWith('.gz') ?
@@ -447,10 +454,10 @@ workflow METATDENOVO {
     //
     // SUBWORKFLOW: run TRANSDECODER. Orf caller alternative for eukaryotes.
     //
-    if ( orf_caller == 'transdecoder' ) {
-        TRANSDECODER ( ch_assembly_contigs.map { _meta, contigs -> [ [id: "${assembly_name}.${orfs_name}" ], contigs ] } )
-        ch_gff      = TRANSDECODER.out.gff
-        ch_protein  = TRANSDECODER.out.pep
+    if ( 'transdecoder' in orf_callers ) {
+        TRANSDECODER ( ch_assembly_contigs.map { _meta, contigs -> [ [id: "${assembly_name}.transdecoder", caller: 'transdecoder' ], contigs ] } )
+        ch_gff      = ch_gff.mix(TRANSDECODER.out.gff)
+        ch_protein  = ch_protein.mix(TRANSDECODER.out.pep)
 
         PIGZ_TRANSDECODER_BED(TRANSDECODER.out.bed)
         PIGZ_TRANSDECODER_CDS(TRANSDECODER.out.cds)
@@ -460,7 +467,7 @@ workflow METATDENOVO {
         // No MultiQC-native module for TransDecoder either -- same custom-content approach as
         // the Prodigal branch above.
         ch_multiqc_files = ch_multiqc_files.mix(
-            ch_protein.collectFile { meta, pep ->
+            TRANSDECODER.out.pep.collectFile { meta, pep ->
                 def n_orfs   = 0
                 def total_aa = 0
                 def reader   = pep.name.endsWith('.gz') ?
@@ -484,20 +491,20 @@ workflow METATDENOVO {
     //
     // SUBWORKFLOW: run METAEUK. Splice-aware ORF caller alternative for eukaryotes.
     //
-    if ( orf_caller == 'metaeuk' ) {
+    if ( 'metaeuk' in orf_callers ) {
         METAEUK (
-            ch_assembly_contigs.map { _meta, contigs -> [ [id: "${assembly_name}.${orfs_name}" ], contigs ] },
+            ch_assembly_contigs.map { _meta, contigs -> [ [id: "${assembly_name}.metaeuk", caller: 'metaeuk' ], contigs ] },
             file(params.metaeuk_db, checkIfExists: true)
         )
-        ch_protein = METAEUK.out.faa
+        ch_protein = ch_protein.mix(METAEUK.out.faa)
 
         UNPIGZ_GFF(METAEUK.out.gff)
-        ch_gff     = UNPIGZ_GFF.out.file
+        ch_gff     = ch_gff.mix(UNPIGZ_GFF.out.file)
 
         // No MultiQC-native module for MetaEuk either -- same custom-content approach as
         // the Prodigal/TransDecoder branches above.
         ch_multiqc_files = ch_multiqc_files.mix(
-            ch_protein.collectFile { meta, faa ->
+            METAEUK.out.faa.collectFile { meta, faa ->
                 def n_orfs   = 0
                 def total_aa = 0
                 def reader   = faa.name.endsWith('.gz') ?
@@ -520,8 +527,8 @@ workflow METATDENOVO {
 
     // Populate channels if the user provided the orfs
     if ( params.user_orfs_faa && params.user_orfs_gff ) {
-        ch_gff = channel.value ( [ [ id: "${assembly_name}.${orfs_name}" ], file(params.user_orfs_gff) ] )
-        ch_protein = channel.value ( [ [ id: "${assembly_name}.${orfs_name}" ], file(params.user_orfs_faa) ] )
+        ch_gff = channel.value ( [ [ id: "${assembly_name}.${orfs_name}", caller: orfs_name ], file(params.user_orfs_gff) ] )
+        ch_protein = channel.value ( [ [ id: "${assembly_name}.${orfs_name}", caller: orfs_name ], file(params.user_orfs_faa) ] )
     }
 
     //
@@ -539,7 +546,7 @@ workflow METATDENOVO {
     //
     ch_hmmclassify = ch_hmmrs
         .combine(ch_protein)
-        .map { hmm, _meta, protein ->[ [ id: "${assembly_name}.${orfs_name}" ], hmm, protein ] }
+        .map { hmm, meta, protein -> [ meta, hmm, protein ] }
     HMMCLASSIFY ( ch_hmmclassify )
 
     //
@@ -551,7 +558,12 @@ workflow METATDENOVO {
     )
 
     ch_featurecounts = BAM_SORT_STATS_SAMTOOLS.out.bam
-        .combine(ch_gff.map { _meta, bam -> bam } )
+        .combine(ch_gff)   // deliberate cross product: every sample x every active caller
+        .map { sampleMeta, bam, callerMeta, gff ->
+            // sampleMeta + [...] (not a fresh map) so fields FEATURECOUNTS_CDS itself reads off the
+            // sample side (e.g. single_end, which picks the -p/paired-end flag) survive the rename.
+            [ sampleMeta + [ id: "${sampleMeta.id}.${callerMeta.caller}", caller: callerMeta.caller ], bam, gff ]
+        }
 
     ch_collect_stats = ch_collect_stats
         .combine(BAM_SORT_STATS_SAMTOOLS.out.idxstats.collect { _meta, idxstats -> idxstats }.map { idxstats -> [ idxstats ] } )
@@ -591,14 +603,15 @@ workflow METATDENOVO {
     // MODULE: Collect featurecounts output counts in one table
     //
     ch_collect_feature = FEATURECOUNTS_CDS.out.counts
-        .collect() { _meta, featurecounts -> featurecounts }
-        .map { featurecounts -> [ [ id:"${assembly_name}.${orfs_name}" ], featurecounts ] }
+        .map { meta, fc -> [ meta.caller, fc ] }
+        .groupTuple()
+        .map { caller, fcs -> [ [ id: "${assembly_name}.${caller}", caller: caller ], fcs ] }
 
     COLLECT_FEATURECOUNTS ( ch_collect_feature )
     ch_versions           = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
-    ch_fcs_for_stats      = COLLECT_FEATURECOUNTS.out.counts.collect { _meta, tsv -> tsv }.map { tsv -> [ tsv ] }
-    ch_fcs_for_summary    = COLLECT_FEATURECOUNTS.out.counts.map { _meta, tsv -> tsv }
-    ch_collect_stats = ch_collect_stats.combine(ch_fcs_for_stats)
+    // [ meta(caller), tsv ] -- kept as a proper tuple (not stripped) so every consumer below can
+    // join it against other per-caller channels instead of relying on positional channel pairing.
+    ch_fcs_for_summary    = COLLECT_FEATURECOUNTS.out.counts
 
     // Initialize ch_merge_tables that will be populated with tables from annotation tools and used by the MERGE_TABLES module which output will then be passed to the COLLECT_STATS module
     ch_merge_tables = channel.empty()
@@ -608,7 +621,7 @@ workflow METATDENOVO {
     //
     if ( ! params.skip_eggnog ) {
         EGGNOG(ch_protein, ch_fcs_for_summary)
-        ch_merge_tables = ch_merge_tables.mix ( EGGNOG.out.sumtable.map { _meta, tsv -> tsv } )
+        ch_merge_tables = ch_merge_tables.mix ( EGGNOG.out.sumtable )
     }
 
     //
@@ -617,7 +630,7 @@ workflow METATDENOVO {
     if( !params.skip_kofamscan ) {
         ch_kofamscan = ch_protein.map { meta, protein -> [ meta, protein ] }
         KOFAMSCAN( ch_kofamscan, ch_fcs_for_summary, params.kofam_ko_list_url, params.kofam_profiles_url )
-        ch_merge_tables = ch_merge_tables.mix ( KOFAMSCAN.out.kofamscan_summary.map { _meta, tsv -> tsv } )
+        ch_merge_tables = ch_merge_tables.mix ( KOFAMSCAN.out.kofamscan_summary )
     }
 
     //
@@ -625,7 +638,7 @@ workflow METATDENOVO {
     //
     if( !params.skip_dbcan ) {
         DBCAN( ch_protein, ch_fcs_for_summary )
-        ch_merge_tables = ch_merge_tables.mix ( DBCAN.out.sumtable.map { _meta, tsv -> tsv } )
+        ch_merge_tables = ch_merge_tables.mix ( DBCAN.out.sumtable )
     }
 
     // set up contig channel to use in TransRate
@@ -661,32 +674,43 @@ workflow METATDENOVO {
                 .map { path -> [ [], path ] }
         }
         ch_eukulele = ch_protein
-            .map { meta, protein -> [ [ id:"${meta.id}" ], protein ] }
+            .map { meta, protein -> [ [ id: meta.id, caller: meta.caller ], protein ] }
             .combine( ch_eukulele_db )
-            .map { meta, fasta, database, directory -> [ [ id: "${meta.id}.${database}" ], fasta, database, directory ] }
+            .map { meta, fasta, database, directory -> [ [ id: "${meta.id}.${database}", caller: meta.caller ], fasta, database, directory ] }
         EUKULELE(ch_eukulele, ch_fcs_for_summary)
 
-        ch_merge_tables = ch_merge_tables.mix(EUKULELE.out.taxonomy_summary.map { _meta, tsv -> tsv })
+        ch_merge_tables = ch_merge_tables.mix(EUKULELE.out.taxonomy_summary)
     }
 
     //
     // Call Diamond for taxonomy with amino acid sequences
     //
+    // Explicit .combine() (rather than relying on ch_protein having historically carried only one
+    // item) so every active caller's proteins are searched against every diamond db -- with N>1
+    // callers, ch_protein is a genuine multi-item queue channel and an implicit pairing would risk
+    // silently degrading to positional lockstep instead of the intended full cross product.
+    ch_diamond_input = ch_protein.combine( ch_diamond_dbs.map { db -> [ db[0], db[1] ] } )
+
     DIAMOND_TAXONOMY(
-        ch_protein,
-        ch_diamond_dbs.map { db -> [ db[0], db[1] ] },
+        ch_diamond_input.map { pm, protein, _dm, _db -> [ pm, protein ] },
+        ch_diamond_input.map { _pm, _protein, dm, db -> [ dm, db ] },
         102,
         []
     )
 
     // Create a unified channel of the output from Diamond together with the diamond db info to
-    // make sure the channels are synchronized before calling TAXONKIT_LINEAGE
+    // make sure the channels are synchronized before calling TAXONKIT_LINEAGE.
+    // .join() is unsafe here: with N>1 callers, multiple items (one per caller) share the same db
+    // name, but ch_diamond_dbs has only one row per db -- Nextflow's join() silently drops all but
+    // one matching left-side item per key when the left side has duplicate keys. .combine() + a
+    // .filter() on matching db name gives the same pairing without that pitfall.
     ch_taxonkit_lineage = DIAMOND_TAXONOMY.out.tsv
-        .map { it -> [ [ id: it[0].db ], [ id: "${it[0].id}.${it[0].db}.lineage", db: it[0].db ], it[1] ] }
-        .join(ch_diamond_dbs)
+        .map { it -> [ [ id: "${it[0].id}.${it[0].db}.lineage", db: it[0].db, caller: it[0].caller ], it[1] ] }
+        .combine(ch_diamond_dbs)
+        .filter { meta, _tsv, dbMeta, _dmnd, _names, _nodes, _ranks, _parse -> meta.db == dbMeta.id }
 
     TAXONKIT_LINEAGE(
-        ch_taxonkit_lineage.map { it -> [ it[1], [], it[2] ] },
+        ch_taxonkit_lineage.map { it -> [ it[0], [], it[1] ] },
         ch_taxonkit_lineage.map { it -> it[4] },
         ch_taxonkit_lineage.map { it -> it[5] }
     )
@@ -697,43 +721,65 @@ workflow METATDENOVO {
 
     FORMAT_DIAMOND_TAX_RANKLIST(
         PIGZ_DIAMOND_LINEAGE.out.archive
-            .map { it -> [ [ id: it[0].db ], it[0], it[1] ] }
-            .join(ch_diamond_dbs)
-            .map { it -> [ [ id: it[1].id - ".lineage" + ".diamond", db: it[1].db ], it[2], it[6] ] }
+            .combine(ch_diamond_dbs)
+            .filter { archiveMeta, _archiveFile, dbMeta, _dmnd, _names, _nodes, _ranks, _parse -> archiveMeta.db == dbMeta.id }
+            .map { archiveMeta, archiveFile, _dbMeta, _dmnd, _names, _nodes, ranks, _parse -> [ [ id: archiveMeta.id - ".lineage" + ".diamond", db: archiveMeta.db, caller: archiveMeta.caller ], archiveFile, ranks ] }
     )
 
     FORMAT_DIAMOND_TAX_TAXDUMP(
         PIGZ_DIAMOND_LINEAGE.out.archive
-            .map { it -> [ [ id: it[0].db ], it[0], it[1] ] }
-            .join(ch_diamond_dbs.filter { it -> it[5] })
-            .map { it -> [ [ id: it[1].id - ".lineage" + ".diamond", db: it[1].db ], it[2], it[4], it[5], it[6] ] }
+            .combine(ch_diamond_dbs.filter { it -> it[5] })
+            .filter { archiveMeta, _archiveFile, dbMeta, _dmnd, _names, _nodes, _ranks, _parse -> archiveMeta.db == dbMeta.id }
+            .map { archiveMeta, archiveFile, _dbMeta, _dmnd, names, nodes, ranks, _parse -> [ [ id: archiveMeta.id - ".lineage" + ".diamond", db: archiveMeta.db, caller: archiveMeta.caller ], archiveFile, names, nodes, ranks ] }
     )
 
-    SUM_DIAMONDTAX(
-        FORMAT_DIAMOND_TAX_RANKLIST.out.taxonomy
-            .map { it -> [ it[0], it[0].db, it[1] ] },
-        ch_fcs_for_summary,
-        'diamondtax'
-    )
+    // Same .join()-with-duplicate-keys pitfall as above: FORMAT_DIAMOND_TAX_RANKLIST.out.taxonomy has
+    // multiple items (one per db) sharing the same caller, but ch_fcs_for_summary has one item per
+    // caller -- .combine() + .filter() instead of .join().
+    ch_diamondtax_sum_input = FORMAT_DIAMOND_TAX_RANKLIST.out.taxonomy
+        .combine( ch_fcs_for_summary )
+        .filter { meta, _taxonomy, fcsMeta, _fcs -> meta.caller == fcsMeta.caller }
+        .map { meta, taxonomy, _fcsMeta, fcs -> [ meta, meta.db, taxonomy, fcs ] }
 
-    ch_merge_tables = ch_merge_tables.mix ( SUM_DIAMONDTAX.out.taxonomy_summary.map { _meta, tsv -> tsv } )
+    SUM_DIAMONDTAX(ch_diamondtax_sum_input, 'diamondtax')
+
+    ch_merge_tables = ch_merge_tables.mix ( SUM_DIAMONDTAX.out.taxonomy_summary )
 
     //
     // MODULE: Collect statistics from mapping analysis
     //
+    // MERGE_TABLES only runs for callers that actually have >=1 annotation table -- matching the
+    // pre-multi-caller behavior, where MERGE_TABLES was never invoked at all (not invoked-with-an-
+    // empty-list; genuinely zero invocations, since .collect() on a channel that never emits produces
+    // no output either) whenever every annotation subworkflow was skipped. MERGE_TABLES's own R script
+    // isn't written to handle being called with zero input tables (glob-of-nothing breaks its
+    // pivot_wider), so preserving "don't call it at all" here, rather than "call it with []", matters.
     MERGE_TABLES (
         ch_merge_tables
-            .collect()
-            .map { it -> [ [ id: "${assembly_name}.${orfs_name}" ], it ] }
+            .map { meta, tsv -> [ meta.caller, tsv ] }
+            .groupTuple()
+            .map { caller, tsvs -> [ [ id: "${assembly_name}.${caller}", caller: caller ], tsvs ] }
     )
-    MERGE_TABLES.out.merged_table
+
+    // COLLECT_STATS must still run once per ACTIVE caller regardless of whether that caller got a
+    // MERGE_TABLES output -- left-join (remainder: true) onto COLLECT_FEATURECOUNTS.out.counts (which
+    // always has exactly one item per active caller) so a caller with no annotation tables still gets
+    // a COLLECT_STATS invocation, with mergetab defaulting to [] -- COLLECT_STATS's own script already
+    // handles a missing mergetab gracefully (`if (mergetab) {...} else {...}`), mirroring what the
+    // pre-multi-caller code's `.ifEmpty { [ [] ] }` fallback did for the single-run case.
+    ch_fcs_mergetab_per_caller = COLLECT_FEATURECOUNTS.out.counts
+        .map { meta, fcs -> [ meta.caller, meta, fcs ] }
+        .join(
+            MERGE_TABLES.out.merged_table.map { meta, mergetab -> [ meta.caller, mergetab ] },
+            remainder: true
+        )
+        .map { _caller, meta, fcs, mergetab -> [ meta, fcs, mergetab ?: [] ] }
 
     ch_collect_stats = ch_collect_stats
-        .combine(
-            channel.empty()
-                .mix ( MERGE_TABLES.out.merged_table.map { _meta, tblout -> [ tblout ] } )
-                .ifEmpty { [ [] ] }
-        )
+        .combine( ch_fcs_mergetab_per_caller )
+        .map { _origMeta, samples, trimlogs, bblogs, idxstats, callerMeta, fcs, mergetab ->
+            [ callerMeta, samples, trimlogs, bblogs, idxstats, fcs, mergetab ]
+        }
 
     COLLECT_STATS(ch_collect_stats)
 
