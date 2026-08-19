@@ -93,12 +93,24 @@ nextflow_pipeline {
                         path("${params.outdir}/summary_tables/megahit.transdecoder.counts.tsv.gz").csv(sep: '\t', decompress: true, header: true).columns["orf"].toSet()
                     )
                 ).isEmpty() },
-                // 2. Every active caller's hmm-classification output exists independently, each keyed by
-                //    its own caller name (HMMER_HMMRANK grouped by caller, not one shared ranking
-                //    blending every active caller's hmm-search summaries together).
-                { assert path("${params.outdir}/summary_tables/megahit.prokka.hmmrank.tsv.gz").exists() },
-                { assert path("${params.outdir}/summary_tables/megahit.prodigal.hmmrank.tsv.gz").exists() },
-                { assert path("${params.outdir}/summary_tables/megahit.transdecoder.hmmrank.tsv.gz").exists() },
+
+                // 4. Every active caller's diamond-taxonomy output exists independently, for every
+                //    diamond db, for every caller -- this is what actually caught a real bug: Nextflow's
+                //    .join() silently drops duplicate left-side keys, and the diamond-taxonomy chain
+                //    (ch_taxonkit_lineage/FORMAT_DIAMOND_TAX_*/SUM_DIAMONDTAX) joins against
+                //    ch_diamond_dbs keyed by db name only -- multiple callers sharing the same db name
+                //    is exactly the duplicate-key case a single-caller test (even with multiple diamond
+                //    dbs) can never produce. If any of these files is missing, that join is silently
+                //    dropping a caller's results again.
+                { assert path("${params.outdir}/summary_tables/megahit.prokka.gtdb-r220-test.diamond.taxonomy.tsv.gz").exists() },
+                { assert path("${params.outdir}/summary_tables/megahit.prokka.ncbi-refseq-test.diamond.taxonomy.tsv.gz").exists() },
+                { assert path("${params.outdir}/summary_tables/megahit.prokka.ncbi-refseq-test.diamond.taxonomy-taxdump.tsv.gz").exists() },
+                { assert path("${params.outdir}/summary_tables/megahit.prodigal.gtdb-r220-test.diamond.taxonomy.tsv.gz").exists() },
+                { assert path("${params.outdir}/summary_tables/megahit.prodigal.ncbi-refseq-test.diamond.taxonomy.tsv.gz").exists() },
+                { assert path("${params.outdir}/summary_tables/megahit.prodigal.ncbi-refseq-test.diamond.taxonomy-taxdump.tsv.gz").exists() },
+                { assert path("${params.outdir}/summary_tables/megahit.transdecoder.gtdb-r220-test.diamond.taxonomy.tsv.gz").exists() },
+                { assert path("${params.outdir}/summary_tables/megahit.transdecoder.ncbi-refseq-test.diamond.taxonomy.tsv.gz").exists() },
+                { assert path("${params.outdir}/summary_tables/megahit.transdecoder.ncbi-refseq-test.diamond.taxonomy-taxdump.tsv.gz").exists() },
             )
         }
     }
