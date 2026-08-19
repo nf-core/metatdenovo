@@ -1,0 +1,76 @@
+nextflow_pipeline {
+
+    name "Test pipeline"
+    script "../main.nf"
+    tag "pipeline"
+    profile "test_megahit_prokka_prodigal"
+
+    test("-profile test_megahit_prokka_prodigal") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+        }
+
+        then {
+            // stable_name: All files + folders in ${params.outdir}/ with a stable name
+            def stable_name = getAllFilesFromDir(params.outdir, relative: true, includeDir: true, ignore: ['pipeline_info/*.{html,json,txt}', 'multiqc/multiqc_plots', 'multiqc/multiqc_plots/**' ])
+            // stable_path: All files in ${params.outdir}/ with stable content
+            def stable_path = getAllFilesFromDir(params.outdir, ignoreFile: 'tests/.nftignore')
+            assertAll(
+                { assert workflow.success },
+                { assert snapshot(
+                    // Number of successful tasks
+                    workflow.trace.succeeded().size(),
+                    // pipeline versions.yml file for multiqc from which Nextflow version is removed because we test pipelines on multiple Nextflow versions
+                    removeNextflowVersion("$outputDir/pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml"),
+                    // All stable path name, with a relative path
+                    stable_name,
+                    // All files with stable contents
+                    stable_path,
+                    // Per-caller values, in the same style as the existing solo prokka/prodigal tests
+                    // (tests/megahit_prokka.nf.test, tests/default.nf.test) -- since this test runs on
+                    // the exact same input samplesheet/assembler, these should be directly comparable
+                    // to the values recorded in those tests' own .snap files as independent confirmation
+                    // that one caller's results aren't contaminated by the other.
+                    path("${params.outdir}/summary_tables/megahit.prokka.counts.tsv.gz").linesGzip.findAll { l -> l.contains('orf') },
+                    path("${params.outdir}/summary_tables/megahit.prokka.counts.tsv.gz").csv(sep: '\t', decompress: true, header: true).columns["tpm"].sum().round(),
+                    path("${params.outdir}/summary_tables/megahit.prokka.overall_stats.tsv.gz").linesGzip.findAll { l -> l.contains('n_feature_count') },
+                    path("${params.outdir}/summary_tables/megahit.prodigal.counts.tsv.gz").linesGzip.findAll { l -> l.contains('orf') },
+                    path("${params.outdir}/summary_tables/megahit.prodigal.counts.tsv.gz").csv(sep: '\t', decompress: true, header: true).columns["tpm"].sum().round(),
+                    path("${params.outdir}/summary_tables/megahit.prodigal.overall_stats.tsv.gz").linesGzip.findAll { l -> l.contains('n_feature_count') },
+                ).match() },
+                { assert path("${params.outdir}/megahit/megahit_assembly.log").readLines().any { l -> l.contains('ALL DONE') } },
+                { assert path("${params.outdir}/megahit/megahit_assembly.contigs.fa.gz").linesGzip.size() > 3000 },
+                { assert path("${params.outdir}/prokka/prokka.gff.gz").linesGzip.size() > 2000 },
+                { assert path("${params.outdir}/summary_tables/megahit.prokka.counts.tsv.gz").linesGzip.size() > 2000 },
+                { assert path("${params.outdir}/summary_tables/megahit.prodigal.counts.tsv.gz").linesGzip.size() > 2000 },
+
+                // === Caller-suffixed featureCounts naming: one file per sample per caller, not a single
+                // file collided/overwritten between the two active callers. Prokka and Prodigal both
+                // route their GFF through the shared UNPIGZ_GFF process -- this pairing is what actually
+                // exercises the fix for that process being called from more than one active `if` block
+                // in the same run (fatal before the fix: "Process 'UNPIGZ_GFF' has been already used"). ===
+                { assert path("${params.outdir}/featurecounts/SAMPLE1_PE.prokka.featureCounts.tsv").exists() },
+                { assert path("${params.outdir}/featurecounts/SAMPLE1_PE.prodigal.featureCounts.tsv").exists() },
+                { assert path("${params.outdir}/featurecounts/SAMPLE2_PE.prokka.featureCounts.tsv").exists() },
+                { assert path("${params.outdir}/featurecounts/SAMPLE2_PE.prodigal.featureCounts.tsv").exists() },
+                // SAMPLE3_PE has two rows in the samplesheet, so CAT_FASTQ concatenates them under a
+                // "_1"-suffixed id -- a pre-existing pipeline naming convention, not caller-related.
+                { assert path("${params.outdir}/featurecounts/SAMPLE3_PE_1.prokka.featureCounts.tsv").exists() },
+                { assert path("${params.outdir}/featurecounts/SAMPLE3_PE_1.prodigal.featureCounts.tsv").exists() },
+
+                // === Contamination check: no existing solo-caller test has two simultaneous callers to
+                // contaminate, so this is new. Zero overlap between the two callers' ORF-ID namespaces
+                // (Prokka locus tags vs. Prodigal contig-derived IDs are disjoint by construction). ===
+                { assert (
+                    path("${params.outdir}/summary_tables/megahit.prokka.counts.tsv.gz").csv(sep: '\t', decompress: true, header: true).columns["orf"].toSet()
+                    .intersect(
+                        path("${params.outdir}/summary_tables/megahit.prodigal.counts.tsv.gz").csv(sep: '\t', decompress: true, header: true).columns["orf"].toSet()
+                    )
+                ).isEmpty() },
+            )
+        }
+    }
+}

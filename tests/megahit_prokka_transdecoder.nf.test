@@ -3,9 +3,9 @@ nextflow_pipeline {
     name "Test pipeline"
     script "../main.nf"
     tag "pipeline"
-    profile "test_megahit_prokka_prodigal_transdecoder"
+    profile "test_megahit_prokka_transdecoder"
 
-    test("-profile test_megahit_prokka_prodigal_transdecoder") {
+    test("-profile test_megahit_prokka_transdecoder") {
 
         when {
             params {
@@ -29,17 +29,14 @@ nextflow_pipeline {
                     stable_name,
                     // All files with stable contents
                     stable_path,
-                    // Per-caller values, in the same style as the existing solo prokka/prodigal/transdecoder
-                    // tests (tests/megahit_prokka.nf.test, tests/default.nf.test, tests/megahit_transdecoder.nf.test)
-                    // -- since this test runs on the exact same input samplesheet/assembler, these should be
+                    // Per-caller values, in the same style as the existing solo prokka/transdecoder
+                    // tests (tests/megahit_prokka.nf.test, tests/megahit_transdecoder.nf.test) -- since
+                    // this test runs on the exact same input samplesheet/assembler, these should be
                     // directly comparable to the values recorded in those tests' own .snap files as
-                    // independent confirmation that no caller's results are contaminated by another's.
+                    // independent confirmation that one caller's results aren't contaminated by the other.
                     path("${params.outdir}/summary_tables/megahit.prokka.counts.tsv.gz").linesGzip.findAll { l -> l.contains('orf') },
                     path("${params.outdir}/summary_tables/megahit.prokka.counts.tsv.gz").csv(sep: '\t', decompress: true, header: true).columns["tpm"].sum().round(),
                     path("${params.outdir}/summary_tables/megahit.prokka.overall_stats.tsv.gz").linesGzip.findAll { l -> l.contains('n_feature_count') },
-                    path("${params.outdir}/summary_tables/megahit.prodigal.counts.tsv.gz").linesGzip.findAll { l -> l.contains('orf') },
-                    path("${params.outdir}/summary_tables/megahit.prodigal.counts.tsv.gz").csv(sep: '\t', decompress: true, header: true).columns["tpm"].sum().round(),
-                    path("${params.outdir}/summary_tables/megahit.prodigal.overall_stats.tsv.gz").linesGzip.findAll { l -> l.contains('n_feature_count') },
                     path("${params.outdir}/summary_tables/megahit.transdecoder.counts.tsv.gz").linesGzip.findAll { l -> l.contains('orf') },
                     path("${params.outdir}/summary_tables/megahit.transdecoder.counts.tsv.gz").csv(sep: '\t', decompress: true, header: true).columns["tpm"].sum().round(),
                     path("${params.outdir}/summary_tables/megahit.transdecoder.overall_stats.tsv.gz").linesGzip.findAll { l -> l.contains('n_feature_count') },
@@ -48,53 +45,31 @@ nextflow_pipeline {
                 { assert path("${params.outdir}/megahit/megahit_assembly.contigs.fa.gz").linesGzip.size() > 3000 },
                 { assert path("${params.outdir}/prokka/prokka.gff.gz").linesGzip.size() > 2000 },
                 { assert path("${params.outdir}/summary_tables/megahit.prokka.counts.tsv.gz").linesGzip.size() > 2000 },
-                { assert path("${params.outdir}/summary_tables/megahit.prodigal.counts.tsv.gz").linesGzip.size() > 2000 },
                 { assert path("${params.outdir}/summary_tables/megahit.transdecoder.counts.tsv.gz").linesGzip.size() > 1000 },
 
                 // === Caller-suffixed featureCounts naming: one file per sample per caller, not a single
-                // file collided/overwritten between simultaneously-active callers. Prokka and Prodigal
-                // both route their GFF through the shared UNPIGZ_GFF process, which used to be invoked
-                // from one `if` block per caller -- fatal once more than one of those blocks ran in the
-                // same execution (Nextflow doesn't allow the same unaliased process to be invoked twice
-                // in one workflow context). Fixed by unzipping every active caller's GFF through a single
-                // UNPIGZ_GFF call; prokka+prodigal together is what actually exercises that fix. ===
+                // file collided/overwritten between the two active callers. ===
                 { assert path("${params.outdir}/featurecounts/SAMPLE1_PE.prokka.featureCounts.tsv").exists() },
-                { assert path("${params.outdir}/featurecounts/SAMPLE1_PE.prodigal.featureCounts.tsv").exists() },
                 { assert path("${params.outdir}/featurecounts/SAMPLE1_PE.transdecoder.featureCounts.tsv").exists() },
                 { assert path("${params.outdir}/featurecounts/SAMPLE2_PE.prokka.featureCounts.tsv").exists() },
-                { assert path("${params.outdir}/featurecounts/SAMPLE2_PE.prodigal.featureCounts.tsv").exists() },
                 { assert path("${params.outdir}/featurecounts/SAMPLE2_PE.transdecoder.featureCounts.tsv").exists() },
                 // SAMPLE3_PE has two rows in the samplesheet, so CAT_FASTQ concatenates them under a
                 // "_1"-suffixed id -- a pre-existing pipeline naming convention, not caller-related.
                 { assert path("${params.outdir}/featurecounts/SAMPLE3_PE_1.prokka.featureCounts.tsv").exists() },
-                { assert path("${params.outdir}/featurecounts/SAMPLE3_PE_1.prodigal.featureCounts.tsv").exists() },
                 { assert path("${params.outdir}/featurecounts/SAMPLE3_PE_1.transdecoder.featureCounts.tsv").exists() },
 
-                // === Contamination checks: no existing solo-caller test has multiple simultaneous
-                // callers to contaminate, so these are new. ===
-                // 1. Zero overlap between any pair of callers' ORF-ID namespaces (Prokka locus tags,
-                //    Prodigal contig-derived IDs, and TransDecoder contig-derived IDs are all disjoint
-                //    by construction).
+                // === Contamination checks: no existing solo-caller test has two simultaneous callers to
+                // contaminate, so these are new. ===
+                // 1. Zero overlap between the two callers' ORF-ID namespaces (Prokka locus tags vs.
+                //    TransDecoder contig-derived IDs are disjoint by construction).
                 { assert (
                     path("${params.outdir}/summary_tables/megahit.prokka.counts.tsv.gz").csv(sep: '\t', decompress: true, header: true).columns["orf"].toSet()
-                    .intersect(
-                        path("${params.outdir}/summary_tables/megahit.prodigal.counts.tsv.gz").csv(sep: '\t', decompress: true, header: true).columns["orf"].toSet()
-                    )
-                ).isEmpty() },
-                { assert (
-                    path("${params.outdir}/summary_tables/megahit.prokka.counts.tsv.gz").csv(sep: '\t', decompress: true, header: true).columns["orf"].toSet()
-                    .intersect(
-                        path("${params.outdir}/summary_tables/megahit.transdecoder.counts.tsv.gz").csv(sep: '\t', decompress: true, header: true).columns["orf"].toSet()
-                    )
-                ).isEmpty() },
-                { assert (
-                    path("${params.outdir}/summary_tables/megahit.prodigal.counts.tsv.gz").csv(sep: '\t', decompress: true, header: true).columns["orf"].toSet()
                     .intersect(
                         path("${params.outdir}/summary_tables/megahit.transdecoder.counts.tsv.gz").csv(sep: '\t', decompress: true, header: true).columns["orf"].toSet()
                     )
                 ).isEmpty() },
 
-                // 4. Every active caller's diamond-taxonomy output exists independently, for every
+                // 2. Every active caller's diamond-taxonomy output exists independently, for every
                 //    diamond db, for every caller -- this is what actually caught a real bug: Nextflow's
                 //    .join() silently drops duplicate left-side keys, and the diamond-taxonomy chain
                 //    (ch_taxonkit_lineage/FORMAT_DIAMOND_TAX_*/SUM_DIAMONDTAX) joins against
@@ -105,9 +80,6 @@ nextflow_pipeline {
                 { assert path("${params.outdir}/summary_tables/megahit.prokka.gtdb-r220-test.diamond.taxonomy.tsv.gz").exists() },
                 { assert path("${params.outdir}/summary_tables/megahit.prokka.ncbi-refseq-test.diamond.taxonomy.tsv.gz").exists() },
                 { assert path("${params.outdir}/summary_tables/megahit.prokka.ncbi-refseq-test.diamond.taxonomy-taxdump.tsv.gz").exists() },
-                { assert path("${params.outdir}/summary_tables/megahit.prodigal.gtdb-r220-test.diamond.taxonomy.tsv.gz").exists() },
-                { assert path("${params.outdir}/summary_tables/megahit.prodigal.ncbi-refseq-test.diamond.taxonomy.tsv.gz").exists() },
-                { assert path("${params.outdir}/summary_tables/megahit.prodigal.ncbi-refseq-test.diamond.taxonomy-taxdump.tsv.gz").exists() },
                 { assert path("${params.outdir}/summary_tables/megahit.transdecoder.gtdb-r220-test.diamond.taxonomy.tsv.gz").exists() },
                 { assert path("${params.outdir}/summary_tables/megahit.transdecoder.ncbi-refseq-test.diamond.taxonomy.tsv.gz").exists() },
                 { assert path("${params.outdir}/summary_tables/megahit.transdecoder.ncbi-refseq-test.diamond.taxonomy-taxdump.tsv.gz").exists() },
