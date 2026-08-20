@@ -111,12 +111,12 @@
                 "bbmap/bbmap/SAMPLE2_PE.bbmap.log",
                 "bbmap/bbmap/SAMPLE3_PE_1.bbmap.log",
                 "featurecounts",
-                "featurecounts/SAMPLE1_PE.featureCounts.tsv",
-                "featurecounts/SAMPLE1_PE.featureCounts.tsv.summary",
-                "featurecounts/SAMPLE2_PE.featureCounts.tsv",
-                "featurecounts/SAMPLE2_PE.featureCounts.tsv.summary",
-                "featurecounts/SAMPLE3_PE_1.featureCounts.tsv",
-                "featurecounts/SAMPLE3_PE_1.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE1_PE.prokka.featureCounts.tsv",
+                "featurecounts/SAMPLE1_PE.prokka.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE2_PE.prokka.featureCounts.tsv",
+                "featurecounts/SAMPLE2_PE.prokka.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE3_PE_1.prokka.featureCounts.tsv",
+                "featurecounts/SAMPLE3_PE_1.prokka.featureCounts.tsv.summary",
                 "megahit",
                 "megahit/megahit_assembly.contigs.fa.gz",
                 "megahit/megahit_assembly.log",
@@ -208,7 +208,7 @@
             ],
             1
         ],
-        "timestamp": "2026-07-31T14:11:02.291325415",
+        "timestamp": "2026-08-19T02:21:44.172646808",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

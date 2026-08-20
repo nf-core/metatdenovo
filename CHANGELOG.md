@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Added`
 
+- [#466](https://github.com/nf-core/metatdenovo/pull/466) - Support running multiple ORF callers in a single execution, e.g. `--orf_caller prokka,transdecoder` (each caller still produces its own independent output, no cross-caller consolidation yet), addresses [#462](https://github.com/nf-core/metatdenovo/issues/462) (@erikrikarddaniel)
 - [#465](https://github.com/nf-core/metatdenovo/pull/465) - Add MetaEuk as a splice-aware `--orf_caller` alternative for eukaryotes (`--metaeuk_db`), addresses [#459](https://github.com/nf-core/metatdenovo/issues/459) (@erikrikarddaniel)
 - [#458](https://github.com/nf-core/metatdenovo/pull/458) - Add basic ORF/protein statistics from Prodigal and TransDecoder to the MultiQC report (custom content, since neither has a MultiQC-native module), addresses the rest of [#456](https://github.com/nf-core/metatdenovo/issues/456) (@erikrikarddaniel)
 - [#457](https://github.com/nf-core/metatdenovo/pull/457) - Add dbCAN CAZyme annotation (`--skip_dbcan`, `--dbcan_dbpath`), addresses [#60](https://github.com/nf-core/metatdenovo/issues/60)/[#430](https://github.com/nf-core/metatdenovo/issues/430) (@erikrikarddaniel)
@@ -21,6 +22,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Fixed`
 
+- [#466](https://github.com/nf-core/metatdenovo/pull/466) - `featurecounts/*.featureCounts.tsv` output filenames now always include the ORF caller name (e.g. `SAMPLE1.prokka.featureCounts.tsv`), required so multiple simultaneous callers (see above) don't overwrite each other's per-sample counts (@erikrikarddaniel)
+- [#466](https://github.com/nf-core/metatdenovo/pull/466) - Fix a crash when hmm-classification finds zero hits for a given ORF caller/hmm-file combination (@erikrikarddaniel)
 - [#458](https://github.com/nf-core/metatdenovo/pull/458) - Fix Prokka stats in the MultiQC report colliding under a single "strain" sample name on any assembly with more than one `prokka_batchsize` chunk, addresses part of [#456](https://github.com/nf-core/metatdenovo/issues/456) (@erikrikarddaniel)
 - [#452](https://github.com/nf-core/metatdenovo/pull/452) - Fix `EGGNOG_FORMAT` renaming the `query` column to `Lorf` instead of `orf`, which broke `EGGNOG_SUM` (@erikrikarddaniel)
 

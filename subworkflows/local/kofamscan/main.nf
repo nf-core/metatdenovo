@@ -12,7 +12,7 @@ workflow KOFAMSCAN {
 
     take:
     kofamscan       // Channel: val(meta), path(fasta)
-    fcs             // featureCounts output
+    fcs             // channel: [ val(meta), path(fcs) ] -- meta.caller must match kofamscan's
     ko_list_url     // string: URL to download the KOfam ko_list file from
     profiles_url    // string: URL to download the KOfam HMM profiles archive from
 
@@ -26,7 +26,12 @@ workflow KOFAMSCAN {
 
     KOFAMSCAN_UNIQUE( KOFAMSCAN_FORMAT.out.kofamtsv )
 
-    KOFAMSCAN_SUM( KOFAMSCAN_SCAN.out.tsv, fcs )
+    ch_kofamscan_sum_input = KOFAMSCAN_SCAN.out.tsv
+        .map { meta, tsv -> [ meta.caller, meta, tsv ] }
+        .join( fcs.map { meta, f -> [ meta.caller, f ] } )
+        .map { _caller, meta, tsv, f -> [ meta, tsv, f ] }
+
+    KOFAMSCAN_SUM( ch_kofamscan_sum_input )
 
     emit:
     kofam_table_out   = KOFAMSCAN_SCAN.out.tsv

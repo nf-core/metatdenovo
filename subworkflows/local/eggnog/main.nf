@@ -9,8 +9,8 @@ include { EGGNOG_SUM      } from '../../../modules/local/eggnog/sum/main'
 
 workflow EGGNOG {
     take:
-    faa
-    collect_fcs
+    faa           // channel: [ val(meta), path(faa) ]
+    feature_counts // channel: [ val(meta), path(fcs) ] -- meta.caller must match faa's
 
     main:
 
@@ -30,7 +30,12 @@ workflow EGGNOG {
 
     EGGNOG_FORMAT(EGGNOGMAPPER.out.annotations)
 
-    EGGNOG_SUM(EGGNOG_FORMAT.out.emappertsv, collect_fcs)
+    ch_eggnog_sum_input = EGGNOG_FORMAT.out.emappertsv
+        .map { meta, tsv -> [ meta.caller, meta, tsv ] }
+        .join( feature_counts.map { meta, fcs -> [ meta.caller, fcs ] } )
+        .map { _caller, meta, tsv, fcs -> [ meta, tsv, fcs ] }
+
+    EGGNOG_SUM(ch_eggnog_sum_input)
 
     emit:
     hits       = EGGNOGMAPPER.out.hits

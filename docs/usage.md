@@ -153,6 +153,11 @@ metaeuk databases UniRef50 metaeuk_uniref50 tmp
 The resulting `metaeuk_uniref50` can then be passed directly as `--metaeuk_db`.
 Run `metaeuk databases -h` for the full list.
 
+#### Running more than one ORF caller
+
+`--orf_caller` also accepts a comma-separated list, e.g. `--orf_caller prokka,transdecoder`, to run more than one caller in the same execution -- useful for mixed prokaryote/eukaryote communities.
+Each active caller runs independently and produces its own complete set of output (GFF, protein FASTA, `summary_tables/<assembly>.<caller>.*`) under its own name, exactly as if it had been run alone; there is currently no consolidation of results across callers.
+
 #### Provide your own ORFs
 
 You can provide a set of ORFs to the pipeline using the `--user_orfs_faa orfs.faa.gz` and `--user_orfs_gff orfs.gff.gz`

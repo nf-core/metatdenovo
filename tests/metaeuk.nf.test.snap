@@ -81,12 +81,12 @@
                 "bbmap/bbmap/RPL28_MRNA.bbmap.log",
                 "bbmap/bbmap/RPL28_MRNA_RECODED.bbmap.log",
                 "featurecounts",
-                "featurecounts/RPL28_GENOMIC.featureCounts.tsv",
-                "featurecounts/RPL28_GENOMIC.featureCounts.tsv.summary",
-                "featurecounts/RPL28_MRNA.featureCounts.tsv",
-                "featurecounts/RPL28_MRNA.featureCounts.tsv.summary",
-                "featurecounts/RPL28_MRNA_RECODED.featureCounts.tsv",
-                "featurecounts/RPL28_MRNA_RECODED.featureCounts.tsv.summary",
+                "featurecounts/RPL28_GENOMIC.metaeuk.featureCounts.tsv",
+                "featurecounts/RPL28_GENOMIC.metaeuk.featureCounts.tsv.summary",
+                "featurecounts/RPL28_MRNA.metaeuk.featureCounts.tsv",
+                "featurecounts/RPL28_MRNA.metaeuk.featureCounts.tsv.summary",
+                "featurecounts/RPL28_MRNA_RECODED.metaeuk.featureCounts.tsv",
+                "featurecounts/RPL28_MRNA_RECODED.metaeuk.featureCounts.tsv.summary",
                 "megahit",
                 "megahit/megahit_assembly.contigs.fa.gz",
                 "megahit/megahit_assembly.log",
@@ -180,7 +180,7 @@
                 "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count"
             ]
         ],
-        "timestamp": "2026-08-18T11:15:59.17763482",
+        "timestamp": "2026-08-19T02:36:43.466230835",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"
