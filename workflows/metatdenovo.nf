@@ -113,7 +113,7 @@ workflow METATDENOVO {
     if ( ( params.assembler && params.user_assembly ) || ( ! params.assembler && ! params.user_assembly ) ) {
         error "Provide either `--assembler` or `--user_assembly`!"
     }
-    if ( ( params.orf_caller && ( params.user_orfs_gff ) ) && ( ! params.orf_caller && ! params.user_orfs_gff ) ) {
+    if ( ( params.orf_caller && params.user_orfs_gff ) || ( ! params.orf_caller && ! params.user_orfs_gff ) ) {
         error "Provide either `--orf_caller` or `--user_orfs_gff`/`--user_orfs_faa`!"
     }
 
