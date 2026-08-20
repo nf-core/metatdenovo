@@ -9,6 +9,8 @@
 //
 include { COLLECT_FEATURECOUNTS              } from '../modules/local/collect/featurecounts/'
 include { COLLECT_STATS                      } from '../modules/local/collect/stats/'
+include { FORMAT_GFF2BED                     } from '../modules/local/format/gff2bed/'
+include { FORMAT_LOCUS_CONSOLIDATE           } from '../modules/local/format/locus_consolidate/'
 include { FORMATSPADES                       } from '../modules/local/format/spades/'
 include { MERGE_TABLES                       } from '../modules/local/merge/summary/'
 include { FORMAT_DIAMOND_TAX_RANKLIST        } from '../modules/local/diamond/format_tax/ranklist/'
@@ -52,6 +54,8 @@ include { BBMAP_ALIGN                                } from '../modules/nf-core/
 include { BBMAP_BBDUK                                } from '../modules/nf-core/bbmap/bbduk/'
 include { BBMAP_BBNORM                               } from '../modules/nf-core/bbmap/bbnorm/'
 include { BBMAP_INDEX                                } from '../modules/nf-core/bbmap/index/'
+include { BEDTOOLS_MERGE                             } from '../modules/nf-core/bedtools/merge/'
+include { BEDTOOLS_SORT                              } from '../modules/nf-core/bedtools/sort/'
 include { CAT_FASTQ            	                     } from '../modules/nf-core/cat/fastq/'
 include { DIAMOND_BLASTP as DIAMOND_TAXONOMY         } from '../modules/nf-core/diamond/blastp/'
 include { FASTQC                                     } from '../modules/nf-core/fastqc/'
@@ -532,6 +536,32 @@ workflow METATDENOVO {
     // comment above for why this can't be one call per caller branch.
     UNPIGZ_GFF(ch_gff_gz)
     ch_gff = ch_gff.mix(UNPIGZ_GFF.out.file)
+
+    //
+    // Consolidate overlapping same-contig CDS calls from different active callers into single loci
+    // before counting, so a read supporting one real gene isn't counted once per caller that called
+    // it (#463). Runs unconditionally, even with a single active caller: with nothing to overlap,
+    // every bedtools-merge row has exactly one contributor, so FORMAT_LOCUS_CONSOLIDATE's
+    // ID-inheritance rule reproduces that caller's own GFF byte-for-byte -- graceful degradation,
+    // no separate code path. Rides through the existing, unmodified ch_featurecounts cross-product
+    // and FEATURECOUNTS_CDS call below by being mixed into ch_gff as just another caller.
+    //
+    // versions_gzip/versions_bedtools are topic:versions tuple emits, not versions.yml Paths --
+    // like every other module's topic-based version emit in this pipeline, they're picked up
+    // automatically by the global channel.topic("versions") collection below and must not be
+    // mixed into ch_versions directly (that expects Path entries only).
+    FORMAT_GFF2BED ( ch_gff )
+
+    ch_locus_bed = FORMAT_GFF2BED.out.bed
+        .map { _meta, bed -> bed }
+        .collectFile(name: "${assembly_name}.combined.bed", sort: true)
+        .map { bed -> [ [ id: "${assembly_name}.locus_consolidate", caller: 'locus_consolidate' ], bed ] }
+
+    BEDTOOLS_SORT ( ch_locus_bed, [] )
+    BEDTOOLS_MERGE ( BEDTOOLS_SORT.out.sorted )
+    FORMAT_LOCUS_CONSOLIDATE ( BEDTOOLS_MERGE.out.bed )
+
+    ch_gff = ch_gff.mix(FORMAT_LOCUS_CONSOLIDATE.out.gff)
 
     // Populate channels if the user provided the orfs
     if ( params.user_orfs_faa && params.user_orfs_gff ) {
