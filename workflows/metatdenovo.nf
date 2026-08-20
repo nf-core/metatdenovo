@@ -8,6 +8,7 @@
 // MODULE: local
 //
 include { COLLECT_FEATURECOUNTS              } from '../modules/local/collect/featurecounts/'
+include { COLLECT_LOCUS_CONSOLIDATE          } from '../modules/local/collect/locus_consolidate/'
 include { COLLECT_STATS                      } from '../modules/local/collect/stats/'
 include { FORMAT_GFF2BED                     } from '../modules/local/format/gff2bed/'
 include { FORMAT_LOCUS_CONSOLIDATE           } from '../modules/local/format/locus_consolidate/'
@@ -644,8 +645,20 @@ workflow METATDENOVO {
         .map { meta, fc -> [ meta.caller, fc ] }
         .groupTuple()
         .map { caller, fcs -> [ [ id: "${assembly_name}.${caller}", caller: caller ], fcs ] }
+        .branch { meta, _fcs ->
+            locus_consolidate: meta.caller == 'locus_consolidate'
+            other: true
+        }
 
-    COLLECT_FEATURECOUNTS ( ch_collect_feature )
+    // Locus-consolidated counts get their own collect module (provenance join), branched out here
+    // so COLLECT_FEATURECOUNTS itself -- and every other caller's table -- stays untouched.
+    COLLECT_LOCUS_CONSOLIDATE (
+        ch_collect_feature.locus_consolidate
+            .combine( FORMAT_LOCUS_CONSOLIDATE.out.provenance.map { _meta, provenance -> provenance } )
+    )
+    ch_versions = ch_versions.mix(COLLECT_LOCUS_CONSOLIDATE.out.versions)
+
+    COLLECT_FEATURECOUNTS ( ch_collect_feature.other )
     ch_versions           = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
     // [ meta(caller), tsv ] -- kept as a proper tuple (not stripped) so every consumer below can
     // join it against other per-caller channels instead of relying on positional channel pairing.
