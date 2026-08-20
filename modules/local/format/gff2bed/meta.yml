@@ -1,0 +1,33 @@
+name: "format_gff2bed"
+description: Converts one ORF caller's CDS-only GFF into a strand-aware BED6, tagging
+  each feature's name column with "<caller>:<original ID>" so multiple callers'
+  output can be concatenated and fed to bedtools merge for locus consolidation
+keywords:
+  - gff
+  - bed
+  - format
+  - locus consolidation
+input:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information, including `caller`
+  - gff:
+      type: file
+      description: One ORF caller's CDS-containing GFF output file
+      pattern: "*.gff{3,.gz,}"
+output:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - bed:
+      type: file
+      description: BED6 file, one row per CDS feature, name column "<caller>:<ID>"
+      pattern: "*.bed"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+authors:
+  - "@erikrikarddaniel"
+maintainers:
+  - "@erikrikarddaniel"
