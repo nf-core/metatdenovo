@@ -99,12 +99,12 @@
                 "bbmap/bbmap/SAMPLE2_PE.bbmap.log",
                 "bbmap/bbmap/SAMPLE3_PE_1.bbmap.log",
                 "featurecounts",
-                "featurecounts/SAMPLE1_PE.featureCounts.tsv",
-                "featurecounts/SAMPLE1_PE.featureCounts.tsv.summary",
-                "featurecounts/SAMPLE2_PE.featureCounts.tsv",
-                "featurecounts/SAMPLE2_PE.featureCounts.tsv.summary",
-                "featurecounts/SAMPLE3_PE_1.featureCounts.tsv",
-                "featurecounts/SAMPLE3_PE_1.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE1_PE.transdecoder.featureCounts.tsv",
+                "featurecounts/SAMPLE1_PE.transdecoder.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE2_PE.transdecoder.featureCounts.tsv",
+                "featurecounts/SAMPLE2_PE.transdecoder.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE3_PE_1.transdecoder.featureCounts.tsv",
+                "featurecounts/SAMPLE3_PE_1.transdecoder.featureCounts.tsv.summary",
                 "megahit",
                 "megahit/megahit_assembly.contigs.fa.gz",
                 "megahit/megahit_assembly.log",
@@ -132,6 +132,7 @@
                 "multiqc/multiqc_data/multiqc_megahit_assemblies.txt",
                 "multiqc/multiqc_data/multiqc_software_versions.txt",
                 "multiqc/multiqc_data/multiqc_sources.txt",
+                "multiqc/multiqc_data/multiqc_transdecoder_stats.txt",
                 "multiqc/multiqc_report.html",
                 "pipeline_info",
                 "pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml",
@@ -193,7 +194,7 @@
                 "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count"
             ]
         ],
-        "timestamp": "2026-07-31T13:44:56.243244372",
+        "timestamp": "2026-08-19T02:32:39.076531654",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

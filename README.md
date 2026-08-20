@@ -40,8 +40,9 @@ On release, automated continuous integration tests run the pipeline on a full-si
    2. [`Megahit`](https://github.com/voutcn/megahit) suggested for both prokaryote and eukaryote assembly; requires less resources
 8. Choice of orf caller:
    1. [`TransDecoder`](https://github.com/TransDecoder/TransDecoder) suggested for eukaryotes; only ORFs
-   2. [`Prokka`](https://github.com/tseemann/prokka) suggested for prokaryotes; ORFs and other features plus functional annotation
-   3. [`Prodigal`](https://github.com/hyattpd/Prodigal) suggested for Prokaryotes; only ORFs
+   2. [`MetaEuk`](https://github.com/soedinglab/metaeuk) suggested for eukaryotes; splice-aware, requires a reference protein database
+   3. [`Prokka`](https://github.com/tseemann/prokka) suggested for prokaryotes; ORFs and other features plus functional annotation
+   4. [`Prodigal`](https://github.com/hyattpd/Prodigal) suggested for Prokaryotes; only ORFs
 9. Quantification of genes identified in assemblies:
    1. Generate index of assembly ([`BBmap index`](https://sourceforge.net/projects/bbmap/))
    2. Mapping cleaned reads to the assembly for quantification ([`BBmap`](https://sourceforge.net/projects/bbmap/))

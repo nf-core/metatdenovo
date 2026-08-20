@@ -93,12 +93,12 @@
                 "bbmap/bbmap/SAMPLE2_PE.bbmap.log",
                 "bbmap/bbmap/SAMPLE3_PE_1.bbmap.log",
                 "featurecounts",
-                "featurecounts/SAMPLE1_PE.featureCounts.tsv",
-                "featurecounts/SAMPLE1_PE.featureCounts.tsv.summary",
-                "featurecounts/SAMPLE2_PE.featureCounts.tsv",
-                "featurecounts/SAMPLE2_PE.featureCounts.tsv.summary",
-                "featurecounts/SAMPLE3_PE_1.featureCounts.tsv",
-                "featurecounts/SAMPLE3_PE_1.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE1_PE.prodigal.featureCounts.tsv",
+                "featurecounts/SAMPLE1_PE.prodigal.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE2_PE.prodigal.featureCounts.tsv",
+                "featurecounts/SAMPLE2_PE.prodigal.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE3_PE_1.prodigal.featureCounts.tsv",
+                "featurecounts/SAMPLE3_PE_1.prodigal.featureCounts.tsv.summary",
                 "multiqc",
                 "multiqc/multiqc_data",
                 "multiqc/multiqc_data/fastqc-status-check-heatmap.txt",
@@ -120,6 +120,7 @@
                 "multiqc/multiqc_data/multiqc_data.json",
                 "multiqc/multiqc_data/multiqc_fastqc.txt",
                 "multiqc/multiqc_data/multiqc_general_stats.txt",
+                "multiqc/multiqc_data/multiqc_prodigal_stats.txt",
                 "multiqc/multiqc_data/multiqc_software_versions.txt",
                 "multiqc/multiqc_data/multiqc_sources.txt",
                 "multiqc/multiqc_data/multiqc_spades_assemblies.txt",
@@ -190,7 +191,7 @@
                 "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count"
             ]
         ],
-        "timestamp": "2026-07-31T13:54:28.154498012",
+        "timestamp": "2026-08-19T02:56:10.701423118",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

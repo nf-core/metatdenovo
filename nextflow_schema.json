@@ -278,8 +278,8 @@
             "properties": {
                 "orf_caller": {
                     "type": "string",
-                    "enum": ["prodigal", "prokka", "transdecoder"],
-                    "description": "Specify which ORF caller to run. Possible alternatives: prodigal, prokka, transdecoder. This needs to be set unless the `--user_orfs_*` params are set.",
+                    "pattern": "^(prodigal|prokka|transdecoder|metaeuk)(,(prodigal|prokka|transdecoder|metaeuk))*$",
+                    "description": "Comma-separated list of ORF callers to run. Possible alternatives: prodigal, prokka, transdecoder, metaeuk. This needs to be set unless the `--user_orfs_*` params are set.",
                     "fa_icon": "fas fa-phone-volume"
                 },
                 "user_orfs_faa": {
@@ -319,6 +319,12 @@
                     "hidden": true,
                     "help_text": "Prokka usually fails on very large input files. This parameter controls the size of smaller batches for which Prokka will be called. Should be a string in the format integer-unit e.g. `--prokka_batchsize '8.MB'`",
                     "fa_icon": "fas fa-expand-alt"
+                },
+                "metaeuk_db": {
+                    "type": "string",
+                    "default": null,
+                    "description": "Path to a reference protein database for MetaEuk, either a protein fasta file or a directory containing an mmseqs2-formatted database. Required when `--orf_caller metaeuk` is used.",
+                    "fa_icon": "far fa-file-code"
                 }
             },
             "fa_icon": "fas fa-phone-volume"

@@ -1,0 +1,33 @@
+name: "format_metaeuk_gff"
+description: Reduces MetaEuk GFF output to CDS lines and adds a gene-level ID
+  attribute shared by every CDS segment of a multi-exon gene
+keywords:
+  - metaeuk
+  - gff
+  - format
+  - gene prediction
+input:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - gff:
+      type: file
+      description: MetaEuk GFF output file
+      pattern: "*.gff{.gz,}"
+output:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - format_gff:
+      type: file
+      description: CDS-only GFF file with an ID attribute per gene, suitable for
+        featureCounts (-g ID -t CDS -F gtf)
+      pattern: "*_format.gff.gz"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+authors:
+  - "@erikrikarddaniel"
+maintainers:
+  - "@erikrikarddaniel"

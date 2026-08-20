@@ -8,8 +8,7 @@ process DBCAN_SUM {
         'biocontainers/mulled-v2-b2ec1fea5791d428eebb8c8ea7409c350d31dada:a447f6b7a6afde38352b24c30ae9cd6e39df95c4-1' }"
 
     input:
-    tuple val(meta), path(dbcan)
-    path(fcs)
+    tuple val(meta), path(dbcan), path(fcs)
 
     output:
     tuple val(meta), path("${meta.id}.dbcan_summary.tsv.gz") , emit: dbcan_summary

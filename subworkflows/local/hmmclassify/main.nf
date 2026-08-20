@@ -11,15 +11,21 @@ workflow HMMCLASSIFY {
 
     HMMER_HMMSEARCH (
         ch_hmmclassify
-            .map { meta, hmm, seqdb -> [ [ id: "${meta.id}.${hmm.baseName}" ], hmm, seqdb, false, true, false ] }
+            .map { meta, hmm, seqdb -> [ [ id: "${meta.id}.${hmm.baseName}", caller: meta.caller ], hmm, seqdb, false, true, false ] }
     )
 
+    // Group hmm-search summaries by caller before ranking, so a caller's HMMER_HMMRANK invocation
+    // only ever sees its own hmm files' summaries -- not another simultaneously-active caller's.
     HMMER_HMMRANK (
-        ch_hmmclassify
-            .map { meta, _hmm, _seqdb -> meta }
-            .distinct()
-            .combine ( HMMER_HMMSEARCH.out.target_summary.collect { _meta, summary -> summary } )
-            .map { summary -> [ summary[0], summary[1..-1] ] }
+        HMMER_HMMSEARCH.out.target_summary
+            .map { meta, summary -> [ meta.caller, summary ] }
+            .groupTuple()
+            .join(
+                ch_hmmclassify
+                    .map { meta, _hmm, _seqdb -> [ meta.caller, meta ] }
+                    .distinct()
+            )
+            .map { _caller, summaries, callerMeta -> [ callerMeta, summaries ] }
     )
 
     SEQTK_HMMHITFAAS(

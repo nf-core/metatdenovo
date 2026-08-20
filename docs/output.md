@@ -155,9 +155,13 @@ BBnorm is a BBmap tool.
 
 ### ORF caller step
 
+`--orf_caller` accepts a comma-separated list of callers (e.g. `--orf_caller prokka,transdecoder`) to run more than one in the same execution.
+Each active caller's output below is produced independently, under its own `<caller>` name -- there is currently no consolidation across callers.
+
 #### Prodigal
 
 As default, [Prodigal](https://github.com/hyattpd/Prodigal) is used to identify ORFs in the assembly.
+Basic ORF statistics (number of ORFs, total and mean amino acid length) are included in the MultiQC report.
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -176,6 +180,7 @@ As default, [Prodigal](https://github.com/hyattpd/Prodigal) is used to identify 
 As one alternative, you can use [Prokka](https://github.com/tseemann/prokka) to identify ORFs in the assembly.
 In addition to calling ORFs (done with Prodigal) Prokka will filter ORFs to only retain quality ORFs and will functionally annotate the ORFs.
 NB: Prodigal or Prokka are recomended for prokaryotic samples
+Basic annotation statistics (contigs, CDS, rRNA, tRNA counts) are included in the MultiQC report.
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -193,6 +198,7 @@ NB: Prodigal or Prokka are recomended for prokaryotic samples
 
 Another alternative is [TransDecoder](https://github.com/sghignone/TransDecoder) to find ORFs in the assembly.
 N.B. TransDecoder is recommended for eukaryotic samples
+Basic ORF statistics (number of ORFs, total and mean amino acid length) are included in the MultiQC report.
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -202,6 +208,24 @@ N.B. TransDecoder is recommended for eukaryotic samples
   - `*.cds.gz`: ORFs in nucleotide format fasta file
   - `*.pep.gz`: ORFs in amino acid format fasta file
   - `*.gff3.gz`: ORFs in genome feature format
+
+</details>
+
+#### MetaEuk
+
+Another eukaryote-targeted alternative is [MetaEuk](https://github.com/soedinglab/metaeuk), a splice-aware ORF caller that aligns contigs against a reference protein database (`--metaeuk_db`) and can call a single gene model spanning an intron.
+N.B. MetaEuk is recommended for eukaryotic samples that mix intron-containing genomic sequence with spliced transcripts.
+Basic ORF statistics (number of ORFs, total and mean amino acid length) are included in the MultiQC report.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `metaeuk/`
+  - `*.fas`: ORFs in amino acid format fasta file
+  - `*.codon.fas`: ORFs in nucleotide format fasta file
+  - `*.tsv`: locations of each protein-coding sequence in the input fasta
+  - `*.gff`: all features (gene/mRNA/exon/CDS) in genome feature file format, as produced natively by MetaEuk
+  - `*_format.gff.gz`: CDS-only genome feature file, with a single shared ID per (possibly multi-exon) gene, used for quantification
 
 </details>
 

@@ -9,8 +9,7 @@ process EGGNOG_SUM {
 
     input:
 
-    tuple val(meta), path(eggnog)
-    path(fcs)
+    tuple val(meta), path(eggnog), path(fcs)
 
     output:
 

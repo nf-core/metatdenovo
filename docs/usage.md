@@ -134,6 +134,32 @@ It also performs functional annotation of ORFs.
 
 For eukaryotic genes, we recommend users to use Transdecoder (`--orf_caller transdecoder`) to call ORFs.
 
+MetaEuk (`--orf_caller metaeuk`) is a second eukaryote-targeted alternative.
+Unlike Transdecoder, which calls ORFs directly on the assembled contigs/transcripts, MetaEuk is splice-aware: it aligns contigs against a reference protein database and can call a single gene model spanning an intron, which matters for assemblies that include intron-containing genomic sequence alongside spliced transcripts.
+It requires a reference protein database, set with `--metaeuk_db` -- either a protein fasta file or a directory containing an mmseqs2-formatted database.
+There's no default, so `--metaeuk_db` must be set whenever `--orf_caller metaeuk` is used.
+
+MetaEuk's own `metaeuk databases` command (outside the pipeline) can download and format several standard amino acid reference databases for this purpose, for example:
+
+- `UniRef50`/`UniRef90`/`UniRef100`
+- `UniProtKB/Swiss-Prot`
+- `GTDB`
+- `NR`
+
+```bash
+metaeuk databases UniRef50 metaeuk_uniref50 tmp
+```
+
+The resulting `metaeuk_uniref50` can then be passed directly as `--metaeuk_db`.
+Run `metaeuk databases -h` for the full list.
+
+#### Running more than one ORF caller
+
+`--orf_caller` also accepts a comma-separated list, e.g. `--orf_caller prokka,transdecoder`, to run more than one caller in the same execution -- useful for mixed prokaryote/eukaryote communities.
+Each active caller runs independently and produces its own complete set of output (GFF, protein FASTA, `summary_tables/<assembly>.<caller>.*`) under its own name, exactly as if it had been run alone; there is currently no consolidation of results across callers.
+
+#### Provide your own ORFs
+
 You can provide a set of ORFs to the pipeline using the `--user_orfs_faa orfs.faa.gz` and `--user_orfs_gff orfs.gff.gz`
 for an amino acid fasta file and a gff file respectively.
 The name used in filenames for user provided ORFs can be set using `--user_orfs_name` parameter.
