@@ -652,9 +652,15 @@ workflow METATDENOVO {
 
     // Locus-consolidated counts get their own collect module (provenance join), branched out here
     // so COLLECT_FEATURECOUNTS itself -- and every other caller's table -- stays untouched.
+    // Keyed by meta.id (not .combine(), which would cross-join every assembly's featureCounts
+    // group against every assembly's provenance file if this pipeline ever ran multiple
+    // simultaneous assemblies) -- matches ch_featurecounts/ch_collect_feature's own convention
+    // just above of staying joinable rather than relying on positional/cardinality pairing.
     COLLECT_LOCUS_CONSOLIDATE (
         ch_collect_feature.locus_consolidate
-            .combine( FORMAT_LOCUS_CONSOLIDATE.out.provenance.map { _meta, provenance -> provenance } )
+            .map { meta, fcs -> [ meta.id, meta, fcs ] }
+            .join( FORMAT_LOCUS_CONSOLIDATE.out.provenance.map { meta, provenance -> [ meta.id, provenance ] } )
+            .map { _id, meta, fcs, provenance -> [ meta, fcs, provenance ] }
     )
     ch_versions = ch_versions.mix(COLLECT_LOCUS_CONSOLIDATE.out.versions)
 
