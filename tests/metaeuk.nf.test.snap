@@ -1,7 +1,7 @@
 {
     "-profile test_metaeuk": {
         "content": [
-            40,
+            48,
             {
                 "BBMAP_ALIGN": {
                     "bbmap": 39.18
@@ -9,7 +9,21 @@
                 "BBMAP_INDEX": {
                     "bbmap": 39.18
                 },
+                "BEDTOOLS_MERGE": {
+                    "bedtools": "2.31.1"
+                },
+                "BEDTOOLS_SORT": {
+                    "bedtools": "2.31.1"
+                },
                 "COLLECT_FEATURECOUNTS": {
+                    "R": "4.5.3",
+                    "dplyr": "1.2.1",
+                    "readr": "2.2.0",
+                    "stringr": "1.6.0",
+                    "dtplyr": "1.3.3",
+                    "data.table": "1.17.8"
+                },
+                "COLLECT_LOCUS_CONSOLIDATE": {
                     "R": "4.5.3",
                     "dplyr": "1.2.1",
                     "readr": "2.2.0",
@@ -30,6 +44,12 @@
                 },
                 "FEATURECOUNTS_CDS": {
                     "subread": "2.1.1"
+                },
+                "FORMAT_GFF2BED": {
+                    "gzip": 1.11
+                },
+                "FORMAT_LOCUS_CONSOLIDATE": {
+                    "gzip": 1.11
                 },
                 "FORMAT_METAEUK_GFF": {
                     "gzip": 1.11
@@ -81,10 +101,16 @@
                 "bbmap/bbmap/RPL28_MRNA.bbmap.log",
                 "bbmap/bbmap/RPL28_MRNA_RECODED.bbmap.log",
                 "featurecounts",
+                "featurecounts/RPL28_GENOMIC.locus_consolidate.featureCounts.tsv",
+                "featurecounts/RPL28_GENOMIC.locus_consolidate.featureCounts.tsv.summary",
                 "featurecounts/RPL28_GENOMIC.metaeuk.featureCounts.tsv",
                 "featurecounts/RPL28_GENOMIC.metaeuk.featureCounts.tsv.summary",
+                "featurecounts/RPL28_MRNA.locus_consolidate.featureCounts.tsv",
+                "featurecounts/RPL28_MRNA.locus_consolidate.featureCounts.tsv.summary",
                 "featurecounts/RPL28_MRNA.metaeuk.featureCounts.tsv",
                 "featurecounts/RPL28_MRNA.metaeuk.featureCounts.tsv.summary",
+                "featurecounts/RPL28_MRNA_RECODED.locus_consolidate.featureCounts.tsv",
+                "featurecounts/RPL28_MRNA_RECODED.locus_consolidate.featureCounts.tsv.summary",
                 "featurecounts/RPL28_MRNA_RECODED.metaeuk.featureCounts.tsv",
                 "featurecounts/RPL28_MRNA_RECODED.metaeuk.featureCounts.tsv.summary",
                 "megahit",
@@ -137,6 +163,7 @@
                 "samtools/megahit.RPL28_MRNA_RECODED.flagstat",
                 "samtools/megahit.RPL28_MRNA_RECODED.idxstats",
                 "summary_tables",
+                "summary_tables/megahit.locus_consolidate.counts.tsv.gz",
                 "summary_tables/megahit.metaeuk.counts.tsv.gz",
                 "summary_tables/megahit.metaeuk.overall_stats.tsv.gz",
                 "transrate",
@@ -180,7 +207,7 @@
                 "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count"
             ]
         ],
-        "timestamp": "2026-08-19T02:36:43.466230835",
+        "timestamp": "2026-08-20T12:09:32.839535339",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

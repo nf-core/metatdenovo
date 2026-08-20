@@ -41,6 +41,24 @@ nextflow_pipeline {
                 // be summed into ONE featureCounts row spanning both exon coordinates, not split
                 // into one row per exon (which is what the raw MetaEuk GFF, un-formatted, would do).
                 { assert path("${params.outdir}/summary_tables/megahit.metaeuk.counts.tsv.gz").csv(sep: '\t', decompress: true, header: true).columns["chr"].any { c -> c.contains(';') } },
+
+                // #463 graceful degradation: with only one caller active, locus consolidation has
+                // nothing to merge, so the ID-inheritance rule must reproduce MetaEuk's own solo table
+                // exactly (same rows, minus the callers/n_calls provenance columns it adds).
+                { assert (
+                    ['orf', 'chr', 'start', 'end', 'strand', 'length', 'sample', 'count', 'tpm'].collect { c ->
+                        path("${params.outdir}/summary_tables/megahit.metaeuk.counts.tsv.gz").csv(sep: '\t', decompress: true, header: true).columns[c]
+                    }.transpose().toSet()
+                ) == (
+                    ['orf', 'chr', 'start', 'end', 'strand', 'length', 'sample', 'count', 'tpm'].collect { c ->
+                        path("${params.outdir}/summary_tables/megahit.locus_consolidate.counts.tsv.gz").csv(sep: '\t', decompress: true, header: true).columns[c]
+                    }.transpose().toSet()
+                ) },
+                { assert (
+                    path("${params.outdir}/summary_tables/megahit.locus_consolidate.counts.tsv.gz")
+                        .csv(sep: '\t', decompress: true, header: true).rows
+                        .every { r -> r["callers"] == 'metaeuk' && (r["n_calls"] as int) == 1 }
+                ) },
             )
         }
     }
