@@ -156,7 +156,9 @@ Run `metaeuk databases -h` for the full list.
 #### Running more than one ORF caller
 
 `--orf_caller` also accepts a comma-separated list, e.g. `--orf_caller prokka,transdecoder`, to run more than one caller in the same execution -- useful for mixed prokaryote/eukaryote communities.
-Each active caller runs independently and produces its own complete set of output (GFF, protein FASTA, `summary_tables/<assembly>.<caller>.*`) under its own name, exactly as if it had been run alone; there is currently no consolidation of results across callers.
+Each active caller still runs independently and produces its own complete set of output (GFF, protein FASTA, `summary_tables/<assembly>.<caller>.*`) under its own name, exactly as if it had been run alone.
+In addition, `summary_tables/<assembly>.locus_consolidate.counts.tsv.gz` merges overlapping/identical same-contig CDS calls from different callers into single loci before counting reads, so a read supporting one real gene isn't counted once per caller that called it; see [Output docs](output.md) for details.
+Cross-contig consolidation is not performed.
 
 #### Provide your own ORFs
 

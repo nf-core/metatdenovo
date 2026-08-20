@@ -256,6 +256,12 @@ Quantification of CDS features with `featureCounts` from the [subread](https://s
   - `*.featureCounts.tsv.summar`: summary statistics
 - `summary_tables/`
   - `<assembly_name>.<orfcaller_name>.counts.tsv.gz`: reformatted count data
+  - `<assembly_name>.locus_consolidate.counts.tsv.gz`: when multiple `--orf_caller` values are
+    active, overlapping/identical same-contig CDS calls from different callers are merged into
+    single loci before counting, so a read supporting one real gene isn't counted once per caller
+    that called it. Same columns as the per-caller tables above, plus `callers` (which caller(s)
+    contributed to the locus) and `n_calls` (how many independent calls were merged). With a single
+    caller active, this table is identical in content to that caller's own table above.
 
 </details>
 
