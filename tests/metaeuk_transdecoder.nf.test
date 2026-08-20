@@ -1,0 +1,93 @@
+nextflow_pipeline {
+
+    name "Test pipeline"
+    script "../main.nf"
+    tag "pipeline"
+    profile "test_metaeuk_transdecoder"
+
+    test("-profile test_metaeuk_transdecoder") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+        }
+
+        then {
+            // stable_name: All files + folders in ${params.outdir}/ with a stable name
+            def stable_name = getAllFilesFromDir(params.outdir, relative: true, includeDir: true, ignore: ['pipeline_info/*.{html,json,txt}', 'multiqc/multiqc_plots', 'multiqc/multiqc_plots/**' ])
+            // stable_path: All files in ${params.outdir}/ with stable content
+            def stable_path = getAllFilesFromDir(params.outdir, ignoreFile: 'tests/.nftignore')
+            assertAll(
+                { assert workflow.success },
+                { assert snapshot(
+                    // Number of successful tasks
+                    workflow.trace.succeeded().size(),
+                    // pipeline versions.yml file for multiqc from which Nextflow version is removed because we test pipelines on multiple Nextflow versions
+                    removeNextflowVersion("$outputDir/pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml"),
+                    // All stable path name, with a relative path
+                    stable_name,
+                    // All files with stable contents
+                    stable_path,
+                    // Per-caller values, in the same style as the existing solo metaeuk test
+                    // (tests/metaeuk.nf.test) -- directly comparable to that test's own .snap values as
+                    // independent confirmation that one caller's results aren't contaminated by the other.
+                    path("${params.outdir}/summary_tables/megahit.metaeuk.counts.tsv.gz").linesGzip.findAll { l -> l.contains('orf') },
+                    path("${params.outdir}/summary_tables/megahit.transdecoder.counts.tsv.gz").linesGzip.findAll { l -> l.contains('orf') },
+                    // The locus-consolidated table itself (#463) -- small enough on this test dataset to
+                    // snapshot verbatim rather than just its header, so any regression in the
+                    // ID-inheritance rule, coordinate round-tripping, or provenance columns shows up as a
+                    // diff here.
+                    path("${params.outdir}/summary_tables/megahit.locus_consolidate.counts.tsv.gz").linesGzip,
+                ).match() },
+                { assert path("${params.outdir}/megahit/megahit_assembly.log").readLines().any { l -> l.contains('ALL DONE') } },
+                { assert path("${params.outdir}/megahit/megahit_assembly.contigs.fa.gz").linesGzip.size() >= 4 },
+
+                // === #463: locus consolidation must not double-count reads shared by two callers ===
+                // k59_0 is the RPL28_MRNA_RECODED locus where MetaEuk and TransDecoder call the exact
+                // same coordinates (1-447, +) for the same real gene: metaeuk's own solo table and
+                // transdecoder's own solo table each independently report all 400 aligned reads for that
+                // sample (naively summing the two per-caller tables would give 800 -- double the true
+                // read count). The consolidated table must report exactly the true, once-only count.
+                { assert (
+                    path("${params.outdir}/summary_tables/megahit.locus_consolidate.counts.tsv.gz")
+                        .csv(sep: '\t', decompress: true, header: true).rows
+                        .findAll { r -> r["sample"] == 'RPL28_MRNA_RECODED' }
+                        .sum { r -> r["count"] as int }
+                ) == 400 },
+                // Provenance on that same merged locus: both callers contributed, two independent calls.
+                { assert (
+                    path("${params.outdir}/summary_tables/megahit.locus_consolidate.counts.tsv.gz")
+                        .csv(sep: '\t', decompress: true, header: true).rows
+                        .find { r -> r["sample"] == 'RPL28_MRNA_RECODED' }
+                        .with { r -> [ r["callers"].tokenize(',').toSet(), r["n_calls"] as int ] }
+                ) == [ ['metaeuk', 'transdecoder'] as Set, 2 ] },
+
+                // === k59_1: MetaEuk's splice-aware call (two exons, - strand) and TransDecoder's
+                // unspliced call (+ strand) overlap in genomic position but are different real gene
+                // models on opposite strands -- bedtools merge's -s (strand-aware) design must keep them
+                // as two separate loci, never merged into one. ===
+                { assert (
+                    path("${params.outdir}/summary_tables/megahit.locus_consolidate.counts.tsv.gz")
+                        .csv(sep: '\t', decompress: true, header: true).rows
+                        .findAll { r -> r["orf"] == 'k59_1.p1' || r["orf"].startsWith('NP_011412.1|k59_1') }
+                        .every { r -> (r["n_calls"] as int) == 1 }
+                ) },
+
+                // Per-sample locus-consolidated read counts never exceed that sample's total aligned
+                // reads (samtools flagstat) -- the general form of the no-double-counting property above,
+                // checked for every sample rather than just the one hand-picked case.
+                { assert (
+                    ['RPL28_GENOMIC', 'RPL28_MRNA', 'RPL28_MRNA_RECODED'].every { sample ->
+                        def consolidated_total = path("${params.outdir}/summary_tables/megahit.locus_consolidate.counts.tsv.gz")
+                            .csv(sep: '\t', decompress: true, header: true).rows
+                            .findAll { r -> r["sample"] == sample }
+                            .sum { r -> r["count"] as int } ?: 0
+                        def flagstat_total = path("${params.outdir}/samtools/megahit.${sample}.flagstat").readLines()[0].tokenize(' ')[0] as int
+                        consolidated_total <= flagstat_total
+                    }
+                ) },
+            )
+        }
+    }
+}
