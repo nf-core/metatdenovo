@@ -8,7 +8,10 @@
 // MODULE: local
 //
 include { COLLECT_FEATURECOUNTS              } from '../modules/local/collect/featurecounts/'
+include { COLLECT_LOCUS_CONSOLIDATE          } from '../modules/local/collect/locus_consolidate/'
 include { COLLECT_STATS                      } from '../modules/local/collect/stats/'
+include { FORMAT_GFF2BED                     } from '../modules/local/format/gff2bed/'
+include { FORMAT_LOCUS_CONSOLIDATE           } from '../modules/local/format/locus_consolidate/'
 include { FORMATSPADES                       } from '../modules/local/format/spades/'
 include { MERGE_TABLES                       } from '../modules/local/merge/summary/'
 include { FORMAT_DIAMOND_TAX_RANKLIST        } from '../modules/local/diamond/format_tax/ranklist/'
@@ -52,6 +55,8 @@ include { BBMAP_ALIGN                                } from '../modules/nf-core/
 include { BBMAP_BBDUK                                } from '../modules/nf-core/bbmap/bbduk/'
 include { BBMAP_BBNORM                               } from '../modules/nf-core/bbmap/bbnorm/'
 include { BBMAP_INDEX                                } from '../modules/nf-core/bbmap/index/'
+include { BEDTOOLS_MERGE                             } from '../modules/nf-core/bedtools/merge/'
+include { BEDTOOLS_SORT                              } from '../modules/nf-core/bedtools/sort/'
 include { CAT_FASTQ            	                     } from '../modules/nf-core/cat/fastq/'
 include { DIAMOND_BLASTP as DIAMOND_TAXONOMY         } from '../modules/nf-core/diamond/blastp/'
 include { FASTQC                                     } from '../modules/nf-core/fastqc/'
@@ -108,7 +113,7 @@ workflow METATDENOVO {
     if ( ( params.assembler && params.user_assembly ) || ( ! params.assembler && ! params.user_assembly ) ) {
         error "Provide either `--assembler` or `--user_assembly`!"
     }
-    if ( ( params.orf_caller && ( params.user_orfs_gff ) ) && ( ! params.orf_caller && ! params.user_orfs_gff ) ) {
+    if ( ( params.orf_caller && params.user_orfs_gff ) || ( ! params.orf_caller && ! params.user_orfs_gff ) ) {
         error "Provide either `--orf_caller` or `--user_orfs_gff`/`--user_orfs_faa`!"
     }
 
@@ -533,6 +538,32 @@ workflow METATDENOVO {
     UNPIGZ_GFF(ch_gff_gz)
     ch_gff = ch_gff.mix(UNPIGZ_GFF.out.file)
 
+    //
+    // Consolidate overlapping same-contig CDS calls from different active callers into single loci
+    // before counting, so a read supporting one real gene isn't counted once per caller that called
+    // it (#463). Runs unconditionally, even with a single active caller: with nothing to overlap,
+    // every bedtools-merge row has exactly one contributor, so FORMAT_LOCUS_CONSOLIDATE's
+    // ID-inheritance rule reproduces that caller's own GFF byte-for-byte -- graceful degradation,
+    // no separate code path. Rides through the existing, unmodified ch_featurecounts cross-product
+    // and FEATURECOUNTS_CDS call below by being mixed into ch_gff as just another caller.
+    //
+    // versions_gzip/versions_bedtools are topic:versions tuple emits, not versions.yml Paths --
+    // like every other module's topic-based version emit in this pipeline, they're picked up
+    // automatically by the global channel.topic("versions") collection below and must not be
+    // mixed into ch_versions directly (that expects Path entries only).
+    FORMAT_GFF2BED ( ch_gff )
+
+    ch_locus_bed = FORMAT_GFF2BED.out.bed
+        .map { _meta, bed -> bed }
+        .collectFile(name: "${assembly_name}.combined.bed", sort: true)
+        .map { bed -> [ [ id: "${assembly_name}.locus_consolidate", caller: 'locus_consolidate' ], bed ] }
+
+    BEDTOOLS_SORT ( ch_locus_bed, [] )
+    BEDTOOLS_MERGE ( BEDTOOLS_SORT.out.sorted )
+    FORMAT_LOCUS_CONSOLIDATE ( BEDTOOLS_MERGE.out.bed )
+
+    ch_gff = ch_gff.mix(FORMAT_LOCUS_CONSOLIDATE.out.gff)
+
     // Populate channels if the user provided the orfs
     if ( params.user_orfs_faa && params.user_orfs_gff ) {
         ch_gff = channel.value ( [ [ id: "${assembly_name}.${orfs_name}", caller: orfs_name ], file(params.user_orfs_gff) ] )
@@ -614,8 +645,26 @@ workflow METATDENOVO {
         .map { meta, fc -> [ meta.caller, fc ] }
         .groupTuple()
         .map { caller, fcs -> [ [ id: "${assembly_name}.${caller}", caller: caller ], fcs ] }
+        .branch { meta, _fcs ->
+            locus_consolidate: meta.caller == 'locus_consolidate'
+            other: true
+        }
 
-    COLLECT_FEATURECOUNTS ( ch_collect_feature )
+    // Locus-consolidated counts get their own collect module (provenance join), branched out here
+    // so COLLECT_FEATURECOUNTS itself -- and every other caller's table -- stays untouched.
+    // Keyed by meta.id (not .combine(), which would cross-join every assembly's featureCounts
+    // group against every assembly's provenance file if this pipeline ever ran multiple
+    // simultaneous assemblies) -- matches ch_featurecounts/ch_collect_feature's own convention
+    // just above of staying joinable rather than relying on positional/cardinality pairing.
+    COLLECT_LOCUS_CONSOLIDATE (
+        ch_collect_feature.locus_consolidate
+            .map { meta, fcs -> [ meta.id, meta, fcs ] }
+            .join( FORMAT_LOCUS_CONSOLIDATE.out.provenance.map { meta, provenance -> [ meta.id, provenance ] } )
+            .map { _id, meta, fcs, provenance -> [ meta, fcs, provenance ] }
+    )
+    ch_versions = ch_versions.mix(COLLECT_LOCUS_CONSOLIDATE.out.versions)
+
+    COLLECT_FEATURECOUNTS ( ch_collect_feature.other )
     ch_versions           = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
     // [ meta(caller), tsv ] -- kept as a proper tuple (not stripped) so every consumer below can
     // join it against other per-caller channels instead of relying on positional channel pairing.

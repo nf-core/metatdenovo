@@ -1,7 +1,7 @@
 {
     "-profile test_megahit_prokka": {
         "content": [
-            47,
+            55,
             {
                 "BBMAP_ALIGN": {
                     "bbmap": 39.18
@@ -9,10 +9,24 @@
                 "BBMAP_INDEX": {
                     "bbmap": 39.18
                 },
+                "BEDTOOLS_MERGE": {
+                    "bedtools": "2.31.1"
+                },
+                "BEDTOOLS_SORT": {
+                    "bedtools": "2.31.1"
+                },
                 "CAT_FASTQ": {
                     "cat": 9.5
                 },
                 "COLLECT_FEATURECOUNTS": {
+                    "R": "4.5.3",
+                    "dplyr": "1.2.1",
+                    "readr": "2.2.0",
+                    "stringr": "1.6.0",
+                    "dtplyr": "1.3.3",
+                    "data.table": "1.17.8"
+                },
+                "COLLECT_LOCUS_CONSOLIDATE": {
                     "R": "4.5.3",
                     "dplyr": "1.2.1",
                     "readr": "2.2.0",
@@ -43,6 +57,12 @@
                     "coreutils": 9.4,
                     "find": "4.6.0",
                     "pigz": 2.8
+                },
+                "FORMAT_GFF2BED": {
+                    "gzip": 1.11
+                },
+                "FORMAT_LOCUS_CONSOLIDATE": {
+                    "gzip": 1.11
                 },
                 "GFF_CAT": {
                     "coreutils": 9.4,
@@ -111,10 +131,16 @@
                 "bbmap/bbmap/SAMPLE2_PE.bbmap.log",
                 "bbmap/bbmap/SAMPLE3_PE_1.bbmap.log",
                 "featurecounts",
+                "featurecounts/SAMPLE1_PE.locus_consolidate.featureCounts.tsv",
+                "featurecounts/SAMPLE1_PE.locus_consolidate.featureCounts.tsv.summary",
                 "featurecounts/SAMPLE1_PE.prokka.featureCounts.tsv",
                 "featurecounts/SAMPLE1_PE.prokka.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE2_PE.locus_consolidate.featureCounts.tsv",
+                "featurecounts/SAMPLE2_PE.locus_consolidate.featureCounts.tsv.summary",
                 "featurecounts/SAMPLE2_PE.prokka.featureCounts.tsv",
                 "featurecounts/SAMPLE2_PE.prokka.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE3_PE_1.locus_consolidate.featureCounts.tsv",
+                "featurecounts/SAMPLE3_PE_1.locus_consolidate.featureCounts.tsv.summary",
                 "featurecounts/SAMPLE3_PE_1.prokka.featureCounts.tsv",
                 "featurecounts/SAMPLE3_PE_1.prokka.featureCounts.tsv.summary",
                 "megahit",
@@ -167,6 +193,7 @@
                 "samtools/megahit.SAMPLE3_PE_1.flagstat",
                 "samtools/megahit.SAMPLE3_PE_1.idxstats",
                 "summary_tables",
+                "summary_tables/megahit.locus_consolidate.counts.tsv.gz",
                 "summary_tables/megahit.prokka.counts.tsv.gz",
                 "summary_tables/megahit.prokka.overall_stats.tsv.gz",
                 "summary_tables/megahit.prokka.prokka-annotations.tsv.gz",
@@ -208,7 +235,7 @@
             ],
             1
         ],
-        "timestamp": "2026-08-19T02:21:44.172646808",
+        "timestamp": "2026-08-20T12:29:10.023209755",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

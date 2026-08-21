@@ -65,6 +65,10 @@
   > Liao Y, Smyth GK and Shi W. featureCounts: an efficient general-purpose program for assigning sequence reads to genomic features. Bioinformatics, 30(7):923-30, 2014
   > Liao Y, Smyth GK and Shi W. The Subread aligner: fast, accurate and scalable read mapping by seed-and-vote. Nucleic Acids Research, 41(10):e108, 2013
 
+- [BEDTools](https://github.com/arq5x/bedtools2)
+
+  > Quinlan AR, Hall IM. BEDTools: a flexible suite of utilities for comparing genomic features. Bioinformatics. 2010 Mar 15;26(6):841-2. doi: 10.1093/bioinformatics/btq033. Epub 2010 Jan 28. PubMed PMID: 20110278; PubMed Central PMCID: PMC2832824.
+
 - [Eggnog](https://github.com/eggnogdb/eggnog-mapper)
 
   > Cantalapiedra C, Hernandez-Plaza A, Letunic I, Bork P, Huerta-Cepas J.

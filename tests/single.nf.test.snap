@@ -1,7 +1,7 @@
 {
     "-profile test_single": {
         "content": [
-            69,
+            79,
             {
                 "BBMAP_ALIGN": {
                     "bbmap": 39.18
@@ -12,10 +12,24 @@
                 "BBMAP_INDEX": {
                     "bbmap": 39.18
                 },
+                "BEDTOOLS_MERGE": {
+                    "bedtools": "2.31.1"
+                },
+                "BEDTOOLS_SORT": {
+                    "bedtools": "2.31.1"
+                },
                 "CAT_FASTQ": {
                     "cat": 9.5
                 },
                 "COLLECT_FEATURECOUNTS": {
+                    "R": "4.5.3",
+                    "dplyr": "1.2.1",
+                    "readr": "2.2.0",
+                    "stringr": "1.6.0",
+                    "dtplyr": "1.3.3",
+                    "data.table": "1.17.8"
+                },
+                "COLLECT_LOCUS_CONSOLIDATE": {
                     "R": "4.5.3",
                     "dplyr": "1.2.1",
                     "readr": "2.2.0",
@@ -36,6 +50,12 @@
                 },
                 "FEATURECOUNTS_CDS": {
                     "subread": "2.1.1"
+                },
+                "FORMAT_GFF2BED": {
+                    "gzip": 1.11
+                },
+                "FORMAT_LOCUS_CONSOLIDATE": {
+                    "gzip": 1.11
                 },
                 "FORMAT_PRODIGAL_GFF": {
                     "gzip": 1.11
@@ -101,14 +121,24 @@
                 "bbmap/bbmap/SAMPLE4_PE_1.bbmap.log",
                 "bbmap/bbmap/SAMPLE5_PE.bbmap.log",
                 "featurecounts",
+                "featurecounts/SAMPLE1_SE.locus_consolidate.featureCounts.tsv",
+                "featurecounts/SAMPLE1_SE.locus_consolidate.featureCounts.tsv.summary",
                 "featurecounts/SAMPLE1_SE.prodigal.featureCounts.tsv",
                 "featurecounts/SAMPLE1_SE.prodigal.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE2_SE.locus_consolidate.featureCounts.tsv",
+                "featurecounts/SAMPLE2_SE.locus_consolidate.featureCounts.tsv.summary",
                 "featurecounts/SAMPLE2_SE.prodigal.featureCounts.tsv",
                 "featurecounts/SAMPLE2_SE.prodigal.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE3_SE.locus_consolidate.featureCounts.tsv",
+                "featurecounts/SAMPLE3_SE.locus_consolidate.featureCounts.tsv.summary",
                 "featurecounts/SAMPLE3_SE.prodigal.featureCounts.tsv",
                 "featurecounts/SAMPLE3_SE.prodigal.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE4_PE_1.locus_consolidate.featureCounts.tsv",
+                "featurecounts/SAMPLE4_PE_1.locus_consolidate.featureCounts.tsv.summary",
                 "featurecounts/SAMPLE4_PE_1.prodigal.featureCounts.tsv",
                 "featurecounts/SAMPLE4_PE_1.prodigal.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE5_PE.locus_consolidate.featureCounts.tsv",
+                "featurecounts/SAMPLE5_PE.locus_consolidate.featureCounts.tsv.summary",
                 "featurecounts/SAMPLE5_PE.prodigal.featureCounts.tsv",
                 "featurecounts/SAMPLE5_PE.prodigal.featureCounts.tsv.summary",
                 "megahit",
@@ -173,6 +203,7 @@
                 "samtools/megahit.SAMPLE5_PE.flagstat",
                 "samtools/megahit.SAMPLE5_PE.idxstats",
                 "summary_tables",
+                "summary_tables/megahit.locus_consolidate.counts.tsv.gz",
                 "summary_tables/megahit.prodigal.counts.tsv.gz",
                 "summary_tables/megahit.prodigal.overall_stats.tsv.gz",
                 "transrate",
@@ -215,7 +246,7 @@
                 "sample\tn_post_trimming\tn_non_contaminated\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count"
             ]
         ],
-        "timestamp": "2026-08-19T02:48:41.551133572",
+        "timestamp": "2026-08-20T12:52:03.739555573",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

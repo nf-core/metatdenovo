@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Added`
 
+- [#467](https://github.com/nf-core/metatdenovo/pull/467) - When multiple `--orf_caller` values are active, merge overlapping/identical same-contig CDS calls from different callers into single loci before counting reads, producing a new `<assembly>.locus_consolidate.counts.tsv.gz` table with caller/call-count provenance columns; with a single caller active it's identical in content to that caller's own table, addresses [#463](https://github.com/nf-core/metatdenovo/issues/463) (@erikrikarddaniel)
 - [#466](https://github.com/nf-core/metatdenovo/pull/466) - Support running multiple ORF callers in a single execution, e.g. `--orf_caller prokka,transdecoder` (each caller still produces its own independent output, no cross-caller consolidation yet), addresses [#462](https://github.com/nf-core/metatdenovo/issues/462) (@erikrikarddaniel)
 - [#465](https://github.com/nf-core/metatdenovo/pull/465) - Add MetaEuk as a splice-aware `--orf_caller` alternative for eukaryotes (`--metaeuk_db`), addresses [#459](https://github.com/nf-core/metatdenovo/issues/459) (@erikrikarddaniel)
 - [#461](https://github.com/nf-core/metatdenovo/pull/461) - Document how to build a taxonomy-aware Diamond database with nf-core/createtaxdb, addresses [#412](https://github.com/nf-core/metatdenovo/issues/412) (@erikrikarddaniel)
@@ -23,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Fixed`
 
+- [#467](https://github.com/nf-core/metatdenovo/pull/467) - Fix validation that was supposed to reject `--orf_caller` and `--user_orfs_gff`/`--user_orfs_faa` both being set at once, but could never actually trigger (@erikrikarddaniel)
 - [#466](https://github.com/nf-core/metatdenovo/pull/466) - `featurecounts/*.featureCounts.tsv` output filenames now always include the ORF caller name (e.g. `SAMPLE1.prokka.featureCounts.tsv`), required so multiple simultaneous callers (see above) don't overwrite each other's per-sample counts (@erikrikarddaniel)
 - [#466](https://github.com/nf-core/metatdenovo/pull/466) - Fix a crash when hmm-classification finds zero hits for a given ORF caller/hmm-file combination (@erikrikarddaniel)
 - [#458](https://github.com/nf-core/metatdenovo/pull/458) - Fix Prokka stats in the MultiQC report colliding under a single "strain" sample name on any assembly with more than one `prokka_batchsize` chunk, addresses part of [#456](https://github.com/nf-core/metatdenovo/issues/456) (@erikrikarddaniel)
