@@ -228,10 +228,11 @@ With a **single caller** there is no cross-caller redundancy to find, so the ste
 On the pipeline's own small prokaryotic test dataset that is nothing at all: 4397 loci produce 4397 clusters, and the protein-consolidated table is identical in content to the locus-consolidated one.
 
 With **two callers** it does what it is for.
-On a full-size metatranscriptome run with `--orf_caller prokka,transdecoder` at the default `--cluster_min_seq_id 0.99`, 68829 loci produced 68300 clusters: 476 clusters contained more than one locus, absorbing 529 loci in total.
-Of those 476, 315 linked calls from different callers -- the genomic-versus-transcript case this exists for -- while 91 merged two Prokka calls and 70 two TransDecoder calls, i.e. redundancy within a single caller.
+On a full-size metatranscriptome run with `--orf_caller prokka,transdecoder` at the default `--cluster_min_seq_id 0.99`, 68829 loci produced 68300 clusters.
+476 of those clusters held more than one locus, covering 1005 loci between them (mean 2.1 members), so 1.5% of loci were grouped with at least one other and the feature count fell by 529.
+Of the 476, 315 linked calls from different callers -- the genomic-versus-transcript case this exists for -- while 91 merged two Prokka calls and 70 two TransDecoder calls, i.e. redundancy within a single caller.
 
-So the effect is real but modest in absolute terms, under 1% of loci here, and concentrated in exactly the calls that two callers disagreed about how to name.
+So the effect is modest in absolute terms, a few percent of loci at most, but two thirds of it is the intended cross-caller kind rather than redundancy collapse.
 If you run a single caller and are watching runtime, `--skip_protein_consolidation` costs you little.
 Lowering `--cluster_min_seq_id` is what makes the step start merging paralogs and strain variants, so change it deliberately rather than to "make something happen".
 
