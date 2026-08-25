@@ -30,10 +30,11 @@ process COLLECT_LOCUSCONSOLIDATE {
 
     setDTthreads($task.cpus)
 
-    # A multi-exon locus whose ID was inherited from a single caller (see FORMAT_LOCUSCONSOLIDATE)
-    # has one provenance row per exon segment, all identical (same caller, same n_calls) -- collapse
-    # to one row per ID or the join below fans out and duplicates that locus's counts rows.
-    provenance <- fread('${provenance}', sep = '\\t') %>% distinct()
+    # Dedupe on ID, not on whole rows: FORMAT_LOCUSCONSOLIDATE now emits one row per locus, but a
+    # duplicate ID differing in any column would survive a plain distinct() and fan this join out --
+    # and here that duplicates the counts rows themselves, so anything summing the table would
+    # double-count.
+    provenance <- fread('${provenance}', sep = '\\t') %>% distinct(ID, .keep_all = TRUE)
 
     tibble(f = Sys.glob('*.featureCounts.tsv')) %>%
         mutate(

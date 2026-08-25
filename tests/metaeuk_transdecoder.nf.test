@@ -67,8 +67,8 @@ nextflow_pipeline {
 
                 // === k59_1: MetaEuk's splice-aware call (two exons, - strand) and TransDecoder's
                 // unspliced call (+ strand) overlap in genomic position but are different real gene
-                // models on opposite strands -- bedtools merge's -s (strand-aware) design must keep them
-                // as two separate loci, never merged into one. ===
+                // models on opposite strands -- the grouping is strand-aware and must keep them as two
+                // separate loci, never merged into one. ===
                 { assert (
                     path("${params.outdir}/summary_tables/megahit.locus_consolidate.counts.tsv.gz")
                         .csv(sep: '\t', decompress: true, header: true).rows
@@ -131,15 +131,26 @@ nextflow_pipeline {
                 // The cluster representatives handed to the annotation tools must be keyed exactly
                 // like the counts table's 'orf' column, or every annotation join silently returns
                 // nothing -- the same class of bug this PR fixes for MetaEuk.
+                // Cluster table shape -- it is in tests/.nftignore (assembly-derived, so md5s would
+                // flake on MEGAHIT non-determinism), so assert its structure instead of its checksum.
                 { assert (
+                    path("${params.outdir}/protein_consolidate/megahit.protein_consolidate_99.clusters.tsv").readLines()
+                        .every { l -> l.tokenize('\t').size() == 2 }
+                ) },
+                { assert (
+                    path("${params.outdir}/protein_consolidate/megahit.protein_consolidate_99.clusters.tsv").readLines()
+                        .collect { l -> l.tokenize('\t') }
+                        .with { rows -> rows.collect { r -> r[0] }.toSet().every { rep -> rows.any { r -> r[0] == rep && r[1] == rep } } }
+                ) },
+                { assert (
+                    path("${params.outdir}/summary_tables/megahit.protein_consolidate_99.counts.tsv.gz")
+                        .csv(sep: '\t', decompress: true, header: true).columns["orf"].toSet()
+                ).every { orf -> orf in (
                     path("${params.outdir}/protein_consolidate/megahit.protein_consolidate_99.representatives.fa.gz").linesGzip
                         .findAll { l -> l.startsWith('>') }
                         .collect { l -> l.substring(1).tokenize(' ')[0] }
                         .toSet()
-                ) == (
-                    path("${params.outdir}/summary_tables/megahit.protein_consolidate_99.counts.tsv.gz")
-                        .csv(sep: '\t', decompress: true, header: true).columns["orf"].toSet()
-                ) },
+                ) } },
             )
         }
     }

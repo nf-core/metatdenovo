@@ -72,9 +72,21 @@ process FORMAT_LOCUSFAA {
                         best_seq[l] = s
                     }
                 }
+                n_emitted = 0
                 for (j = 1; j <= n_loci; j++) {
                     l = locus_order[j]
-                    if (l in best_seq) print ">" l "\\n" best_seq[l]
+                    if (l in best_seq) { print ">" l "\\n" best_seq[l]; n_emitted++ }
+                    else if (n_missing++ < 5) missing = missing " " l
+                }
+                # A locus with no resolvable protein would otherwise vanish silently: it gets no
+                # cluster, and the inner join in the counts collector then drops its reads while tpm is
+                # renormalised over what is left, so the totals still look self-consistent. Fail
+                # loudly instead -- this only happens when the fasta ids of some caller stop matching
+                # its gff ids, which is exactly the bug class FORMAT_METAEUKFAA exists to fix.
+                if (n_emitted < n_loci) {
+                    printf "ERROR: %d of %d loci had no matching protein sequence, e.g.%s\\n", \\
+                        n_loci - n_emitted, n_loci, missing > "/dev/stderr"
+                    exit 1
                 }
             }' - all_proteins.faa \\
         | gzip -c > ${prefix}.locus.faa.gz

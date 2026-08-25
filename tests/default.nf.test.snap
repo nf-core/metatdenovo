@@ -11,9 +11,6 @@
                 "BBMAP_INDEX": {
                     "bbmap": 39.18
                 },
-                "BEDTOOLS_MERGE": {
-                    "bedtools": "2.31.1"
-                },
                 "BEDTOOLS_SORT": {
                     "bedtools": "2.31.1"
                 },
@@ -219,8 +216,8 @@
                 "prodigal/megahit.prodigal_all.txt.gz",
                 "prodigal/megahit.prodigal_format.gff.gz",
                 "protein_consolidate",
+                "protein_consolidate/megahit.protein_consolidate_99.clusters.tsv",
                 "protein_consolidate/megahit.protein_consolidate_99.representatives.fa.gz",
-                "protein_consolidate/megahit.protein_consolidate_99.tsv",
                 "samtools",
                 "samtools/SAMPLE1_PE.sorted.bam",
                 "samtools/SAMPLE1_PE.sorted.bam.bai",
@@ -267,9 +264,7 @@
                 "trimgalore/fastqc/SAMPLE3_PE_1_2_val_2_fastqc.zip"
             ],
             [
-                "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f",
-                "megahit.protein_consolidate_99.representatives.fa.gz:md5,7676533a4cace02357c65fed079e21cf",
-                "megahit.protein_consolidate_99.tsv:md5,c1ab12c242b3c9ce1d0b086b42351e8b"
+                "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f"
             ],
             16,
             [
@@ -284,7 +279,7 @@
                 "sample\tn_post_trimming\tn_non_contaminated\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count"
             ]
         ],
-        "timestamp": "2026-08-25T10:56:14.211433673",
+        "timestamp": "2026-08-25T12:29:58.847244471",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

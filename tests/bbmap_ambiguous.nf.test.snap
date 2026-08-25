@@ -1,16 +1,13 @@
 {
     "-profile test_bbmap_ambiguous": {
         "content": [
-            52,
+            51,
             {
                 "BBMAP_ALIGN": {
                     "bbmap": 39.18
                 },
                 "BBMAP_INDEX": {
                     "bbmap": 39.18
-                },
-                "BEDTOOLS_MERGE": {
-                    "bedtools": "2.31.1"
                 },
                 "BEDTOOLS_SORT": {
                     "bedtools": "2.31.1"
@@ -207,7 +204,7 @@
                 "orf\tchr\tstart\tend\tstrand\tlength\tsample\tcount\ttpm"
             ]
         ],
-        "timestamp": "2026-08-21T15:26:46.226729816",
+        "timestamp": "2026-08-25T12:36:23.258172297",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

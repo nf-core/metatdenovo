@@ -58,7 +58,6 @@ include { BBMAP_ALIGN                                } from '../modules/nf-core/
 include { BBMAP_BBDUK                                } from '../modules/nf-core/bbmap/bbduk/'
 include { BBMAP_BBNORM                               } from '../modules/nf-core/bbmap/bbnorm/'
 include { BBMAP_INDEX                                } from '../modules/nf-core/bbmap/index/'
-include { BEDTOOLS_MERGE                             } from '../modules/nf-core/bedtools/merge/'
 include { BEDTOOLS_SORT                              } from '../modules/nf-core/bedtools/sort/'
 include { SEQKIT_GREP                                } from '../modules/nf-core/seqkit/grep/'
 include { CAT_FASTQ            	                     } from '../modules/nf-core/cat/fastq/'
@@ -148,6 +147,21 @@ workflow METATDENOVO {
         error "When using `--orf_caller metaeuk`, you must also specify `--metaeuk_db`!"
     }
 
+    // --bbmap_ambiguous all keeps every top-scoring alignment, so without --featurecounts_fraction a
+    // multi-mapping read is counted at full weight at EVERY site it hits. On the per-caller and
+    // per-locus tables that is just featureCounts' documented -M behaviour, and some users want it.
+    // Protein consolidation, though, sums per-locus counts across a cluster -- and a gene duplicated
+    // across contigs is exactly the read set that multi-maps -- so those reads get counted once per
+    // copy in a single cluster row. Fail rather than warn: the resulting table looks entirely
+    // ordinary, so a missed warning ships as a wrong number.
+    //
+    // Note --bbmap_ambiguous toss is deliberately NOT an error here. It discards multi-mapping reads,
+    // which makes the consolidated counts conservative for duplicated genes rather than wrong, and
+    // that is a legitimate choice; it is documented in usage.md instead.
+    if ( params.bbmap_ambiguous == 'all' && ! params.featurecounts_fraction && ! params.skip_protein_consolidation && orf_callers ) {
+        error "`--bbmap_ambiguous all` counts a multi-mapping read at full weight at every site it aligns to, which double-counts it when protein consolidation sums counts across a cluster. Add `--featurecounts_fraction` so each alignment is weighted 1/N, or `--skip_protein_consolidation` if you do not need the consolidated table."
+    }
+
     // Deal with user-supplied assembly to make sure output names are correct
     assembler     = params.assembler
     assembly_name = params.assembler ?: params.user_assembly_name
@@ -160,7 +174,12 @@ workflow METATDENOVO {
     // other's tables -- the same reason assembler and ORF caller are already in output filenames.
     // Computed once here and threaded from here; it's used as a caller name, so it ends up in the
     // counts table's filename and in every annotation table derived from the cluster representatives.
-    protein_consolidate_name = "protein_consolidate_${Math.round(params.cluster_min_seq_id * 100)}"
+    // BigDecimal from the string form, not Math.round: rounding to whole percent made 0.995 and 1.0
+    // both "100", so two runs at different identities would overwrite each other's tables -- exactly
+    // what putting the identity in the name is meant to prevent. Trailing zeros are stripped and the
+    // decimal point becomes "_", so 0.99 -> 99, 1.0 -> 100, 0.995 -> 99_5.
+    cluster_pct              = new java.math.BigDecimal(params.cluster_min_seq_id.toString()).multiply(new java.math.BigDecimal("100"))
+    protein_consolidate_name = "protein_consolidate_" + cluster_pct.stripTrailingZeros().toPlainString().replace('.', '_')
 
 
     // If the user supplied hmm files, we will run hmmsearch and then rank the results.
@@ -553,11 +572,16 @@ workflow METATDENOVO {
     //
     // Consolidate overlapping same-contig CDS calls from different active callers into single loci
     // before counting, so a read supporting one real gene isn't counted once per caller that called
-    // it (#463). Runs unconditionally, even with a single active caller: with nothing to overlap,
-    // every bedtools-merge row has exactly one contributor, so FORMAT_LOCUSCONSOLIDATE's
-    // ID-inheritance rule reproduces that caller's own GFF byte-for-byte -- graceful degradation,
-    // no separate code path. Rides through the existing, unmodified ch_featurecounts cross-product
-    // and FEATURECOUNTS_CDS call below by being mixed into ch_gff as just another caller.
+    // it (#463). Runs unconditionally, even with a single active caller: FORMAT_LOCUSCONSOLIDATE only
+    // ever merges calls from DIFFERENT callers, so with one caller nothing merges, every locus keeps
+    // that caller's own ORF id, and the consolidated table is identical in content to that caller's
+    // own -- graceful degradation, no separate code path. Rides through the existing, unmodified
+    // ch_featurecounts cross-product and FEATURECOUNTS_CDS call below by being mixed into ch_gff as
+    // just another caller.
+    //
+    // The grouping deliberately does NOT use bedtools merge: merging on overlap alone cannot tell
+    // two callers agreeing on one gene from one caller calling two adjacent genes, and prokaryotic
+    // genes overlap routinely, so it fused 14.8% of Prodigal's ORFs on this pipeline's own test data.
     //
     // versions_gzip/versions_bedtools are topic:versions tuple emits, not versions.yml Paths --
     // like every other module's topic-based version emit in this pipeline, they're picked up
@@ -571,8 +595,7 @@ workflow METATDENOVO {
         .map { bed -> [ [ id: "${assembly_name}.locus_consolidate", caller: 'locus_consolidate' ], bed ] }
 
     BEDTOOLS_SORT ( ch_locus_bed, [] )
-    BEDTOOLS_MERGE ( BEDTOOLS_SORT.out.sorted )
-    FORMAT_LOCUSCONSOLIDATE ( BEDTOOLS_MERGE.out.bed )
+    FORMAT_LOCUSCONSOLIDATE ( BEDTOOLS_SORT.out.sorted )
 
     ch_gff = ch_gff.mix(FORMAT_LOCUSCONSOLIDATE.out.gff)
 
@@ -622,13 +645,17 @@ workflow METATDENOVO {
             'linclust'
         )
 
-        ch_protein_clusters = MMSEQS_FASTA_CLUSTER.out.clusters
+        // Re-pick each cluster's representative as its lexicographically smallest member, so the
+        // cluster id is a function of the cluster content rather than of the order MMseqs2 happened
+        // to see the sequences in. Everything downstream reads the rewritten table, so the counts
+        // table and the annotated representatives cannot disagree about a cluster name.
+        FORMAT_CLUSTERREPS ( MMSEQS_FASTA_CLUSTER.out.clusters )
+        ch_protein_clusters = FORMAT_CLUSTERREPS.out.clusters
 
         // Annotate one protein per cluster in addition to each caller's own ORFs, by feeding the
         // cluster representatives into ch_protein as another caller. The sequence ids here are locus
         // ids, which is exactly what the cluster counts table's 'orf' column holds, so every
         // annotation summary module's join against the counts finds them without special-casing.
-        FORMAT_CLUSTERREPS ( MMSEQS_FASTA_CLUSTER.out.clusters )
 
         // 'fa', not 'faa': SEQKIT_GREP appends the input's own .gz itself, and only *.fa.gz/*.fq.gz
         // match its output declaration, so anything else here fails as a missing output file.
@@ -743,14 +770,16 @@ workflow METATDENOVO {
     //
     // Keyed on the assembly name rather than meta.id, since the three inputs carry three different
     // caller names; meta.id is "<assembly>.<caller>" throughout, so stripping the caller recovers a
-    // key they share without assuming there is only ever one assembly in flight.
+    // key they share without assuming there is only ever one assembly in flight. The strip is
+    // anchored to the end -- a plain string minus removes the FIRST occurrence, which would silently
+    // produce mismatched keys if an assembly name happened to contain the caller name.
     ch_protein_consolidate_counts = channel.empty()
     if ( ! params.skip_protein_consolidation && orf_callers ) {
         COLLECT_PROTEINCONSOLIDATE (
             ch_collect_feature.locus_consolidate
-                .map { meta, fcs -> [ meta.id - ".${meta.caller}", fcs ] }
-                .join( FORMAT_LOCUSCONSOLIDATE.out.provenance.map { meta, provenance -> [ meta.id - ".${meta.caller}", provenance ] } )
-                .join( ch_protein_clusters.map { meta, clusters -> [ meta.id - ".${meta.caller}", clusters ] } )
+                .map { meta, fcs -> [ meta.id.replaceAll(java.util.regex.Pattern.quote(".${meta.caller}") + '$', ''), fcs ] }
+                .join( FORMAT_LOCUSCONSOLIDATE.out.provenance.map { meta, provenance -> [ meta.id.replaceAll(java.util.regex.Pattern.quote(".${meta.caller}") + '$', ''), provenance ] } )
+                .join( ch_protein_clusters.map { meta, clusters -> [ meta.id.replaceAll(java.util.regex.Pattern.quote(".${meta.caller}") + '$', ''), clusters ] } )
                 .map { assembly, fcs, provenance, clusters ->
                     [ [ id: "${assembly}.${protein_consolidate_name}", caller: protein_consolidate_name ], fcs, provenance, clusters ]
                 }
@@ -931,6 +960,11 @@ workflow METATDENOVO {
             MERGE_TABLES.out.merged_table.map { meta, mergetab -> [ meta.caller, mergetab ] },
             remainder: true
         )
+        // remainder: true also emits right-only entries, i.e. a caller that produced annotation tables
+        // but no counts. That cannot happen for any reachable config today, but it would arrive here
+        // as a null meta and kill COLLECT_STATS on tag "$meta.id" -- drop it instead, so a future
+        // wiring mistake degrades to a missing stats row rather than a crash far from its cause.
+        .filter { _caller, meta, _fcs, _mergetab -> meta != null }
         .map { _caller, meta, fcs, mergetab -> [ meta, fcs, mergetab ?: [] ] }
 
     ch_collect_stats = ch_collect_stats

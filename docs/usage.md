@@ -223,7 +223,7 @@ Unlike locus consolidation, protein consolidation is **not** a no-op when only o
 Use `--skip_protein_consolidation` to turn it off.
 
 How much it actually changes depends strongly on the community, and for prokaryotic data the honest answer is often "very little".
-On the pipeline's own prokaryotic test dataset, a single-caller (Prodigal) run at the default `--cluster_min_seq_id 0.99` merged nothing at all: 4028 loci produced 4028 clusters, so the protein-consolidated table was identical in content to the locus-consolidated one.
+On the pipeline's own prokaryotic test dataset, a single-caller (Prodigal) run at the default `--cluster_min_seq_id 0.99` merged nothing at all: 4397 loci produced 4397 clusters, so the protein-consolidated table was identical in content to the locus-consolidated one.
 That is a small dataset and not a general result, but it matches expectation -- a prokaryotic de novo assembly does not usually contain the same protein on two different contigs at 99% identity.
 The cross-contig merging this step exists for is mainly relevant to mixed or eukaryote-containing communities, where one gene can be assembled both from genomic DNA and from its transcript.
 If your community is prokaryotic and you are watching runtime, `--skip_protein_consolidation` is unlikely to cost you much; conversely, lowering `--cluster_min_seq_id` is what makes the step start merging paralogs and strain variants, so change it deliberately rather than to "make something happen".

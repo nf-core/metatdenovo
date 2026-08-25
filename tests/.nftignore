@@ -46,6 +46,7 @@ spades/spades.spades.log
 spades/spades.yaml
 spades/*.gz
 summary_tables/*.tsv.gz
+protein_consolidate/*
 transdecoder/*.gz
 transrate/*.assemblies.csv
 transrate/*.contigs.csv

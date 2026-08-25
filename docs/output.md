@@ -156,7 +156,7 @@ BBnorm is a BBmap tool.
 ### ORF caller step
 
 `--orf_caller` accepts a comma-separated list of callers (e.g. `--orf_caller prokka,transdecoder`) to run more than one in the same execution.
-Each active caller's output below is produced independently, under its own `<caller>` name -- there is currently no consolidation across callers.
+Each active caller's output below is produced independently, under its own `<caller>` name; consolidation across callers is reported separately, in the `summary_tables/` consolidation levels.
 
 #### Prodigal
 
@@ -256,12 +256,16 @@ Quantification of CDS features with `featureCounts` from the [subread](https://s
   - `*.featureCounts.tsv.summar`: summary statistics
 - `summary_tables/`
   - `<assembly_name>.<orfcaller_name>.counts.tsv.gz`: reformatted count data
-  - `<assembly_name>.locus_consolidate.counts.tsv.gz`: when multiple `--orf_caller` values are
-    active, overlapping/identical same-contig CDS calls from different callers are merged into
-    single loci before counting, so a read supporting one real gene isn't counted once per caller
-    that called it. Same columns as the per-caller tables above, plus `callers` (which caller(s)
-    contributed to the locus) and `n_calls` (how many independent calls were merged). With a single
-    caller active, this table is identical in content to that caller's own table above.
+  - `<assembly_name>.locus_consolidate.counts.tsv.gz`: overlapping same-contig CDS calls from
+    _different_ callers merged into single loci before counting, so a read supporting one real gene
+    isn't counted once per caller that called it.
+    Two overlapping calls from the _same_ caller are two genes rather than one and are never merged,
+    which matters because prokaryotic genes overlap each other routinely.
+    Produced on every run, not only when several callers are active.
+    Same columns as the per-caller tables above, plus `callers` (which caller(s) contributed) and
+    `n_calls` (how many independent calls were merged).
+    With a single caller active nothing can merge, so this table is identical in content to that
+    caller's own table above.
 
 </details>
 

@@ -1,4 +1,61 @@
 {
+    "cluster table - representative is re-picked as the smallest member": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.clusters.tsv:md5,68c2ef911ccd66bc0664a8a105389639"
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.representatives.txt:md5,0dee9e64c1e7849e739b5dbb7c3c4f7f"
+                    ]
+                ],
+                "2": [
+                    [
+                        "FORMAT_CLUSTERREPS",
+                        "gzip",
+                        "1.11"
+                    ]
+                ],
+                "clusters": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.clusters.tsv:md5,68c2ef911ccd66bc0664a8a105389639"
+                    ]
+                ],
+                "representatives": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.representatives.txt:md5,0dee9e64c1e7849e739b5dbb7c3c4f7f"
+                    ]
+                ],
+                "versions_gzip": [
+                    [
+                        "FORMAT_CLUSTERREPS",
+                        "gzip",
+                        "1.11"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-08-25T12:25:01.331627558",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
+    },
     "cluster table - stub": {
         "content": [
             {
@@ -7,14 +64,30 @@
                         {
                             "id": "test"
                         },
-                        "test.representatives.txt:md5,d41d8cd98f00b204e9800998ecf8427e"
+                        "test.clusters.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
                     ]
                 ],
                 "1": [
                     [
+                        {
+                            "id": "test"
+                        },
+                        "test.representatives.txt:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "2": [
+                    [
                         "FORMAT_CLUSTERREPS",
                         "gzip",
                         "1.11"
+                    ]
+                ],
+                "clusters": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.clusters.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
                     ]
                 ],
                 "representatives": [
@@ -34,48 +107,7 @@
                 ]
             }
         ],
-        "timestamp": "2026-08-25T10:44:08.002926314",
-        "meta": {
-            "nf-test": "0.9.5",
-            "nextflow": "26.04.6"
-        }
-    },
-    "cluster table - distinct representatives in cluster order": {
-        "content": [
-            {
-                "0": [
-                    [
-                        {
-                            "id": "test"
-                        },
-                        "test.representatives.txt:md5,0dee9e64c1e7849e739b5dbb7c3c4f7f"
-                    ]
-                ],
-                "1": [
-                    [
-                        "FORMAT_CLUSTERREPS",
-                        "gzip",
-                        "1.11"
-                    ]
-                ],
-                "representatives": [
-                    [
-                        {
-                            "id": "test"
-                        },
-                        "test.representatives.txt:md5,0dee9e64c1e7849e739b5dbb7c3c4f7f"
-                    ]
-                ],
-                "versions_gzip": [
-                    [
-                        "FORMAT_CLUSTERREPS",
-                        "gzip",
-                        "1.11"
-                    ]
-                ]
-            }
-        ],
-        "timestamp": "2026-08-25T10:43:58.965571225",
+        "timestamp": "2026-08-25T12:25:08.55323738",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

@@ -35,9 +35,10 @@ process COLLECT_PROTEINCONSOLIDATE {
     # its length below.
     clusters <- fread('${clusters}', sep = '\\t', header = FALSE, col.names = c('cluster', 'orf'))
 
-    # As in COLLECT_LOCUSCONSOLIDATE: one provenance row per exon segment for a multi-exon locus,
-    # all identical, so collapse before joining or the counts fan out.
-    provenance <- fread('${provenance}', sep = '\\t') %>% distinct()
+    # FORMAT_LOCUSCONSOLIDATE emits one provenance row per locus, but dedupe on ID defensively: a
+    # second row for the same ID differing in any column would survive a plain distinct() and fan the
+    # join out, inflating n_loci/n_calls and duplicating the loci list.
+    provenance <- fread('${provenance}', sep = '\\t') %>% distinct(ID, .keep_all = TRUE)
 
     counts <- tibble(f = Sys.glob('*.featureCounts.tsv')) %>%
         mutate(
@@ -83,6 +84,17 @@ process COLLECT_PROTEINCONSOLIDATE {
     # cluster's members without double counting -- provided each read was exclusively assigned to one
     # feature at counting time, which is what --bbmap_ambiguous/--featurecounts_fraction control.
     # tpm is recomputed from the summed counts rather than summed from the per-locus tpms.
+    # An inner join here would silently drop any locus missing from the cluster table, and because tpm
+    # is renormalised over the survivors the output would still look internally consistent while
+    # under-reporting reads relative to the locus-level table. Fail instead.
+    orphans <- counts %>% filter(count > 0) %>% distinct(orf) %>% anti_join(clusters, by = 'orf')
+    if (nrow(orphans) > 0) {
+        stop(sprintf(
+            '%d locus/loci with counts are absent from the cluster table, e.g. %s',
+            nrow(orphans), paste(head(orphans\$orf, 5), collapse = ', ')
+        ))
+    }
+
     counts %>%
         filter(count > 0) %>%
         inner_join(clusters, by = 'orf') %>%

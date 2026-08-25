@@ -1,16 +1,13 @@
 {
     "-profile test_metaeuk_transdecoder": {
         "content": [
-            69,
+            68,
             {
                 "BBMAP_ALIGN": {
                     "bbmap": 39.18
                 },
                 "BBMAP_INDEX": {
                     "bbmap": 39.18
-                },
-                "BEDTOOLS_MERGE": {
-                    "bedtools": "2.31.1"
                 },
                 "BEDTOOLS_SORT": {
                     "bedtools": "2.31.1"
@@ -205,8 +202,8 @@
                 "pipeline_info",
                 "pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml",
                 "protein_consolidate",
+                "protein_consolidate/megahit.protein_consolidate_99.clusters.tsv",
                 "protein_consolidate/megahit.protein_consolidate_99.representatives.fa.gz",
-                "protein_consolidate/megahit.protein_consolidate_99.tsv",
                 "samtools",
                 "samtools/RPL28_GENOMIC.sorted.bam",
                 "samtools/RPL28_GENOMIC.sorted.bam.bai",
@@ -265,9 +262,7 @@
                 "megahit.metaeuk_format.faa.gz:md5,ad243c05fb3c9c1a4f3d0d7b61840cf2",
                 "megahit.metaeuk_format.gff.gz:md5,9f4ba2f29292871fb361b621124cb2b2",
                 "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f",
-                "multiqc_metaeuk_stats.txt:md5,be6038955478f96fdcaaa12d04c6d4a9",
-                "megahit.protein_consolidate_99.representatives.fa.gz:md5,069cd1819a82562e90bf10a58959f6e4",
-                "megahit.protein_consolidate_99.tsv:md5,68c2ef911ccd66bc0664a8a105389639"
+                "multiqc_metaeuk_stats.txt:md5,be6038955478f96fdcaaa12d04c6d4a9"
             ],
             [
                 "orf\tchr\tstart\tend\tstrand\tlength\tsample\tcount\ttpm"
@@ -288,7 +283,7 @@
                 "k59_1.p1\tk59_1\t183\t611\t+\t429\tRPL28_GENOMIC\t12\t153410.5534105534\ttransdecoder\t1\t1\tk59_1.p1"
             ]
         ],
-        "timestamp": "2026-08-25T10:50:59.7039514",
+        "timestamp": "2026-08-25T12:33:10.314320429",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"
