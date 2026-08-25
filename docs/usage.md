@@ -222,11 +222,18 @@ The identity is part of the output name, rounded to whole percent, so runs at di
 Unlike locus consolidation, protein consolidation is **not** a no-op when only one ORF caller is active: near-identical proteins on different contigs are merged whichever caller found them, which also collapses assembly redundancy.
 Use `--skip_protein_consolidation` to turn it off.
 
-How much it actually changes depends strongly on the community, and for prokaryotic data the honest answer is often "very little".
-On the pipeline's own prokaryotic test dataset, a single-caller (Prodigal) run at the default `--cluster_min_seq_id 0.99` merged nothing at all: 4397 loci produced 4397 clusters, so the protein-consolidated table was identical in content to the locus-consolidated one.
-That is a small dataset and not a general result, but it matches expectation -- a prokaryotic de novo assembly does not usually contain the same protein on two different contigs at 99% identity.
-The cross-contig merging this step exists for is mainly relevant to mixed or eukaryote-containing communities, where one gene can be assembled both from genomic DNA and from its transcript.
-If your community is prokaryotic and you are watching runtime, `--skip_protein_consolidation` is unlikely to cost you much; conversely, lowering `--cluster_min_seq_id` is what makes the step start merging paralogs and strain variants, so change it deliberately rather than to "make something happen".
+How much it changes depends mostly on how many ORF callers are active, and secondarily on the community.
+
+With a **single caller** there is no cross-caller redundancy to find, so the step only collapses cases where one caller called near-identical proteins on two different contigs.
+On the pipeline's own small prokaryotic test dataset that is nothing at all: 4397 loci produce 4397 clusters, and the protein-consolidated table is identical in content to the locus-consolidated one.
+
+With **two callers** it does what it is for.
+On a full-size metatranscriptome run with `--orf_caller prokka,transdecoder` at the default `--cluster_min_seq_id 0.99`, 68829 loci produced 68300 clusters: 476 clusters contained more than one locus, absorbing 529 loci in total.
+Of those 476, 315 linked calls from different callers -- the genomic-versus-transcript case this exists for -- while 91 merged two Prokka calls and 70 two TransDecoder calls, i.e. redundancy within a single caller.
+
+So the effect is real but modest in absolute terms, under 1% of loci here, and concentrated in exactly the calls that two callers disagreed about how to name.
+If you run a single caller and are watching runtime, `--skip_protein_consolidation` costs you little.
+Lowering `--cluster_min_seq_id` is what makes the step start merging paralogs and strain variants, so change it deliberately rather than to "make something happen".
 
 ```bash
 nextflow run nf-core/metatdenovo -profile docker --outdir results/ --input samplesheet.csv --assembler megahit --orf_caller metaeuk,transdecoder --metaeuk_db /path/to/db --cluster_min_seq_id 0.95
