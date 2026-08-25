@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Added`
 
+- Add `--save_bbduk_removed_fastq` to optionally keep the reads removed (matched) by BBDuk contaminant filtering, instead of only keeping the clean reads, addresses [#17](https://github.com/nf-core/metatdenovo/issues/17) (@danilodileo)
 - [#467](https://github.com/nf-core/metatdenovo/pull/467) - When multiple `--orf_caller` values are active, merge overlapping/identical same-contig CDS calls from different callers into single loci before counting reads, producing a new `<assembly>.locus_consolidate.counts.tsv.gz` table with caller/call-count provenance columns; with a single caller active it's identical in content to that caller's own table, addresses [#463](https://github.com/nf-core/metatdenovo/issues/463) (@erikrikarddaniel)
 - [#466](https://github.com/nf-core/metatdenovo/pull/466) - Support running multiple ORF callers in a single execution, e.g. `--orf_caller prokka,transdecoder` (each caller still produces its own independent output, no cross-caller consolidation yet), addresses [#462](https://github.com/nf-core/metatdenovo/issues/462) (@erikrikarddaniel)
 - [#465](https://github.com/nf-core/metatdenovo/pull/465) - Add MetaEuk as a splice-aware `--orf_caller` alternative for eukaryotes (`--metaeuk_db`), addresses [#459](https://github.com/nf-core/metatdenovo/issues/459) (@erikrikarddaniel)
