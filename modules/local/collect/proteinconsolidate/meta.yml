@@ -17,7 +17,7 @@ input:
       pattern: "*.featureCounts.tsv"
   - provenance:
       type: file
-      description: Per-locus provenance table (ID, callers, n_calls) from FORMAT_LOCUS_CONSOLIDATE
+      description: Per-locus provenance table (ID, callers, n_calls) from FORMAT_LOCUSCONSOLIDATE
       pattern: "*.provenance.tsv.gz"
   - clusters:
       type: file

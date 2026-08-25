@@ -8,12 +8,12 @@
 // MODULE: local
 //
 include { COLLECT_FEATURECOUNTS              } from '../modules/local/collect/featurecounts/'
-include { COLLECT_LOCUS_CONSOLIDATE          } from '../modules/local/collect/locus_consolidate/'
+include { COLLECT_LOCUSCONSOLIDATE           } from '../modules/local/collect/locusconsolidate/'
 include { COLLECT_PROTEINCONSOLIDATE         } from '../modules/local/collect/proteinconsolidate/'
 include { COLLECT_STATS                      } from '../modules/local/collect/stats/'
 include { FORMAT_CLUSTERREPS                 } from '../modules/local/format/clusterreps/'
 include { FORMAT_GFF2BED                     } from '../modules/local/format/gff2bed/'
-include { FORMAT_LOCUS_CONSOLIDATE           } from '../modules/local/format/locus_consolidate/'
+include { FORMAT_LOCUSCONSOLIDATE            } from '../modules/local/format/locusconsolidate/'
 include { FORMAT_LOCUSFAA                    } from '../modules/local/format/locusfaa/'
 include { FORMATSPADES                       } from '../modules/local/format/spades/'
 include { MERGE_TABLES                       } from '../modules/local/merge/summary/'
@@ -554,7 +554,7 @@ workflow METATDENOVO {
     // Consolidate overlapping same-contig CDS calls from different active callers into single loci
     // before counting, so a read supporting one real gene isn't counted once per caller that called
     // it (#463). Runs unconditionally, even with a single active caller: with nothing to overlap,
-    // every bedtools-merge row has exactly one contributor, so FORMAT_LOCUS_CONSOLIDATE's
+    // every bedtools-merge row has exactly one contributor, so FORMAT_LOCUSCONSOLIDATE's
     // ID-inheritance rule reproduces that caller's own GFF byte-for-byte -- graceful degradation,
     // no separate code path. Rides through the existing, unmodified ch_featurecounts cross-product
     // and FEATURECOUNTS_CDS call below by being mixed into ch_gff as just another caller.
@@ -572,9 +572,9 @@ workflow METATDENOVO {
 
     BEDTOOLS_SORT ( ch_locus_bed, [] )
     BEDTOOLS_MERGE ( BEDTOOLS_SORT.out.sorted )
-    FORMAT_LOCUS_CONSOLIDATE ( BEDTOOLS_MERGE.out.bed )
+    FORMAT_LOCUSCONSOLIDATE ( BEDTOOLS_MERGE.out.bed )
 
-    ch_gff = ch_gff.mix(FORMAT_LOCUS_CONSOLIDATE.out.gff)
+    ch_gff = ch_gff.mix(FORMAT_LOCUSCONSOLIDATE.out.gff)
 
     // Populate channels if the user provided the orfs
     if ( params.user_orfs_faa && params.user_orfs_gff ) {
@@ -602,7 +602,7 @@ workflow METATDENOVO {
         // 1:1 pairing if the pipeline ever consolidates more than one assembly in a run. Callers are
         // sorted so the two lists stay aligned and the task's inputs hash reproducibly.
         FORMAT_LOCUSFAA (
-            FORMAT_LOCUS_CONSOLIDATE.out.members
+            FORMAT_LOCUSCONSOLIDATE.out.members
                 .map { meta, members -> [ meta.id, meta, members ] }
                 .join(
                     ch_protein
@@ -727,13 +727,13 @@ workflow METATDENOVO {
     // group against every assembly's provenance file if this pipeline ever ran multiple
     // simultaneous assemblies) -- matches ch_featurecounts/ch_collect_feature's own convention
     // just above of staying joinable rather than relying on positional/cardinality pairing.
-    COLLECT_LOCUS_CONSOLIDATE (
+    COLLECT_LOCUSCONSOLIDATE (
         ch_collect_feature.locus_consolidate
             .map { meta, fcs -> [ meta.id, meta, fcs ] }
-            .join( FORMAT_LOCUS_CONSOLIDATE.out.provenance.map { meta, provenance -> [ meta.id, provenance ] } )
+            .join( FORMAT_LOCUSCONSOLIDATE.out.provenance.map { meta, provenance -> [ meta.id, provenance ] } )
             .map { _id, meta, fcs, provenance -> [ meta, fcs, provenance ] }
     )
-    ch_versions = ch_versions.mix(COLLECT_LOCUS_CONSOLIDATE.out.versions)
+    ch_versions = ch_versions.mix(COLLECT_LOCUSCONSOLIDATE.out.versions)
 
     // Third consolidation level: sum the per-locus counts above across each protein cluster, so a
     // gene called on two contigs is reported once. Safe to sum after the fact rather than recount,
@@ -749,7 +749,7 @@ workflow METATDENOVO {
         COLLECT_PROTEINCONSOLIDATE (
             ch_collect_feature.locus_consolidate
                 .map { meta, fcs -> [ meta.id - ".${meta.caller}", fcs ] }
-                .join( FORMAT_LOCUS_CONSOLIDATE.out.provenance.map { meta, provenance -> [ meta.id - ".${meta.caller}", provenance ] } )
+                .join( FORMAT_LOCUSCONSOLIDATE.out.provenance.map { meta, provenance -> [ meta.id - ".${meta.caller}", provenance ] } )
                 .join( ch_protein_clusters.map { meta, clusters -> [ meta.id - ".${meta.caller}", clusters ] } )
                 .map { assembly, fcs, provenance, clusters ->
                     [ [ id: "${assembly}.${protein_consolidate_name}", caller: protein_consolidate_name ], fcs, provenance, clusters ]

@@ -23,7 +23,7 @@
                     "dtplyr": "1.3.3",
                     "data.table": "1.17.8"
                 },
-                "COLLECT_LOCUS_CONSOLIDATE": {
+                "COLLECT_LOCUSCONSOLIDATE": {
                     "R": "4.5.3",
                     "dplyr": "1.2.1",
                     "readr": "2.2.0",
@@ -59,10 +59,10 @@
                 "FORMAT_GFF2BED": {
                     "gzip": 1.11
                 },
-                "FORMAT_LOCUSFAA": {
+                "FORMAT_LOCUSCONSOLIDATE": {
                     "gzip": 1.11
                 },
-                "FORMAT_LOCUS_CONSOLIDATE": {
+                "FORMAT_LOCUSFAA": {
                     "gzip": 1.11
                 },
                 "FORMAT_METAEUKFAA": {

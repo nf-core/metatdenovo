@@ -1,4 +1,4 @@
-name: "format_locus_consolidate"
+name: "format_locusconsolidate"
 description: Turns bedtools-merge output (strand-aware merged CDS intervals from multiple
   ORF callers) into a consolidated GFF, applying the ID-inheritance rule -- a locus with a
   single distinct contributor keeps that contributor's own original ID, a locus with

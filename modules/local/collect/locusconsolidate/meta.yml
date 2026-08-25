@@ -1,6 +1,6 @@
-name: "collect_locus_consolidate"
+name: "collect_locusconsolidate"
 description: Collects per-sample featureCounts output against the locus-consolidated GFF
-  into one TPM-normalized table, joined with FORMAT_LOCUS_CONSOLIDATE's provenance table
+  into one TPM-normalized table, joined with FORMAT_LOCUSCONSOLIDATE's provenance table
   (which caller(s) contributed to each locus, and how many independent calls were merged)
 keywords:
   - counts
@@ -18,7 +18,7 @@ input:
       pattern: "*.featureCounts.tsv"
   - provenance:
       type: file
-      description: Per-locus provenance table from FORMAT_LOCUS_CONSOLIDATE (ID, callers, n_calls)
+      description: Per-locus provenance table from FORMAT_LOCUSCONSOLIDATE (ID, callers, n_calls)
       pattern: "*.provenance.tsv.gz"
 output:
   - meta:

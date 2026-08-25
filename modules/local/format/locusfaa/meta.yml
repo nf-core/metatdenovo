@@ -13,7 +13,7 @@ input:
       description: Groovy Map containing sample information
   - members:
       type: file
-      description: Per-locus membership table (ID, caller, orf) from FORMAT_LOCUS_CONSOLIDATE
+      description: Per-locus membership table (ID, caller, orf) from FORMAT_LOCUSCONSOLIDATE
       pattern: "*.members.tsv.gz"
   - callers:
       type: list

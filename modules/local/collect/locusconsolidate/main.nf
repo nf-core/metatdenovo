@@ -1,4 +1,4 @@
-process COLLECT_LOCUS_CONSOLIDATE {
+process COLLECT_LOCUSCONSOLIDATE {
     tag "$meta.id"
     label 'process_high'
 
@@ -30,7 +30,7 @@ process COLLECT_LOCUS_CONSOLIDATE {
 
     setDTthreads($task.cpus)
 
-    # A multi-exon locus whose ID was inherited from a single caller (see FORMAT_LOCUS_CONSOLIDATE)
+    # A multi-exon locus whose ID was inherited from a single caller (see FORMAT_LOCUSCONSOLIDATE)
     # has one provenance row per exon segment, all identical (same caller, same n_calls) -- collapse
     # to one row per ID or the join below fans out and duplicates that locus's counts rows.
     provenance <- fread('${provenance}', sep = '\\t') %>% distinct()

@@ -35,7 +35,7 @@ process COLLECT_PROTEINCONSOLIDATE {
     # its length below.
     clusters <- fread('${clusters}', sep = '\\t', header = FALSE, col.names = c('cluster', 'orf'))
 
-    # As in COLLECT_LOCUS_CONSOLIDATE: one provenance row per exon segment for a multi-exon locus,
+    # As in COLLECT_LOCUSCONSOLIDATE: one provenance row per exon segment for a multi-exon locus,
     # all identical, so collapse before joining or the counts fan out.
     provenance <- fread('${provenance}', sep = '\\t') %>% distinct()
 
