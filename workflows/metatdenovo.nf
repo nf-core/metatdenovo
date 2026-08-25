@@ -11,6 +11,7 @@ include { COLLECT_FEATURECOUNTS              } from '../modules/local/collect/fe
 include { COLLECT_LOCUS_CONSOLIDATE          } from '../modules/local/collect/locus_consolidate/'
 include { COLLECT_PROTEINCONSOLIDATE         } from '../modules/local/collect/proteinconsolidate/'
 include { COLLECT_STATS                      } from '../modules/local/collect/stats/'
+include { FORMAT_CLUSTERREPS                 } from '../modules/local/format/clusterreps/'
 include { FORMAT_GFF2BED                     } from '../modules/local/format/gff2bed/'
 include { FORMAT_LOCUS_CONSOLIDATE           } from '../modules/local/format/locus_consolidate/'
 include { FORMAT_LOCUSFAA                    } from '../modules/local/format/locusfaa/'
@@ -59,6 +60,7 @@ include { BBMAP_BBNORM                               } from '../modules/nf-core/
 include { BBMAP_INDEX                                } from '../modules/nf-core/bbmap/index/'
 include { BEDTOOLS_MERGE                             } from '../modules/nf-core/bedtools/merge/'
 include { BEDTOOLS_SORT                              } from '../modules/nf-core/bedtools/sort/'
+include { SEQKIT_GREP                                } from '../modules/nf-core/seqkit/grep/'
 include { CAT_FASTQ            	                     } from '../modules/nf-core/cat/fastq/'
 include { DIAMOND_BLASTP as DIAMOND_TAXONOMY         } from '../modules/nf-core/diamond/blastp/'
 include { FASTQC                                     } from '../modules/nf-core/fastqc/'
@@ -621,6 +623,22 @@ workflow METATDENOVO {
         )
 
         ch_protein_clusters = MMSEQS_FASTA_CLUSTER.out.clusters
+
+        // Annotate one protein per cluster in addition to each caller's own ORFs, by feeding the
+        // cluster representatives into ch_protein as another caller. The sequence ids here are locus
+        // ids, which is exactly what the cluster counts table's 'orf' column holds, so every
+        // annotation summary module's join against the counts finds them without special-casing.
+        FORMAT_CLUSTERREPS ( MMSEQS_FASTA_CLUSTER.out.clusters )
+
+        // 'fa', not 'faa': SEQKIT_GREP appends the input's own .gz itself, and only *.fa.gz/*.fq.gz
+        // match its output declaration, so anything else here fails as a missing output file.
+        SEQKIT_GREP (
+            MMSEQS_FASTA_CLUSTER.out.seqs,
+            FORMAT_CLUSTERREPS.out.representatives.map { _meta, representatives -> representatives },
+            'fa'
+        )
+
+        ch_protein = ch_protein.mix(SEQKIT_GREP.out.filter)
     }
 
     //
@@ -744,7 +762,14 @@ workflow METATDENOVO {
     ch_versions           = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
     // [ meta(caller), tsv ] -- kept as a proper tuple (not stripped) so every consumer below can
     // join it against other per-caller channels instead of relying on positional channel pairing.
-    ch_fcs_for_summary    = COLLECT_FEATURECOUNTS.out.counts
+    //
+    // The cluster representatives are annotated as just another caller, so their counts have to be
+    // available to the annotation subworkflows on the same footing. This also keeps COLLECT_STATS
+    // correct: it left-joins MERGE_TABLES's output onto this channel with remainder: true, so a
+    // caller present in ch_merge_tables but missing here would emit an entry with a null meta that
+    // COLLECT_STATS cannot consume. Empty, hence a no-op, when consolidation is skipped.
+    ch_counts_per_caller  = COLLECT_FEATURECOUNTS.out.counts.mix(ch_protein_consolidate_counts)
+    ch_fcs_for_summary    = ch_counts_per_caller
 
     // Initialize ch_merge_tables that will be populated with tables from annotation tools and used by the MERGE_TABLES module which output will then be passed to the COLLECT_STATS module
     ch_merge_tables = channel.empty()
@@ -900,7 +925,7 @@ workflow METATDENOVO {
     // a COLLECT_STATS invocation, with mergetab defaulting to [] -- COLLECT_STATS's own script already
     // handles a missing mergetab gracefully (`if (mergetab) {...} else {...}`), mirroring what the
     // pre-multi-caller code's `.ifEmpty { [ [] ] }` fallback did for the single-run case.
-    ch_fcs_mergetab_per_caller = COLLECT_FEATURECOUNTS.out.counts
+    ch_fcs_mergetab_per_caller = ch_counts_per_caller
         .map { meta, fcs -> [ meta.caller, meta, fcs ] }
         .join(
             MERGE_TABLES.out.merged_table.map { meta, mergetab -> [ meta.caller, mergetab ] },

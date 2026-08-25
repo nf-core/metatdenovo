@@ -1,0 +1,84 @@
+{
+    "cluster table - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.representatives.txt:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "1": [
+                    [
+                        "FORMAT_CLUSTERREPS",
+                        "gzip",
+                        "1.11"
+                    ]
+                ],
+                "representatives": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.representatives.txt:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "versions_gzip": [
+                    [
+                        "FORMAT_CLUSTERREPS",
+                        "gzip",
+                        "1.11"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-08-25T10:44:08.002926314",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
+    },
+    "cluster table - distinct representatives in cluster order": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.representatives.txt:md5,0dee9e64c1e7849e739b5dbb7c3c4f7f"
+                    ]
+                ],
+                "1": [
+                    [
+                        "FORMAT_CLUSTERREPS",
+                        "gzip",
+                        "1.11"
+                    ]
+                ],
+                "representatives": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.representatives.txt:md5,0dee9e64c1e7849e739b5dbb7c3c4f7f"
+                    ]
+                ],
+                "versions_gzip": [
+                    [
+                        "FORMAT_CLUSTERREPS",
+                        "gzip",
+                        "1.11"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-08-25T10:43:58.965571225",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
+    }
+}

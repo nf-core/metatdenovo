@@ -1,0 +1,68 @@
+nextflow_process {
+
+    name "Test Process FORMAT_CLUSTERREPS"
+    script "../main.nf"
+    process "FORMAT_CLUSTERREPS"
+
+    tag "modules"
+    tag "modules_local"
+    tag "format"
+    tag "format/clusterreps"
+
+    // Inputs are built inline rather than read from a fixture: the pipeline repo carries no test
+    // data of its own. The ids are real MMseqs2 output from the metaeuk_transdecoder profile.
+
+    test("cluster table - distinct representatives in cluster order") {
+
+        when {
+            process {
+                """
+                def clusters = file("\${workDir}/test.clusters.tsv")
+                clusters.text = [
+                    ['k59_1.p1',                'k59_1.p1'],
+                    ['NP_011412.1|k59_1|-|191', 'NP_011412.1|k59_1|-|191'],
+                    ['NP_011412.1|k59_1|-|191', 'locus_k59_0_1_447_+']
+                ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+
+                input[0] = [ [ id:'test' ], clusters ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                // One line per cluster, not per member: the two-member cluster contributes once,
+                // and order follows the table rather than being sorted.
+                { assert path(process.out.representatives[0][1]).readLines() == [
+                    'k59_1.p1',
+                    'NP_011412.1|k59_1|-|191'
+                ] },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+
+    test("cluster table - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                def clusters = file("\${workDir}/test.clusters.tsv")
+                clusters.text = ''
+
+                input[0] = [ [ id:'test' ], clusters ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+}
