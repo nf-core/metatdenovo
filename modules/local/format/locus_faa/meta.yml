@@ -1,0 +1,44 @@
+name: "format_locus_faa"
+description: Builds a protein FASTA with exactly one sequence per consolidated locus,
+  named after the locus, by resolving each locus's membership back to the contributing
+  ORF callers' protein sequences
+keywords:
+  - fasta
+  - format
+  - locus consolidation
+  - protein
+input:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - members:
+      type: file
+      description: Per-locus membership table (ID, caller, orf) from FORMAT_LOCUS_CONSOLIDATE
+      pattern: "*.members.tsv.gz"
+  - callers:
+      type: list
+      description: ORF caller names, in the same order as the protein FASTAs
+  - faas:
+      type: list
+      description: Per-caller protein FASTAs, in the same order as the caller names.
+        May be gzipped or not, mixed.
+      pattern: "*.{faa,fas,pep}{.gz,}"
+output:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - faa:
+      type: file
+      description: >
+        Protein FASTA with one sequence per consolidated locus, the sequence id being the
+        locus id. A locus several callers agreed on takes the longest of their sequences,
+        ties broken on the lexicographically smallest "<caller>:<orf>".
+      pattern: "*.locus.faa.gz"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+authors:
+  - "@erikrikarddaniel"
+maintainers:
+  - "@erikrikarddaniel"
