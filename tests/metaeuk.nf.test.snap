@@ -1,7 +1,7 @@
 {
     "-profile test_metaeuk": {
         "content": [
-            48,
+            49,
             {
                 "BBMAP_ALIGN": {
                     "bbmap": 39.18
@@ -49,6 +49,9 @@
                     "gzip": 1.11
                 },
                 "FORMAT_LOCUS_CONSOLIDATE": {
+                    "gzip": 1.11
+                },
+                "FORMAT_METAEUK_FAA": {
                     "gzip": 1.11
                 },
                 "FORMAT_METAEUK_GFF": {
@@ -121,6 +124,7 @@
                 "metaeuk/megahit.metaeuk.fas",
                 "metaeuk/megahit.metaeuk.gff",
                 "metaeuk/megahit.metaeuk.headersMap.tsv",
+                "metaeuk/megahit.metaeuk_format.faa.gz",
                 "metaeuk/megahit.metaeuk_format.gff.gz",
                 "multiqc",
                 "multiqc/multiqc_data",
@@ -195,6 +199,7 @@
                 "megahit.metaeuk.fas:md5,cab473bca453ec98053f2544d9a01a1c",
                 "megahit.metaeuk.gff:md5,f5ceef9a3b9917aeb174e1374d566e28",
                 "megahit.metaeuk.headersMap.tsv:md5,5ec29818faeff6db35900f11e8e55738",
+                "megahit.metaeuk_format.faa.gz:md5,ad243c05fb3c9c1a4f3d0d7b61840cf2",
                 "megahit.metaeuk_format.gff.gz:md5,9f4ba2f29292871fb361b621124cb2b2",
                 "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f",
                 "multiqc_metaeuk_stats.txt:md5,be6038955478f96fdcaaa12d04c6d4a9"
@@ -207,7 +212,7 @@
                 "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count"
             ]
         ],
-        "timestamp": "2026-08-20T12:09:32.839535339",
+        "timestamp": "2026-08-25T10:12:04.806707551",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"
