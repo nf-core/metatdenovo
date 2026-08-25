@@ -13,6 +13,7 @@ process FORMAT_LOCUS_CONSOLIDATE {
     output:
     tuple val(meta), path("${prefix}.gff.gz")        , emit: gff
     tuple val(meta), path("${prefix}.provenance.tsv.gz"), emit: provenance
+    tuple val(meta), path("${prefix}.members.tsv.gz")   , emit: members
     tuple val("${task.process}"), val('gzip'), eval('gzip --version  2>&1 | grep "^gzip" | sed "s/^gzip \\([0-9.]\\+\\).*/\\1/"'), emit: versions_gzip, topic: versions
 
     when:
@@ -26,10 +27,17 @@ process FORMAT_LOCUS_CONSOLIDATE {
     // distinct contributor inherits that contributor's own original ID verbatim, so a single-caller
     // run is byte-identical to that caller's own per-caller GFF; a locus with several distinct
     // contributors gets a fresh coordinate-derived ID instead.
+    //
+    // The members table records which original per-caller ORF each locus was built from, which the
+    // provenance table above deliberately does not keep (it collapses to caller names and a count).
+    // Cross-contig protein clustering needs it to find a protein sequence for a locus whose ID was
+    // synthesized. Rows are deduplicated because a multi-exon gene produces one bedtools-merge row
+    // per exon segment, all naming the same contributor.
     """
     awk 'BEGIN {
             FS = OFS = "\\t"
             print "ID", "callers", "n_calls" | "gzip -c > ${prefix}.provenance.tsv.gz"
+            print "ID", "caller", "orf" | "gzip -c > ${prefix}.members.tsv.gz"
         }
         {
             start = \$2 + 1
@@ -57,6 +65,16 @@ process FORMAT_LOCUS_CONSOLIDATE {
 
             print \$1, "locus_consolidate", "CDS", start, end, ".", strand, ".", "ID="id | "gzip -c > ${prefix}.gff.gz"
             print id, callers, \$6 | "gzip -c > ${prefix}.provenance.tsv.gz"
+
+            for (i = 1; i <= n; i++) {
+                sep    = index(names[i], ":")
+                caller = substr(names[i], 1, sep - 1)
+                orf    = substr(names[i], sep + 1)
+                if (!((id, caller, orf) in members)) {
+                    members[id, caller, orf] = 1
+                    print id, caller, orf | "gzip -c > ${prefix}.members.tsv.gz"
+                }
+            }
         }' ${merged_bed}
     """
 
@@ -65,5 +83,6 @@ process FORMAT_LOCUS_CONSOLIDATE {
     """
     gzip -c /dev/null > ${prefix}.gff.gz
     gzip -c /dev/null > ${prefix}.provenance.tsv.gz
+    gzip -c /dev/null > ${prefix}.members.tsv.gz
     """
 }

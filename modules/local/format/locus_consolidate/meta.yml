@@ -32,6 +32,13 @@ output:
       type: file
       description: Per-locus provenance table (ID, callers, n_calls)
       pattern: "*.provenance.tsv.gz"
+  - members:
+      type: file
+      description: >
+        Per-locus membership table (ID, caller, orf), one row per original per-caller ORF
+        the locus was merged from, deduplicated across the exon segments of a multi-exon
+        gene. Lets a locus with a synthesized ID be traced back to a protein sequence.
+      pattern: "*.members.tsv.gz"
   - versions:
       type: file
       description: File containing software versions
