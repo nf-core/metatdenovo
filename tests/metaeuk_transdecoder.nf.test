@@ -39,6 +39,8 @@ nextflow_pipeline {
                     // ID-inheritance rule, coordinate round-tripping, or provenance columns shows up as a
                     // diff here.
                     path("${params.outdir}/summary_tables/megahit.locus_consolidate.counts.tsv.gz").linesGzip,
+                    // Likewise the protein-consolidated table (#460), verbatim.
+                    path("${params.outdir}/summary_tables/megahit.protein_consolidate_99.counts.tsv.gz").linesGzip,
                 ).match() },
                 { assert path("${params.outdir}/megahit/megahit_assembly.log").readLines().any { l -> l.contains('ALL DONE') } },
                 { assert path("${params.outdir}/megahit/megahit_assembly.contigs.fa.gz").linesGzip.size() >= 4 },
@@ -86,6 +88,57 @@ nextflow_pipeline {
                         def flagstat_total = path("${params.outdir}/samtools/megahit.${sample}.flagstat").readLines()[0].tokenize(' ')[0] as int
                         consolidated_total <= flagstat_total
                     }
+                ) },
+
+                // === #460: cross-contig consolidation, which coordinates cannot do ===
+                // This dataset co-assembles one gene twice: contig k59_1 carries the spliced genomic
+                // RPL28 call (two exons, - strand) and contig k59_0 the synonymously recoded mRNA
+                // version (one exon, + strand). They share no coordinate system, so locus
+                // consolidation above necessarily leaves them as two separate loci -- but their
+                // proteins are identical, so protein clustering must merge them into one row per
+                // sample, carrying provenance from both contributing loci.
+                { assert (
+                    path("${params.outdir}/summary_tables/megahit.protein_consolidate_99.counts.tsv.gz")
+                        .csv(sep: '\t', decompress: true, header: true).rows
+                        .findAll { r -> (r["n_loci"] as int) == 2 }
+                        .every { r ->
+                            r["loci"].tokenize(',').toSet() == [ 'NP_011412.1|k59_1|-|191', 'locus_k59_0_1_447_+' ] as Set &&
+                            r["callers"].tokenize(',').toSet() == [ 'metaeuk', 'transdecoder' ] as Set &&
+                            (r["n_calls"] as int) == 3
+                        }
+                ) },
+                // The unrelated opposite-strand TransDecoder call on k59_1 is a genuinely different
+                // protein and must NOT be swept into that cluster.
+                { assert (
+                    path("${params.outdir}/summary_tables/megahit.protein_consolidate_99.counts.tsv.gz")
+                        .csv(sep: '\t', decompress: true, header: true).rows
+                        .findAll { r -> r["orf"] == 'k59_1.p1' }
+                        .every { r -> (r["n_loci"] as int) == 1 && r["callers"] == 'transdecoder' }
+                ) },
+                // Consolidating must not invent or lose reads: every sample's total is unchanged from
+                // the locus level, since clustering only regroups rows, and still within what actually
+                // aligned.
+                { assert (
+                    ['RPL28_GENOMIC', 'RPL28_MRNA', 'RPL28_MRNA_RECODED'].every { sample ->
+                        def total = { table ->
+                            path("${params.outdir}/summary_tables/${table}").csv(sep: '\t', decompress: true, header: true).rows
+                                .findAll { r -> r["sample"] == sample }
+                                .sum { r -> r["count"] as int } ?: 0
+                        }
+                        total('megahit.protein_consolidate_99.counts.tsv.gz') == total('megahit.locus_consolidate.counts.tsv.gz')
+                    }
+                ) },
+                // The cluster representatives handed to the annotation tools must be keyed exactly
+                // like the counts table's 'orf' column, or every annotation join silently returns
+                // nothing -- the same class of bug this PR fixes for MetaEuk.
+                { assert (
+                    path("${params.outdir}/protein_consolidate/megahit.protein_consolidate_99.representatives.fa.gz").linesGzip
+                        .findAll { l -> l.startsWith('>') }
+                        .collect { l -> l.substring(1).tokenize(' ')[0] }
+                        .toSet()
+                ) == (
+                    path("${params.outdir}/summary_tables/megahit.protein_consolidate_99.counts.tsv.gz")
+                        .csv(sep: '\t', decompress: true, header: true).columns["orf"].toSet()
                 ) },
             )
         }
