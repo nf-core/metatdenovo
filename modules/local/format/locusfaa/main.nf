@@ -1,6 +1,8 @@
 process FORMAT_LOCUSFAA {
     tag "$meta.id"
-    label 'process_low'
+    // Holds every protein sequence in memory to pick the longest per locus, so memory scales with
+    // the total protein sequence; process_medium rather than process_low for that.
+    label 'process_medium'
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine in ['singularity', 'apptainer'] && !task.ext.singularity_pull_docker_container ?

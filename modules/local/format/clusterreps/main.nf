@@ -1,6 +1,8 @@
 process FORMAT_CLUSTERREPS {
     tag "$meta.id"
-    label 'process_low'
+    // Buffers every cluster's members to re-pick the representative, so memory scales with the
+    // number of loci; process_medium rather than process_low for that.
+    label 'process_medium'
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine in ['singularity', 'apptainer'] && !task.ext.singularity_pull_docker_container ?

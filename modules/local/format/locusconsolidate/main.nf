@@ -1,6 +1,8 @@
 process FORMAT_LOCUSCONSOLIDATE {
     tag "$meta.id"
-    label 'process_low'
+    // Buffers provenance and members for every locus until END, so memory scales with the number
+    // of called ORFs rather than being streamed; process_medium rather than process_low for that.
+    label 'process_medium'
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine in ['singularity', 'apptainer'] && !task.ext.singularity_pull_docker_container ?
