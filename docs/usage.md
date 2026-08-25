@@ -167,6 +167,34 @@ You can provide a set of ORFs to the pipeline using the `--user_orfs_faa orfs.fa
 for an amino acid fasta file and a gff file respectively.
 The name used in filenames for user provided ORFs can be set using `--user_orfs_name` parameter.
 
+### Read mapping and quantification options
+
+After assembly and ORF calling, reads are mapped back to the assembly with BBMap and quantified per ORF/CDS with featureCounts, producing the `summary_tables/<assembly>.<orfcaller>.counts.tsv.gz` tables (and, when multiple ORF callers are active, the locus-consolidated table described above).
+
+A read can align equally well to more than one site in the assembly.
+`--bbmap_ambiguous` controls how BBMap handles that:
+
+| bbmap_ambiguous | Behaviour                           |
+| --------------- | ----------------------------------- |
+| best (default)  | Use the first best-scoring site     |
+| random          | Pick one top-scoring site at random |
+| toss            | Treat the read as unmapped          |
+| all             | Retain every top-scoring site       |
+
+`best`, `random` and `toss` all guarantee at most one reported alignment per read, which is exactly what the counts tables above -- and the locus consolidation described above ([issue #463](https://github.com/nf-core/metatdenovo/issues/463)), and any future cross-contig consolidation -- assume when summing counts per ORF or locus: a read is never counted more than once.
+`all` deliberately breaks that guarantee: a read can legitimately count toward more than one ORF.
+
+`--featurecounts_fraction` controls how featureCounts treats reads with more than one reported alignment.
+By default (`false`), a read that maps to N sites contributes a full count to each of the N ORFs it hits, so per-sample totals inflate under `--bbmap_ambiguous all`.
+Setting `--featurecounts_fraction` makes each such read contribute 1/N to each site instead, keeping totals close to the number of reads actually sequenced.
+It has no effect unless `--bbmap_ambiguous all` is also set, since `best`/`random`/`toss` never produce more than one reported alignment per read to begin with.
+
+A typical command line enabling both:
+
+```bash
+nextflow run nf-core/metatdenovo -profile docker --outdir results/ --input samplesheet.csv --assembler megahit --orf_caller prodigal --bbmap_ambiguous all --featurecounts_fraction
+```
+
 ### Taxonomic annotation options
 
 Metatdenovo uses two different programs for taxonomy annotation: EUKulele and Diamond.

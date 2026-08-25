@@ -12,9 +12,9 @@ process BBMAP_BBDUK {
     path contaminants
 
     output:
-    tuple val(meta), path('*.fastq.gz')   , emit: reads
+    tuple val(meta), path('*.fastq.gz')     , emit: reads
     tuple val(meta), path('*.matched.fq.gz'), emit: reads_removed, optional: true
-    tuple val(meta), path('*.log')     , emit: log
+    tuple val(meta), path('*.log')          , emit: log
     tuple val("${task.process}"), val('bbmap'), eval('bbversion.sh | grep -v "Duplicate cpuset"'), emit: versions_bbmap, topic: versions
 
     when:

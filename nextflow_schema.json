@@ -271,9 +271,32 @@
                     "default": 0.9,
                     "fa_icon": "fas fa-address-card",
                     "description": "Minimum identity needed to assign read to a contig"
+                },
+                "bbmap_ambiguous": {
+                    "type": "string",
+                    "default": "best",
+                    "enum": ["best", "all", "random", "toss"],
+                    "fa_icon": "fas fa-random",
+                    "description": "How BBMap should handle reads that align equally well to more than one site",
+                    "help_text": "- `best`: use the first best-scoring site (default).\n- `random`: pick one top-scoring site at random.\n- `toss`: treat the read as unmapped.\n- `all`: keep every top-scoring site, i.e. true multi-mapping.\n\nEach of `best`/`random`/`toss` produces at most one alignment per read, which is what the pipeline's counts tables (including the locus-consolidated table, see `--featurecounts_fraction` below) assume when summing counts per ORF/locus. `all` deliberately breaks that assumption and should normally be paired with `--featurecounts_fraction`."
                 }
             },
             "fa_icon": "fas fa-filter"
+        },
+        "quantification_options": {
+            "title": "Quantification options",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "featurecounts_fraction": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-divide",
+                    "description": "Count multi-mapped reads fractionally in featureCounts instead of at full weight per site",
+                    "help_text": "Only has an effect on reads with more than one reported alignment, i.e. in practice when `--bbmap_ambiguous all` is used. With the default `false`, a read that maps to N sites contributes a full count to each of the N ORFs it hits; with `true`, it contributes 1/N to each instead, keeping per-sample totals from inflating."
+                }
+            },
+            "fa_icon": "fas fa-percentage"
         },
         "orf_caller_options": {
             "title": "Orf Caller options",
@@ -641,6 +664,9 @@
         },
         {
             "$ref": "#/$defs/mapping_options"
+        },
+        {
+            "$ref": "#/$defs/quantification_options"
         },
         {
             "$ref": "#/$defs/orf_caller_options"
