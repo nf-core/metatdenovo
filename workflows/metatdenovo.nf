@@ -12,6 +12,7 @@ include { COLLECT_LOCUS_CONSOLIDATE          } from '../modules/local/collect/lo
 include { COLLECT_STATS                      } from '../modules/local/collect/stats/'
 include { FORMAT_GFF2BED                     } from '../modules/local/format/gff2bed/'
 include { FORMAT_LOCUS_CONSOLIDATE           } from '../modules/local/format/locus_consolidate/'
+include { FORMAT_LOCUSFAA                    } from '../modules/local/format/locusfaa/'
 include { FORMATSPADES                       } from '../modules/local/format/spades/'
 include { MERGE_TABLES                       } from '../modules/local/merge/summary/'
 include { FORMAT_DIAMOND_TAX_RANKLIST        } from '../modules/local/diamond/format_tax/ranklist/'
@@ -86,6 +87,7 @@ include { paramsSummaryMap                           } from 'plugin/nf-schema'
 include { paramsSummaryMultiqc                       } from '../subworkflows/nf-core/utils_nfcore_pipeline/'
 include { softwareVersionsToYAML                     } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { BAM_SORT_STATS_SAMTOOLS                    } from '../subworkflows/nf-core/bam_sort_stats_samtools/'
+include { MMSEQS_FASTA_CLUSTER                       } from '../subworkflows/nf-core/mmseqs_fasta_cluster/'
 include { UTILS_NEXTFLOW_PIPELINE                    } from '../subworkflows/nf-core/utils_nextflow_pipeline/'
 include { UTILS_NFCORE_PIPELINE                      } from '../subworkflows/nf-core/utils_nfcore_pipeline/'
 include { methodsDescriptionText                     } from '../subworkflows/local/utils_nfcore_metatdenovo_pipeline'
@@ -149,6 +151,13 @@ workflow METATDENOVO {
 
     // Deal with params from user-supplied ORFs
     orfs_name  = params.orf_caller ?: params.user_orfs_name
+
+    // Name the cross-contig consolidation level after the clustering identity it was produced at,
+    // rounded to whole percent, so reruns at a different --cluster_min_seq_id don't overwrite each
+    // other's tables -- the same reason assembler and ORF caller are already in output filenames.
+    // Computed once here and threaded from here; it's used as a caller name, so it ends up in the
+    // counts table's filename and in every annotation table derived from the cluster representatives.
+    protein_consolidate_name = "protein_consolidate_${Math.round(params.cluster_min_seq_id * 100)}"
 
 
     // If the user supplied hmm files, we will run hmmsearch and then rank the results.
@@ -568,6 +577,49 @@ workflow METATDENOVO {
     if ( params.user_orfs_faa && params.user_orfs_gff ) {
         ch_gff = channel.value ( [ [ id: "${assembly_name}.${orfs_name}", caller: orfs_name ], file(params.user_orfs_gff) ] )
         ch_protein = channel.value ( [ [ id: "${assembly_name}.${orfs_name}", caller: orfs_name ], file(params.user_orfs_faa) ] )
+    }
+
+    //
+    // Consolidate calls for the same gene that ended up on DIFFERENT contigs, which coordinates
+    // cannot detect: a splice-aware genomic call and a transcript-derived call for one gene share no
+    // coordinate system, but converge on nearly the same protein (#460). Cluster the proteins and
+    // treat one cluster as one gene.
+    //
+    // Clustering runs on loci rather than on each caller's raw ORFs, because the counts table this
+    // feeds aggregates the per-locus counts locus consolidation produces above -- so cluster members
+    // have to BE loci. FORMAT_LOCUSFAA resolves each locus back to one protein sequence for that.
+    //
+    // Deliberately placed before ch_protein is consumed below, and dependent only on the GFFs and
+    // proteins rather than on any counts, so it runs alongside mapping instead of behind it.
+    // Skipped entirely for user-supplied ORFs, which replace ch_gff/ch_protein wholesale just above
+    // and already bypass locus consolidation.
+    ch_protein_clusters = channel.empty()
+    if ( ! params.skip_protein_consolidation && orf_callers ) {
+        // Keyed on the locus-consolidation meta.id rather than .combine()d, so this stays a genuine
+        // 1:1 pairing if the pipeline ever consolidates more than one assembly in a run. Callers are
+        // sorted so the two lists stay aligned and the task's inputs hash reproducibly.
+        FORMAT_LOCUSFAA (
+            FORMAT_LOCUS_CONSOLIDATE.out.members
+                .map { meta, members -> [ meta.id, meta, members ] }
+                .join(
+                    ch_protein
+                        .map { meta, faa -> [ meta.caller, faa ] }
+                        .toList()
+                        .map { pairs ->
+                            def sorted = pairs.sort { a, b -> a[0] <=> b[0] }
+                            [ "${assembly_name}.locus_consolidate", sorted.collect { pair -> pair[0] }, sorted.collect { pair -> pair[1] } ]
+                        }
+                )
+                .map { _id, meta, members, callers, faas -> [ meta, members, callers, faas ] }
+        )
+
+        MMSEQS_FASTA_CLUSTER (
+            FORMAT_LOCUSFAA.out.faa
+                .map { _meta, faa -> [ [ id: "${assembly_name}.${protein_consolidate_name}", caller: protein_consolidate_name ], faa ] },
+            'linclust'
+        )
+
+        ch_protein_clusters = MMSEQS_FASTA_CLUSTER.out.clusters
     }
 
     //
