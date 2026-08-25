@@ -3,7 +3,7 @@ Changes in component 'nf-core/bbmap/bbduk'
 Changes in 'bbmap/bbduk/meta.yml':
 --- modules/nf-core/bbmap/bbduk/meta.yml
 +++ modules/nf-core/bbmap/bbduk/meta.yml
-@@ -44,6 +44,20 @@
+@@ -44,6 +44,21 @@
            pattern: "*fastq.gz"
            ontologies:
              - edam: http://edamontology.org/format_3989 # GZIP
@@ -17,7 +17,8 @@ Changes in 'bbmap/bbduk/meta.yml':
 +          type: file
 +          description: |
 +            Reads that matched the contaminants reference (kmer filtering) and were removed from
-+            the main output; only produced when a contaminants reference is provided
++            the main output; only produced when a contaminants reference is provided and
++            task.ext.save_removed is truthy
 +          pattern: "*.matched.fq.gz"
 +          ontologies:
 +            - edam: http://edamontology.org/format_3989 # GZIP
@@ -42,7 +43,7 @@ Changes in 'bbmap/bbduk/main.nf':
      def raw      = meta.single_end ? "in=${reads[0]}" : "in1=${reads[0]} in2=${reads[1]}"
      def trimmed  = meta.single_end ? "out=${prefix}.fastq.gz" : "out1=${prefix}_1.fastq.gz out2=${prefix}_2.fastq.gz"
      def contaminants_fa = contaminants ? "ref=$contaminants" : ''
-+    def matched  = contaminants ? (meta.single_end ? "outm=${prefix}.matched.fq.gz" : "outm1=${prefix}_1.matched.fq.gz outm2=${prefix}_2.matched.fq.gz") : ''
++    def matched  = (contaminants && task.ext.save_removed) ? (meta.single_end ? "outm=${prefix}.matched.fq.gz" : "outm1=${prefix}_1.matched.fq.gz outm2=${prefix}_2.matched.fq.gz") : ''
      """
      bbduk.sh \\
          -Xmx${task.memory.toGiga()}g \\
@@ -57,7 +58,7 @@ Changes in 'bbmap/bbduk/main.nf':
      stub:
      def prefix = task.ext.prefix ?: "${meta.id}"
      def output_command  = meta.single_end ? "echo '' | gzip > ${prefix}.fastq.gz" : "echo '' | gzip > ${prefix}_1.fastq.gz ; echo '' | gzip > ${prefix}_2.fastq.gz"
-+    def matched_command = contaminants ? (meta.single_end ? "echo '' | gzip > ${prefix}.matched.fq.gz" : "echo '' | gzip > ${prefix}_1.matched.fq.gz ; echo '' | gzip > ${prefix}_2.matched.fq.gz") : ''
++    def matched_command = (contaminants && task.ext.save_removed) ? (meta.single_end ? "echo '' | gzip > ${prefix}.matched.fq.gz" : "echo '' | gzip > ${prefix}_1.matched.fq.gz ; echo '' | gzip > ${prefix}_2.matched.fq.gz") : ''
      """
      touch ${prefix}.bbduk.log
      $output_command
@@ -65,8 +66,270 @@ Changes in 'bbmap/bbduk/main.nf':
      """
  }
 
-'modules/nf-core/bbmap/bbduk/tests/main.nf.test.snap' is unchanged
-'modules/nf-core/bbmap/bbduk/tests/nextflow.config' is unchanged
+Changes in 'bbmap/bbduk/tests/main.nf.test.snap':
+--- modules/nf-core/bbmap/bbduk/tests/main.nf.test.snap
++++ modules/nf-core/bbmap/bbduk/tests/main.nf.test.snap
+@@ -23,47 +23,68 @@
+                 ]
+             }
+         ],
+-        "timestamp": "2026-03-11T13:48:35.546486468",
+-        "meta": {
+-            "nf-test": "0.9.4",
+-            "nextflow": "25.10.4"
+-        }
++        "meta": {
++            "nf-test": "0.9.3",
++            "nextflow": "25.10.4"
++        },
++        "timestamp": "2026-08-25T10:31:39.758005"
+     },
+     "sarscov2 - single end w/ contams [fastq,fasta] - fastq": {
+         "content": [
+-            {
+-                "versions_bbmap": [
+-                    [
+-                        "BBMAP_BBDUK",
+-                        "bbmap",
+-                        "39.18"
+-                    ]
+-                ]
+-            }
+-        ],
+-        "timestamp": "2026-03-11T13:48:42.244604664",
+-        "meta": {
+-            "nf-test": "0.9.4",
+-            "nextflow": "25.10.4"
+-        }
++            [
++                [
++                    {
++                        "id": "test",
++                        "single_end": true
++                    },
++                    "test.trim.matched.fq.gz:md5,4161df271f9bfcd25d5845a1e220dbec"
++                ]
++            ],
++            {
++                "versions_bbmap": [
++                    [
++                        "BBMAP_BBDUK",
++                        "bbmap",
++                        "39.18"
++                    ]
++                ]
++            }
++        ],
++        "meta": {
++            "nf-test": "0.9.3",
++            "nextflow": "25.10.4"
++        },
++        "timestamp": "2026-08-25T10:31:51.959051"
+     },
+     "sarscov2 - paired end w/ contams [fastq,fasta] - fastq": {
+         "content": [
+-            {
+-                "versions_bbmap": [
+-                    [
+-                        "BBMAP_BBDUK",
+-                        "bbmap",
+-                        "39.18"
+-                    ]
+-                ]
+-            }
+-        ],
+-        "timestamp": "2026-03-11T13:48:48.784934284",
+-        "meta": {
+-            "nf-test": "0.9.4",
+-            "nextflow": "25.10.4"
+-        }
++            [
++                [
++                    {
++                        "id": "test",
++                        "single_end": false
++                    },
++                    [
++                        "test.trim_1.matched.fq.gz:md5,4161df271f9bfcd25d5845a1e220dbec",
++                        "test.trim_2.matched.fq.gz:md5,2ebae722295ea66d84075a3b042e2b42"
++                    ]
++                ]
++            ],
++            {
++                "versions_bbmap": [
++                    [
++                        "BBMAP_BBDUK",
++                        "bbmap",
++                        "39.18"
++                    ]
++                ]
++            }
++        ],
++        "meta": {
++            "nf-test": "0.9.3",
++            "nextflow": "25.10.4"
++        },
++        "timestamp": "2026-08-25T10:32:04.214894"
+     },
+     "sarscov2 - paired end fastq - fastq - stub": {
+         "content": [
+@@ -81,15 +102,18 @@
+                     ]
+                 ],
+                 "1": [
+-                    [
+-                        {
+-                            "id": "test",
+-                            "single_end": false
+-                        },
+-                        "test.trim.bbduk.log:md5,d41d8cd98f00b204e9800998ecf8427e"
+-                    ]
++                    
+                 ],
+                 "2": [
++                    [
++                        {
++                            "id": "test",
++                            "single_end": false
++                        },
++                        "test.trim.bbduk.log:md5,d41d8cd98f00b204e9800998ecf8427e"
++                    ]
++                ],
++                "3": [
+                     [
+                         "BBMAP_BBDUK",
+                         "bbmap",
+@@ -117,20 +141,23 @@
+                         ]
+                     ]
+                 ],
+-                "versions_bbmap": [
+-                    [
+-                        "BBMAP_BBDUK",
+-                        "bbmap",
+-                        "39.18"
+-                    ]
+-                ]
+-            }
+-        ],
+-        "timestamp": "2026-03-11T13:49:01.865562833",
+-        "meta": {
+-            "nf-test": "0.9.4",
+-            "nextflow": "25.10.4"
+-        }
++                "reads_removed": [
++                    
++                ],
++                "versions_bbmap": [
++                    [
++                        "BBMAP_BBDUK",
++                        "bbmap",
++                        "39.18"
++                    ]
++                ]
++            }
++        ],
++        "meta": {
++            "nf-test": "0.9.3",
++            "nextflow": "25.10.4"
++        },
++        "timestamp": "2026-08-25T10:32:20.618099"
+     },
+     "sarscov2 - single end fastq - fastq - stub": {
+         "content": [
+@@ -145,16 +172,19 @@
+                     ]
+                 ],
+                 "1": [
+-                    [
+-                        {
+-                            "id": "test",
+-                            "single_end": true
+-                        },
+-                        "test.trim.bbduk.log:md5,d41d8cd98f00b204e9800998ecf8427e"
+-                    ]
++                    
+                 ],
+                 "2": [
+                     [
++                        {
++                            "id": "test",
++                            "single_end": true
++                        },
++                        "test.trim.bbduk.log:md5,d41d8cd98f00b204e9800998ecf8427e"
++                    ]
++                ],
++                "3": [
++                    [
+                         "BBMAP_BBDUK",
+                         "bbmap",
+                         "39.18"
+@@ -178,20 +208,23 @@
+                         "test.trim.fastq.gz:md5,68b329da9893e34099c7d8ad5cb9c940"
+                     ]
+                 ],
+-                "versions_bbmap": [
+-                    [
+-                        "BBMAP_BBDUK",
+-                        "bbmap",
+-                        "39.18"
+-                    ]
+-                ]
+-            }
+-        ],
+-        "timestamp": "2026-03-11T13:48:55.283515523",
+-        "meta": {
+-            "nf-test": "0.9.4",
+-            "nextflow": "25.10.4"
+-        }
++                "reads_removed": [
++                    
++                ],
++                "versions_bbmap": [
++                    [
++                        "BBMAP_BBDUK",
++                        "bbmap",
++                        "39.18"
++                    ]
++                ]
++            }
++        ],
++        "meta": {
++            "nf-test": "0.9.3",
++            "nextflow": "25.10.4"
++        },
++        "timestamp": "2026-08-25T10:32:12.086091"
+     },
+     "sarscov2 - single end fastq - fastq": {
+         "content": [
+@@ -214,10 +247,10 @@
+                 ]
+             }
+         ],
+-        "timestamp": "2026-03-11T13:48:28.903217831",
+-        "meta": {
+-            "nf-test": "0.9.4",
+-            "nextflow": "25.10.4"
+-        }
++        "meta": {
++            "nf-test": "0.9.3",
++            "nextflow": "25.10.4"
++        },
++        "timestamp": "2026-08-25T10:31:27.216584"
+     }
+ }
+Changes in 'bbmap/bbduk/tests/nextflow.config':
+--- modules/nf-core/bbmap/bbduk/tests/nextflow.config
++++ modules/nf-core/bbmap/bbduk/tests/nextflow.config
+@@ -3,6 +3,7 @@
+     withName: BBMAP_BBDUK {
+         ext.args = 'trimq=10 qtrim=r'
+         ext.prefix = { "${meta.id}.trim" }
++        ext.save_removed = true
+     }
+ 
+ }
+
 Changes in 'bbmap/bbduk/tests/main.nf.test':
 --- modules/nf-core/bbmap/bbduk/tests/main.nf.test
 +++ modules/nf-core/bbmap/bbduk/tests/main.nf.test

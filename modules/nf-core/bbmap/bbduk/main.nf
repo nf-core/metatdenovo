@@ -26,7 +26,7 @@ process BBMAP_BBDUK {
     def raw      = meta.single_end ? "in=${reads[0]}" : "in1=${reads[0]} in2=${reads[1]}"
     def trimmed  = meta.single_end ? "out=${prefix}.fastq.gz" : "out1=${prefix}_1.fastq.gz out2=${prefix}_2.fastq.gz"
     def contaminants_fa = contaminants ? "ref=$contaminants" : ''
-    def matched  = contaminants ? (meta.single_end ? "outm=${prefix}.matched.fq.gz" : "outm1=${prefix}_1.matched.fq.gz outm2=${prefix}_2.matched.fq.gz") : ''
+    def matched  = (contaminants && task.ext.save_removed) ? (meta.single_end ? "outm=${prefix}.matched.fq.gz" : "outm1=${prefix}_1.matched.fq.gz outm2=${prefix}_2.matched.fq.gz") : ''
     """
     bbduk.sh \\
         -Xmx${task.memory.toGiga()}g \\
@@ -42,7 +42,7 @@ process BBMAP_BBDUK {
     stub:
     def prefix = task.ext.prefix ?: "${meta.id}"
     def output_command  = meta.single_end ? "echo '' | gzip > ${prefix}.fastq.gz" : "echo '' | gzip > ${prefix}_1.fastq.gz ; echo '' | gzip > ${prefix}_2.fastq.gz"
-    def matched_command = contaminants ? (meta.single_end ? "echo '' | gzip > ${prefix}.matched.fq.gz" : "echo '' | gzip > ${prefix}_1.matched.fq.gz ; echo '' | gzip > ${prefix}_2.matched.fq.gz") : ''
+    def matched_command = (contaminants && task.ext.save_removed) ? (meta.single_end ? "echo '' | gzip > ${prefix}.matched.fq.gz" : "echo '' | gzip > ${prefix}_1.matched.fq.gz ; echo '' | gzip > ${prefix}_2.matched.fq.gz") : ''
     """
     touch ${prefix}.bbduk.log
     $output_command

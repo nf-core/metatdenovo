@@ -54,7 +54,8 @@ output:
           type: file
           description: |
             Reads that matched the contaminants reference (kmer filtering) and were removed from
-            the main output; only produced when a contaminants reference is provided
+            the main output; only produced when a contaminants reference is provided and
+            task.ext.save_removed is truthy
           pattern: "*.matched.fq.gz"
           ontologies:
             - edam: http://edamontology.org/format_3989 # GZIP
