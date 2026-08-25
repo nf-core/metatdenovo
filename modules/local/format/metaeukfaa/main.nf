@@ -1,4 +1,4 @@
-process FORMAT_METAEUK_FAA {
+process FORMAT_METAEUKFAA {
     tag "$meta.id"
     label 'process_low'
 

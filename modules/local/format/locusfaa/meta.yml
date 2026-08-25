@@ -1,4 +1,4 @@
-name: "format_locus_faa"
+name: "format_locusfaa"
 description: Builds a protein FASTA with exactly one sequence per consolidated locus,
   named after the locus, by resolving each locus's membership back to the contributing
   ORF callers' protein sequences

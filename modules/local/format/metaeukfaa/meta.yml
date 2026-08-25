@@ -1,4 +1,4 @@
-name: "format_metaeuk_faa"
+name: "format_metaeukfaa"
 description: Rewrites MetaEuk protein FASTA sequence ids to match the ID attribute
   FORMAT_METAEUK_GFF derives from the GFF, so ORF-keyed joins between counts tables
   and annotation tables work

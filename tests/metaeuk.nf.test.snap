@@ -51,7 +51,7 @@
                 "FORMAT_LOCUS_CONSOLIDATE": {
                     "gzip": 1.11
                 },
-                "FORMAT_METAEUK_FAA": {
+                "FORMAT_METAEUKFAA": {
                     "gzip": 1.11
                 },
                 "FORMAT_METAEUK_GFF": {
@@ -212,7 +212,7 @@
                 "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count"
             ]
         ],
-        "timestamp": "2026-08-25T10:12:04.806707551",
+        "timestamp": "2026-08-25T10:30:45.180160994",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"
