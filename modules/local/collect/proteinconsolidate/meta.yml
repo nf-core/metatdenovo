@@ -1,0 +1,45 @@
+name: "collect_proteinconsolidate"
+description: Aggregates per-locus featureCounts output into per-cluster counts, summing
+  the counts of every locus whose protein fell in the same MMseqs2 cluster, so one gene
+  called on several contigs is counted once
+keywords:
+  - counts
+  - clustering
+  - consolidation
+  - featurecounts
+input:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - inputfiles:
+      type: file
+      description: featureCounts output tables for the consolidated loci, one per sample
+      pattern: "*.featureCounts.tsv"
+  - provenance:
+      type: file
+      description: Per-locus provenance table (ID, callers, n_calls) from FORMAT_LOCUS_CONSOLIDATE
+      pattern: "*.provenance.tsv.gz"
+  - clusters:
+      type: file
+      description: MMseqs2 cluster membership, headerless representative/member pairs
+      pattern: "*.tsv"
+output:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - counts:
+      type: file
+      description: >
+        Per-cluster, per-sample counts table. Columns orf (the cluster representative's locus
+        id), chr, start, end, strand, length, sample, count, tpm, callers, n_calls, n_loci,
+        loci. Coordinates are semicolon-joined across the cluster's member loci; tpm is
+        recomputed from the summed counts rather than summed from the per-locus tpms.
+      pattern: "*.counts.tsv.gz"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+authors:
+  - "@erikrikarddaniel"
+maintainers:
+  - "@erikrikarddaniel"

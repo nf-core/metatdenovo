@@ -9,6 +9,7 @@
 //
 include { COLLECT_FEATURECOUNTS              } from '../modules/local/collect/featurecounts/'
 include { COLLECT_LOCUS_CONSOLIDATE          } from '../modules/local/collect/locus_consolidate/'
+include { COLLECT_PROTEINCONSOLIDATE         } from '../modules/local/collect/proteinconsolidate/'
 include { COLLECT_STATS                      } from '../modules/local/collect/stats/'
 include { FORMAT_GFF2BED                     } from '../modules/local/format/gff2bed/'
 include { FORMAT_LOCUS_CONSOLIDATE           } from '../modules/local/format/locus_consolidate/'
@@ -715,6 +716,29 @@ workflow METATDENOVO {
             .map { _id, meta, fcs, provenance -> [ meta, fcs, provenance ] }
     )
     ch_versions = ch_versions.mix(COLLECT_LOCUS_CONSOLIDATE.out.versions)
+
+    // Third consolidation level: sum the per-locus counts above across each protein cluster, so a
+    // gene called on two contigs is reported once. Safe to sum after the fact rather than recount,
+    // because a read only aligns to one contig -- provided each read was exclusively assigned to one
+    // feature at counting time, which is what --bbmap_ambiguous/--featurecounts_fraction control
+    // (#464).
+    //
+    // Keyed on the assembly name rather than meta.id, since the three inputs carry three different
+    // caller names; meta.id is "<assembly>.<caller>" throughout, so stripping the caller recovers a
+    // key they share without assuming there is only ever one assembly in flight.
+    ch_protein_consolidate_counts = channel.empty()
+    if ( ! params.skip_protein_consolidation && orf_callers ) {
+        COLLECT_PROTEINCONSOLIDATE (
+            ch_collect_feature.locus_consolidate
+                .map { meta, fcs -> [ meta.id - ".${meta.caller}", fcs ] }
+                .join( FORMAT_LOCUS_CONSOLIDATE.out.provenance.map { meta, provenance -> [ meta.id - ".${meta.caller}", provenance ] } )
+                .join( ch_protein_clusters.map { meta, clusters -> [ meta.id - ".${meta.caller}", clusters ] } )
+                .map { assembly, fcs, provenance, clusters ->
+                    [ [ id: "${assembly}.${protein_consolidate_name}", caller: protein_consolidate_name ], fcs, provenance, clusters ]
+                }
+        )
+        ch_protein_consolidate_counts = COLLECT_PROTEINCONSOLIDATE.out.counts
+    }
 
     COLLECT_FEATURECOUNTS ( ch_collect_feature.other )
     ch_versions           = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
