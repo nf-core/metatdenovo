@@ -159,6 +159,30 @@ Run `metaeuk databases -h` for the full list.
 Each active caller still runs independently and produces its own complete set of output (GFF, protein FASTA, `summary_tables/<assembly>.<caller>.*`) under its own name, exactly as if it had been run alone.
 In addition, the pipeline consolidates calls that different callers made for the same gene, at two levels; see [Consolidating calls for the same gene](#consolidating-calls-for-the-same-gene) below and the [Output docs](output.md).
 
+##### Comparing callers: mind the minimum ORF length
+
+Do not read the per-caller tables, or the `callers` column of the consolidated tables, as a like-for-like comparison of what each caller found.
+The callers do not use comparable minimum ORF lengths, and the difference is large enough to dominate a naive count.
+
+TransDecoder's `LongOrfs` step defaults to a 100 aa minimum, so it cannot report anything shorter.
+Prodigal, which Prokka wraps and which this pipeline runs in metagenome mode, has no equivalent floor and readily calls short ORFs, including partial ones running off the ends of fragmentary contigs.
+A caller-specific count therefore mixes "this caller found a gene the other missed" with "the other caller was never eligible to call it".
+
+The pipeline's own full-size test makes the size of the effect concrete (its output is published with the release, so the numbers below can be inspected).
+Running `--orf_caller prokka,transdecoder` on a metatranscriptome gave 68829 consolidated loci:
+
+| Loci              | Count | Mean protein length |
+| ----------------- | ----- | ------------------- |
+| Called by both    | 23034 | ~245 aa             |
+| TransDecoder only | 29844 | ~168 aa             |
+| Prokka only       | 15951 | ~80 aa              |
+
+83% of the Prokka-only loci are shorter than 100 aa, i.e. below the length TransDecoder would ever report.
+Comparing only what both callers could have found leaves about 29800 TransDecoder-only against about 2700 Prokka-only -- an order of magnitude apart, where the raw counts suggest a factor of two.
+
+If you want to compare callers, apply a common length threshold first.
+The short Prodigal calls are not necessarily wrong -- small proteins are real, and so are partial genes at contig edges -- they are simply not something the other caller was in a position to confirm.
+
 #### Provide your own ORFs
 
 You can provide a set of ORFs to the pipeline using the `--user_orfs_faa orfs.faa.gz` and `--user_orfs_gff orfs.gff.gz`
