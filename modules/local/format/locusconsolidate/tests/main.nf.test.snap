@@ -1,4 +1,37 @@
 {
+    "tie order must not change the grouping": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test.gff.gz:md5,86ea05259de3ba7437f755dc11ade6bc"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test.provenance.tsv.gz:md5,2e390739394831bc88e44f41f082b066"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test.members.tsv.gz:md5,3e7821af5b15a98103ce252e1628188a"
+                ]
+            ]
+        ],
+        "timestamp": "2026-08-26T19:37:38.236861741",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
+    },
     "single caller - overlapping adjacent genes must NOT merge": {
         "content": [
             [

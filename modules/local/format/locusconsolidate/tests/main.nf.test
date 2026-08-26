@@ -133,4 +133,49 @@ nextflow_process {
             )
         }
     }
+
+    test("tie order must not change the grouping") {
+
+        when {
+            process {
+                """
+                // Three calls sharing a start on one contig and strand: two from one caller, one from
+                // the other. A greedy sweep absorbs whichever equal-start call it meets first, so the
+                // result used to depend on which caller's BED was concatenated first -- and that
+                // changes whenever a caller's task re-runs into a different work directory. Measured
+                // on the full-size test data, the same 91863 calls gave 68829, 68826 or 68828 loci
+                // depending only on that order.
+                //
+                // The rows below are fed in the reverse of the module's own total order, so a module
+                // that trusted its input order would group them differently from a sorted feed.
+                def bed = file("\${workDir}/ties.bed")
+                bed.text = [
+                    ['k141_500', '1000', '1900', 'transdecoder:k141_500.p1', '0', '+'],
+                    ['k141_500', '1000', '1500', 'prokka:GENE_00002',        '0', '+'],
+                    ['k141_500', '1000', '1400', 'prokka:GENE_00001',        '0', '+']
+                ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+
+                input[0] = [ [ id:'test' ], bed ]
+                """
+            }
+        }
+
+        then {
+            def gff  = path(process.out.gff[0][1]).linesGzip
+            def prov = path(process.out.provenance[0][1]).linesGzip.findAll { l -> !l.startsWith('ID\t') }
+            assertAll(
+                { assert process.success },
+                // In the module's own order the two prokka calls come first, shortest end first.
+                // GENE_00001 opens a locus; GENE_00002 shares its caller so it cannot join and starts
+                // a new one; the transdecoder call then merges into that second locus. So GENE_00001
+                // stays alone and the merged locus spans to 1900.
+                { assert gff.size() == 2 },
+                { assert gff.any { l -> l.contains('ID=locus_k141_500_1001_1900_+') } },
+                { assert gff.any { l -> l.endsWith('ID=GENE_00001') } },
+                { assert prov.any { l -> l == 'locus_k141_500_1001_1900_+\tprokka,transdecoder\t2' } },
+                { assert prov.any { l -> l == 'GENE_00001\tprokka\t1' } },
+                { assert snapshot(process.out.gff, process.out.provenance, process.out.members).match() }
+            )
+        }
+    }
 }

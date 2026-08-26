@@ -43,12 +43,23 @@ process FORMAT_LOCUSCONSOLIDATE {
     // Grouping is a single greedy sweep in sorted order, so it is deterministic but not "optimal":
     // in a chain A(caller1) - B(caller2) - C(caller1), B binds to A and C starts a new locus.
     //
+    // Because the sweep is greedy, WHICH call a locus absorbs depends on the order equal-start calls
+    // arrive in, so the input is re-sorted here on a total order over the fields that matter --
+    // chrom, start, end, strand, name -- rather than trusting the upstream sort. Ordering by
+    // (chrom, start) alone leaves ties to be broken by whatever order the per-caller BEDs happened to
+    // be concatenated in, which changes when a caller's task re-runs into a different work directory.
+    // Measured on the full-size test data (91863 calls, 16335 coordinate groups holding more than one
+    // call): 68829 loci with one caller's BED first, 68826 with the other's, 68828 shuffled. With the
+    // sort below, all three give 68829. LC_ALL=C so the name comparison is byte order everywhere
+    // rather than whatever collation the host locale supplies.
+    //
     // Provenance and members are accumulated by locus ID and written at END rather than per group,
     // because a multi-exon gene contributes several non-overlapping groups that all inherit the same
     // ID. Emitting per group would repeat that ID with per-segment counts, and any consumer joining
     // on it would fan out and duplicate the locus's counts.
     """
-    awk 'BEGIN { FS = OFS = "\\t"; SEP = SUBSEP }
+    LC_ALL=C sort -k1,1 -k2,2n -k3,3n -k6,6 -k4,4 ${sorted_bed} \\
+        | awk 'BEGIN { FS = OFS = "\\t"; SEP = SUBSEP }
 
         # Close the open group for one contig/strand: assign the locus its ID and record provenance.
         function flush(key,   i, n, parts, cnt, id, sep, seen_member) {
@@ -140,7 +151,7 @@ process FORMAT_LOCUSCONSOLIDATE {
                 # contributing ORFs -- not exon segments, and not intervals.
                 print id, callers, n | "gzip -c > ${prefix}.provenance.tsv.gz"
             }
-        }' ${sorted_bed}
+        }'
     """
 
     stub:
