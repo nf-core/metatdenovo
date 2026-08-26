@@ -484,7 +484,7 @@ workflow METATDENOVO {
                     }
                 }
                 reader.close()
-                def mean_aa = n_orfs > 0 ? (total_aa / n_orfs) : 0
+                def mean_aa = n_orfs > 0 ? (total_aa / n_orfs) : 0.0
                 def content = "Sample,n_orfs,total_aa,mean_aa_length\n${meta.id},${n_orfs},${total_aa},${String.format(Locale.ROOT, '%.1f', mean_aa)}\n"
                 [ 'prodigal_stats_mqc.csv', content ]
             }
@@ -521,7 +521,7 @@ workflow METATDENOVO {
                     }
                 }
                 reader.close()
-                def mean_aa = n_orfs > 0 ? (total_aa / n_orfs) : 0
+                def mean_aa = n_orfs > 0 ? (total_aa / n_orfs) : 0.0
                 def content = "Sample,n_orfs,total_aa,mean_aa_length\n${meta.id},${n_orfs},${total_aa},${String.format(Locale.ROOT, '%.1f', mean_aa)}\n"
                 [ 'transdecoder_stats_mqc.csv', content ]
             }
@@ -557,7 +557,7 @@ workflow METATDENOVO {
                     }
                 }
                 reader.close()
-                def mean_aa = n_orfs > 0 ? (total_aa / n_orfs) : 0
+                def mean_aa = n_orfs > 0 ? (total_aa / n_orfs) : 0.0
                 def content = "Sample,n_orfs,total_aa,mean_aa_length\n${meta.id},${n_orfs},${total_aa},${String.format(Locale.ROOT, '%.1f', mean_aa)}\n"
                 [ 'metaeuk_stats_mqc.csv', content ]
             }
