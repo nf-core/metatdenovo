@@ -192,12 +192,6 @@
                 "trimgalore/fastqc/RPL28_MRNA_RECODED_2_val_2_fastqc.zip"
             ],
             [
-                "megahit.metaeuk.codon.fas:md5,8bc52c564165881a622d69413cf33452",
-                "megahit.metaeuk.fas:md5,cab473bca453ec98053f2544d9a01a1c",
-                "megahit.metaeuk.gff:md5,f5ceef9a3b9917aeb174e1374d566e28",
-                "megahit.metaeuk.headersMap.tsv:md5,5ec29818faeff6db35900f11e8e55738",
-                "megahit.metaeuk_format.faa.gz:md5,ad243c05fb3c9c1a4f3d0d7b61840cf2",
-                "megahit.metaeuk_format.gff.gz:md5,9f4ba2f29292871fb361b621124cb2b2",
                 "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f",
                 "multiqc_metaeuk_stats.txt:md5,be6038955478f96fdcaaa12d04c6d4a9"
             ],
@@ -209,7 +203,7 @@
                 "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count"
             ]
         ],
-        "timestamp": "2026-08-25T12:14:21.51777374",
+        "timestamp": "2026-08-26T21:24:53.325836684",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"
