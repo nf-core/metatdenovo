@@ -29,16 +29,18 @@ Changes in 'bbmap/bbduk/meta.yml':
 Changes in 'bbmap/bbduk/main.nf':
 --- modules/nf-core/bbmap/bbduk/main.nf
 +++ modules/nf-core/bbmap/bbduk/main.nf
-@@ -12,7 +12,8 @@
+@@ -12,8 +12,9 @@
      path contaminants
  
      output:
 -    tuple val(meta), path('*.fastq.gz'), emit: reads
-+    tuple val(meta), path('*.fastq.gz')   , emit: reads
+-    tuple val(meta), path('*.log')     , emit: log
++    tuple val(meta), path('*.fastq.gz')     , emit: reads
 +    tuple val(meta), path('*.matched.fq.gz'), emit: reads_removed, optional: true
-     tuple val(meta), path('*.log')     , emit: log
++    tuple val(meta), path('*.log')          , emit: log
      tuple val("${task.process}"), val('bbmap'), eval('bbversion.sh | grep -v "Duplicate cpuset"'), emit: versions_bbmap, topic: versions
  
+     when:
 @@ -25,6 +26,7 @@
      def raw      = meta.single_end ? "in=${reads[0]}" : "in1=${reads[0]} in2=${reads[1]}"
      def trimmed  = meta.single_end ? "out=${prefix}.fastq.gz" : "out1=${prefix}_1.fastq.gz out2=${prefix}_2.fastq.gz"
@@ -318,6 +320,7 @@ Changes in 'bbmap/bbduk/tests/main.nf.test.snap':
 +        "timestamp": "2026-08-25T10:31:27.216584"
      }
  }
+'modules/nf-core/bbmap/bbduk/tests/nextflow_no_save_removed.config' was created
 Changes in 'bbmap/bbduk/tests/nextflow.config':
 --- modules/nf-core/bbmap/bbduk/tests/nextflow.config
 +++ modules/nf-core/bbmap/bbduk/tests/nextflow.config
@@ -333,7 +336,23 @@ Changes in 'bbmap/bbduk/tests/nextflow.config':
 Changes in 'bbmap/bbduk/tests/main.nf.test':
 --- modules/nf-core/bbmap/bbduk/tests/main.nf.test
 +++ modules/nf-core/bbmap/bbduk/tests/main.nf.test
-@@ -82,7 +82,8 @@
+@@ -27,6 +27,7 @@
+         then {
+             assertAll(
+                 { assert process.success },
++                { assert process.out.reads_removed.size() == 0 },
+                 { assert path(process.out.log.get(0).get(1)).getText().contains("Input is being processed as unpaired")},
+                 { assert snapshot(process.out.reads,
+                                   process.out.findAll { key, val -> key.startsWith('versions') }).match() }
+@@ -53,6 +54,7 @@
+         then {
+             assertAll(
+                 { assert process.success },
++                { assert process.out.reads_removed.size() == 0 },
+                 { assert path(process.out.log.get(0).get(1)).getText().contains("Input is being processed as paired")},
+                 { assert snapshot(process.out.reads,
+                                   process.out.findAll { key, val -> key.startsWith('versions') }).match() }
+@@ -82,8 +84,35 @@
                  { assert process.success },
                  { assert process.out.reads.get(0).get(1).endsWith("test.trim.fastq.gz") },
                  { assert path(process.out.log.get(0).get(1)).getText().contains("Input is being processed as unpaired")},
@@ -341,9 +360,36 @@ Changes in 'bbmap/bbduk/tests/main.nf.test':
 +                { assert snapshot(process.out.reads_removed,
 +                                  process.out.findAll { key, val -> key.startsWith('versions') }).match() }
  
++            )
++        }
++    }
++
++    test("sarscov2 - single end w/ contams [fastq,fasta] - fastq - save_removed off") {
++
++        config "./nextflow_no_save_removed.config"
++
++        when {
++            process {
++                """
++                input[0] = [
++                    [ id:'test', single_end:true ], // meta map
++                    [  file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true) ]
++                ]
++                input[1] = [
++                    file(params.modules_testdata_base_path + 'genomics/sarscov2/genome/transcriptome.fasta', checkIfExists: true)
++                ]
++                """
++            }
++        }
++
++        then {
++            assertAll(
++                { assert process.success },
++                { assert process.out.reads_removed.size() == 0 }
              )
          }
-@@ -111,7 +112,8 @@
+     }
+@@ -111,7 +140,8 @@
                  { assert process.out.reads.get(0).get(1).get(0).endsWith("test.trim_1.fastq.gz") },
                  { assert process.out.reads.get(0).get(1).get(1).endsWith("test.trim_2.fastq.gz") },
                  { assert path(process.out.log.get(0).get(1)).getText().contains("Input is being processed as paired")},

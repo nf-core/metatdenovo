@@ -91,6 +91,32 @@ nextflow_process {
         }
     }
 
+    test("sarscov2 - single end w/ contams [fastq,fasta] - fastq - save_removed off") {
+
+        config "./nextflow_no_save_removed.config"
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test', single_end:true ], // meta map
+                    [  file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true) ]
+                ]
+                input[1] = [
+                    file(params.modules_testdata_base_path + 'genomics/sarscov2/genome/transcriptome.fasta', checkIfExists: true)
+                ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert process.out.reads_removed.size() == 0 }
+            )
+        }
+    }
+
     test("sarscov2 - paired end w/ contams [fastq,fasta] - fastq") {
 
         when {
