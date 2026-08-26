@@ -25,6 +25,12 @@ workflow EGGNOG {
     ch_eggnog_data_dir = EGGNOG_DOWNLOAD.out.eggnog_db
         .combine(EGGNOG_DOWNLOAD.out.taxa_db)
         .combine(EGGNOG_DOWNLOAD.out.pkl)
+        // .first() makes this a value channel again. EGGNOG_DOWNLOAD takes no input, so its outputs
+        // are value channels and can be reused by every faa item, but .combine() demotes the result
+        // to a queue channel holding a single item -- which the first faa then consumes, leaving
+        // EGGNOGMAPPER to run exactly once no matter how many ORF callers are in faa. With several
+        // callers that silently annotated only the first of them. (.map() above does not demote.)
+        .first()
 
     EGGNOGMAPPER(faa, ch_search_mode_db, ch_eggnog_data_dir)
 
