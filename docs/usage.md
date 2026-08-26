@@ -89,6 +89,7 @@ _Do not mix single end and pairs for the same sample!_
 
 The pipeline can remove potential contaminants using the BBduk program.
 Specify a fasta file, gzipped or not, with `--sequence_filter sequences.fasta`.
+Use `--save_bbduk_removed_fastq` to also keep the reads that were removed (i.e. matched the filter reference) instead of only keeping the filtered/clean reads.
 For further documentation, see the [BBduk official website](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbduk-guide/).
 
 ### Digital normalization

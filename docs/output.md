@@ -101,6 +101,7 @@ BBduk is built-in tool from BBmap.
 
 - `bbmap/`
   - `bbduk/*.fastq.gz`: fastq files after removal of sequences specified with `--sequence_filter`. Only saved if you set `--save_bbduk_fastq`.
+  - `bbduk/*.matched.fq.gz`: fastq files with the reads that were removed (matched `--sequence_filter`). Only saved if you set `--save_bbduk_removed_fastq`.
   - `bbduk/*.bbduk.log`: text files with the results from BBduk analysis. The number of filtered reads can be found here.
 - `summary_tables/`
 

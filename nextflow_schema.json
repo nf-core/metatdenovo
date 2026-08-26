@@ -124,6 +124,11 @@
                     "type": "boolean",
                     "description": "Save the resulting fastq files from filtering",
                     "fa_icon": "fas fa-align-center"
+                },
+                "save_bbduk_removed_fastq": {
+                    "type": "boolean",
+                    "description": "Save the reads that were removed (matched the sequence_filter reference) during BBDuk filtering",
+                    "fa_icon": "fas fa-align-center"
                 }
             },
             "fa_icon": "fas fa-filter"
