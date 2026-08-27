@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Added`
 
+- [#NN](https://github.com/nf-core/metatdenovo/pull/NN) - Add `--save_eukulele_alignments` to optionally publish EUKulele's raw Diamond alignment file, which is now withheld by default since nothing in the pipeline consumes it and it can be 100x larger than the taxonomy results it feeds, addresses [#475](https://github.com/nf-core/metatdenovo/issues/475) (@erikrikarddaniel)
 - [#469](https://github.com/nf-core/metatdenovo/pull/469) - Add `--save_bbduk_removed_fastq` to optionally keep the reads removed (matched) by BBDuk contaminant filtering, instead of only keeping the clean reads, addresses [#17](https://github.com/nf-core/metatdenovo/issues/17) (@danilodileo)
 - [#468](https://github.com/nf-core/metatdenovo/pull/468) - Add `--bbmap_ambiguous` (`best`/`all`/`random`/`toss`, default `best`) and `--featurecounts_fraction` to control how BBMap and featureCounts handle reads that align to more than one site, addresses [#464](https://github.com/nf-core/metatdenovo/issues/464) (@erikrikarddaniel)
 - [#467](https://github.com/nf-core/metatdenovo/pull/467) - When multiple `--orf_caller` values are active, merge overlapping/identical same-contig CDS calls from different callers into single loci before counting reads, producing a new `<assembly>.locus_consolidate.counts.tsv.gz` table with caller/call-count provenance columns; with a single caller active it's identical in content to that caller's own table, addresses [#463](https://github.com/nf-core/metatdenovo/issues/463) (@erikrikarddaniel)
@@ -26,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Fixed`
 
+- [#NN](https://github.com/nf-core/metatdenovo/pull/NN) - Fix `eukulele/search`'s `stub:` block failing with "No such file or directory" because it never creates the `taxonomy_estimation`/`taxonomy_counts`/`mets_full/diamond` subdirectories it writes into (@erikrikarddaniel)
 - [#467](https://github.com/nf-core/metatdenovo/pull/467) - Fix validation that was supposed to reject `--orf_caller` and `--user_orfs_gff`/`--user_orfs_faa` both being set at once, but could never actually trigger (@erikrikarddaniel)
 - [#466](https://github.com/nf-core/metatdenovo/pull/466) - `featurecounts/*.featureCounts.tsv` output filenames now always include the ORF caller name (e.g. `SAMPLE1.prokka.featureCounts.tsv`), required so multiple simultaneous callers (see above) don't overwrite each other's per-sample counts (@erikrikarddaniel)
 - [#466](https://github.com/nf-core/metatdenovo/pull/466) - Fix a crash when hmm-classification finds zero hits for a given ORF caller/hmm-file combination (@erikrikarddaniel)

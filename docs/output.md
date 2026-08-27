@@ -323,7 +323,7 @@ GTDB currently only works as a user provided database, i.e. data must be downloa
 <summary>Output files</summary>
 
 - `eukulele/<assembly_name>.<orfcaller_name>_<database>`
-  - `<assembly_name>.<orfcaller_name>/mets_full/diamond/proteins.diamond.out.gz`: Diamond output
+  - `<assembly_name>.<orfcaller_name>/mets_full/diamond/proteins.diamond.out.gz`: EUKulele's raw Diamond alignments, only written with `--save_eukulele_alignments`
   - `<assembly_name>.<orfcaller_name>/taxonomy_counts/*.csv.gz`: counts for different ranks, see [EUKulele documentation](https://eukulele.readthedocs.io)
   - `<assembly_name>.<orfcaller_name>/taxonomy_estimation/proteins-estimated-taxonomy.out.gz`: EUKulele taxonomy assignment
 - `summary_tables/`

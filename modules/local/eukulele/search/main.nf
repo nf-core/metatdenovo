@@ -55,6 +55,7 @@ process EUKULELE_SEARCH {
     stub:
     prefix   = task.ext.prefix ?: ("${dbname}" ? "${meta.id}_${dbname}" : "${meta.id}")
     """
+    mkdir -p ${prefix}/taxonomy_estimation ${prefix}/taxonomy_counts ${prefix}/mets_full/diamond
     gzip -c /dev/null > ${prefix}/taxonomy_estimation/empty.out.gz
     gzip -c /dev/null > ${prefix}/taxonomy_counts/empty.csv.gz
     gzip -c /dev/null > ${prefix}/mets_full/diamond/empty
