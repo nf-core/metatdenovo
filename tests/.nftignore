@@ -1,5 +1,6 @@
 .DS_Store
 bbmap/bbduk/*.fastq.gz
+bbmap/bbduk/*.matched.fq.gz
 bbmap/bbduk/*.bbduk.log
 bbmap/bbnorm/all_samples.bbnorm.log
 bbmap/bbmap/*.log
