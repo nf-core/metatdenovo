@@ -1,0 +1,181 @@
+nextflow_process {
+
+    name "Test Process FORMAT_LOCUSCONSOLIDATE"
+    script "../main.nf"
+    process "FORMAT_LOCUSCONSOLIDATE"
+
+    tag "modules"
+    tag "modules_local"
+    tag "format"
+    tag "format/locusconsolidate"
+
+    // Inputs are built inline rather than read from a fixture: the pipeline repo carries no test data
+    // of its own. Coordinates below are real -- the overlapping Prodigal pair is from the default test
+    // profile's own assembly, and the two-caller and multi-exon cases from test_metaeuk_transdecoder.
+
+    test("single caller - overlapping adjacent genes must NOT merge") {
+
+        when {
+            process {
+                """
+                // k141_102_5 and k141_102_6 are two distinct Prodigal genes that overlap on the same
+                // strand, the ordinary prokaryotic operon pattern. Merging on overlap alone fused
+                // them into one locus and summed their counts; only the caller condition keeps them
+                // apart. Input is BED, sorted by (chrom, start) as BEDTOOLS_SORT leaves it.
+                def bed = file("\${workDir}/single.bed")
+                bed.text = [
+                    ['k141_102', '4199', '5300', 'prodigal:k141_102_5', '0', '-'],
+                    ['k141_102', '5296', '6355', 'prodigal:k141_102_6', '0', '-']
+                ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+
+                input[0] = [ [ id:'test' ], bed ]
+                """
+            }
+        }
+
+        then {
+            def gff  = path(process.out.gff[0][1]).linesGzip
+            def prov = path(process.out.provenance[0][1]).linesGzip
+            assertAll(
+                { assert process.success },
+                // Two genes in, two loci out, each keeping its own Prodigal id.
+                { assert gff.size() == 2 },
+                { assert gff.every { l -> l.contains('ID=k141_102_') } },
+                { assert gff.any { l -> l.endsWith('ID=k141_102_5') } },
+                { assert gff.any { l -> l.endsWith('ID=k141_102_6') } },
+                // Nothing merged, so no synthesized id and every locus has one call.
+                { assert gff.every { l -> !l.contains('ID=locus_') } },
+                { assert prov.findAll { l -> !l.startsWith('ID\t') }.every { l -> l.endsWith('\tprodigal\t1') } },
+                { assert snapshot(process.out.gff, process.out.provenance, process.out.members).match() }
+            )
+        }
+    }
+
+    test("two callers overlapping - merge into one locus with a synthesized id") {
+
+        when {
+            process {
+                """
+                def bed = file("\${workDir}/two.bed")
+                bed.text = [
+                    ['k59_0', '0', '447', 'metaeuk:NP_011412.1|k59_0|+|0', '0', '+'],
+                    ['k59_0', '0', '447', 'transdecoder:k59_0.p1',         '0', '+']
+                ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+
+                input[0] = [ [ id:'test' ], bed ]
+                """
+            }
+        }
+
+        then {
+            def prov = path(process.out.provenance[0][1]).linesGzip.findAll { l -> !l.startsWith('ID\t') }
+            assertAll(
+                { assert process.success },
+                { assert path(process.out.gff[0][1]).linesGzip == ['k59_0\tlocus_consolidate\tCDS\t1\t447\t.\t+\t.\tID=locus_k59_0_1_447_+'] },
+                // Callers are sorted, and n_calls counts contributing ORFs.
+                { assert prov == ['locus_k59_0_1_447_+\tmetaeuk,transdecoder\t2'] },
+                { assert path(process.out.members[0][1]).linesGzip.findAll { l -> !l.startsWith('ID\t') }.size() == 2 }
+            )
+        }
+    }
+
+    test("multi-exon gene - one GFF row per exon but a single provenance row") {
+
+        when {
+            process {
+                """
+                // Two exons of one spliced MetaEuk call. Both inherit the same locus id, so the GFF
+                // keeps a row each (featureCounts sums them as one meta-feature via -g ID) while
+                // provenance must collapse to one row -- a second row would fan out the join in
+                // COLLECT_LOCUSCONSOLIDATE and duplicate this locus's counts.
+                def bed = file("\${workDir}/exons.bed")
+                bed.text = [
+                    ['k59_1', '191',  '590',  'metaeuk:NP_011412.1|k59_1|-|191', '0', '-'],
+                    ['k59_1', '1101', '1149', 'metaeuk:NP_011412.1|k59_1|-|191', '0', '-']
+                ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+
+                input[0] = [ [ id:'test' ], bed ]
+                """
+            }
+        }
+
+        then {
+            def prov    = path(process.out.provenance[0][1]).linesGzip.findAll { l -> !l.startsWith('ID\t') }
+            def members = path(process.out.members[0][1]).linesGzip.findAll { l -> !l.startsWith('ID\t') }
+            assertAll(
+                { assert process.success },
+                { assert path(process.out.gff[0][1]).linesGzip.size() == 2 },
+                { assert prov == ['NP_011412.1|k59_1|-|191\tmetaeuk\t1'] },
+                { assert members.size() == 1 }
+            )
+        }
+    }
+
+    test("bed - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                def bed = file("\${workDir}/stub.bed")
+                bed.text = ''
+
+                input[0] = [ [ id:'test' ], bed ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+
+    test("tie order must not change the grouping") {
+
+        when {
+            process {
+                """
+                // Three calls sharing a start on one contig and strand: two from one caller, one from
+                // the other. A greedy sweep absorbs whichever equal-start call it meets first, so the
+                // result used to depend on which caller's BED was concatenated first -- and that
+                // changes whenever a caller's task re-runs into a different work directory. Measured
+                // on the full-size test data, the same 91863 calls gave 68829, 68826 or 68828 loci
+                // depending only on that order.
+                //
+                // The rows below are fed in the reverse of the module's own total order, so a module
+                // that trusted its input order would group them differently from a sorted feed.
+                def bed = file("\${workDir}/ties.bed")
+                bed.text = [
+                    ['k141_500', '1000', '1900', 'transdecoder:k141_500.p1', '0', '+'],
+                    ['k141_500', '1000', '1500', 'prokka:GENE_00002',        '0', '+'],
+                    ['k141_500', '1000', '1400', 'prokka:GENE_00001',        '0', '+']
+                ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+
+                input[0] = [ [ id:'test' ], bed ]
+                """
+            }
+        }
+
+        then {
+            def gff  = path(process.out.gff[0][1]).linesGzip
+            def prov = path(process.out.provenance[0][1]).linesGzip.findAll { l -> !l.startsWith('ID\t') }
+            assertAll(
+                { assert process.success },
+                // In the module's own order the two prokka calls come first, shortest end first.
+                // GENE_00001 opens a locus; GENE_00002 shares its caller so it cannot join and starts
+                // a new one; the transdecoder call then merges into that second locus. So GENE_00001
+                // stays alone and the merged locus spans to 1900.
+                { assert gff.size() == 2 },
+                { assert gff.any { l -> l.contains('ID=locus_k141_500_1001_1900_+') } },
+                { assert gff.any { l -> l.endsWith('ID=GENE_00001') } },
+                { assert prov.any { l -> l == 'locus_k141_500_1001_1900_+\tprokka,transdecoder\t2' } },
+                { assert prov.any { l -> l == 'GENE_00001\tprokka\t1' } },
+                { assert snapshot(process.out.gff, process.out.provenance, process.out.members).match() }
+            )
+        }
+    }
+}

@@ -45,6 +45,69 @@ nextflow_pipeline {
                     path("${params.outdir}/summary_tables/megahit.prodigal.overall_stats.tsv.gz").linesGzip.findAll { l -> l.contains('n_feature_count') },
                 ).match() },
                 { assert path("${params.outdir}/megahit/megahit_assembly.log").readLines().any { l -> l.contains('ALL DONE') } },
+
+                // === #463 single-caller degeneracy, the property the consolidation levels rest on ===
+                // With one caller nothing can merge, so the locus-consolidated table must reproduce
+                // Prodigal's own table exactly (minus the provenance columns it adds). This is the
+                // assertion that would have caught locus consolidation fusing overlapping ADJACENT
+                // genes from one caller: on this dataset that silently collapsed 515 of 3470 ORFs
+                // into 238 shared loci and summed counts across genes that are not the same gene.
+                { assert (
+                    ['orf', 'chr', 'start', 'end', 'strand', 'length', 'sample', 'count', 'tpm'].collect { c ->
+                        path("${params.outdir}/summary_tables/megahit.prodigal.counts.tsv.gz").csv(sep: '\t', decompress: true, header: true).columns[c]
+                    }.transpose().toSet()
+                ) == (
+                    ['orf', 'chr', 'start', 'end', 'strand', 'length', 'sample', 'count', 'tpm'].collect { c ->
+                        path("${params.outdir}/summary_tables/megahit.locus_consolidate.counts.tsv.gz").csv(sep: '\t', decompress: true, header: true).columns[c]
+                    }.transpose().toSet()
+                ) },
+                { assert (
+                    path("${params.outdir}/summary_tables/megahit.locus_consolidate.counts.tsv.gz")
+                        .csv(sep: '\t', decompress: true, header: true).rows
+                        .every { r -> r["callers"] == 'prodigal' && (r["n_calls"] as int) == 1 }
+                ) },
+
+                // === #460 outputs. These are in tests/.nftignore -- they derive from the assembly and
+                // MEGAHIT is not deterministic between runs, so md5s would flake -- hence assertions
+                // on their shape and cross-consistency instead of on their checksums. ===
+                //
+                // Every counted cluster must have a representative keyed identically, or its annotation
+                // join silently returns nothing. Containment rather than equality: the counts table
+                // drops rows with no reads in any sample, so clusters that were called but never
+                // sequenced legitimately have a representative and no counts row.
+                { assert (
+                    path("${params.outdir}/summary_tables/megahit.protein_consolidate_99.counts.tsv.gz")
+                        .csv(sep: '\t', decompress: true, header: true).columns["orf"].toSet()
+                ).every { orf -> orf in (
+                    path("${params.outdir}/protein_consolidate/megahit.protein_consolidate_99.representatives.fa.gz").linesGzip
+                        .findAll { l -> l.startsWith('>') }
+                        .collect { l -> l.substring(1).tokenize(' ')[0] }
+                        .toSet()
+                ) } },
+                // Cluster table shape: two columns, and every representative is a member of its own
+                // cluster -- the property COLLECT_PROTEINCONSOLIDATE relies on to inherit a length.
+                { assert (
+                    path("${params.outdir}/protein_consolidate/megahit.protein_consolidate_99.clusters.tsv").readLines()
+                        .every { l -> l.tokenize('\t').size() == 2 }
+                ) },
+                { assert (
+                    path("${params.outdir}/protein_consolidate/megahit.protein_consolidate_99.clusters.tsv").readLines()
+                        .collect { l -> l.tokenize('\t') }
+                        .with { rows -> rows.collect { r -> r[0] }.toSet().every { rep -> rows.any { r -> r[0] == rep && r[1] == rep } } }
+                ) },
+                // No locus may be lost between the two levels: clustering regroups rows, it does not
+                // drop reads. Silent loss here would still look self-consistent, since tpm is
+                // renormalised over whatever survives.
+                { assert (
+                    ['SAMPLE1_PE', 'SAMPLE2_PE', 'SAMPLE3_PE_1'].every { sample ->
+                        def total = { table ->
+                            path("${params.outdir}/summary_tables/${table}").csv(sep: '\t', decompress: true, header: true).rows
+                                .findAll { r -> r["sample"] == sample }
+                                .sum { r -> r["count"] as double } ?: 0.0
+                        }
+                        total('megahit.protein_consolidate_99.counts.tsv.gz') == total('megahit.locus_consolidate.counts.tsv.gz')
+                    }
+                ) },
                 { assert path("${params.outdir}/megahit/megahit_assembly.log").readLines().any { l -> l.contains('k list: 25,37,49') } },
                 { assert path("${params.outdir}/megahit/megahit_assembly.contigs.fa.gz").linesGzip.size() > 3000 },
                 { assert path("${params.outdir}/samtools/megahit.SAMPLE1_PE.idxstats").readLines().size() > 1600 },

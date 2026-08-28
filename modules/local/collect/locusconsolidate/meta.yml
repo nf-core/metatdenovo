@@ -1,0 +1,38 @@
+name: "collect_locusconsolidate"
+description: Collects per-sample featureCounts output against the locus-consolidated GFF
+  into one TPM-normalized table, joined with FORMAT_LOCUSCONSOLIDATE's provenance table
+  (which caller(s) contributed to each locus, and how many independent calls were merged)
+keywords:
+  - counts
+  - tpm
+  - locus consolidation
+  - provenance
+input:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - inputfiles:
+      type: file
+      description: One `*.featureCounts.tsv` file per sample, counted against the
+        locus-consolidated GFF
+      pattern: "*.featureCounts.tsv"
+  - provenance:
+      type: file
+      description: Per-locus provenance table from FORMAT_LOCUSCONSOLIDATE (ID, callers, n_calls)
+      pattern: "*.provenance.tsv.gz"
+output:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - counts:
+      type: file
+      description: TPM-normalized counts table with provenance columns appended
+      pattern: "*.counts.tsv.gz"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+authors:
+  - "@erikrikarddaniel"
+maintainers:
+  - "@erikrikarddaniel"

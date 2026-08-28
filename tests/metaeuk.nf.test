@@ -59,6 +59,23 @@ nextflow_pipeline {
                         .csv(sep: '\t', decompress: true, header: true).rows
                         .every { r -> r["callers"] == 'metaeuk' && (r["n_calls"] as int) == 1 }
                 ) },
+
+                // #460: MetaEuk's own two outputs disagree on ORF ids -- its protein fasta header is
+                // target|contig|strand|bitscore|evalue|nExons|lowCoord|... while the gff's TCS_ID (and
+                // hence the counts tables) is target|contig|strand|lowCoord. Every join keyed on 'orf'
+                // (eggnog/kofamscan/dbcan/eukulele summary tables) silently returns zero rows unless
+                // the two are reconciled, and no test caught it because every metaeuk profile skips
+                // those tools. Assert the reconciliation directly: the published protein fasta's
+                // sequence ids must be exactly the set of ORF ids in the counts table.
+                { assert (
+                    path("${params.outdir}/metaeuk/megahit.metaeuk_format.faa.gz").linesGzip
+                        .findAll { l -> l.startsWith('>') }
+                        .collect { l -> l.substring(1).tokenize(' ')[0] }
+                        .toSet()
+                ) == (
+                    path("${params.outdir}/summary_tables/megahit.metaeuk.counts.tsv.gz")
+                        .csv(sep: '\t', decompress: true, header: true).columns["orf"].toSet()
+                ) },
             )
         }
     }

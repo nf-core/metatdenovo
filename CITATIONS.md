@@ -69,6 +69,16 @@
 
   > Quinlan AR, Hall IM. BEDTools: a flexible suite of utilities for comparing genomic features. Bioinformatics. 2010 Mar 15;26(6):841-2. doi: 10.1093/bioinformatics/btq033. Epub 2010 Jan 28. PubMed PMID: 20110278; PubMed Central PMCID: PMC2832824.
 
+- [MMseqs2](https://github.com/soedinglab/MMseqs2)
+
+  > Steinegger M, Soding J. MMseqs2 enables sensitive protein sequence searching for the analysis of massive data sets. Nat Biotechnol. 2017 Nov;35(11):1026-1028. doi: 10.1038/nbt.3988. Epub 2017 Oct 16. PubMed PMID: 29035372.
+
+  > Steinegger M, Soding J. Clustering huge protein sequence sets in linear time. Nat Commun. 2018 Jun 29;9(1):2542. doi: 10.1038/s41467-018-04964-5. PubMed PMID: 29959318; PubMed Central PMCID: PMC6026198.
+
+- [SeqKit](https://github.com/shenwei356/seqkit)
+
+  > Shen W, Le S, Li Y, Hu F. SeqKit: A Cross-Platform and Ultrafast Toolkit for FASTA/Q File Manipulation. PLoS One. 2016 Oct 5;11(10):e0163962. doi: 10.1371/journal.pone.0163962. PubMed PMID: 27706213; PubMed Central PMCID: PMC5051824.
+
 - [Eggnog](https://github.com/eggnogdb/eggnog-mapper)
 
   > Cantalapiedra C, Hernandez-Plaza A, Letunic I, Bork P, Huerta-Cepas J.
