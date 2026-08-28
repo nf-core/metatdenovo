@@ -1,0 +1,92 @@
+nextflow_process {
+
+    name "Test Process FORMAT_METAEUKFAA"
+    script "../main.nf"
+    process "FORMAT_METAEUKFAA"
+
+    tag "modules"
+    tag "modules_local"
+    tag "format"
+    tag "format/metaeukfaa"
+
+    // Inputs are built inline rather than read from a fixture: the pipeline repo carries no
+    // test data of its own, and a two-record MetaEuk fasta is small enough to state literally.
+    // The headers below are real MetaEuk output from the pipeline's own metaeuk test profile.
+
+    test("metaeuk fasta - headers rewritten to the gff id form") {
+
+        when {
+            process {
+                """
+                def faa = file("\${workDir}/metaeuk.fas")
+                faa.text = [
+                    '>NP_011412.1|k59_0|+|310|1.429e-91|1|0|446|0[0]:446[446]:447[447]',
+                    'MPSRFTKTRKHRGHVSAGKGRIGKHRKHPGGRGMAGGQHHHRINMDKYHPGYFGKVGMRY',
+                    'FHKQQAHFWKPVLNLDKLWTLIPEDKRDQYLKSASKETAPVIDTLAAGYGKILGKGRIPN',
+                    '>NP_011412.1|k59_1|-|318|5.581e-94|2|191|1148|1148[1148]:1101[1101]:48[48]|592[589]:191[191]:402[399]',
+                    'MPSRFTKTRKHRGHVSAGKGRIGKHRKHPGGRGMAGGQHHHRINMDKYHPGYFGKVGMRY',
+                    ''
+                ].join('\\n')
+
+                input[0] = [ [ id:'test' ], faa ]
+                """
+            }
+        }
+
+        then {
+            def ids = path(process.out.format_faa[0][1]).linesGzip.findAll { l -> l.startsWith('>') }
+            assertAll(
+                { assert process.success },
+                // Fields 1,2,3,7 of the header -- NOT the first four, which would wrongly keep the
+                // bitscore (310/318) and drop the low coordinate (0/191) the gff id actually uses.
+                { assert ids == ['>NP_011412.1|k59_0|+|0', '>NP_011412.1|k59_1|-|191'] },
+                // Sequence lines must pass through untouched.
+                { assert path(process.out.format_faa[0][1]).linesGzip.findAll { l -> !l.startsWith('>') }.size() == 3 },
+                { assert snapshot(process.out.format_faa).match() }
+            )
+        }
+    }
+
+    test("header with too few fields - fails loudly") {
+
+        when {
+            process {
+                """
+                def faa = file("\${workDir}/short.fas")
+                faa.text = '>NP_011412.1|k59_0|+|310\\nMPSRFTK\\n'
+
+                input[0] = [ [ id:'test' ], faa ]
+                """
+            }
+        }
+
+        then {
+            // A silently passed-through header would produce ids that stop matching the gff, which
+            // is exactly the failure mode this module exists to prevent -- so it must error instead.
+            assert process.failed
+        }
+    }
+
+    test("metaeuk fasta - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                def faa = file("\${workDir}/metaeuk.fas")
+                faa.text = '>NP_011412.1|k59_0|+|310|1.429e-91|1|0|446|x\\nMPSRFTK\\n'
+
+                input[0] = [ [ id:'test' ], faa ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+}

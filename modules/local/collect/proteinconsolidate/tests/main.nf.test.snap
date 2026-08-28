@@ -1,0 +1,52 @@
+{
+    "two loci of one gene on different contigs are summed into one cluster - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.counts.tsv.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "1": [
+                    "versions.yml:md5,e1f547b0bc2222e7c89532ef4005de78"
+                ],
+                "counts": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.counts.tsv.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "versions": [
+                    "versions.yml:md5,e1f547b0bc2222e7c89532ef4005de78"
+                ]
+            }
+        ],
+        "timestamp": "2026-08-25T10:38:19.578043657",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
+    },
+    "two loci of one gene on different contigs are summed into one cluster": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test.counts.tsv.gz:md5,9a588e6c2457bf1800e22a15358b3e51"
+                ]
+            ]
+        ],
+        "timestamp": "2026-08-25T10:38:54.887895433",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
+    }
+}
