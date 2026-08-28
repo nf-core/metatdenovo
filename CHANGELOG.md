@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Changed`
 
+- [#NN](https://github.com/nf-core/metatdenovo/pull/NN) - Keep `COLLECT_FEATURECOUNTS` generic by moving the Transdecoder-specific `cds.` ORF-ID-prefix stripping into a new local post-processing module, `TIDYVERSE_STRIPCDSPREFIX`, matching the pattern nf-core/magmap already established for its own genome-accession join; no change to the output tables themselves, addresses [nf-core/magmap#237](https://github.com/nf-core/magmap/issues/237) (@erikrikarddaniel)
 - [#454](https://github.com/nf-core/metatdenovo/pull/454) - Template sync to nf-core/tools 4.1.0, update all vendored modules/subworkflows (@erikrikarddaniel)
 - [#452](https://github.com/nf-core/metatdenovo/pull/452) - Replace several local modules (`HMMRANK`, `UNPIGZ`, `TRANSDECODER`, `KOFAMSCAN`, `EGGNOGMAPPER`, `MEGAHIT`, `TRANSRATE`) with official nf-core/modules equivalents, addresses [#445](https://github.com/nf-core/metatdenovo/issues/445) (@erikrikarddaniel)
 - [#450](https://github.com/nf-core/metatdenovo/pull/450) - Template sync to nf-core/tools 4.0.3, update all vendored modules/subworkflows (@erikrikarddaniel)

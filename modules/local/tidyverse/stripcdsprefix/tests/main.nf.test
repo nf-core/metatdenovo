@@ -1,0 +1,74 @@
+nextflow_process {
+
+    name "Test Process TIDYVERSE_STRIPCDSPREFIX"
+    script "../main.nf"
+    process "TIDYVERSE_STRIPCDSPREFIX"
+
+    tag "modules"
+    tag "modules_local"
+    tag "tidyverse"
+    tag "tidyverse/stripcdsprefix"
+
+    // Input is built inline rather than read from a fixture: the pipeline repo carries no test
+    // data of its own. Shape matches COLLECT_FEATURECOUNTS's own output (orf, chr, start, end,
+    // strand, length, sample, count, tpm). One row uses a Transdecoder-style "cds."-prefixed ID,
+    // the other an already-clean ID (e.g. from prodigal/prokka/locus-consolidation), which must
+    // pass through untouched.
+
+    test("cds. prefix is stripped, other IDs untouched") {
+
+        when {
+            process {
+                """
+                def rows = [
+                    ['orf', 'chr', 'start', 'end', 'strand', 'length', 'sample', 'count', 'tpm'],
+                    ['cds.NP_011412.1', 'k59_1', '183', '611', '+', '429', 'SAMPLE1', '12', '500000'],
+                    ['locus_k59_0_1_447_+', 'k59_0', '1', '447', '+', '447', 'SAMPLE1', '12', '500000']
+                ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+
+                def baos = new java.io.ByteArrayOutputStream()
+                new java.util.zip.GZIPOutputStream(baos).withCloseable { gz -> gz.write(rows.getBytes('UTF-8')) }
+
+                def counts = file("\${workDir}/test.counts.tsv.gz")
+                counts.bytes = baos.toByteArray()
+
+                input[0] = [ [ id:'test' ], counts ]
+                """
+            }
+        }
+
+        then {
+            def orfs = path(process.out.counts[0][1]).csv(sep: '\t', decompress: true, header: true).columns["orf"]
+            assertAll(
+                { assert process.success },
+                { assert orfs.contains('NP_011412.1') },
+                { assert orfs.contains('locus_k59_0_1_447_+') },
+                { assert orfs.every { orf -> !orf.startsWith('cds.') } },
+                { assert snapshot(process.out.counts).match() }
+            )
+        }
+    }
+
+    test("cds. prefix is stripped, other IDs untouched - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                def counts = file("\${workDir}/empty.counts.tsv.gz")
+                counts.text = ''
+
+                input[0] = [ [ id:'test' ], counts ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+}

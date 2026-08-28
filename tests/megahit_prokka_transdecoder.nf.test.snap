@@ -1,7 +1,7 @@
 {
     "-profile test_megahit_prokka_transdecoder": {
         "content": [
-            90,
+            92,
             {
                 "BBMAP_ALIGN": {
                     "bbmap": 39.18
@@ -150,6 +150,12 @@
                 },
                 "TAXONKIT_LINEAGE": {
                     "taxonkit": "0.18.0"
+                },
+                "TIDYVERSE_STRIPCDSPREFIX": {
+                    "R": "4.5.3",
+                    "readr": "2.2.0",
+                    "dplyr": "1.2.1",
+                    "stringr": "1.6.0"
                 },
                 "TRANSDECODER_LONGORF": {
                     "transdecoder": "5.7.1"
@@ -317,7 +323,7 @@
                 "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count\tdiamondtax_gtdb-r220-test\tdiamondtax_ncbi-refseq-test"
             ]
         ],
-        "timestamp": "2026-08-25T13:02:19.131201775",
+        "timestamp": "2026-08-28T11:23:36.620076248",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

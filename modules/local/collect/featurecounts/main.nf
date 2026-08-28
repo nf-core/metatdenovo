@@ -52,8 +52,6 @@ process COLLECT_FEATURECOUNTS {
             )
         ) %>%
         tidyr::unnest(d) %>%
-        # Transdecoder appends "cds." to ORF IDs in the gff file, but does not in the fasta file. Remove to make compatible between tables.
-        mutate(orf = str_remove(orf, '^cds\\\\.')) %>%
         select(-f) %>%
         write_tsv("${prefix}.counts.tsv.gz")
 
