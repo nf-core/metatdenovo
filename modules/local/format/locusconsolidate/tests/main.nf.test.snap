@@ -1,0 +1,141 @@
+{
+    "tie order must not change the grouping": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test.gff.gz:md5,86ea05259de3ba7437f755dc11ade6bc"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test.provenance.tsv.gz:md5,2e390739394831bc88e44f41f082b066"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test.members.tsv.gz:md5,3e7821af5b15a98103ce252e1628188a"
+                ]
+            ]
+        ],
+        "timestamp": "2026-08-26T19:37:38.236861741",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
+    },
+    "single caller - overlapping adjacent genes must NOT merge": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test.gff.gz:md5,efaf79b7bc197b78480673e73806e94b"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test.provenance.tsv.gz:md5,4ed9deee0b2a3b9e3c557bb570ed22ab"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test.members.tsv.gz:md5,6da8c1be50a1fe11006f3fcf666d7af6"
+                ]
+            ]
+        ],
+        "timestamp": "2026-08-25T12:04:14.504611756",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
+    },
+    "bed - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.gff.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.provenance.tsv.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "2": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.members.tsv.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "3": [
+                    [
+                        "FORMAT_LOCUSCONSOLIDATE",
+                        "gzip",
+                        "1.11"
+                    ]
+                ],
+                "gff": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.gff.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "members": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.members.tsv.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "provenance": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.provenance.tsv.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "versions_gzip": [
+                    [
+                        "FORMAT_LOCUSCONSOLIDATE",
+                        "gzip",
+                        "1.11"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-08-25T12:04:35.724370741",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
+    }
+}

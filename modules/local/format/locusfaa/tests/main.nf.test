@@ -1,0 +1,108 @@
+nextflow_process {
+
+    name "Test Process FORMAT_LOCUSFAA"
+    script "../main.nf"
+    process "FORMAT_LOCUSFAA"
+
+    tag "modules"
+    tag "modules_local"
+    tag "format"
+    tag "format/locusfaa"
+
+    // Inputs are built inline rather than read from a fixture: the pipeline repo carries no test
+    // data of its own. The ids below are real output from the metaeuk_transdecoder test profile --
+    // two loci on different contigs whose proteins are identical (the point of cross-contig
+    // consolidation), plus an unrelated one, and one locus two callers both called.
+
+    test("three loci, one of them multi-caller") {
+
+        when {
+            process {
+                """
+                def members = file("\${workDir}/test.members.tsv")
+                members.text = [
+                    ['ID', 'caller', 'orf'],
+                    ['locus_k59_0_1_447_+', 'metaeuk', 'NP_011412.1|k59_0|+|0'],
+                    ['locus_k59_0_1_447_+', 'transdecoder', 'k59_0.p1'],
+                    ['k59_1.p1', 'transdecoder', 'k59_1.p1'],
+                    ['NP_011412.1|k59_1|-|191', 'metaeuk', 'NP_011412.1|k59_1|-|191']
+                ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+                def gzipped = file("\${workDir}/test.members.tsv.gz")
+                ['gzip', '-c', members.toString()].execute().getInputStream().withStream { s ->
+                    gzipped.withOutputStream { o -> o << s }
+                }
+
+                // MetaEuk fasta: uncompressed, id is the whole header.
+                def metaeuk = file("\${workDir}/metaeuk.faa")
+                metaeuk.text = [
+                    '>NP_011412.1|k59_0|+|0',
+                    'MPSRFTKTRKHRGHVSAGKGRIGKHRKHPGGRGMAGG',
+                    '>NP_011412.1|k59_1|-|191',
+                    'MPSRFTKTRKHRGHVSAGKGRIGKHRKHPGGRGMAGG',
+                    ''
+                ].join('\\n')
+
+                // TransDecoder fasta: header carries a description after the id, which must be
+                // dropped, and k59_0.p1 is deliberately SHORTER so the longest-wins rule is tested
+                // rather than accidentally satisfied by a tie.
+                def transdecoder = file("\${workDir}/transdecoder.faa")
+                transdecoder.text = [
+                    '>k59_0.p1 GENE.k59_0~~k59_0.p1  ORF type:3prime_partial (+)',
+                    'MPSRFTKTRKHRGHVSAGK',
+                    '>k59_1.p1 GENE.k59_1~~k59_1.p1  ORF type:complete (+)',
+                    'MRLSDQFNNTTSSSDFFFSQLGDESSFDDNWNIWNST*',
+                    ''
+                ].join('\\n')
+
+                input[0] = [ [ id:'test' ], gzipped, ['metaeuk', 'transdecoder'], [ metaeuk, transdecoder ] ]
+                """
+            }
+        }
+
+        then {
+            def lines = path(process.out.faa[0][1]).linesGzip
+            def ids   = lines.findAll { l -> l.startsWith('>') }
+            def seqs  = [ids, lines.findAll { l -> !l.startsWith('>') }].transpose().collectEntries()
+            assertAll(
+                { assert process.success },
+                // One sequence per locus, emitted in members-table order for reproducibility.
+                { assert ids == ['>locus_k59_0_1_447_+', '>k59_1.p1', '>NP_011412.1|k59_1|-|191'] },
+                // The multi-caller locus takes the LONGEST contributor, i.e. MetaEuk's 37-residue
+                // sequence, not TransDecoder's 19-residue one.
+                { assert seqs['>locus_k59_0_1_447_+'] == 'MPSRFTKTRKHRGHVSAGKGRIGKHRKHPGGRGMAGG' },
+                // Single-contributor loci simply take their own caller's sequence, and the
+                // TransDecoder description after the id must not have confused the lookup.
+                { assert seqs['>k59_1.p1'] == 'MRLSDQFNNTTSSSDFFFSQLGDESSFDDNWNIWNST*' },
+                // The two cross-contig loci end up with identical sequences -- this is what makes
+                // them cluster together downstream.
+                { assert seqs['>NP_011412.1|k59_1|-|191'] == seqs['>locus_k59_0_1_447_+'] },
+                { assert snapshot(process.out.faa).match() }
+            )
+        }
+    }
+
+    test("three loci, one of them multi-caller - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                def members = file("\${workDir}/empty.members.tsv.gz")
+                members.text = ''
+                def faa = file("\${workDir}/empty.faa")
+                faa.text = ''
+
+                input[0] = [ [ id:'test' ], members, ['metaeuk'], [ faa ] ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+}

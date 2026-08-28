@@ -1,16 +1,13 @@
 {
     "-profile test_metaeuk_transdecoder": {
         "content": [
-            60,
+            68,
             {
                 "BBMAP_ALIGN": {
                     "bbmap": 39.18
                 },
                 "BBMAP_INDEX": {
                     "bbmap": 39.18
-                },
-                "BEDTOOLS_MERGE": {
-                    "bedtools": "2.31.1"
                 },
                 "BEDTOOLS_SORT": {
                     "bedtools": "2.31.1"
@@ -23,7 +20,15 @@
                     "dtplyr": "1.3.3",
                     "data.table": "1.17.8"
                 },
-                "COLLECT_LOCUS_CONSOLIDATE": {
+                "COLLECT_LOCUSCONSOLIDATE": {
+                    "R": "4.5.3",
+                    "dplyr": "1.2.1",
+                    "readr": "2.2.0",
+                    "stringr": "1.6.0",
+                    "dtplyr": "1.3.3",
+                    "data.table": "1.17.8"
+                },
+                "COLLECT_PROTEINCONSOLIDATE": {
                     "R": "4.5.3",
                     "dplyr": "1.2.1",
                     "readr": "2.2.0",
@@ -45,10 +50,19 @@
                 "FEATURECOUNTS_CDS": {
                     "subread": "2.1.1"
                 },
+                "FORMAT_CLUSTERREPS": {
+                    "gzip": 1.11
+                },
                 "FORMAT_GFF2BED": {
                     "gzip": 1.11
                 },
-                "FORMAT_LOCUS_CONSOLIDATE": {
+                "FORMAT_LOCUSCONSOLIDATE": {
+                    "gzip": 1.11
+                },
+                "FORMAT_LOCUSFAA": {
+                    "gzip": 1.11
+                },
+                "FORMAT_METAEUKFAA": {
                     "gzip": 1.11
                 },
                 "FORMAT_METAEUK_GFF": {
@@ -59,6 +73,15 @@
                 },
                 "METAEUK_EASYPREDICT": {
                     "metaeuk": "6.a5d39d9"
+                },
+                "MMSEQS_CREATEDB": {
+                    "mmseqs": "18.8cc5c"
+                },
+                "MMSEQS_CREATETSV": {
+                    "mmseqs": "18.8cc5c"
+                },
+                "MMSEQS_LINCLUST": {
+                    "mmseqs": "18.8cc5c"
                 },
                 "PIGZ_TRANSDECODER_BED": {
                     "pigz": 2.8
@@ -86,6 +109,9 @@
                 },
                 "SAMTOOLS_STATS": {
                     "samtools": 1.24
+                },
+                "SEQKIT_GREP": {
+                    "seqkit": "2.13.0"
                 },
                 "SEQTK_MERGEPE": {
                     "seqtk": "1.4-r122"
@@ -145,6 +171,7 @@
                 "metaeuk/megahit.metaeuk.fas",
                 "metaeuk/megahit.metaeuk.gff",
                 "metaeuk/megahit.metaeuk.headersMap.tsv",
+                "metaeuk/megahit.metaeuk_format.faa.gz",
                 "metaeuk/megahit.metaeuk_format.gff.gz",
                 "multiqc",
                 "multiqc/multiqc_data",
@@ -174,6 +201,9 @@
                 "multiqc/multiqc_report.html",
                 "pipeline_info",
                 "pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml",
+                "protein_consolidate",
+                "protein_consolidate/megahit.protein_consolidate_99.clusters.tsv",
+                "protein_consolidate/megahit.protein_consolidate_99.representatives.fa.gz",
                 "samtools",
                 "samtools/RPL28_GENOMIC.sorted.bam",
                 "samtools/RPL28_GENOMIC.sorted.bam.bai",
@@ -191,6 +221,8 @@
                 "summary_tables/megahit.locus_consolidate.counts.tsv.gz",
                 "summary_tables/megahit.metaeuk.counts.tsv.gz",
                 "summary_tables/megahit.metaeuk.overall_stats.tsv.gz",
+                "summary_tables/megahit.protein_consolidate_99.counts.tsv.gz",
+                "summary_tables/megahit.protein_consolidate_99.overall_stats.tsv.gz",
                 "summary_tables/megahit.transdecoder.counts.tsv.gz",
                 "summary_tables/megahit.transdecoder.overall_stats.tsv.gz",
                 "transdecoder",
@@ -223,11 +255,6 @@
                 "trimgalore/fastqc/RPL28_MRNA_RECODED_2_val_2_fastqc.zip"
             ],
             [
-                "megahit.metaeuk.codon.fas:md5,8bc52c564165881a622d69413cf33452",
-                "megahit.metaeuk.fas:md5,cab473bca453ec98053f2544d9a01a1c",
-                "megahit.metaeuk.gff:md5,f5ceef9a3b9917aeb174e1374d566e28",
-                "megahit.metaeuk.headersMap.tsv:md5,5ec29818faeff6db35900f11e8e55738",
-                "megahit.metaeuk_format.gff.gz:md5,9f4ba2f29292871fb361b621124cb2b2",
                 "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f",
                 "multiqc_metaeuk_stats.txt:md5,be6038955478f96fdcaaa12d04c6d4a9"
             ],
@@ -242,9 +269,15 @@
                 "k59_1.p1\tk59_1\t183\t611\t+\t429\tRPL28_GENOMIC\t12\t153410.5534105534\ttransdecoder\t1",
                 "NP_011412.1|k59_1|-|191\tk59_1;k59_1\t192;1102\t590;1149\t-;-\t447\tRPL28_GENOMIC\t69\t846589.4465894466\tmetaeuk\t1",
                 "locus_k59_0_1_447_+\tk59_0\t1\t447\t+\t447\tRPL28_MRNA_RECODED\t400\t1000000\tmetaeuk,transdecoder\t2"
+            ],
+            [
+                "orf\tchr\tstart\tend\tstrand\tlength\tsample\tcount\ttpm\tcallers\tn_calls\tn_loci\tloci",
+                "NP_011412.1|k59_1|-|191\tk59_1;k59_1;k59_0\t192;1102;1\t590;1149;447\t-;-;+\t447\tRPL28_GENOMIC\t69\t846589.4465894466\tmetaeuk,transdecoder\t3\t2\tNP_011412.1|k59_1|-|191,locus_k59_0_1_447_+",
+                "NP_011412.1|k59_1|-|191\tk59_1;k59_1;k59_0\t192;1102;1\t590;1149;447\t-;-;+\t447\tRPL28_MRNA_RECODED\t400\t1000000\tmetaeuk,transdecoder\t3\t2\tNP_011412.1|k59_1|-|191,locus_k59_0_1_447_+",
+                "k59_1.p1\tk59_1\t183\t611\t+\t429\tRPL28_GENOMIC\t12\t153410.5534105534\ttransdecoder\t1\t1\tk59_1.p1"
             ]
         ],
-        "timestamp": "2026-08-20T12:06:04.245443485",
+        "timestamp": "2026-08-26T21:26:15.407856159",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"
