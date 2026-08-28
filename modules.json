@@ -205,7 +205,7 @@
                     },
                     "transdecoder/predict": {
                         "branch": "master",
-                        "git_sha": "f9b05e226409f21226a46d95d2d26c58d68958e6",
+                        "git_sha": "863a36f28b3c3c39b182be6f977799fb8de49598",
                         "installed_by": ["modules"]
                     },
                     "transrate": {

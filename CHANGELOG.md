@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Fixed`
 
+- [#480](https://github.com/nf-core/metatdenovo/pull/480) - Update the vendored `transdecoder/predict` module so `-resume` no longer fails it with a missing-output error on an otherwise unchanged run, addresses [#477](https://github.com/nf-core/metatdenovo/issues/477) (@erikrikarddaniel)
 - [#481](https://github.com/nf-core/metatdenovo/pull/481) - Fix `eukulele/search`'s `stub:` block failing with "No such file or directory" because it never creates the `taxonomy_estimation`/`taxonomy_counts`/`mets_full/diamond` subdirectories it writes into (@erikrikarddaniel)
 - [#479](https://github.com/nf-core/metatdenovo/pull/479) - Fix a crash in the MultiQC ORF statistics when an ORF caller returns no proteins at all (@erikrikarddaniel)
 - [#479](https://github.com/nf-core/metatdenovo/pull/479) - Run eggnog-mapper for every active ORF caller. With more than one `--orf_caller`, only the first one was annotated, so `<assembly>.<caller>.emapper.tsv.gz` and the `n_eggnog` column of `<assembly>.<caller>.overall_stats.tsv.gz` were missing for the rest (@erikrikarddaniel)
