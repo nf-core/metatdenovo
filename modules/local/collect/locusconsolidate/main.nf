@@ -51,10 +51,7 @@ process COLLECT_LOCUSCONSOLIDATE {
                         ) %>%
                         rename(orf = Geneid, chr = Chr, start = Start, end = End, strand = Strand, length = Length) %>%
                         group_by(sample) %>%
-                        # Rounded so a single caller's own table (from COLLECT_FEATURECOUNTS's data.table/
-                        # dtplyr computation) is byte-comparable to this one -- the unrounded value can
-                        # otherwise round the last significant digit differently between the two backends.
-                        mutate(tpm = round(r/sum(r) * 1e6, 6)) %>% ungroup() %>%
+                        mutate(tpm = round(r/sum(r) * 1e6, 6)) %>% ungroup() %>%  # round so consistent
                         select(-r) %>%
                         as_tibble()
                 }

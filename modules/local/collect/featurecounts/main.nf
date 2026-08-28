@@ -45,11 +45,7 @@ process COLLECT_FEATURECOUNTS {
                         ) %>%
                         rename(orf = Geneid, chr = Chr, start = Start, end = End, strand = Strand, length = Length) %>%
                         group_by(sample) %>%
-                        # Rounded so a single caller's table is byte-comparable to COLLECT_LOCUSCONSOLIDATE's/
-                        # COLLECT_PROTEINCONSOLIDATE's independently-computed tpm for the same counts --
-                        # data.table/dtplyr here vs plain dplyr there can otherwise round the last
-                        # significant digit differently for the same mathematical value.
-                        mutate(tpm = round(r/sum(r) * 1e6, 6)) %>% ungroup() %>%
+                        mutate(tpm = round(r/sum(r) * 1e6, 6)) %>% ungroup() %>%  # round so consistent
                         select(-r) %>%
                         as_tibble()
                 }
