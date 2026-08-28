@@ -102,7 +102,9 @@ process COLLECT_PROTEINCONSOLIDATE {
         summarise(count = sum(count), .groups = 'drop') %>%
         left_join(cluster_attrs, by = 'cluster') %>%
         group_by(sample) %>%
-        mutate(tpm = (count/length)/sum(count/length) * 1e6) %>%
+        # Rounded for consistency with COLLECT_FEATURECOUNTS/COLLECT_LOCUSCONSOLIDATE, which round for
+        # the same reason: keeps output stable regardless of which R backend computed the division.
+        mutate(tpm = round((count/length)/sum(count/length) * 1e6, 6)) %>%
         ungroup() %>%
         rename(orf = cluster) %>%
         select(orf, chr, start, end, strand, length, sample, count, tpm, callers, n_calls, n_loci, loci) %>%
