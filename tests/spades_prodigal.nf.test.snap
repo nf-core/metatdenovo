@@ -1,7 +1,7 @@
 {
     "-profile test_spades_prodigal": {
         "content": [
-            53,
+            54,
             {
                 "BBMAP_ALIGN": {
                     "bbmap": 39.18
@@ -86,6 +86,12 @@
                 },
                 "SPADES": {
                     "spades": "4.1.0"
+                },
+                "TIDYVERSE_STRIPCDSPREFIX": {
+                    "R": "4.5.3",
+                    "readr": "2.2.0",
+                    "dplyr": "1.2.1",
+                    "stringr": "1.6.0"
                 },
                 "TRANSRATE": {
                     "transrate": "1.0.3"
@@ -215,7 +221,7 @@
                 "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count"
             ]
         ],
-        "timestamp": "2026-08-25T13:13:14.476877999",
+        "timestamp": "2026-08-28T11:56:43.668550074",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"
