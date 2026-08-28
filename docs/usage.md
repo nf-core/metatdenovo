@@ -158,8 +158,31 @@ Run `metaeuk databases -h` for the full list.
 
 `--orf_caller` also accepts a comma-separated list, e.g. `--orf_caller prokka,transdecoder`, to run more than one caller in the same execution -- useful for mixed prokaryote/eukaryote communities.
 Each active caller still runs independently and produces its own complete set of output (GFF, protein FASTA, `summary_tables/<assembly>.<caller>.*`) under its own name, exactly as if it had been run alone.
-In addition, `summary_tables/<assembly>.locus_consolidate.counts.tsv.gz` merges overlapping/identical same-contig CDS calls from different callers into single loci before counting reads, so a read supporting one real gene isn't counted once per caller that called it; see [Output docs](output.md) for details.
-Cross-contig consolidation is not performed.
+In addition, the pipeline consolidates calls that different callers made for the same gene, at two levels; see [Consolidating calls for the same gene](#consolidating-calls-for-the-same-gene) below and the [Output docs](output.md).
+
+##### Comparing callers: mind the minimum ORF length
+
+Do not read the per-caller tables, or the `callers` column of the consolidated tables, as a like-for-like comparison of what each caller found.
+The callers do not use comparable minimum ORF lengths, and the difference is large enough to dominate a naive count.
+
+TransDecoder's `LongOrfs` step defaults to a 100 aa minimum, so it cannot report anything shorter.
+Prodigal, which Prokka wraps and which this pipeline runs in metagenome mode, has no equivalent floor and readily calls short ORFs, including partial ones running off the ends of fragmentary contigs.
+A caller-specific count therefore mixes "this caller found a gene the other missed" with "the other caller was never eligible to call it".
+
+The pipeline's own full-size test makes the size of the effect concrete (its output is published with the release, so the numbers below can be inspected).
+Running `--orf_caller prokka,transdecoder` on a metatranscriptome gave 68829 consolidated loci:
+
+| Loci              | Count | Mean protein length |
+| ----------------- | ----- | ------------------- |
+| Called by both    | 23034 | ~245 aa             |
+| TransDecoder only | 29844 | ~168 aa             |
+| Prokka only       | 15951 | ~80 aa              |
+
+83% of the Prokka-only loci are shorter than 100 aa, i.e. below the length TransDecoder would ever report.
+Comparing only what both callers could have found leaves about 29800 TransDecoder-only against about 2700 Prokka-only -- an order of magnitude apart, where the raw counts suggest a factor of two.
+
+If you want to compare callers, apply a common length threshold first.
+The short Prodigal calls are not necessarily wrong -- small proteins are real, and so are partial genes at contig edges -- they are simply not something the other caller was in a position to confirm.
 
 #### Provide your own ORFs
 
@@ -193,6 +216,53 @@ A typical command line enabling both:
 
 ```bash
 nextflow run nf-core/metatdenovo -profile docker --outdir results/ --input samplesheet.csv --assembler megahit --orf_caller prodigal --bbmap_ambiguous all --featurecounts_fraction
+```
+
+### Consolidating calls for the same gene
+
+The same gene can be called more than once: by two ORF callers on one contig, or -- in a mixed prokaryote/eukaryote assembly -- on two different contigs, when a gene is assembled both from genomic DNA and from its transcript.
+Counting each call separately would count one gene's reads several times, so the pipeline reports counts at three levels, from most raw to most consolidated.
+
+| Table                                                     | Consolidation                                                                               |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `<assembly>.<orfcaller>.counts.tsv.gz`                    | None: exactly what that caller found                                                        |
+| `<assembly>.locus_consolidate.counts.tsv.gz`              | Overlapping CDS calls from different callers **on the same contig**, merged before counting |
+| `<assembly>.protein_consolidate_<identity>.counts.tsv.gz` | Calls **on different contigs** whose proteins cluster together                              |
+
+The three are produced side by side, so you can choose how much consolidation to trust; the more consolidated levels also carry provenance columns (`callers`, `n_calls`, and at the protein level `n_loci` and `loci`) so you can see what was merged into each row.
+
+Locus consolidation is coordinate-based and close to unambiguous.
+Protein consolidation is inference-based: it links a splice-aware genomic call to a transcript-derived call for the same gene, which have no coordinate relationship at all but converge on nearly the same protein.
+It can also merge genuinely distinct paralogs, which is why the default identity is deliberately high.
+
+Reads are never remapped onto a cluster representative.
+Each read keeps aligning to the contig it actually came from and the per-locus counts are summed afterwards, so a cluster member that differs from the representative in nucleotide sequence -- through synonymous variation, say -- is not under-counted.
+
+`--cluster_min_seq_id` sets the minimum protein identity for two calls to be treated as one gene, and `--cluster_coverage` the minimum fraction of both proteins the alignment must cover.
+Because these are separate, `--cluster_min_seq_id 1.0` is less strict than it sounds: calls that agree exactly where they align but are trimmed differently at the ends still cluster.
+Conversely, a splice-aware caller whose exon boundary is off by a few residues in the middle of a gene falls below 1.0, which is why the default is `0.99` rather than exact identity.
+
+The identity is part of the output name, rounded to whole percent, so runs at different settings don't overwrite each other: `--cluster_min_seq_id 0.99` gives `protein_consolidate_99` and `0.9` gives `protein_consolidate_90`.
+
+Unlike locus consolidation, protein consolidation is **not** a no-op when only one ORF caller is active: near-identical proteins on different contigs are merged whichever caller found them, which also collapses assembly redundancy.
+Use `--skip_protein_consolidation` to turn it off.
+
+How much it changes depends mostly on how many ORF callers are active, and secondarily on the community.
+
+With a **single caller** there is no cross-caller redundancy to find, so the step only collapses cases where one caller called near-identical proteins on two different contigs.
+On the pipeline's own small prokaryotic test dataset that is nothing at all: 4397 loci produce 4397 clusters, and the protein-consolidated table is identical in content to the locus-consolidated one.
+
+With **two callers** it does what it is for.
+On a full-size metatranscriptome run with `--orf_caller prokka,transdecoder` at the default `--cluster_min_seq_id 0.99`, 68829 loci produced 68300 clusters.
+476 of those clusters held more than one locus, covering 1005 loci between them (mean 2.1 members), so 1.5% of loci were grouped with at least one other and the feature count fell by 529.
+Of the 476, 315 linked calls from different callers -- the genomic-versus-transcript case this exists for -- while 91 merged two Prokka calls and 70 two TransDecoder calls, i.e. redundancy within a single caller.
+
+So the effect is modest in absolute terms, a few percent of loci at most, but two thirds of it is the intended cross-caller kind rather than redundancy collapse.
+If you run a single caller and are watching runtime, `--skip_protein_consolidation` costs you little.
+Lowering `--cluster_min_seq_id` is what makes the step start merging paralogs and strain variants, so change it deliberately rather than to "make something happen".
+
+```bash
+nextflow run nf-core/metatdenovo -profile docker --outdir results/ --input samplesheet.csv --assembler megahit --orf_caller metaeuk,transdecoder --metaeuk_db /path/to/db --cluster_min_seq_id 0.95
 ```
 
 ### Taxonomic annotation options

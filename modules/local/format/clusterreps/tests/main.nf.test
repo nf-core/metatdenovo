@@ -1,0 +1,79 @@
+nextflow_process {
+
+    name "Test Process FORMAT_CLUSTERREPS"
+    script "../main.nf"
+    process "FORMAT_CLUSTERREPS"
+
+    tag "modules"
+    tag "modules_local"
+    tag "format"
+    tag "format/clusterreps"
+
+    // Inputs are built inline rather than read from a fixture: the pipeline repo carries no test
+    // data of its own. The ids are real MMseqs2 output from the metaeuk_transdecoder profile.
+
+    test("cluster table - representative is re-picked as the smallest member") {
+
+        when {
+            process {
+                """
+                // MMseqs2 named 'locus_k59_0_1_447_+' the representative here, which is NOT the
+                // smallest member -- that is the case that must be rewritten. Which member MMseqs2
+                // picks depends on input order, so leaving it alone lets an unrelated upstream
+                // change silently rename a cluster whose membership never changed.
+                def clusters = file("\${workDir}/test.clusters.tsv")
+                clusters.text = [
+                    ['k59_1.p1',           'k59_1.p1'],
+                    ['locus_k59_0_1_447_+', 'locus_k59_0_1_447_+'],
+                    ['locus_k59_0_1_447_+', 'NP_011412.1|k59_1|-|191']
+                ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+
+                input[0] = [ [ id:'test' ], clusters ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                // One line per cluster, not per member, and the two-member cluster is now named
+                // after its smallest member rather than after whichever one MMseqs2 chose.
+                { assert path(process.out.representatives[0][1]).readLines() == [
+                    'k59_1.p1',
+                    'NP_011412.1|k59_1|-|191'
+                ] },
+                // The rewritten table keeps every member, re-keyed to the new representative, and the
+                // representative is a member of its own cluster.
+                { assert path(process.out.clusters[0][1]).readLines() == [
+                    'k59_1.p1\tk59_1.p1',
+                    'NP_011412.1|k59_1|-|191\tNP_011412.1|k59_1|-|191',
+                    'NP_011412.1|k59_1|-|191\tlocus_k59_0_1_447_+'
+                ] },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+
+    test("cluster table - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                def clusters = file("\${workDir}/test.clusters.tsv")
+                clusters.text = ''
+
+                input[0] = [ [ id:'test' ], clusters ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+}

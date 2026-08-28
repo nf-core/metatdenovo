@@ -1,0 +1,127 @@
+nextflow_process {
+
+    name "Test Process COLLECT_PROTEINCONSOLIDATE"
+    script "../main.nf"
+    process "COLLECT_PROTEINCONSOLIDATE"
+
+    tag "modules"
+    tag "modules_local"
+    tag "collect"
+    tag "collect/proteinconsolidate"
+
+    // Inputs are built inline rather than read from a fixture: the pipeline repo carries no test
+    // data of its own. The loci, coordinates and counts below are real values from the
+    // metaeuk_transdecoder test profile -- one gene called on two different contigs (a spliced
+    // genomic call on k59_1 and a synonymously recoded mRNA call on k59_0) whose proteins are
+    // identical and therefore cluster together, plus one unrelated ORF that must not.
+
+    test("two loci of one gene on different contigs are summed into one cluster") {
+
+        when {
+            process {
+                """
+                def genomic = file("\${workDir}/genomic.featureCounts.tsv")
+                genomic.text = [
+                    ['# Program:featureCounts'],
+                    ['Geneid', 'Chr', 'Start', 'End', 'Strand', 'Length', 'RPL28_GENOMIC.sorted.bam'],
+                    ['NP_011412.1|k59_1|-|191', 'k59_1;k59_1', '192;1102', '590;1149', '-;-', '447', '69'],
+                    ['locus_k59_0_1_447_+',     'k59_0',       '1',        '447',      '+',   '447', '0'],
+                    ['k59_1.p1',                'k59_1',       '183',      '611',      '+',   '429', '12']
+                ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+
+                def mrna = file("\${workDir}/mrna.featureCounts.tsv")
+                mrna.text = [
+                    ['# Program:featureCounts'],
+                    ['Geneid', 'Chr', 'Start', 'End', 'Strand', 'Length', 'RPL28_MRNA_RECODED.sorted.bam'],
+                    ['NP_011412.1|k59_1|-|191', 'k59_1;k59_1', '192;1102', '590;1149', '-;-', '447', '0'],
+                    ['locus_k59_0_1_447_+',     'k59_0',       '1',        '447',      '+',   '447', '400'],
+                    ['k59_1.p1',                'k59_1',       '183',      '611',      '+',   '429', '0']
+                ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+
+                def provenance = file("\${workDir}/test.provenance.tsv")
+                provenance.text = [
+                    ['ID', 'callers', 'n_calls'],
+                    ['locus_k59_0_1_447_+',     'metaeuk,transdecoder', '2'],
+                    ['k59_1.p1',                'transdecoder',         '1'],
+                    ['NP_011412.1|k59_1|-|191', 'metaeuk',              '1']
+                ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+
+                // Headerless MMseqs2 output: representative, member. The representative is always a
+                // member of its own cluster.
+                def clusters = file("\${workDir}/test.clusters.tsv")
+                clusters.text = [
+                    ['NP_011412.1|k59_1|-|191', 'NP_011412.1|k59_1|-|191'],
+                    ['NP_011412.1|k59_1|-|191', 'locus_k59_0_1_447_+'],
+                    ['k59_1.p1',                'k59_1.p1']
+                ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+
+                input[0] = [ [ id:'test' ], [ genomic, mrna ], provenance, clusters ]
+                """
+            }
+        }
+
+        then {
+            def rows = path(process.out.counts[0][1]).csv(sep: '\t', decompress: true, header: true).rows
+            def merged = rows.findAll { r -> r["orf"] == 'NP_011412.1|k59_1|-|191' }
+            def solo   = rows.findAll { r -> r["orf"] == 'k59_1.p1' }
+            assertAll(
+                { assert process.success },
+
+                // The two contigs' loci collapse to one cluster, each sample keeping its own count.
+                // Zero-count rows are dropped, so the genomic sample has one row, not two.
+                { assert merged.size() == 2 },
+                { assert merged.find { r -> r["sample"] == 'RPL28_GENOMIC' }["count"] as int == 69 },
+                { assert merged.find { r -> r["sample"] == 'RPL28_MRNA_RECODED' }["count"] as int == 400 },
+
+                // Provenance is unioned across the cluster's members, not taken from the
+                // representative alone: the mRNA locus contributed the transdecoder call.
+                { assert merged.every { r -> r["callers"] == 'metaeuk,transdecoder' } },
+                { assert merged.every { r -> (r["n_loci"] as int) == 2 } },
+                { assert merged.every { r -> (r["n_calls"] as int) == 3 } },
+                { assert merged.every { r -> r["loci"] == 'NP_011412.1|k59_1|-|191,locus_k59_0_1_447_+' } },
+
+                // Length is the representative's, not the sum of its members'.
+                { assert merged.every { r -> (r["length"] as int) == 447 } },
+
+                // The unrelated ORF stays in a cluster of its own.
+                { assert solo.size() == 1 },
+                { assert solo[0]["sample"] == 'RPL28_GENOMIC' },
+                { assert (solo[0]["count"] as int) == 12 },
+                { assert (solo[0]["n_loci"] as int) == 1 },
+                { assert solo[0]["callers"] == 'transdecoder' },
+
+                // tpm is recomputed per sample over the clusters, so it sums to 1e6 within a sample.
+                { assert rows.findAll { r -> r["sample"] == 'RPL28_GENOMIC' }.sum { r -> r["tpm"] as double } == 1e6 },
+
+                { assert snapshot(process.out.counts).match() }
+            )
+        }
+    }
+
+    test("two loci of one gene on different contigs are summed into one cluster - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                def counts = file("\${workDir}/empty.featureCounts.tsv")
+                counts.text = ''
+                def provenance = file("\${workDir}/empty.provenance.tsv")
+                provenance.text = ''
+                def clusters = file("\${workDir}/empty.clusters.tsv")
+                clusters.text = ''
+
+                input[0] = [ [ id:'test' ], [ counts ], provenance, clusters ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+}

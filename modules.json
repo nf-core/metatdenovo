@@ -27,11 +27,6 @@
                         "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",
                         "installed_by": ["modules"]
                     },
-                    "bedtools/merge": {
-                        "branch": "master",
-                        "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",
-                        "installed_by": ["modules"]
-                    },
                     "bedtools/sort": {
                         "branch": "master",
                         "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",
@@ -90,6 +85,26 @@
                         "branch": "master",
                         "git_sha": "ad5daf951b6b4ab49fcf2547c1c1e8f0cd5a6ce7",
                         "installed_by": ["modules"]
+                    },
+                    "mmseqs/cluster": {
+                        "branch": "master",
+                        "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",
+                        "installed_by": ["mmseqs_fasta_cluster"]
+                    },
+                    "mmseqs/createdb": {
+                        "branch": "master",
+                        "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",
+                        "installed_by": ["mmseqs_fasta_cluster", "modules"]
+                    },
+                    "mmseqs/createtsv": {
+                        "branch": "master",
+                        "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",
+                        "installed_by": ["mmseqs_fasta_cluster", "modules"]
+                    },
+                    "mmseqs/linclust": {
+                        "branch": "master",
+                        "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",
+                        "installed_by": ["mmseqs_fasta_cluster", "modules"]
                     },
                     "multiqc": {
                         "branch": "master",
@@ -152,6 +167,11 @@
                         "git_sha": "9339809fcb90af8a8b7051e6cd914894d5c52002",
                         "installed_by": ["bam_stats_samtools"]
                     },
+                    "seqkit/grep": {
+                        "branch": "master",
+                        "git_sha": "d07a945f421a4a91ce4e5a22db63e0e7f8741607",
+                        "installed_by": ["modules"]
+                    },
                     "seqtk/mergepe": {
                         "branch": "master",
                         "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",
@@ -207,6 +227,11 @@
             },
             "subworkflows": {
                 "nf-core": {
+                    "mmseqs_fasta_cluster": {
+                        "branch": "master",
+                        "git_sha": "9ef13474c5ed9a2d740b0b8565209be636361b5a",
+                        "installed_by": ["subworkflows"]
+                    },
                     "utils_nextflow_pipeline": {
                         "branch": "master",
                         "git_sha": "1a545fcbd762911c21a64ced3dbef99b2b51ac75",

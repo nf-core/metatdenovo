@@ -298,6 +298,39 @@
             },
             "fa_icon": "fas fa-percentage"
         },
+        "consolidation_options": {
+            "title": "Consolidation options",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "skip_protein_consolidation": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-forward",
+                    "description": "Skip cross-contig consolidation of ORFs whose proteins cluster together",
+                    "help_text": "Cross-contig consolidation clusters the called proteins and sums the per-locus counts of everything that lands in one cluster, producing `summary_tables/<assembly>.protein_consolidate_<identity>.counts.tsv.gz`. Unlike the locus consolidation it builds on, this is not a no-op when only one ORF caller is active: near-identical proteins on different contigs are merged whichever caller found them."
+                },
+                "cluster_min_seq_id": {
+                    "type": "number",
+                    "default": 0.99,
+                    "minimum": 0,
+                    "maximum": 1,
+                    "fa_icon": "fas fa-equals",
+                    "description": "Minimum sequence identity for two proteins to be considered the same gene",
+                    "help_text": "Passed to MMseqs2 as `--min-seq-id`. Rounded to whole percent for the output table name, so 0.99 gives `protein_consolidate_99`. This is less strict than it looks even at 1.0, since coverage is controlled separately by `--cluster_coverage`: calls that are identical where they align but trimmed differently at the ends still cluster. Conversely a splice-aware caller whose exon boundary is off by a few residues in the middle of a gene will fall below 1.0, which is why the default is 0.99 rather than exact identity."
+                },
+                "cluster_coverage": {
+                    "type": "number",
+                    "default": 0.8,
+                    "minimum": 0,
+                    "maximum": 1,
+                    "fa_icon": "fas fa-arrows-alt-h",
+                    "description": "Minimum fraction of both proteins that must be covered by the alignment",
+                    "help_text": "Passed to MMseqs2 as `-c`, with its default bidirectional coverage mode, so the threshold applies to both the longer and the shorter sequence."
+                }
+            },
+            "fa_icon": "fas fa-object-group"
+        },
         "orf_caller_options": {
             "title": "Orf Caller options",
             "type": "object",
@@ -487,6 +520,11 @@
                     "description": "EUKulele database folder.",
                     "help_text": "If this parameter is set, EUKulele will look for a database to use in this folder. If --eukulele_db also is set, the specified database will be searched for in this directory and if it is not present it will be downloaded. If a custom database (see EUKulele documentation) should be used, EUKulele will assume that it is present in this folder - N.B. only works with one custom database (if using a custom database, point to a directory that only contains that database).",
                     "fa_icon": "far fa-file-code"
+                },
+                "save_eukulele_alignments": {
+                    "type": "boolean",
+                    "description": "Also publish EUKulele's raw Diamond alignment file, on top of the taxonomy estimation and counts.",
+                    "fa_icon": "fas fa-download"
                 }
             },
             "fa_icon": "fas fa-address-card"
@@ -667,6 +705,9 @@
         },
         {
             "$ref": "#/$defs/quantification_options"
+        },
+        {
+            "$ref": "#/$defs/consolidation_options"
         },
         {
             "$ref": "#/$defs/orf_caller_options"

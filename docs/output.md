@@ -157,7 +157,7 @@ BBnorm is a BBmap tool.
 ### ORF caller step
 
 `--orf_caller` accepts a comma-separated list of callers (e.g. `--orf_caller prokka,transdecoder`) to run more than one in the same execution.
-Each active caller's output below is produced independently, under its own `<caller>` name -- there is currently no consolidation across callers.
+Each active caller's output below is produced independently, under its own `<caller>` name; consolidation across callers is reported separately, in the `summary_tables/` consolidation levels.
 
 #### Prodigal
 
@@ -257,12 +257,16 @@ Quantification of CDS features with `featureCounts` from the [subread](https://s
   - `*.featureCounts.tsv.summar`: summary statistics
 - `summary_tables/`
   - `<assembly_name>.<orfcaller_name>.counts.tsv.gz`: reformatted count data
-  - `<assembly_name>.locus_consolidate.counts.tsv.gz`: when multiple `--orf_caller` values are
-    active, overlapping/identical same-contig CDS calls from different callers are merged into
-    single loci before counting, so a read supporting one real gene isn't counted once per caller
-    that called it. Same columns as the per-caller tables above, plus `callers` (which caller(s)
-    contributed to the locus) and `n_calls` (how many independent calls were merged). With a single
-    caller active, this table is identical in content to that caller's own table above.
+  - `<assembly_name>.locus_consolidate.counts.tsv.gz`: overlapping same-contig CDS calls from
+    _different_ callers merged into single loci before counting, so a read supporting one real gene
+    isn't counted once per caller that called it.
+    Two overlapping calls from the _same_ caller are two genes rather than one and are never merged,
+    which matters because prokaryotic genes overlap each other routinely.
+    Produced on every run, not only when several callers are active.
+    Same columns as the per-caller tables above, plus `callers` (which caller(s) contributed) and
+    `n_calls` (how many independent calls were merged).
+    With a single caller active nothing can merge, so this table is identical in content to that
+    caller's own table above.
 
 </details>
 
@@ -323,7 +327,7 @@ GTDB currently only works as a user provided database, i.e. data must be downloa
 <summary>Output files</summary>
 
 - `eukulele/<assembly_name>.<orfcaller_name>_<database>`
-  - `<assembly_name>.<orfcaller_name>/mets_full/diamond/proteins.diamond.out.gz`: Diamond output
+  - `<assembly_name>.<orfcaller_name>/mets_full/diamond/proteins.diamond.out.gz`: EUKulele's raw Diamond alignments, only written with `--save_eukulele_alignments`
   - `<assembly_name>.<orfcaller_name>/taxonomy_counts/*.csv.gz`: counts for different ranks, see [EUKulele documentation](https://eukulele.readthedocs.io)
   - `<assembly_name>.<orfcaller_name>/taxonomy_estimation/proteins-estimated-taxonomy.out.gz`: EUKulele taxonomy assignment
 - `summary_tables/`
@@ -379,6 +383,8 @@ Filenames start with assembly program and ORF caller, to allow reruns of the pip
 - `summary_tables/`
   - `<assembly_name>.<orfcaller_name>.overall_stats.tsv.gz`: overall statistics from the pipeline, e.g. number of reads, number of called ORFs, number of reads mapping back to contigs/ORFs etc.
   - `<assembly_name>.<orfcaller_name>.counts.tsv.gz`: read counts per ORF and sample.
+  - `<assembly_name>.locus_consolidate.counts.tsv.gz`: read counts per sample after merging overlapping CDS calls from different ORF callers on the same contig into single loci, so one gene is not counted once per caller that found it. Adds `callers` and `n_calls` columns recording what was merged. Identical to a single caller's own table when only one caller is active.
+  - `<assembly_name>.protein_consolidate_<identity>.counts.tsv.gz`: read counts per sample after additionally merging calls on _different_ contigs whose proteins cluster together at `--cluster_min_seq_id` -- typically a gene assembled both from genomic DNA and from its transcript. Adds `n_loci` and `loci` on top of `callers`/`n_calls`. See [Consolidating calls for the same gene](usage.md#consolidating-calls-for-the-same-gene).
   - `<assembly_name>.<orfcaller_name>.emapper.tsv.gz`: reformatted output from EggNOG-mapper.
   - `<assembly_name>.<orfcaller_name>.kofamscan.tsv.gz`: reformatted output from Kofamscan.
   - `<assembly_name>.<orfcaller_name>.kofamscan-uniq.tsv.gz`: reformatted output from Kofamscan with a _single_ row per ORF in contrast to the above.

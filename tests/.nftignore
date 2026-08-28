@@ -47,7 +47,22 @@ spades/spades.spades.log
 spades/spades.yaml
 spades/*.gz
 summary_tables/*.tsv.gz
+protein_consolidate/*
 transdecoder/*.gz
+# MetaEuk's own output, and the two files this pipeline derives from it, are not
+# byte-stable across machines: MetaEuk is MMseqs2-derived and orders its results by
+# how the work was distributed, so the same input gives the same content in a
+# different order elsewhere. Confirmed on CI, where one job produced different md5s
+# for these six files while the identical shard on the other Nextflow version matched
+# -- and where multiqc_metaeuk_stats.txt, derived from them, stayed byte-identical.
+# Their presence is still asserted through stable_name, the ORF count and mean length
+# through the MultiQC stats file, and the FASTA/GFF id contract through the explicit
+# assertions in tests/metaeuk.nf.test.
+metaeuk/*.fas
+metaeuk/*.gff
+metaeuk/*.headersMap.tsv
+metaeuk/*_format.faa.gz
+metaeuk/*_format.gff.gz
 transrate/*.assemblies.csv
 transrate/*.contigs.csv
 multiqc/multiqc_data/multiqc_megahit_assemblies.txt
