@@ -122,6 +122,12 @@
                 "SEQTK_MERGEPE": {
                     "seqtk": "1.4-r122"
                 },
+                "TIDYVERSE_STRIPCDSPREFIX": {
+                    "R": "4.5.3",
+                    "readr": "2.2.0",
+                    "dplyr": "1.2.1",
+                    "stringr": "1.6.0"
+                },
                 "TRANSRATE": {
                     "transrate": "1.0.3"
                 },
@@ -279,7 +285,7 @@
                 "sample\tn_post_trimming\tn_non_contaminated\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count"
             ]
         ],
-        "timestamp": "2026-08-25T12:29:58.847244471",
+        "timestamp": "2026-08-28T11:56:07.732871953",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

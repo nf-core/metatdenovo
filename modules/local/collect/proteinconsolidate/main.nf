@@ -102,7 +102,7 @@ process COLLECT_PROTEINCONSOLIDATE {
         summarise(count = sum(count), .groups = 'drop') %>%
         left_join(cluster_attrs, by = 'cluster') %>%
         group_by(sample) %>%
-        mutate(tpm = (count/length)/sum(count/length) * 1e6) %>%
+        mutate(tpm = round((count/length)/sum(count/length) * 1e6, 6)) %>%  # round so consistent
         ungroup() %>%
         rename(orf = cluster) %>%
         select(orf, chr, start, end, strand, length, sample, count, tpm, callers, n_calls, n_loci, loci) %>%

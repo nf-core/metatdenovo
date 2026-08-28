@@ -1,5 +1,22 @@
 {
-    "two loci of one gene on different contigs are summed into one cluster - stub": {
+    "cds. prefix is stripped, other IDs untouched": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test.counts.tsv.gz:md5,95a629ecd96d06df5829d517c7a4a5ca"
+                ]
+            ]
+        ],
+        "timestamp": "2026-08-28T10:55:48.069287947",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
+    },
+    "cds. prefix is stripped, other IDs untouched - stub": {
         "content": [
             {
                 "0": [
@@ -11,7 +28,7 @@
                     ]
                 ],
                 "1": [
-                    "versions.yml:md5,e1f547b0bc2222e7c89532ef4005de78"
+                    "versions.yml:md5,729dd70f75e4afd91bdab4689ab92b68"
                 ],
                 "counts": [
                     [
@@ -22,28 +39,11 @@
                     ]
                 ],
                 "versions": [
-                    "versions.yml:md5,e1f547b0bc2222e7c89532ef4005de78"
+                    "versions.yml:md5,729dd70f75e4afd91bdab4689ab92b68"
                 ]
             }
         ],
-        "timestamp": "2026-08-25T10:38:19.578043657",
-        "meta": {
-            "nf-test": "0.9.5",
-            "nextflow": "26.04.6"
-        }
-    },
-    "two loci of one gene on different contigs are summed into one cluster": {
-        "content": [
-            [
-                [
-                    {
-                        "id": "test"
-                    },
-                    "test.counts.tsv.gz:md5,8c5fc41389edfa719663fe05fa246d84"
-                ]
-            ]
-        ],
-        "timestamp": "2026-08-28T12:49:45.145802541",
+        "timestamp": "2026-08-28T10:55:54.820623112",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

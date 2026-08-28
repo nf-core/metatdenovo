@@ -1,7 +1,7 @@
 {
     "-profile test_diamond": {
         "content": [
-            63,
+            64,
             {
                 "BBMAP_ALIGN": {
                     "bbmap": 39.18
@@ -117,6 +117,12 @@
                 },
                 "TAXONKIT_LINEAGE": {
                     "taxonkit": "0.18.0"
+                },
+                "TIDYVERSE_STRIPCDSPREFIX": {
+                    "R": "4.5.3",
+                    "readr": "2.2.0",
+                    "dplyr": "1.2.1",
+                    "stringr": "1.6.0"
                 },
                 "TRANSRATE": {
                     "transrate": "1.0.3"
@@ -243,7 +249,7 @@
                 "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f"
             ]
         ],
-        "timestamp": "2026-08-25T13:23:55.601499867",
+        "timestamp": "2026-08-28T11:56:54.781018169",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

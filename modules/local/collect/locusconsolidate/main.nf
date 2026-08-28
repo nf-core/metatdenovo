@@ -51,7 +51,7 @@ process COLLECT_LOCUSCONSOLIDATE {
                         ) %>%
                         rename(orf = Geneid, chr = Chr, start = Start, end = End, strand = Strand, length = Length) %>%
                         group_by(sample) %>%
-                        mutate(tpm = r/sum(r) * 1e6) %>% ungroup() %>%
+                        mutate(tpm = round(r/sum(r) * 1e6, 6)) %>% ungroup() %>%  # round so consistent
                         select(-r) %>%
                         as_tibble()
                 }

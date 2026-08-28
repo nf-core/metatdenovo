@@ -20,6 +20,7 @@ include { MERGE_TABLES                       } from '../modules/local/merge/summ
 include { FORMAT_DIAMOND_TAX_RANKLIST        } from '../modules/local/diamond/format_tax/ranklist/'
 include { FORMAT_DIAMOND_TAX_TAXDUMP         } from '../modules/local/diamond/format_tax/taxdump/'
 include { SUMTAXONOMY as SUM_DIAMONDTAX      } from '../modules/local/sumtaxonomy/'
+include { TIDYVERSE_STRIPCDSPREFIX           } from '../modules/local/tidyverse/stripcdsprefix/'
 include { TRANSRATE                          } from '../modules/nf-core/transrate/'
 include { WRITESPADESYAML                    } from '../modules/local/spades/writeyaml/'
 
@@ -789,6 +790,14 @@ workflow METATDENOVO {
 
     COLLECT_FEATURECOUNTS ( ch_collect_feature.other )
     ch_versions           = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
+
+    // COLLECT_FEATURECOUNTS itself is kept generic (no Transdecoder-specific ID handling), so this
+    // caller-agnostic strip -- a no-op for every caller but transdecoder -- happens as a separate
+    // post-processing step, matching the id-reconciliation pattern nf-core/magmap already
+    // established for its own genome-accession join (see nf-core/magmap#238).
+    TIDYVERSE_STRIPCDSPREFIX ( COLLECT_FEATURECOUNTS.out.counts )
+    ch_versions           = ch_versions.mix(TIDYVERSE_STRIPCDSPREFIX.out.versions)
+
     // [ meta(caller), tsv ] -- kept as a proper tuple (not stripped) so every consumer below can
     // join it against other per-caller channels instead of relying on positional channel pairing.
     //
@@ -797,7 +806,7 @@ workflow METATDENOVO {
     // correct: it left-joins MERGE_TABLES's output onto this channel with remainder: true, so a
     // caller present in ch_merge_tables but missing here would emit an entry with a null meta that
     // COLLECT_STATS cannot consume. Empty, hence a no-op, when consolidation is skipped.
-    ch_counts_per_caller  = COLLECT_FEATURECOUNTS.out.counts.mix(ch_protein_consolidate_counts)
+    ch_counts_per_caller  = TIDYVERSE_STRIPCDSPREFIX.out.counts.mix(ch_protein_consolidate_counts)
     ch_fcs_for_summary    = ch_counts_per_caller
 
     // Initialize ch_merge_tables that will be populated with tables from annotation tools and used by the MERGE_TABLES module which output will then be passed to the COLLECT_STATS module
