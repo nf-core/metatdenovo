@@ -1,7 +1,7 @@
 {
     "-profile test_metaeuk": {
         "content": [
-            49,
+            51,
             {
                 "BBMAP_ALIGN": {
                     "bbmap": 39.18
@@ -59,6 +59,16 @@
                 },
                 "METAEUK_EASYPREDICT": {
                     "metaeuk": "6.a5d39d9"
+                },
+                "METAEUK_FAA_CAT": {
+                    "coreutils": 9.4,
+                    "find": "4.6.0",
+                    "pigz": 2.8
+                },
+                "METAEUK_GFF_CAT": {
+                    "coreutils": 9.4,
+                    "find": "4.6.0",
+                    "pigz": 2.8
                 },
                 "SAMTOOLS_FLAGSTAT": {
                     "samtools": 1.24
@@ -123,10 +133,6 @@
                 "megahit/megahit_assembly.contigs.fa.gz",
                 "megahit/megahit_assembly.log",
                 "metaeuk",
-                "metaeuk/megahit.metaeuk.codon.fas",
-                "metaeuk/megahit.metaeuk.fas",
-                "metaeuk/megahit.metaeuk.gff",
-                "metaeuk/megahit.metaeuk.headersMap.tsv",
                 "metaeuk/megahit.metaeuk_format.faa.gz",
                 "metaeuk/megahit.metaeuk_format.gff.gz",
                 "multiqc",
@@ -209,7 +215,7 @@
                 "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count"
             ]
         ],
-        "timestamp": "2026-08-28T11:45:39.744201188",
+        "timestamp": "2026-08-30T21:00:16.491108698",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

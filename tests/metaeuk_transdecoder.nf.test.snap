@@ -1,7 +1,7 @@
 {
     "-profile test_metaeuk_transdecoder": {
         "content": [
-            70,
+            72,
             {
                 "BBMAP_ALIGN": {
                     "bbmap": 39.18
@@ -73,6 +73,16 @@
                 },
                 "METAEUK_EASYPREDICT": {
                     "metaeuk": "6.a5d39d9"
+                },
+                "METAEUK_FAA_CAT": {
+                    "coreutils": 9.4,
+                    "find": "4.6.0",
+                    "pigz": 2.8
+                },
+                "METAEUK_GFF_CAT": {
+                    "coreutils": 9.4,
+                    "find": "4.6.0",
+                    "pigz": 2.8
                 },
                 "MMSEQS_CREATEDB": {
                     "mmseqs": "18.8cc5c"
@@ -173,10 +183,6 @@
                 "megahit/megahit_assembly.contigs.fa.gz",
                 "megahit/megahit_assembly.log",
                 "metaeuk",
-                "metaeuk/megahit.metaeuk.codon.fas",
-                "metaeuk/megahit.metaeuk.fas",
-                "metaeuk/megahit.metaeuk.gff",
-                "metaeuk/megahit.metaeuk.headersMap.tsv",
                 "metaeuk/megahit.metaeuk_format.faa.gz",
                 "metaeuk/megahit.metaeuk_format.gff.gz",
                 "multiqc",
@@ -283,7 +289,7 @@
                 "k59_1.p1\tk59_1\t183\t611\t+\t429\tRPL28_GENOMIC\t12\t153410.553411\ttransdecoder\t1\t1\tk59_1.p1"
             ]
         ],
-        "timestamp": "2026-08-28T12:57:54.242210608",
+        "timestamp": "2026-08-30T21:04:08.247271125",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

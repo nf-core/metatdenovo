@@ -9,7 +9,9 @@ keywords:
   - gene prediction
 components:
   - metaeuk/easypredict
+  - find/concatenate
   - format/metaeuk/gff
+  - format/metaeukfaa
 input:
   - fasta:
       type: file
@@ -24,6 +26,11 @@ input:
         mmseqs2-formatted protein database, used as the MetaEuk homology
         reference
         Structure: path(database)
+  - batchsize:
+      type: string
+      description: |
+        Size of the assembly batches MetaEuk is called on, e.g. '100.MB'.
+        Usually from params.metaeuk_batchsize
 output:
   - faa:
       type: file

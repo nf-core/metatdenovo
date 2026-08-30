@@ -386,6 +386,15 @@
                     "default": null,
                     "description": "Path to a reference protein database for MetaEuk, either a protein fasta file or a directory containing an mmseqs2-formatted database. Required when `--orf_caller metaeuk` is used.",
                     "fa_icon": "far fa-file-code"
+                },
+                "metaeuk_batchsize": {
+                    "type": "integer",
+                    "description": "Size of individual files annotated by MetaEuk in one batch.",
+                    "default": "104857600",
+                    "pattern": "^\\d+(\\.\\d+)?\\.?\\s*(K|M|G|T)?B$",
+                    "hidden": true,
+                    "help_text": "MetaEuk reloads and searches its full reference database on every batch, so very small batches multiply that fixed cost -- unlike Prokka's batching, where each batch is self-contained. This parameter controls the size of the smaller assembly batches MetaEuk is called on, primarily to bound its peak memory use and to limit how much work is lost if a single batch fails. Should be a string in the format integer-unit e.g. `--metaeuk_batchsize '100.MB'`",
+                    "fa_icon": "fas fa-expand-alt"
                 }
             },
             "fa_icon": "fas fa-phone-volume"

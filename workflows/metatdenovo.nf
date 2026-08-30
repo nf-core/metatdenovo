@@ -535,7 +535,8 @@ workflow METATDENOVO {
     if ( 'metaeuk' in orf_callers ) {
         METAEUK (
             ch_assembly_contigs.map { _meta, contigs -> [ [id: "${assembly_name}.metaeuk", caller: 'metaeuk' ], contigs ] },
-            file(params.metaeuk_db, checkIfExists: true)
+            file(params.metaeuk_db, checkIfExists: true),
+            params.metaeuk_batchsize
         )
         ch_protein = ch_protein.mix(METAEUK.out.faa)
 
