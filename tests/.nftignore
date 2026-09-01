@@ -63,10 +63,12 @@ metaeuk/*.gff
 metaeuk/*.headersMap.tsv
 metaeuk/*_format.faa.gz
 metaeuk/*_format.gff.gz
-transrate/*.assemblies.csv
-transrate/*.contigs.csv
-multiqc/multiqc_data/multiqc_megahit_assemblies.txt
-multiqc/multiqc_data/multiqc_spades_assemblies.txt
+# QUAST's quast.log and report.html/report.tex embed run timestamps and
+# work-directory-specific absolute paths, so only file presence (stable_path), not
+# content, is asserted; the numeric stats we actually care about are covered instead
+# through MultiQC's own parsed table (see the explicit assertions in the pipeline tests).
+quast/**
+multiqc/multiqc_data/multiqc_quast.txt
 trimgalore/fastqc/*.{html,zip}
 trimgalore/*trimming_report.txt
 pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml

@@ -19,7 +19,6 @@ include { FORMAT_DIAMOND_TAX_RANKLIST        } from '../modules/local/diamond/fo
 include { FORMAT_DIAMOND_TAX_TAXDUMP         } from '../modules/local/diamond/format_tax/taxdump/'
 include { SUMTAXONOMY as SUM_DIAMONDTAX      } from '../modules/local/sumtaxonomy/'
 include { TIDYVERSE_STRIPCDSPREFIX           } from '../modules/local/tidyverse/stripcdsprefix/'
-include { TRANSRATE                          } from '../modules/nf-core/transrate/'
 include { WRITESPADESYAML                    } from '../modules/local/spades/writeyaml/'
 
 
@@ -75,8 +74,8 @@ include { PIGZ_COMPRESS as PIGZ_TRANSDECODER_BED     } from '../modules/nf-core/
 include { PIGZ_COMPRESS as PIGZ_TRANSDECODER_CDS     } from '../modules/nf-core/pigz/compress/'
 include { PIGZ_COMPRESS as PIGZ_TRANSDECODER_GFF     } from '../modules/nf-core/pigz/compress/'
 include { PIGZ_COMPRESS as PIGZ_TRANSDECODER_PEP     } from '../modules/nf-core/pigz/compress/'
-include { PIGZ_UNCOMPRESS as UNPIGZ_CONTIGS          } from '../modules/nf-core/pigz/uncompress/'
 include { PIGZ_UNCOMPRESS as UNPIGZ_GFF              } from '../modules/nf-core/pigz/uncompress/'
+include { QUAST                                      } from '../modules/nf-core/quast/'
 include { SEQTK_MERGEPE                              } from '../modules/nf-core/seqtk/mergepe/'
 include { SEQTK_SEQ as SEQTK_SEQ_CONTIG_FILTER       } from '../modules/nf-core/seqtk/seq/'
 include { SPADES                                     } from '../modules/nf-core/spades/'
@@ -836,17 +835,15 @@ workflow METATDENOVO {
         ch_merge_tables = ch_merge_tables.mix ( DBCAN.out.sumtable )
     }
 
-    // set up contig channel to use in TransRate
-    UNPIGZ_CONTIGS(ch_assembly_contigs)
-    ch_unzipped_contigs = UNPIGZ_CONTIGS.out.file
-
     //
-    // MODULE: Use TransRate to judge assembly quality, piped into MultiQC
+    // MODULE: Use QUAST to judge assembly quality, piped into MultiQC via its native report.tsv parser
     //
-    TRANSRATE(ch_unzipped_contigs.map { meta, contigs -> [ meta, contigs, [] ] })
-    ch_multiqc_files = ch_multiqc_files.mix(
-        TRANSRATE.out.assemblies.collectFile { meta, csv -> [ "${meta.id}_assemblies_mqc.csv", csv.text ] }
+    QUAST(
+        ch_assembly_contigs,
+        channel.value([ [:], [] ]),
+        channel.value([ [:], [] ])
     )
+    ch_multiqc_files = ch_multiqc_files.mix(QUAST.out.results.map { _meta, dir -> dir })
 
     //
     // SUBWORKFLOW: Eukulele

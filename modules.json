@@ -141,6 +141,11 @@
                         "git_sha": "a0fe96944016c6cb69d8b64ffc635c71b76310ae",
                         "installed_by": ["modules"]
                     },
+                    "quast": {
+                        "branch": "master",
+                        "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",
+                        "installed_by": ["modules"]
+                    },
                     "rundbcan/cazymeannotation": {
                         "branch": "master",
                         "git_sha": "5e0b34c7ad0841e3e160b15a0180bf2b9be0e3bf",
@@ -216,11 +221,6 @@
                     "transdecoder/predict": {
                         "branch": "master",
                         "git_sha": "863a36f28b3c3c39b182be6f977799fb8de49598",
-                        "installed_by": ["modules"]
-                    },
-                    "transrate": {
-                        "branch": "master",
-                        "git_sha": "e7ee4ca0f1117ef440fe65a5038eecfd8fe5810e",
                         "installed_by": ["modules"]
                     },
                     "trimgalore": {

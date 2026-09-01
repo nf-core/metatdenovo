@@ -4,5 +4,4 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - bioconda::blast=2.2.31
-  - bioconda::transrate=1.0.3
+  - bioconda::quast=5.3.0
