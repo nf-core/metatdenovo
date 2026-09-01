@@ -31,13 +31,13 @@
                     "dtplyr": "1.3.3",
                     "data.table": "1.17.8"
                 },
-                "COLLECT_STATS": {
-                    "R": "4.5.3",
-                    "dplyr": "1.2.1",
-                    "readr": "2.2.0",
-                    "purrr": "1.2.2",
-                    "tidyr": "1.3.2",
-                    "stringr": "1.6.0"
+                "CUSTOM_COLLECTSTATS": {
+                    "R": "4.3.1",
+                    "dplyr": "1.1.4",
+                    "readr": "2.1.5",
+                    "purrr": "1.1.0",
+                    "tidyr": "1.3.1",
+                    "stringr": "1.5.2"
                 },
                 "FASTQC": {
                     "fastqc": "0.12.1"
@@ -218,10 +218,10 @@
             3000000,
             4,
             [
-                "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count"
+                "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tprodigal"
             ]
         ],
-        "timestamp": "2026-08-28T11:56:43.668550074",
+        "timestamp": "2026-09-01T09:36:03.792423595",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

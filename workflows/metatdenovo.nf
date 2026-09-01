@@ -10,7 +10,6 @@
 include { COLLECT_FEATURECOUNTS              } from '../modules/local/collect/featurecounts/'
 include { COLLECT_LOCUSCONSOLIDATE           } from '../modules/local/collect/locusconsolidate/'
 include { COLLECT_PROTEINCONSOLIDATE         } from '../modules/local/collect/proteinconsolidate/'
-include { COLLECT_STATS                      } from '../modules/local/collect/stats/'
 include { FORMAT_CLUSTERREPS                 } from '../modules/local/format/clusterreps/'
 include { FORMAT_GFF2BED                     } from '../modules/local/format/gff2bed/'
 include { FORMAT_LOCUSCONSOLIDATE            } from '../modules/local/format/locusconsolidate/'
@@ -62,6 +61,7 @@ include { BBMAP_INDEX                                } from '../modules/nf-core/
 include { BEDTOOLS_SORT                              } from '../modules/nf-core/bedtools/sort/'
 include { SEQKIT_GREP                                } from '../modules/nf-core/seqkit/grep/'
 include { CAT_FASTQ            	                     } from '../modules/nf-core/cat/fastq/'
+include { CUSTOM_COLLECTSTATS                        } from '../modules/nf-core/custom/collectstats/main'
 include { DIAMOND_BLASTP as DIAMOND_TAXONOMY         } from '../modules/nf-core/diamond/blastp/'
 include { FASTQC                                     } from '../modules/nf-core/fastqc/'
 include { MEGAHIT                                    } from '../modules/nf-core/megahit/'
@@ -802,14 +802,14 @@ workflow METATDENOVO {
     // join it against other per-caller channels instead of relying on positional channel pairing.
     //
     // The cluster representatives are annotated as just another caller, so their counts have to be
-    // available to the annotation subworkflows on the same footing. This also keeps COLLECT_STATS
+    // available to the annotation subworkflows on the same footing. This also keeps CUSTOM_COLLECTSTATS
     // correct: it left-joins MERGE_TABLES's output onto this channel with remainder: true, so a
     // caller present in ch_merge_tables but missing here would emit an entry with a null meta that
-    // COLLECT_STATS cannot consume. Empty, hence a no-op, when consolidation is skipped.
+    // CUSTOM_COLLECTSTATS cannot consume. Empty, hence a no-op, when consolidation is skipped.
     ch_counts_per_caller  = TIDYVERSE_STRIPCDSPREFIX.out.counts.mix(ch_protein_consolidate_counts)
     ch_fcs_for_summary    = ch_counts_per_caller
 
-    // Initialize ch_merge_tables that will be populated with tables from annotation tools and used by the MERGE_TABLES module which output will then be passed to the COLLECT_STATS module
+    // Initialize ch_merge_tables that will be populated with tables from annotation tools and used by the MERGE_TABLES module which output will then be passed to the CUSTOM_COLLECTSTATS module
     ch_merge_tables = channel.empty()
 
     //
@@ -957,10 +957,10 @@ workflow METATDENOVO {
             .map { caller, tsvs -> [ [ id: "${assembly_name}.${caller}", caller: caller ], tsvs ] }
     )
 
-    // COLLECT_STATS must still run once per ACTIVE caller regardless of whether that caller got a
+    // CUSTOM_COLLECTSTATS must still run once per ACTIVE caller regardless of whether that caller got a
     // MERGE_TABLES output -- left-join (remainder: true) onto COLLECT_FEATURECOUNTS.out.counts (which
     // always has exactly one item per active caller) so a caller with no annotation tables still gets
-    // a COLLECT_STATS invocation, with mergetab defaulting to [] -- COLLECT_STATS's own script already
+    // a CUSTOM_COLLECTSTATS invocation, with mergetab defaulting to [] -- CUSTOM_COLLECTSTATS's own script already
     // handles a missing mergetab gracefully (`if (mergetab) {...} else {...}`), mirroring what the
     // pre-multi-caller code's `.ifEmpty { [ [] ] }` fallback did for the single-run case.
     ch_fcs_mergetab_per_caller = ch_counts_per_caller
@@ -971,7 +971,7 @@ workflow METATDENOVO {
         )
         // remainder: true also emits right-only entries, i.e. a caller that produced annotation tables
         // but no counts. That cannot happen for any reachable config today, but it would arrive here
-        // as a null meta and kill COLLECT_STATS on tag "$meta.id" -- drop it instead, so a future
+        // as a null meta and kill CUSTOM_COLLECTSTATS on tag "$meta.id" -- drop it instead, so a future
         // wiring mistake degrades to a missing stats row rather than a crash far from its cause.
         .filter { _caller, meta, _fcs, _mergetab -> meta != null }
         .map { _caller, meta, fcs, mergetab -> [ meta, fcs, mergetab ?: [] ] }
@@ -979,10 +979,15 @@ workflow METATDENOVO {
     ch_collect_stats = ch_collect_stats
         .combine( ch_fcs_mergetab_per_caller )
         .map { _origMeta, samples, trimlogs, bblogs, idxstats, callerMeta, fcs, mergetab ->
-            [ callerMeta, samples, trimlogs, bblogs, idxstats, fcs, mergetab ]
+            // CUSTOM_COLLECTSTATS's `fcs` input accepts one or more files and derives each one's
+            // feature-count column name from the text between the first and second dot of its
+            // filename -- wrapped in a list here so a single caller's counts file (named
+            // "<assembly>.<caller>.counts.tsv.gz") still stages as a list, giving a column named
+            // after the caller.
+            [ callerMeta, samples, trimlogs, bblogs, idxstats, [ fcs ], mergetab ]
         }
 
-    COLLECT_STATS(ch_collect_stats)
+    CUSTOM_COLLECTSTATS(ch_collect_stats)
 
     //
     // MODULE: MultiQC

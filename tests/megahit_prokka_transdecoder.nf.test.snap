@@ -31,13 +31,13 @@
                     "dtplyr": "1.3.3",
                     "data.table": "1.17.8"
                 },
-                "COLLECT_STATS": {
-                    "R": "4.5.3",
-                    "dplyr": "1.2.1",
-                    "readr": "2.2.0",
-                    "purrr": "1.2.2",
-                    "tidyr": "1.3.2",
-                    "stringr": "1.6.0"
+                "CUSTOM_COLLECTSTATS": {
+                    "R": "4.3.1",
+                    "dplyr": "1.1.4",
+                    "readr": "2.1.5",
+                    "purrr": "1.1.0",
+                    "tidyr": "1.3.1",
+                    "stringr": "1.5.2"
                 },
                 "DIAMOND_TAXONOMY": {
                     "diamond": "2.2.1"
@@ -313,17 +313,17 @@
             ],
             3000000,
             [
-                "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count\tdiamondtax_gtdb-r220-test\tdiamondtax_ncbi-refseq-test"
+                "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tprokka\tdiamondtax_gtdb-r220-test\tdiamondtax_ncbi-refseq-test"
             ],
             [
                 "orf\tchr\tstart\tend\tstrand\tlength\tsample\tcount\ttpm"
             ],
             3000000,
             [
-                "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count\tdiamondtax_gtdb-r220-test\tdiamondtax_ncbi-refseq-test"
+                "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\ttransdecoder\tdiamondtax_gtdb-r220-test\tdiamondtax_ncbi-refseq-test"
             ]
         ],
-        "timestamp": "2026-08-28T11:23:36.620076248",
+        "timestamp": "2026-09-01T09:08:01.825948723",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"
