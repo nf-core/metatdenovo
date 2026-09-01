@@ -15,7 +15,7 @@
                 "CAT_FASTQ": {
                     "cat": 9.5
                 },
-                "COLLECT_FEATURECOUNTS": {
+                "COLLECT_LOCUSCONSOLIDATE": {
                     "R": "4.5.3",
                     "dplyr": "1.2.1",
                     "readr": "2.2.0",
@@ -23,7 +23,7 @@
                     "dtplyr": "1.3.3",
                     "data.table": "1.17.8"
                 },
-                "COLLECT_LOCUSCONSOLIDATE": {
+                "CUSTOM_COLLECTFEATURECOUNTS": {
                     "R": "4.5.3",
                     "dplyr": "1.2.1",
                     "readr": "2.2.0",
@@ -210,7 +210,7 @@
                 "orf\tchr\tstart\tend\tstrand\tlength\tsample\tcount\ttpm"
             ]
         ],
-        "timestamp": "2026-09-01T08:36:42.635081837",
+        "timestamp": "2026-09-01T10:51:44.184290154",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

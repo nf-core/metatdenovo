@@ -24,8 +24,8 @@ process FORMAT_GFF2BED {
     // BED is 0-based half-open, GFF is 1-based inclusive: start shifts by one, end is unchanged.
     // The "(^|;)ID=" anchor (rather than a bare "ID=") avoids matching inside MetaEuk's
     // Target_ID=/TCS_ID= attributes, which also contain the substring "ID=".
-    // The "cds." prefix strip mirrors COLLECT_FEATURECOUNTS's existing TransDecoder-ID normalization
-    // (modules/local/collect/featurecounts/main.nf), so a locus this caller is the sole contributor to
+    // The "cds." prefix strip mirrors TIDYVERSE_STRIPCDSPREFIX's existing TransDecoder-ID normalization
+    // (modules/local/tidyverse/stripcdsprefix/main.nf), so a locus this caller is the sole contributor to
     // inherits an ID matching that caller's own per-caller counts table exactly.
     """
     $cat_input \\

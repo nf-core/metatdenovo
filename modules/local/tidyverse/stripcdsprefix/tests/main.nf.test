@@ -10,7 +10,7 @@ nextflow_process {
     tag "tidyverse/stripcdsprefix"
 
     // Input is built inline rather than read from a fixture: the pipeline repo carries no test
-    // data of its own. Shape matches COLLECT_FEATURECOUNTS's own output (orf, chr, start, end,
+    // data of its own. Shape matches CUSTOM_COLLECTFEATURECOUNTS's own output (orf, chr, start, end,
     // strand, length, sample, count, tpm). One row uses a Transdecoder-style "cds."-prefixed ID,
     // the other an already-clean ID (e.g. from prodigal/prokka/locus-consolidation), which must
     // pass through untouched.

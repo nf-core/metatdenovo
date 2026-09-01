@@ -7,7 +7,6 @@
 //
 // MODULE: local
 //
-include { COLLECT_FEATURECOUNTS              } from '../modules/local/collect/featurecounts/'
 include { COLLECT_LOCUSCONSOLIDATE           } from '../modules/local/collect/locusconsolidate/'
 include { COLLECT_PROTEINCONSOLIDATE         } from '../modules/local/collect/proteinconsolidate/'
 include { FORMAT_CLUSTERREPS                 } from '../modules/local/format/clusterreps/'
@@ -61,6 +60,7 @@ include { BBMAP_INDEX                                } from '../modules/nf-core/
 include { BEDTOOLS_SORT                              } from '../modules/nf-core/bedtools/sort/'
 include { SEQKIT_GREP                                } from '../modules/nf-core/seqkit/grep/'
 include { CAT_FASTQ            	                     } from '../modules/nf-core/cat/fastq/'
+include { CUSTOM_COLLECTFEATURECOUNTS                } from '../modules/nf-core/custom/collectfeaturecounts/main'
 include { CUSTOM_COLLECTSTATS                        } from '../modules/nf-core/custom/collectstats/main'
 include { DIAMOND_BLASTP as DIAMOND_TAXONOMY         } from '../modules/nf-core/diamond/blastp/'
 include { FASTQC                                     } from '../modules/nf-core/fastqc/'
@@ -750,7 +750,7 @@ workflow METATDENOVO {
         }
 
     // Locus-consolidated counts get their own collect module (provenance join), branched out here
-    // so COLLECT_FEATURECOUNTS itself -- and every other caller's table -- stays untouched.
+    // so CUSTOM_COLLECTFEATURECOUNTS itself -- and every other caller's table -- stays untouched.
     // Keyed by meta.id (not .combine(), which would cross-join every assembly's featureCounts
     // group against every assembly's provenance file if this pipeline ever ran multiple
     // simultaneous assemblies) -- matches ch_featurecounts/ch_collect_feature's own convention
@@ -788,14 +788,13 @@ workflow METATDENOVO {
         ch_protein_consolidate_counts = COLLECT_PROTEINCONSOLIDATE.out.counts
     }
 
-    COLLECT_FEATURECOUNTS ( ch_collect_feature.other )
-    ch_versions           = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
+    CUSTOM_COLLECTFEATURECOUNTS ( ch_collect_feature.other )
 
-    // COLLECT_FEATURECOUNTS itself is kept generic (no Transdecoder-specific ID handling), so this
+    // CUSTOM_COLLECTFEATURECOUNTS itself is kept generic (no Transdecoder-specific ID handling), so this
     // caller-agnostic strip -- a no-op for every caller but transdecoder -- happens as a separate
     // post-processing step, matching the id-reconciliation pattern nf-core/magmap already
     // established for its own genome-accession join (see nf-core/magmap#238).
-    TIDYVERSE_STRIPCDSPREFIX ( COLLECT_FEATURECOUNTS.out.counts )
+    TIDYVERSE_STRIPCDSPREFIX ( CUSTOM_COLLECTFEATURECOUNTS.out.counts )
     ch_versions           = ch_versions.mix(TIDYVERSE_STRIPCDSPREFIX.out.versions)
 
     // [ meta(caller), tsv ] -- kept as a proper tuple (not stripped) so every consumer below can
@@ -958,7 +957,7 @@ workflow METATDENOVO {
     )
 
     // CUSTOM_COLLECTSTATS must still run once per ACTIVE caller regardless of whether that caller got a
-    // MERGE_TABLES output -- left-join (remainder: true) onto COLLECT_FEATURECOUNTS.out.counts (which
+    // MERGE_TABLES output -- left-join (remainder: true) onto CUSTOM_COLLECTFEATURECOUNTS.out.counts (which
     // always has exactly one item per active caller) so a caller with no annotation tables still gets
     // a CUSTOM_COLLECTSTATS invocation, with mergetab defaulting to [] -- CUSTOM_COLLECTSTATS's own script already
     // handles a missing mergetab gracefully (`if (mergetab) {...} else {...}`), mirroring what the

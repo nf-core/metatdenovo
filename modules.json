@@ -38,6 +38,11 @@
                         "installed_by": ["modules"],
                         "patch": "modules/nf-core/cat/fastq/cat-fastq.diff"
                     },
+                    "custom/collectfeaturecounts": {
+                        "branch": "master",
+                        "git_sha": "94b413835288b0e80bd29256d0a95e4fce020a8b",
+                        "installed_by": ["modules"]
+                    },
                     "custom/collectstats": {
                         "branch": "master",
                         "git_sha": "23e432f42c1f2aea64898b48839ebf7b925e4e8a",
