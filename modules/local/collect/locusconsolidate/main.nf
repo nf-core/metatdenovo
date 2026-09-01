@@ -34,7 +34,7 @@ process COLLECT_LOCUSCONSOLIDATE {
     # duplicate ID differing in any column would survive a plain distinct() and fan this join out --
     # and here that duplicates the counts rows themselves, so anything summing the table would
     # double-count.
-    provenance <- fread('${provenance}', sep = '\\t') %>% distinct(ID, .keep_all = TRUE)
+    provenance <- fread(cmd = "zcat '${provenance}'", sep = '\\t') %>% distinct(ID, .keep_all = TRUE)
 
     tibble(f = Sys.glob('*.featureCounts.tsv')) %>%
         mutate(

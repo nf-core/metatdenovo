@@ -38,7 +38,7 @@ process COLLECT_PROTEINCONSOLIDATE {
     # FORMAT_LOCUSCONSOLIDATE emits one provenance row per locus, but dedupe on ID defensively: a
     # second row for the same ID differing in any column would survive a plain distinct() and fan the
     # join out, inflating n_loci/n_calls and duplicating the loci list.
-    provenance <- fread('${provenance}', sep = '\\t') %>% distinct(ID, .keep_all = TRUE)
+    provenance <- fread(cmd = "zcat '${provenance}'", sep = '\\t') %>% distinct(ID, .keep_all = TRUE)
 
     counts <- tibble(f = Sys.glob('*.featureCounts.tsv')) %>%
         mutate(
