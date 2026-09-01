@@ -140,22 +140,26 @@ For eukaryotic genes, we recommend users to use Transdecoder (`--orf_caller tran
 
 MetaEuk (`--orf_caller metaeuk`) is a second eukaryote-targeted alternative.
 Unlike Transdecoder, which calls ORFs directly on the assembled contigs/transcripts, MetaEuk is splice-aware: it aligns contigs against a reference protein database and can call a single gene model spanning an intron, which matters for assemblies that include intron-containing genomic sequence alongside spliced transcripts.
-It requires a reference protein database, set with `--metaeuk_db` -- either a protein fasta file or a directory containing an mmseqs2-formatted database.
-There's no default, so `--metaeuk_db` must be set whenever `--orf_caller metaeuk` is used.
 
-MetaEuk's own `metaeuk databases` command (outside the pipeline) can download and format several standard amino acid reference databases for this purpose, for example:
+It requires a reference protein database.
+By default the pipeline downloads and builds one automatically the first time it's needed, using MetaEuk's own `metaeuk databases` command, and caches it under `--metaeuk_db_dir` (default `./metaeuk_db/`) so later runs reuse it instead of re-downloading.
+`--metaeuk_db_name` (default `UniRef50`) picks which database to build; it must be one of the names `metaeuk databases -h` lists, for example:
 
 - `UniRef50`/`UniRef90`/`UniRef100`
 - `UniProtKB/Swiss-Prot`
 - `GTDB`
 - `NR`
 
+`UniRef50` is tens of gigabytes and can take a long time to download and format -- pick a smaller database with `--metaeuk_db_name` if that's a concern, or build one ahead of time and skip the download entirely with `--metaeuk_db` (below).
+
+If a suitable database already exists -- built outside the pipeline, shared from another run, or anything else you'd rather point at directly -- pass it with `--metaeuk_db`, either a protein fasta file or a directory containing an mmseqs2-formatted database.
+This takes priority over `--metaeuk_db_name`/`--metaeuk_db_dir`, which are then ignored:
+
 ```bash
-metaeuk databases UniRef50 metaeuk_uniref50 tmp
+metaeuk databases UniRef50 metaeuk_uniref50/UniRef50 tmp
 ```
 
-The resulting `metaeuk_uniref50` can then be passed directly as `--metaeuk_db`.
-Run `metaeuk databases -h` for the full list.
+The resulting `metaeuk_uniref50` directory can then be passed directly as `--metaeuk_db metaeuk_uniref50`.
 
 #### Running more than one ORF caller
 

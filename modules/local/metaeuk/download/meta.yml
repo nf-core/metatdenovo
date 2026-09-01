@@ -1,0 +1,35 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "metaeuk_download"
+description: Downloads and builds a reference protein database for MetaEuk
+keywords:
+  - metaeuk
+  - download
+  - database
+  - reference
+tools:
+  - "metaeuk":
+      description: "MetaEuk - sensitive, high-throughput gene discovery and annotation
+        for large-scale eukaryotic metagenomics"
+      homepage: "https://github.com/soedinglab/metaeuk"
+      documentation: "https://github.com/soedinglab/metaeuk/wiki"
+      tool_dev_url: "https://github.com/soedinglab/metaeuk"
+      doi: "10.1186/s13059-020-02295-z"
+      licence: ["GPL v3"]
+      identifier: biotools:MetaEuk
+
+input:
+  - db_name:
+      type: string
+      description: Name of a reference database that `metaeuk databases` knows how to
+        download and build, e.g. `UniRef50` (run `metaeuk databases -h` for the full list)
+output:
+  database:
+    - "${db_name}":
+        type: directory
+        description: Directory containing the mmseqs2-formatted reference database, ready
+          to pass as `database` to METAEUK_EASYPREDICT
+        pattern: "${db_name}"
+authors:
+  - "@erikrikarddaniel"
+maintainers:
+  - "@erikrikarddaniel"

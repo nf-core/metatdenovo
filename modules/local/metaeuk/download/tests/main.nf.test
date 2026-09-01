@@ -1,0 +1,33 @@
+nextflow_process {
+
+    name "Test Process METAEUK_DOWNLOAD"
+    script "../main.nf"
+    process "METAEUK_DOWNLOAD"
+
+    tag "modules"
+    tag "modules_local"
+    tag "metaeuk"
+    tag "metaeuk/download"
+
+    // A real (non-stub) run downloads and builds a full MetaEuk reference database
+    // (the smallest of which is still far too large for CI), so only the stub is tested here.
+    test("UniRef50 - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                input[0] = 'UniRef50'
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            assert snapshot(process.out).match()
+        }
+
+    }
+
+}
