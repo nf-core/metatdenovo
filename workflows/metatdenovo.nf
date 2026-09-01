@@ -789,7 +789,6 @@ workflow METATDENOVO {
     }
 
     CUSTOM_COLLECTFEATURECOUNTS ( ch_collect_feature.other )
-    ch_versions           = ch_versions.mix(CUSTOM_COLLECTFEATURECOUNTS.out.versions)
 
     // CUSTOM_COLLECTFEATURECOUNTS itself is kept generic (no Transdecoder-specific ID handling), so this
     // caller-agnostic strip -- a no-op for every caller but transdecoder -- happens as a separate
