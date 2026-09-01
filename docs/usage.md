@@ -148,17 +148,17 @@ By default the pipeline downloads and builds one automatically the first time it
 The database itself, and the URL it's fetched from, are entirely MetaEuk's own -- the pipeline doesn't maintain a separate mapping of names to URLs, only the list of names it allows `--metaeuk_db_name` to be.
 That list is restricted to the amino-acid databases `metaeuk databases -h` offers (its nucleotide and profile entries aren't valid MetaEuk homology references), but since the actual download depends on MetaEuk's own logic and a third-party host we don't control, we can only vouch for the ones we've actually confirmed downloadable ourselves:
 
-| Name                   | Confirmed downloadable | Notes                                                      |
-| ---------------------- | ---------------------- | ---------------------------------------------------------- |
-| `UniRef100`            | –                      | not yet tested                                             |
-| `UniRef90`             | –                      | not yet tested                                             |
-| `UniRef50`             | –                      | default; tens of GB, not yet download-tested end-to-end    |
-| `UniProtKB`            | –                      | not yet tested                                             |
-| `UniProtKB/TrEMBL`     | –                      | not yet tested                                             |
-| `UniProtKB/Swiss-Prot` | 2026-09-01             | small (~90 MB), a good choice for a quick smoke test       |
-| `NR`                   | –                      | not yet tested                                             |
-| `GTDB`                 | –                      | not yet tested                                             |
-| `PDB`                  | –                      | download failed 2026-09-01: `ftp.wwpdb.org` didn't resolve |
+| Name                   | Confirmed downloadable | Notes                                                                                                                                                         |
+| ---------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `UniRef100`            | –                      | not yet tested                                                                                                                                                |
+| `UniRef90`             | –                      | not yet tested                                                                                                                                                |
+| `UniRef50`             | –                      | default; tens of GB, not yet download-tested end-to-end                                                                                                       |
+| `UniProtKB`            | –                      | not yet tested                                                                                                                                                |
+| `UniProtKB/TrEMBL`     | –                      | not yet tested                                                                                                                                                |
+| `UniProtKB/Swiss-Prot` | 2026-09-01             | small (~90 MB), a good choice for a quick smoke test                                                                                                          |
+| `NR`                   | –                      | not yet tested                                                                                                                                                |
+| `GTDB`                 | –                      | bacterial/archaeal genomes -- a strange choice as a homology reference for MetaEuk's eukaryote-targeted gene calling, but included since the tool supports it |
+| `PDB`                  | –                      | download failed 2026-09-01: `ftp.wwpdb.org` didn't resolve                                                                                                    |
 
 A dash means we simply haven't tried it, not that it's known broken -- update this table (with today's date) whenever you confirm one works, and add a short note if one fails.
 
