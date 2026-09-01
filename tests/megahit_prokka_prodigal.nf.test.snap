@@ -1,7 +1,7 @@
 {
     "-profile test_megahit_prokka_prodigal": {
         "content": [
-            65,
+            64,
             {
                 "BBMAP_ALIGN": {
                     "bbmap": 39.18
@@ -93,6 +93,9 @@
                     "readr": "2.2.0",
                     "stringr": "1.6.0"
                 },
+                "QUAST": {
+                    "quast": "5.3.0"
+                },
                 "SAMTOOLS_FLAGSTAT": {
                     "samtools": 1.24
                 },
@@ -117,14 +120,8 @@
                     "dplyr": "1.2.1",
                     "stringr": "1.6.0"
                 },
-                "TRANSRATE": {
-                    "transrate": "1.0.3"
-                },
                 "TRIMGALORE": {
                     "trimgalore": "2.3.0"
-                },
-                "UNPIGZ_CONTIGS": {
-                    "pigz": 2.8
                 },
                 "UNPIGZ_GFF": {
                     "pigz": 2.8
@@ -182,12 +179,14 @@
                 "multiqc/multiqc_data/multiqc_data.json",
                 "multiqc/multiqc_data/multiqc_fastqc.txt",
                 "multiqc/multiqc_data/multiqc_general_stats.txt",
-                "multiqc/multiqc_data/multiqc_megahit_assemblies.txt",
                 "multiqc/multiqc_data/multiqc_prodigal_stats.txt",
                 "multiqc/multiqc_data/multiqc_prokka.txt",
+                "multiqc/multiqc_data/multiqc_quast.txt",
                 "multiqc/multiqc_data/multiqc_software_versions.txt",
                 "multiqc/multiqc_data/multiqc_sources.txt",
                 "multiqc/multiqc_data/prokka_plot.txt",
+                "multiqc/multiqc_data/quast_num_contigs.txt",
+                "multiqc/multiqc_data/quast_table.txt",
                 "multiqc/multiqc_report.html",
                 "pipeline_info",
                 "pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml",
@@ -201,6 +200,26 @@
                 "prokka/prokka.faa.gz",
                 "prokka/prokka.ffn.gz",
                 "prokka/prokka.gff.gz",
+                "quast",
+                "quast/megahit",
+                "quast/megahit.tsv",
+                "quast/megahit/basic_stats",
+                "quast/megahit/basic_stats/GC_content_plot.pdf",
+                "quast/megahit/basic_stats/Nx_plot.pdf",
+                "quast/megahit/basic_stats/cumulative_plot.pdf",
+                "quast/megahit/basic_stats/megahit_assembly.contigs_GC_content_plot.pdf",
+                "quast/megahit/icarus.html",
+                "quast/megahit/icarus_viewers",
+                "quast/megahit/icarus_viewers/contig_size_viewer.html",
+                "quast/megahit/quast.log",
+                "quast/megahit/report.html",
+                "quast/megahit/report.pdf",
+                "quast/megahit/report.tex",
+                "quast/megahit/report.tsv",
+                "quast/megahit/report.txt",
+                "quast/megahit/transposed_report.tex",
+                "quast/megahit/transposed_report.tsv",
+                "quast/megahit/transposed_report.txt",
                 "samtools",
                 "samtools/SAMPLE1_PE.sorted.bam",
                 "samtools/SAMPLE1_PE.sorted.bam.bai",
@@ -221,9 +240,6 @@
                 "summary_tables/megahit.prokka.counts.tsv.gz",
                 "summary_tables/megahit.prokka.overall_stats.tsv.gz",
                 "summary_tables/megahit.prokka.prokka-annotations.tsv.gz",
-                "transrate",
-                "transrate/megahit.assemblies.csv",
-                "transrate/megahit.contigs.csv",
                 "trimgalore",
                 "trimgalore/SAMPLE1_PE_1.fastq.gz_trimming_report.txt",
                 "trimgalore/SAMPLE1_PE_2.fastq.gz_trimming_report.txt",
@@ -246,7 +262,9 @@
                 "trimgalore/fastqc/SAMPLE3_PE_1_2_val_2_fastqc.zip"
             ],
             [
-                "multiqc_citations.txt:md5,d59b1beea6256a7bf5f599da543910db"
+                "multiqc_citations.txt:md5,9af6aefe57f066cc7e3c782a93f48cf3",
+                "quast_num_contigs.txt:md5,915d8a72308188443dd674492b1cf32a",
+                "quast_table.txt:md5,dd8d34b3d003ac53314f49b613054139"
             ],
             [
                 "orf\tchr\tstart\tend\tstrand\tlength\tsample\tcount\ttpm"
@@ -263,7 +281,7 @@
                 "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tprodigal"
             ]
         ],
-        "timestamp": "2026-09-01T11:12:28.301044656",
+        "timestamp": "2026-09-01T16:05:26.425562137",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"
