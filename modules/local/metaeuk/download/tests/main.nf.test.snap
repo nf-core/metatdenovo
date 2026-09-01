@@ -4,19 +4,42 @@
             {
                 "0": [
                     [
-                        "UniRef50.dbtype:md5,d41d8cd98f00b204e9800998ecf8427e",
-                        "UniRef50.version:md5,d41d8cd98f00b204e9800998ecf8427e"
+                        "db.dbtype:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "db.version:md5,d41d8cd98f00b204e9800998ecf8427e"
                     ]
                 ],
                 "database": [
                     [
-                        "UniRef50.dbtype:md5,d41d8cd98f00b204e9800998ecf8427e",
-                        "UniRef50.version:md5,d41d8cd98f00b204e9800998ecf8427e"
+                        "db.dbtype:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "db.version:md5,d41d8cd98f00b204e9800998ecf8427e"
                     ]
                 ]
             }
         ],
-        "timestamp": "2026-09-01T08:33:10.297831203",
+        "timestamp": "2026-09-01T09:23:19.296351398",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
+    },
+    "UniProtKB/Swiss-Prot - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        "db.dbtype:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "db.version:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "database": [
+                    [
+                        "db.dbtype:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "db.version:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-09-01T09:23:33.378201564",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

@@ -24,11 +24,13 @@ input:
         download and build, e.g. `UniRef50` (run `metaeuk databases -h` for the full list)
 output:
   database:
-    - "${db_name}":
+    - "${db_dir}":
         type: directory
         description: Directory containing the mmseqs2-formatted reference database, ready
-          to pass as `database` to METAEUK_EASYPREDICT
-        pattern: "${db_name}"
+          to pass as `database` to METAEUK_EASYPREDICT. Named after db_name with any
+          characters unsafe for a directory name (e.g. the `/` in `UniProtKB/Swiss-Prot`)
+          replaced with `_`
+        pattern: "${db_dir}"
 authors:
   - "@erikrikarddaniel"
 maintainers:

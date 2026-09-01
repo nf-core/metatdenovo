@@ -30,4 +30,25 @@ nextflow_process {
 
     }
 
+    // A db_name with a `/` (e.g. UniProtKB/Swiss-Prot, from `metaeuk databases -h`) can't be
+    // used directly as a directory/prefix name -- this is the case that exercises db_dir.
+    test("UniProtKB/Swiss-Prot - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                input[0] = 'UniProtKB/Swiss-Prot'
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            assert snapshot(process.out).match()
+        }
+
+    }
+
 }

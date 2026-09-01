@@ -14,17 +14,23 @@ process METAEUK_DOWNLOAD {
     // reports no version itself -- METAEUK_EASYPREDICT already reports the same tool's version
     // on every run that reaches it.
     output:
-    path "${db_name}", emit: database
+    path "${db_dir}", emit: database
 
     when:
     task.ext.when == null || task.ext.when
 
     script:
+    // Some names `metaeuk databases -h` lists contain a `/` (e.g. UniProtKB/Swiss-Prot), which
+    // can't be a directory/prefix name -- db_dir is a filesystem-safe stand-in used only for
+    // that, kept distinct per db_name so storeDir doesn't reuse one database's cache for
+    // another. The prefix inside db_dir doesn't need to match db_name: METAEUK_EASYPREDICT finds
+    // it later from whichever *.version file is actually there.
+    db_dir = db_name.replaceAll('[^A-Za-z0-9_.-]', '_')
     def args = task.ext.args ?: ''
     """
     metaeuk databases \\
         ${db_name} \\
-        ${db_name}/${db_name} \\
+        ${db_dir}/db \\
         tmp/ \\
         ${args} \\
         --threads ${task.cpus}
@@ -33,9 +39,10 @@ process METAEUK_DOWNLOAD {
     """
 
     stub:
+    db_dir = db_name.replaceAll('[^A-Za-z0-9_.-]', '_')
     """
-    mkdir -p ${db_name}
-    touch ${db_name}/${db_name}.version
-    touch ${db_name}/${db_name}.dbtype
+    mkdir -p ${db_dir}
+    touch ${db_dir}/db.version
+    touch ${db_dir}/db.dbtype
     """
 }
