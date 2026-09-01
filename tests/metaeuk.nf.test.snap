@@ -215,9 +215,7 @@
             ],
             [
                 "multiqc_citations.txt:md5,2d1a8ef8ba06c7eada06ab3e96552ea4",
-                "multiqc_metaeuk_stats.txt:md5,be6038955478f96fdcaaa12d04c6d4a9",
-                "quast_num_contigs.txt:md5,ad38e1fee4de70ee5ea6c92bccce71cb",
-                "quast_table.txt:md5,ad1c5a643c6460904d4e516651718ed5"
+                "multiqc_metaeuk_stats.txt:md5,be6038955478f96fdcaaa12d04c6d4a9"
             ],
             16,
             [
@@ -227,7 +225,7 @@
                 "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tmetaeuk"
             ]
         ],
-        "timestamp": "2026-09-01T16:19:39.96188276",
+        "timestamp": "2026-09-01T17:37:04.376098894",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

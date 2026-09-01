@@ -65,10 +65,15 @@ metaeuk/*_format.faa.gz
 metaeuk/*_format.gff.gz
 # QUAST's quast.log and report.html/report.tex embed run timestamps and
 # work-directory-specific absolute paths, so only file presence (stable_path), not
-# content, is asserted; the numeric stats we actually care about are covered instead
-# through MultiQC's own parsed table (see the explicit assertions in the pipeline tests).
+# content, is asserted. MultiQC's own parsed quast tables are ignored too: MEGAHIT has
+# no fixed seed (see the MEGAHIT non-determinism note this repo already carries for
+# assembly-derived checksums), so N50/L50/largest-contig/GC%/etc. can shift slightly
+# between runs even though contig *count* usually doesn't -- confirmed flaky in CI on
+# quast_table.txt for both 'test' and 'test_kofamscan'.
 quast/**
 multiqc/multiqc_data/multiqc_quast.txt
+multiqc/multiqc_data/quast_table.txt
+multiqc/multiqc_data/quast_num_contigs.txt
 trimgalore/fastqc/*.{html,zip}
 trimgalore/*trimming_report.txt
 pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml
