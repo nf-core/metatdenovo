@@ -408,7 +408,18 @@
                 "metaeuk_db_name": {
                     "type": "string",
                     "default": "UniRef50",
-                    "description": "Name of the reference database to download and build for MetaEuk when `--metaeuk_db` isn't set. Must be one of the names `metaeuk databases -h` lists.",
+                    "enum": [
+                        "UniRef100",
+                        "UniRef90",
+                        "UniRef50",
+                        "UniProtKB",
+                        "UniProtKB/TrEMBL",
+                        "UniProtKB/Swiss-Prot",
+                        "NR",
+                        "GTDB",
+                        "PDB"
+                    ],
+                    "description": "Name of the amino-acid reference database to download and build for MetaEuk when `--metaeuk_db` isn't set. Restricted to the amino-acid databases `metaeuk databases -h` lists (its nucleotide/profile entries aren't valid MetaEuk homology references); see the table in usage.md for which of these we've actually confirmed downloadable.",
                     "fa_icon": "fas fa-download"
                 },
                 "metaeuk_db_dir": {

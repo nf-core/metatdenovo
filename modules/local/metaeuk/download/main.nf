@@ -28,6 +28,8 @@ process METAEUK_DOWNLOAD {
     db_dir = db_name.replaceAll('[^A-Za-z0-9_.-]', '_')
     def args = task.ext.args ?: ''
     """
+    mkdir -p ${db_dir}
+
     metaeuk databases \\
         ${db_name} \\
         ${db_dir}/db \\
