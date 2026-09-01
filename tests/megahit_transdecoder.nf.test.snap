@@ -1,7 +1,7 @@
 {
     "-profile test_megahit_transdecoder": {
         "content": [
-            55,
+            59,
             {
                 "BBMAP_ALIGN": {
                     "bbmap": 39.18
@@ -96,8 +96,28 @@
                     "dplyr": "1.2.1",
                     "stringr": "1.6.0"
                 },
+                "TRANSDECODER_BED_CAT": {
+                    "coreutils": 9.4,
+                    "find": "4.6.0",
+                    "pigz": 2.8
+                },
+                "TRANSDECODER_CDS_CAT": {
+                    "coreutils": 9.4,
+                    "find": "4.6.0",
+                    "pigz": 2.8
+                },
+                "TRANSDECODER_GFF_CAT": {
+                    "coreutils": 9.4,
+                    "find": "4.6.0",
+                    "pigz": 2.8
+                },
                 "TRANSDECODER_LONGORF": {
                     "transdecoder": "5.7.1"
+                },
+                "TRANSDECODER_PEP_CAT": {
+                    "coreutils": 9.4,
+                    "find": "4.6.0",
+                    "pigz": 2.8
                 },
                 "TRANSDECODER_PREDICT": {
                     "transdecoder": "5.7.1"
@@ -183,10 +203,10 @@
                 "summary_tables/megahit.transdecoder.counts.tsv.gz",
                 "summary_tables/megahit.transdecoder.overall_stats.tsv.gz",
                 "transdecoder",
-                "transdecoder/megahit_assembly.contigs.fa.transdecoder.bed.gz",
-                "transdecoder/megahit_assembly.contigs.fa.transdecoder.cds.gz",
-                "transdecoder/megahit_assembly.contigs.fa.transdecoder.gff3.gz",
-                "transdecoder/megahit_assembly.contigs.fa.transdecoder.pep.gz",
+                "transdecoder/megahit.transdecoder.bed.gz",
+                "transdecoder/megahit.transdecoder.cds.gz",
+                "transdecoder/megahit.transdecoder.gff3.gz",
+                "transdecoder/megahit.transdecoder.pep.gz",
                 "transrate",
                 "transrate/megahit.assemblies.csv",
                 "transrate/megahit.contigs.csv",
@@ -224,7 +244,7 @@
                 "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count"
             ]
         ],
-        "timestamp": "2026-08-28T11:22:21.696137354",
+        "timestamp": "2026-09-01T14:05:49.471680967",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

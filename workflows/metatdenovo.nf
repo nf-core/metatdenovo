@@ -496,7 +496,10 @@ workflow METATDENOVO {
     // SUBWORKFLOW: run TRANSDECODER. Orf caller alternative for eukaryotes.
     //
     if ( 'transdecoder' in orf_callers ) {
-        TRANSDECODER ( ch_assembly_contigs.map { _meta, contigs -> [ [id: "${assembly_name}.transdecoder", caller: 'transdecoder' ], contigs ] } )
+        TRANSDECODER (
+            ch_assembly_contigs.map { _meta, contigs -> [ [id: "${assembly_name}.transdecoder", caller: 'transdecoder' ], contigs ] },
+            params.transdecoder_batchsize
+        )
         ch_gff      = ch_gff.mix(TRANSDECODER.out.gff)
         ch_protein  = ch_protein.mix(TRANSDECODER.out.pep)
 
