@@ -8,6 +8,7 @@ keywords:
 components:
   - transdecoder/longorf
   - transdecoder/predict
+  - find/concatenate
 input:
   - fasta:
       type: file
@@ -15,6 +16,11 @@ input:
         Channel containing metadata and an assembly fasta file
         Structure: [ val(meta), path(fasta) ]
       pattern: "*.{fa,fasta,fa.gz,fasta.gz}"
+  - batchsize:
+      type: string
+      description: |
+        Size of the assembly batches TransDecoder is called on, e.g. '100.MB'.
+        Usually from params.transdecoder_batchsize
 output:
   - pep:
       type: file
