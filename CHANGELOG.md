@@ -26,7 +26,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Changed`
 
-- [#NN](https://github.com/nf-core/metatdenovo/pull/NN) - Run MetaEuk on the assembly split into batches (`--metaeuk_batchsize`), the same pattern already used for Prokka, so a killed or failed batch only costs re-running that batch instead of the whole assembly, and to bound `extractorfs`'s peak memory on very large assemblies, addresses part of [#486](https://github.com/nf-core/metatdenovo/issues/486) (@erikrikarddaniel)
 - [#483](https://github.com/nf-core/metatdenovo/pull/483) - Keep `COLLECT_FEATURECOUNTS` generic by moving the Transdecoder-specific `cds.` ORF-ID-prefix stripping into a new local post-processing module, `TIDYVERSE_STRIPCDSPREFIX`, matching the pattern nf-core/magmap already established for its own genome-accession join; no change to the output tables themselves, addresses [nf-core/magmap#237](https://github.com/nf-core/magmap/issues/237) (@erikrikarddaniel)
 - [#454](https://github.com/nf-core/metatdenovo/pull/454) - Template sync to nf-core/tools 4.1.0, update all vendored modules/subworkflows (@erikrikarddaniel)
 - [#452](https://github.com/nf-core/metatdenovo/pull/452) - Replace several local modules (`HMMRANK`, `UNPIGZ`, `TRANSDECODER`, `KOFAMSCAN`, `EGGNOGMAPPER`, `MEGAHIT`, `TRANSRATE`) with official nf-core/modules equivalents, addresses [#445](https://github.com/nf-core/metatdenovo/issues/445) (@erikrikarddaniel)
