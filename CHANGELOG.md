@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Added`
 
+- [#NN](https://github.com/nf-core/metatdenovo/pull/NN) - Make user-supplied ORFs (`--user_orfs_gff`/`--user_orfs_faa`, and a new `--user_orfs` CSV supporting multiple named sets, schema `assets/schema_user_orfs.json`) additive with `--orf_caller` instead of mutually exclusive with it, and let them participate in locus/protein consolidation like any other caller (@erikrikarddaniel)
 - [#492](https://github.com/nf-core/metatdenovo/pull/492) - Split TransDecoder's LongOrfs/Predict on transcripts batched by size (`--transdecoder_batchsize`), same mechanism as Prokka/MetaEuk batching, bounding memory and limiting how much work a killed/failed batch loses; note that TransDecoder.Predict self-trains its coding model per batch, so a very large batch size recovers the exact unbatched behaviour, addresses part of [#486](https://github.com/nf-core/metatdenovo/issues/486) (@erikrikarddaniel)
 - [#492](https://github.com/nf-core/metatdenovo/pull/492) - Split MetaEuk's ORF calling on assembly contigs batched by size (`--metaeuk_batchsize`), same mechanism as Prokka batching, addresses part of [#486](https://github.com/nf-core/metatdenovo/issues/486) (@erikrikarddaniel)
 - [#482](https://github.com/nf-core/metatdenovo/pull/482) - Document why BBMap, rather than e.g. Bowtie2, is used for read mapping and contaminant removal in `conf/modules.config` (@erikrikarddaniel)
