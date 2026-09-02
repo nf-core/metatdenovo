@@ -1,7 +1,7 @@
 {
     "-profile test_bbmap_ambiguous": {
         "content": [
-            52,
+            51,
             {
                 "BBMAP_ALIGN": {
                     "bbmap": 39.18
@@ -15,14 +15,6 @@
                 "CAT_FASTQ": {
                     "cat": 9.5
                 },
-                "COLLECT_FEATURECOUNTS": {
-                    "R": "4.5.3",
-                    "dplyr": "1.2.1",
-                    "readr": "2.2.0",
-                    "stringr": "1.6.0",
-                    "dtplyr": "1.3.3",
-                    "data.table": "1.17.8"
-                },
                 "COLLECT_LOCUSCONSOLIDATE": {
                     "R": "4.5.3",
                     "dplyr": "1.2.1",
@@ -31,13 +23,21 @@
                     "dtplyr": "1.3.3",
                     "data.table": "1.17.8"
                 },
-                "COLLECT_STATS": {
+                "CUSTOM_COLLECTFEATURECOUNTS": {
                     "R": "4.5.3",
                     "dplyr": "1.2.1",
                     "readr": "2.2.0",
-                    "purrr": "1.2.2",
-                    "tidyr": "1.3.2",
-                    "stringr": "1.6.0"
+                    "stringr": "1.6.0",
+                    "dtplyr": "1.3.3",
+                    "data.table": "1.17.8"
+                },
+                "CUSTOM_COLLECTSTATS": {
+                    "R": "4.3.1",
+                    "dplyr": "1.1.4",
+                    "readr": "2.1.5",
+                    "purrr": "1.1.0",
+                    "tidyr": "1.3.1",
+                    "stringr": "1.5.2"
                 },
                 "FASTQC": {
                     "fastqc": "0.12.1"
@@ -66,6 +66,9 @@
                 "PRODIGAL_MODULE": {
                     "prodigal": "2.6.3"
                 },
+                "QUAST": {
+                    "quast": "5.3.0"
+                },
                 "SAMTOOLS_FLAGSTAT": {
                     "samtools": 1.24
                 },
@@ -90,14 +93,8 @@
                     "dplyr": "1.2.1",
                     "stringr": "1.6.0"
                 },
-                "TRANSRATE": {
-                    "transrate": "1.0.3"
-                },
                 "TRIMGALORE": {
                     "trimgalore": "2.3.0"
-                },
-                "UNPIGZ_CONTIGS": {
-                    "pigz": 2.8
                 },
                 "UNPIGZ_GFF": {
                     "pigz": 2.8
@@ -149,10 +146,12 @@
                 "multiqc/multiqc_data/multiqc_data.json",
                 "multiqc/multiqc_data/multiqc_fastqc.txt",
                 "multiqc/multiqc_data/multiqc_general_stats.txt",
-                "multiqc/multiqc_data/multiqc_megahit_assemblies.txt",
                 "multiqc/multiqc_data/multiqc_prodigal_stats.txt",
+                "multiqc/multiqc_data/multiqc_quast.txt",
                 "multiqc/multiqc_data/multiqc_software_versions.txt",
                 "multiqc/multiqc_data/multiqc_sources.txt",
+                "multiqc/multiqc_data/quast_num_contigs.txt",
+                "multiqc/multiqc_data/quast_table.txt",
                 "multiqc/multiqc_report.html",
                 "pipeline_info",
                 "pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml",
@@ -162,6 +161,26 @@
                 "prodigal/megahit.prodigal.gff.gz",
                 "prodigal/megahit.prodigal_all.txt.gz",
                 "prodigal/megahit.prodigal_format.gff.gz",
+                "quast",
+                "quast/megahit",
+                "quast/megahit.tsv",
+                "quast/megahit/basic_stats",
+                "quast/megahit/basic_stats/GC_content_plot.pdf",
+                "quast/megahit/basic_stats/Nx_plot.pdf",
+                "quast/megahit/basic_stats/cumulative_plot.pdf",
+                "quast/megahit/basic_stats/megahit_assembly.contigs_GC_content_plot.pdf",
+                "quast/megahit/icarus.html",
+                "quast/megahit/icarus_viewers",
+                "quast/megahit/icarus_viewers/contig_size_viewer.html",
+                "quast/megahit/quast.log",
+                "quast/megahit/report.html",
+                "quast/megahit/report.pdf",
+                "quast/megahit/report.tex",
+                "quast/megahit/report.tsv",
+                "quast/megahit/report.txt",
+                "quast/megahit/transposed_report.tex",
+                "quast/megahit/transposed_report.tsv",
+                "quast/megahit/transposed_report.txt",
                 "samtools",
                 "samtools/SAMPLE1_PE.sorted.bam",
                 "samtools/SAMPLE1_PE.sorted.bam.bai",
@@ -179,9 +198,6 @@
                 "summary_tables/megahit.locus_consolidate.counts.tsv.gz",
                 "summary_tables/megahit.prodigal.counts.tsv.gz",
                 "summary_tables/megahit.prodigal.overall_stats.tsv.gz",
-                "transrate",
-                "transrate/megahit.assemblies.csv",
-                "transrate/megahit.contigs.csv",
                 "trimgalore",
                 "trimgalore/SAMPLE1_PE_1.fastq.gz_trimming_report.txt",
                 "trimgalore/SAMPLE1_PE_2.fastq.gz_trimming_report.txt",
@@ -204,13 +220,13 @@
                 "trimgalore/fastqc/SAMPLE3_PE_1_2_val_2_fastqc.zip"
             ],
             [
-                "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f"
+                "multiqc_citations.txt:md5,2d1a8ef8ba06c7eada06ab3e96552ea4"
             ],
             [
                 "orf\tchr\tstart\tend\tstrand\tlength\tsample\tcount\ttpm"
             ]
         ],
-        "timestamp": "2026-08-28T11:47:50.121416808",
+        "timestamp": "2026-09-01T16:58:55.603649122",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

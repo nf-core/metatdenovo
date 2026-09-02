@@ -1,7 +1,7 @@
 {
     "-profile test_metaeuk": {
         "content": [
-            51,
+            48,
             {
                 "BBMAP_ALIGN": {
                     "bbmap": 39.18
@@ -12,14 +12,6 @@
                 "BEDTOOLS_SORT": {
                     "bedtools": "2.31.1"
                 },
-                "COLLECT_FEATURECOUNTS": {
-                    "R": "4.5.3",
-                    "dplyr": "1.2.1",
-                    "readr": "2.2.0",
-                    "stringr": "1.6.0",
-                    "dtplyr": "1.3.3",
-                    "data.table": "1.17.8"
-                },
                 "COLLECT_LOCUSCONSOLIDATE": {
                     "R": "4.5.3",
                     "dplyr": "1.2.1",
@@ -28,13 +20,21 @@
                     "dtplyr": "1.3.3",
                     "data.table": "1.17.8"
                 },
-                "COLLECT_STATS": {
+                "CUSTOM_COLLECTFEATURECOUNTS": {
                     "R": "4.5.3",
                     "dplyr": "1.2.1",
                     "readr": "2.2.0",
-                    "purrr": "1.2.2",
-                    "tidyr": "1.3.2",
-                    "stringr": "1.6.0"
+                    "stringr": "1.6.0",
+                    "dtplyr": "1.3.3",
+                    "data.table": "1.17.8"
+                },
+                "CUSTOM_COLLECTSTATS": {
+                    "R": "4.3.1",
+                    "dplyr": "1.1.4",
+                    "readr": "2.1.5",
+                    "purrr": "1.1.0",
+                    "tidyr": "1.3.1",
+                    "stringr": "1.5.2"
                 },
                 "FASTQC": {
                     "fastqc": "0.12.1"
@@ -60,15 +60,8 @@
                 "METAEUK_EASYPREDICT": {
                     "metaeuk": "6.a5d39d9"
                 },
-                "METAEUK_FAA_CAT": {
-                    "coreutils": 9.4,
-                    "find": "4.6.0",
-                    "pigz": 2.8
-                },
-                "METAEUK_GFF_CAT": {
-                    "coreutils": 9.4,
-                    "find": "4.6.0",
-                    "pigz": 2.8
+                "QUAST": {
+                    "quast": "5.3.0"
                 },
                 "SAMTOOLS_FLAGSTAT": {
                     "samtools": 1.24
@@ -94,14 +87,8 @@
                     "dplyr": "1.2.1",
                     "stringr": "1.6.0"
                 },
-                "TRANSRATE": {
-                    "transrate": "1.0.3"
-                },
                 "TRIMGALORE": {
                     "trimgalore": "2.3.0"
-                },
-                "UNPIGZ_CONTIGS": {
-                    "pigz": 2.8
                 },
                 "UNPIGZ_GFF": {
                     "pigz": 2.8
@@ -133,6 +120,10 @@
                 "megahit/megahit_assembly.contigs.fa.gz",
                 "megahit/megahit_assembly.log",
                 "metaeuk",
+                "metaeuk/megahit.metaeuk.codon.fas",
+                "metaeuk/megahit.metaeuk.fas",
+                "metaeuk/megahit.metaeuk.gff",
+                "metaeuk/megahit.metaeuk.headersMap.tsv",
                 "metaeuk/megahit.metaeuk_format.faa.gz",
                 "metaeuk/megahit.metaeuk_format.gff.gz",
                 "multiqc",
@@ -155,13 +146,35 @@
                 "multiqc/multiqc_data/multiqc_data.json",
                 "multiqc/multiqc_data/multiqc_fastqc.txt",
                 "multiqc/multiqc_data/multiqc_general_stats.txt",
-                "multiqc/multiqc_data/multiqc_megahit_assemblies.txt",
                 "multiqc/multiqc_data/multiqc_metaeuk_stats.txt",
+                "multiqc/multiqc_data/multiqc_quast.txt",
                 "multiqc/multiqc_data/multiqc_software_versions.txt",
                 "multiqc/multiqc_data/multiqc_sources.txt",
+                "multiqc/multiqc_data/quast_num_contigs.txt",
+                "multiqc/multiqc_data/quast_table.txt",
                 "multiqc/multiqc_report.html",
                 "pipeline_info",
                 "pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml",
+                "quast",
+                "quast/megahit",
+                "quast/megahit.tsv",
+                "quast/megahit/basic_stats",
+                "quast/megahit/basic_stats/GC_content_plot.pdf",
+                "quast/megahit/basic_stats/Nx_plot.pdf",
+                "quast/megahit/basic_stats/cumulative_plot.pdf",
+                "quast/megahit/basic_stats/megahit_assembly.contigs_GC_content_plot.pdf",
+                "quast/megahit/icarus.html",
+                "quast/megahit/icarus_viewers",
+                "quast/megahit/icarus_viewers/contig_size_viewer.html",
+                "quast/megahit/quast.log",
+                "quast/megahit/report.html",
+                "quast/megahit/report.pdf",
+                "quast/megahit/report.tex",
+                "quast/megahit/report.tsv",
+                "quast/megahit/report.txt",
+                "quast/megahit/transposed_report.tex",
+                "quast/megahit/transposed_report.tsv",
+                "quast/megahit/transposed_report.txt",
                 "samtools",
                 "samtools/RPL28_GENOMIC.sorted.bam",
                 "samtools/RPL28_GENOMIC.sorted.bam.bai",
@@ -179,9 +192,6 @@
                 "summary_tables/megahit.locus_consolidate.counts.tsv.gz",
                 "summary_tables/megahit.metaeuk.counts.tsv.gz",
                 "summary_tables/megahit.metaeuk.overall_stats.tsv.gz",
-                "transrate",
-                "transrate/megahit.assemblies.csv",
-                "transrate/megahit.contigs.csv",
                 "trimgalore",
                 "trimgalore/RPL28_GENOMIC_1.fastq.gz_trimming_report.txt",
                 "trimgalore/RPL28_GENOMIC_2.fastq.gz_trimming_report.txt",
@@ -204,7 +214,7 @@
                 "trimgalore/fastqc/RPL28_MRNA_RECODED_2_val_2_fastqc.zip"
             ],
             [
-                "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f",
+                "multiqc_citations.txt:md5,2d1a8ef8ba06c7eada06ab3e96552ea4",
                 "multiqc_metaeuk_stats.txt:md5,be6038955478f96fdcaaa12d04c6d4a9"
             ],
             16,
@@ -212,10 +222,10 @@
                 "orf\tchr\tstart\tend\tstrand\tlength\tsample\tcount\ttpm"
             ],
             [
-                "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count"
+                "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tmetaeuk"
             ]
         ],
-        "timestamp": "2026-08-30T21:00:16.491108698",
+        "timestamp": "2026-09-01T17:37:04.376098894",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

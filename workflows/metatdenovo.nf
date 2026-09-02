@@ -7,10 +7,8 @@
 //
 // MODULE: local
 //
-include { COLLECT_FEATURECOUNTS              } from '../modules/local/collect/featurecounts/'
 include { COLLECT_LOCUSCONSOLIDATE           } from '../modules/local/collect/locusconsolidate/'
 include { COLLECT_PROTEINCONSOLIDATE         } from '../modules/local/collect/proteinconsolidate/'
-include { COLLECT_STATS                      } from '../modules/local/collect/stats/'
 include { FORMAT_CLUSTERREPS                 } from '../modules/local/format/clusterreps/'
 include { FORMAT_GFF2BED                     } from '../modules/local/format/gff2bed/'
 include { FORMAT_LOCUSCONSOLIDATE            } from '../modules/local/format/locusconsolidate/'
@@ -21,7 +19,6 @@ include { FORMAT_DIAMOND_TAX_RANKLIST        } from '../modules/local/diamond/fo
 include { FORMAT_DIAMOND_TAX_TAXDUMP         } from '../modules/local/diamond/format_tax/taxdump/'
 include { SUMTAXONOMY as SUM_DIAMONDTAX      } from '../modules/local/sumtaxonomy/'
 include { TIDYVERSE_STRIPCDSPREFIX           } from '../modules/local/tidyverse/stripcdsprefix/'
-include { TRANSRATE                          } from '../modules/nf-core/transrate/'
 include { WRITESPADESYAML                    } from '../modules/local/spades/writeyaml/'
 
 
@@ -62,6 +59,8 @@ include { BBMAP_INDEX                                } from '../modules/nf-core/
 include { BEDTOOLS_SORT                              } from '../modules/nf-core/bedtools/sort/'
 include { SEQKIT_GREP                                } from '../modules/nf-core/seqkit/grep/'
 include { CAT_FASTQ            	                     } from '../modules/nf-core/cat/fastq/'
+include { CUSTOM_COLLECTFEATURECOUNTS                } from '../modules/nf-core/custom/collectfeaturecounts/main'
+include { CUSTOM_COLLECTSTATS                        } from '../modules/nf-core/custom/collectstats/main'
 include { DIAMOND_BLASTP as DIAMOND_TAXONOMY         } from '../modules/nf-core/diamond/blastp/'
 include { FASTQC                                     } from '../modules/nf-core/fastqc/'
 include { MEGAHIT                                    } from '../modules/nf-core/megahit/'
@@ -75,8 +74,8 @@ include { PIGZ_COMPRESS as PIGZ_TRANSDECODER_BED     } from '../modules/nf-core/
 include { PIGZ_COMPRESS as PIGZ_TRANSDECODER_CDS     } from '../modules/nf-core/pigz/compress/'
 include { PIGZ_COMPRESS as PIGZ_TRANSDECODER_GFF     } from '../modules/nf-core/pigz/compress/'
 include { PIGZ_COMPRESS as PIGZ_TRANSDECODER_PEP     } from '../modules/nf-core/pigz/compress/'
-include { PIGZ_UNCOMPRESS as UNPIGZ_CONTIGS          } from '../modules/nf-core/pigz/uncompress/'
 include { PIGZ_UNCOMPRESS as UNPIGZ_GFF              } from '../modules/nf-core/pigz/uncompress/'
+include { QUAST                                      } from '../modules/nf-core/quast/'
 include { SEQTK_MERGEPE                              } from '../modules/nf-core/seqtk/mergepe/'
 include { SEQTK_SEQ as SEQTK_SEQ_CONTIG_FILTER       } from '../modules/nf-core/seqtk/seq/'
 include { SPADES                                     } from '../modules/nf-core/spades/'
@@ -754,7 +753,7 @@ workflow METATDENOVO {
         }
 
     // Locus-consolidated counts get their own collect module (provenance join), branched out here
-    // so COLLECT_FEATURECOUNTS itself -- and every other caller's table -- stays untouched.
+    // so CUSTOM_COLLECTFEATURECOUNTS itself -- and every other caller's table -- stays untouched.
     // Keyed by meta.id (not .combine(), which would cross-join every assembly's featureCounts
     // group against every assembly's provenance file if this pipeline ever ran multiple
     // simultaneous assemblies) -- matches ch_featurecounts/ch_collect_feature's own convention
@@ -792,28 +791,27 @@ workflow METATDENOVO {
         ch_protein_consolidate_counts = COLLECT_PROTEINCONSOLIDATE.out.counts
     }
 
-    COLLECT_FEATURECOUNTS ( ch_collect_feature.other )
-    ch_versions           = ch_versions.mix(COLLECT_FEATURECOUNTS.out.versions)
+    CUSTOM_COLLECTFEATURECOUNTS ( ch_collect_feature.other )
 
-    // COLLECT_FEATURECOUNTS itself is kept generic (no Transdecoder-specific ID handling), so this
+    // CUSTOM_COLLECTFEATURECOUNTS itself is kept generic (no Transdecoder-specific ID handling), so this
     // caller-agnostic strip -- a no-op for every caller but transdecoder -- happens as a separate
     // post-processing step, matching the id-reconciliation pattern nf-core/magmap already
     // established for its own genome-accession join (see nf-core/magmap#238).
-    TIDYVERSE_STRIPCDSPREFIX ( COLLECT_FEATURECOUNTS.out.counts )
+    TIDYVERSE_STRIPCDSPREFIX ( CUSTOM_COLLECTFEATURECOUNTS.out.counts )
     ch_versions           = ch_versions.mix(TIDYVERSE_STRIPCDSPREFIX.out.versions)
 
     // [ meta(caller), tsv ] -- kept as a proper tuple (not stripped) so every consumer below can
     // join it against other per-caller channels instead of relying on positional channel pairing.
     //
     // The cluster representatives are annotated as just another caller, so their counts have to be
-    // available to the annotation subworkflows on the same footing. This also keeps COLLECT_STATS
+    // available to the annotation subworkflows on the same footing. This also keeps CUSTOM_COLLECTSTATS
     // correct: it left-joins MERGE_TABLES's output onto this channel with remainder: true, so a
     // caller present in ch_merge_tables but missing here would emit an entry with a null meta that
-    // COLLECT_STATS cannot consume. Empty, hence a no-op, when consolidation is skipped.
+    // CUSTOM_COLLECTSTATS cannot consume. Empty, hence a no-op, when consolidation is skipped.
     ch_counts_per_caller  = TIDYVERSE_STRIPCDSPREFIX.out.counts.mix(ch_protein_consolidate_counts)
     ch_fcs_for_summary    = ch_counts_per_caller
 
-    // Initialize ch_merge_tables that will be populated with tables from annotation tools and used by the MERGE_TABLES module which output will then be passed to the COLLECT_STATS module
+    // Initialize ch_merge_tables that will be populated with tables from annotation tools and used by the MERGE_TABLES module which output will then be passed to the CUSTOM_COLLECTSTATS module
     ch_merge_tables = channel.empty()
 
     //
@@ -841,17 +839,15 @@ workflow METATDENOVO {
         ch_merge_tables = ch_merge_tables.mix ( DBCAN.out.sumtable )
     }
 
-    // set up contig channel to use in TransRate
-    UNPIGZ_CONTIGS(ch_assembly_contigs)
-    ch_unzipped_contigs = UNPIGZ_CONTIGS.out.file
-
     //
-    // MODULE: Use TransRate to judge assembly quality, piped into MultiQC
+    // MODULE: Use QUAST to judge assembly quality, piped into MultiQC via its native report.tsv parser
     //
-    TRANSRATE(ch_unzipped_contigs.map { meta, contigs -> [ meta, contigs, [] ] })
-    ch_multiqc_files = ch_multiqc_files.mix(
-        TRANSRATE.out.assemblies.collectFile { meta, csv -> [ "${meta.id}_assemblies_mqc.csv", csv.text ] }
+    QUAST(
+        ch_assembly_contigs,
+        channel.value([ [:], [] ]),
+        channel.value([ [:], [] ])
     )
+    ch_multiqc_files = ch_multiqc_files.mix(QUAST.out.results.map { _meta, dir -> dir })
 
     //
     // SUBWORKFLOW: Eukulele
@@ -961,10 +957,10 @@ workflow METATDENOVO {
             .map { caller, tsvs -> [ [ id: "${assembly_name}.${caller}", caller: caller ], tsvs ] }
     )
 
-    // COLLECT_STATS must still run once per ACTIVE caller regardless of whether that caller got a
-    // MERGE_TABLES output -- left-join (remainder: true) onto COLLECT_FEATURECOUNTS.out.counts (which
+    // CUSTOM_COLLECTSTATS must still run once per ACTIVE caller regardless of whether that caller got a
+    // MERGE_TABLES output -- left-join (remainder: true) onto CUSTOM_COLLECTFEATURECOUNTS.out.counts (which
     // always has exactly one item per active caller) so a caller with no annotation tables still gets
-    // a COLLECT_STATS invocation, with mergetab defaulting to [] -- COLLECT_STATS's own script already
+    // a CUSTOM_COLLECTSTATS invocation, with mergetab defaulting to [] -- CUSTOM_COLLECTSTATS's own script already
     // handles a missing mergetab gracefully (`if (mergetab) {...} else {...}`), mirroring what the
     // pre-multi-caller code's `.ifEmpty { [ [] ] }` fallback did for the single-run case.
     ch_fcs_mergetab_per_caller = ch_counts_per_caller
@@ -975,7 +971,7 @@ workflow METATDENOVO {
         )
         // remainder: true also emits right-only entries, i.e. a caller that produced annotation tables
         // but no counts. That cannot happen for any reachable config today, but it would arrive here
-        // as a null meta and kill COLLECT_STATS on tag "$meta.id" -- drop it instead, so a future
+        // as a null meta and kill CUSTOM_COLLECTSTATS on tag "$meta.id" -- drop it instead, so a future
         // wiring mistake degrades to a missing stats row rather than a crash far from its cause.
         .filter { _caller, meta, _fcs, _mergetab -> meta != null }
         .map { _caller, meta, fcs, mergetab -> [ meta, fcs, mergetab ?: [] ] }
@@ -983,10 +979,15 @@ workflow METATDENOVO {
     ch_collect_stats = ch_collect_stats
         .combine( ch_fcs_mergetab_per_caller )
         .map { _origMeta, samples, trimlogs, bblogs, idxstats, callerMeta, fcs, mergetab ->
-            [ callerMeta, samples, trimlogs, bblogs, idxstats, fcs, mergetab ]
+            // CUSTOM_COLLECTSTATS's `fcs` input accepts one or more files and derives each one's
+            // feature-count column name from the text between the first and second dot of its
+            // filename -- wrapped in a list here so a single caller's counts file (named
+            // "<assembly>.<caller>.counts.tsv.gz") still stages as a list, giving a column named
+            // after the caller.
+            [ callerMeta, samples, trimlogs, bblogs, idxstats, [ fcs ], mergetab ]
         }
 
-    COLLECT_STATS(ch_collect_stats)
+    CUSTOM_COLLECTSTATS(ch_collect_stats)
 
     //
     // MODULE: MultiQC

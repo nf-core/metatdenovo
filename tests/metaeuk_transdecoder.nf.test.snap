@@ -1,7 +1,7 @@
 {
     "-profile test_metaeuk_transdecoder": {
         "content": [
-            76,
+            69,
             {
                 "BBMAP_ALIGN": {
                     "bbmap": 39.18
@@ -11,14 +11,6 @@
                 },
                 "BEDTOOLS_SORT": {
                     "bedtools": "2.31.1"
-                },
-                "COLLECT_FEATURECOUNTS": {
-                    "R": "4.5.3",
-                    "dplyr": "1.2.1",
-                    "readr": "2.2.0",
-                    "stringr": "1.6.0",
-                    "dtplyr": "1.3.3",
-                    "data.table": "1.17.8"
                 },
                 "COLLECT_LOCUSCONSOLIDATE": {
                     "R": "4.5.3",
@@ -36,13 +28,21 @@
                     "dtplyr": "1.3.3",
                     "data.table": "1.17.8"
                 },
-                "COLLECT_STATS": {
+                "CUSTOM_COLLECTFEATURECOUNTS": {
                     "R": "4.5.3",
                     "dplyr": "1.2.1",
                     "readr": "2.2.0",
-                    "purrr": "1.2.2",
-                    "tidyr": "1.3.2",
-                    "stringr": "1.6.0"
+                    "stringr": "1.6.0",
+                    "dtplyr": "1.3.3",
+                    "data.table": "1.17.8"
+                },
+                "CUSTOM_COLLECTSTATS": {
+                    "R": "4.3.1",
+                    "dplyr": "1.1.4",
+                    "readr": "2.1.5",
+                    "purrr": "1.1.0",
+                    "tidyr": "1.3.1",
+                    "stringr": "1.5.2"
                 },
                 "FASTQC": {
                     "fastqc": "0.12.1"
@@ -74,16 +74,6 @@
                 "METAEUK_EASYPREDICT": {
                     "metaeuk": "6.a5d39d9"
                 },
-                "METAEUK_FAA_CAT": {
-                    "coreutils": 9.4,
-                    "find": "4.6.0",
-                    "pigz": 2.8
-                },
-                "METAEUK_GFF_CAT": {
-                    "coreutils": 9.4,
-                    "find": "4.6.0",
-                    "pigz": 2.8
-                },
                 "MMSEQS_CREATEDB": {
                     "mmseqs": "18.8cc5c"
                 },
@@ -104,6 +94,9 @@
                 },
                 "PIGZ_TRANSDECODER_PEP": {
                     "pigz": 2.8
+                },
+                "QUAST": {
+                    "quast": "5.3.0"
                 },
                 "SAMTOOLS_FLAGSTAT": {
                     "samtools": 1.24
@@ -132,40 +125,14 @@
                     "dplyr": "1.2.1",
                     "stringr": "1.6.0"
                 },
-                "TRANSDECODER_BED_CAT": {
-                    "coreutils": 9.4,
-                    "find": "4.6.0",
-                    "pigz": 2.8
-                },
-                "TRANSDECODER_CDS_CAT": {
-                    "coreutils": 9.4,
-                    "find": "4.6.0",
-                    "pigz": 2.8
-                },
-                "TRANSDECODER_GFF_CAT": {
-                    "coreutils": 9.4,
-                    "find": "4.6.0",
-                    "pigz": 2.8
-                },
                 "TRANSDECODER_LONGORF": {
                     "transdecoder": "5.7.1"
-                },
-                "TRANSDECODER_PEP_CAT": {
-                    "coreutils": 9.4,
-                    "find": "4.6.0",
-                    "pigz": 2.8
                 },
                 "TRANSDECODER_PREDICT": {
                     "transdecoder": "5.7.1"
                 },
-                "TRANSRATE": {
-                    "transrate": "1.0.3"
-                },
                 "TRIMGALORE": {
                     "trimgalore": "2.3.0"
-                },
-                "UNPIGZ_CONTIGS": {
-                    "pigz": 2.8
                 },
                 "UNPIGZ_GFF": {
                     "pigz": 2.8
@@ -203,6 +170,10 @@
                 "megahit/megahit_assembly.contigs.fa.gz",
                 "megahit/megahit_assembly.log",
                 "metaeuk",
+                "metaeuk/megahit.metaeuk.codon.fas",
+                "metaeuk/megahit.metaeuk.fas",
+                "metaeuk/megahit.metaeuk.gff",
+                "metaeuk/megahit.metaeuk.headersMap.tsv",
                 "metaeuk/megahit.metaeuk_format.faa.gz",
                 "metaeuk/megahit.metaeuk_format.gff.gz",
                 "multiqc",
@@ -225,17 +196,39 @@
                 "multiqc/multiqc_data/multiqc_data.json",
                 "multiqc/multiqc_data/multiqc_fastqc.txt",
                 "multiqc/multiqc_data/multiqc_general_stats.txt",
-                "multiqc/multiqc_data/multiqc_megahit_assemblies.txt",
                 "multiqc/multiqc_data/multiqc_metaeuk_stats.txt",
+                "multiqc/multiqc_data/multiqc_quast.txt",
                 "multiqc/multiqc_data/multiqc_software_versions.txt",
                 "multiqc/multiqc_data/multiqc_sources.txt",
                 "multiqc/multiqc_data/multiqc_transdecoder_stats.txt",
+                "multiqc/multiqc_data/quast_num_contigs.txt",
+                "multiqc/multiqc_data/quast_table.txt",
                 "multiqc/multiqc_report.html",
                 "pipeline_info",
                 "pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml",
                 "protein_consolidate",
                 "protein_consolidate/megahit.protein_consolidate_99.clusters.tsv",
                 "protein_consolidate/megahit.protein_consolidate_99.representatives.fa.gz",
+                "quast",
+                "quast/megahit",
+                "quast/megahit.tsv",
+                "quast/megahit/basic_stats",
+                "quast/megahit/basic_stats/GC_content_plot.pdf",
+                "quast/megahit/basic_stats/Nx_plot.pdf",
+                "quast/megahit/basic_stats/cumulative_plot.pdf",
+                "quast/megahit/basic_stats/megahit_assembly.contigs_GC_content_plot.pdf",
+                "quast/megahit/icarus.html",
+                "quast/megahit/icarus_viewers",
+                "quast/megahit/icarus_viewers/contig_size_viewer.html",
+                "quast/megahit/quast.log",
+                "quast/megahit/report.html",
+                "quast/megahit/report.pdf",
+                "quast/megahit/report.tex",
+                "quast/megahit/report.tsv",
+                "quast/megahit/report.txt",
+                "quast/megahit/transposed_report.tex",
+                "quast/megahit/transposed_report.tsv",
+                "quast/megahit/transposed_report.txt",
                 "samtools",
                 "samtools/RPL28_GENOMIC.sorted.bam",
                 "samtools/RPL28_GENOMIC.sorted.bam.bai",
@@ -258,13 +251,10 @@
                 "summary_tables/megahit.transdecoder.counts.tsv.gz",
                 "summary_tables/megahit.transdecoder.overall_stats.tsv.gz",
                 "transdecoder",
-                "transdecoder/megahit.transdecoder.bed.gz",
-                "transdecoder/megahit.transdecoder.cds.gz",
-                "transdecoder/megahit.transdecoder.gff3.gz",
-                "transdecoder/megahit.transdecoder.pep.gz",
-                "transrate",
-                "transrate/megahit.assemblies.csv",
-                "transrate/megahit.contigs.csv",
+                "transdecoder/megahit_assembly.contigs.fa.transdecoder.bed.gz",
+                "transdecoder/megahit_assembly.contigs.fa.transdecoder.cds.gz",
+                "transdecoder/megahit_assembly.contigs.fa.transdecoder.gff3.gz",
+                "transdecoder/megahit_assembly.contigs.fa.transdecoder.pep.gz",
                 "trimgalore",
                 "trimgalore/RPL28_GENOMIC_1.fastq.gz_trimming_report.txt",
                 "trimgalore/RPL28_GENOMIC_2.fastq.gz_trimming_report.txt",
@@ -287,7 +277,7 @@
                 "trimgalore/fastqc/RPL28_MRNA_RECODED_2_val_2_fastqc.zip"
             ],
             [
-                "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f",
+                "multiqc_citations.txt:md5,2d1a8ef8ba06c7eada06ab3e96552ea4",
                 "multiqc_metaeuk_stats.txt:md5,be6038955478f96fdcaaa12d04c6d4a9"
             ],
             [
@@ -309,7 +299,7 @@
                 "k59_1.p1\tk59_1\t183\t611\t+\t429\tRPL28_GENOMIC\t12\t153410.553411\ttransdecoder\t1\t1\tk59_1.p1"
             ]
         ],
-        "timestamp": "2026-09-01T14:40:58.624501699",
+        "timestamp": "2026-09-01T17:39:14.421007467",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

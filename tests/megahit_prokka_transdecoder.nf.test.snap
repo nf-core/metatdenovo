@@ -1,7 +1,7 @@
 {
     "-profile test_megahit_prokka_transdecoder": {
         "content": [
-            96,
+            91,
             {
                 "BBMAP_ALIGN": {
                     "bbmap": 39.18
@@ -15,14 +15,6 @@
                 "CAT_FASTQ": {
                     "cat": 9.5
                 },
-                "COLLECT_FEATURECOUNTS": {
-                    "R": "4.5.3",
-                    "dplyr": "1.2.1",
-                    "readr": "2.2.0",
-                    "stringr": "1.6.0",
-                    "dtplyr": "1.3.3",
-                    "data.table": "1.17.8"
-                },
                 "COLLECT_LOCUSCONSOLIDATE": {
                     "R": "4.5.3",
                     "dplyr": "1.2.1",
@@ -31,13 +23,21 @@
                     "dtplyr": "1.3.3",
                     "data.table": "1.17.8"
                 },
-                "COLLECT_STATS": {
+                "CUSTOM_COLLECTFEATURECOUNTS": {
                     "R": "4.5.3",
                     "dplyr": "1.2.1",
                     "readr": "2.2.0",
-                    "purrr": "1.2.2",
-                    "tidyr": "1.3.2",
-                    "stringr": "1.6.0"
+                    "stringr": "1.6.0",
+                    "dtplyr": "1.3.3",
+                    "data.table": "1.17.8"
+                },
+                "CUSTOM_COLLECTSTATS": {
+                    "R": "4.3.1",
+                    "dplyr": "1.1.4",
+                    "readr": "2.1.5",
+                    "purrr": "1.1.0",
+                    "tidyr": "1.3.1",
+                    "stringr": "1.5.2"
                 },
                 "DIAMOND_TAXONOMY": {
                     "diamond": "2.2.1"
@@ -126,6 +126,9 @@
                     "readr": "2.2.0",
                     "stringr": "1.6.0"
                 },
+                "QUAST": {
+                    "quast": "5.3.0"
+                },
                 "SAMTOOLS_FLAGSTAT": {
                     "samtools": 1.24
                 },
@@ -157,40 +160,14 @@
                     "dplyr": "1.2.1",
                     "stringr": "1.6.0"
                 },
-                "TRANSDECODER_BED_CAT": {
-                    "coreutils": 9.4,
-                    "find": "4.6.0",
-                    "pigz": 2.8
-                },
-                "TRANSDECODER_CDS_CAT": {
-                    "coreutils": 9.4,
-                    "find": "4.6.0",
-                    "pigz": 2.8
-                },
-                "TRANSDECODER_GFF_CAT": {
-                    "coreutils": 9.4,
-                    "find": "4.6.0",
-                    "pigz": 2.8
-                },
                 "TRANSDECODER_LONGORF": {
                     "transdecoder": "5.7.1"
-                },
-                "TRANSDECODER_PEP_CAT": {
-                    "coreutils": 9.4,
-                    "find": "4.6.0",
-                    "pigz": 2.8
                 },
                 "TRANSDECODER_PREDICT": {
                     "transdecoder": "5.7.1"
                 },
-                "TRANSRATE": {
-                    "transrate": "1.0.3"
-                },
                 "TRIMGALORE": {
                     "trimgalore": "2.3.0"
-                },
-                "UNPIGZ_CONTIGS": {
-                    "pigz": 2.8
                 },
                 "UNPIGZ_GFF": {
                     "pigz": 2.8
@@ -257,12 +234,14 @@
                 "multiqc/multiqc_data/multiqc_data.json",
                 "multiqc/multiqc_data/multiqc_fastqc.txt",
                 "multiqc/multiqc_data/multiqc_general_stats.txt",
-                "multiqc/multiqc_data/multiqc_megahit_assemblies.txt",
                 "multiqc/multiqc_data/multiqc_prokka.txt",
+                "multiqc/multiqc_data/multiqc_quast.txt",
                 "multiqc/multiqc_data/multiqc_software_versions.txt",
                 "multiqc/multiqc_data/multiqc_sources.txt",
                 "multiqc/multiqc_data/multiqc_transdecoder_stats.txt",
                 "multiqc/multiqc_data/prokka_plot.txt",
+                "multiqc/multiqc_data/quast_num_contigs.txt",
+                "multiqc/multiqc_data/quast_table.txt",
                 "multiqc/multiqc_report.html",
                 "pipeline_info",
                 "pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml",
@@ -270,6 +249,26 @@
                 "prokka/prokka.faa.gz",
                 "prokka/prokka.ffn.gz",
                 "prokka/prokka.gff.gz",
+                "quast",
+                "quast/megahit",
+                "quast/megahit.tsv",
+                "quast/megahit/basic_stats",
+                "quast/megahit/basic_stats/GC_content_plot.pdf",
+                "quast/megahit/basic_stats/Nx_plot.pdf",
+                "quast/megahit/basic_stats/cumulative_plot.pdf",
+                "quast/megahit/basic_stats/megahit_assembly.contigs_GC_content_plot.pdf",
+                "quast/megahit/icarus.html",
+                "quast/megahit/icarus_viewers",
+                "quast/megahit/icarus_viewers/contig_size_viewer.html",
+                "quast/megahit/quast.log",
+                "quast/megahit/report.html",
+                "quast/megahit/report.pdf",
+                "quast/megahit/report.tex",
+                "quast/megahit/report.tsv",
+                "quast/megahit/report.txt",
+                "quast/megahit/transposed_report.tex",
+                "quast/megahit/transposed_report.tsv",
+                "quast/megahit/transposed_report.txt",
                 "samtools",
                 "samtools/SAMPLE1_PE.sorted.bam",
                 "samtools/SAMPLE1_PE.sorted.bam.bai",
@@ -297,13 +296,10 @@
                 "summary_tables/megahit.transdecoder.ncbi-refseq-test.diamond.taxonomy.tsv.gz",
                 "summary_tables/megahit.transdecoder.overall_stats.tsv.gz",
                 "transdecoder",
-                "transdecoder/megahit.transdecoder.bed.gz",
-                "transdecoder/megahit.transdecoder.cds.gz",
-                "transdecoder/megahit.transdecoder.gff3.gz",
-                "transdecoder/megahit.transdecoder.pep.gz",
-                "transrate",
-                "transrate/megahit.assemblies.csv",
-                "transrate/megahit.contigs.csv",
+                "transdecoder/megahit_assembly.contigs.fa.transdecoder.bed.gz",
+                "transdecoder/megahit_assembly.contigs.fa.transdecoder.cds.gz",
+                "transdecoder/megahit_assembly.contigs.fa.transdecoder.gff3.gz",
+                "transdecoder/megahit_assembly.contigs.fa.transdecoder.pep.gz",
                 "trimgalore",
                 "trimgalore/SAMPLE1_PE_1.fastq.gz_trimming_report.txt",
                 "trimgalore/SAMPLE1_PE_2.fastq.gz_trimming_report.txt",
@@ -326,24 +322,24 @@
                 "trimgalore/fastqc/SAMPLE3_PE_1_2_val_2_fastqc.zip"
             ],
             [
-                "multiqc_citations.txt:md5,d59b1beea6256a7bf5f599da543910db"
+                "multiqc_citations.txt:md5,9af6aefe57f066cc7e3c782a93f48cf3"
             ],
             [
                 "orf\tchr\tstart\tend\tstrand\tlength\tsample\tcount\ttpm"
             ],
             3000000,
             [
-                "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count\tdiamondtax_gtdb-r220-test\tdiamondtax_ncbi-refseq-test"
+                "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tprokka\tdiamondtax_gtdb-r220-test\tdiamondtax_ncbi-refseq-test"
             ],
             [
                 "orf\tchr\tstart\tend\tstrand\tlength\tsample\tcount\ttpm"
             ],
             3000000,
             [
-                "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count\tdiamondtax_gtdb-r220-test\tdiamondtax_ncbi-refseq-test"
+                "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\ttransdecoder\tdiamondtax_gtdb-r220-test\tdiamondtax_ncbi-refseq-test"
             ]
         ],
-        "timestamp": "2026-09-01T14:38:29.586808366",
+        "timestamp": "2026-09-01T17:30:57.655498028",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"
