@@ -340,8 +340,19 @@
                 "orf_caller": {
                     "type": "string",
                     "pattern": "^(prodigal|prokka|transdecoder|metaeuk)(,(prodigal|prokka|transdecoder|metaeuk))*$",
-                    "description": "Comma-separated list of ORF callers to run. Possible alternatives: prodigal, prokka, transdecoder, metaeuk. This needs to be set unless the `--user_orfs_*` params are set.",
+                    "description": "Comma-separated list of ORF callers to run. Possible alternatives: prodigal, prokka, transdecoder, metaeuk. At least one of this, `--user_orfs`, or `--user_orfs_gff`/`--user_orfs_faa` must be set; any combination may be set together.",
                     "fa_icon": "fas fa-phone-volume"
+                },
+                "user_orfs": {
+                    "type": "string",
+                    "default": null,
+                    "format": "file-path",
+                    "exists": true,
+                    "schema": "assets/schema_user_orfs.json",
+                    "pattern": "^\\S+\\.(csv|tsv|json|yaml|yml)$",
+                    "description": "Path to comma-separated file listing user-provided ORF calls to add alongside (or instead of) `--orf_caller`.",
+                    "help_text": "This has to be a comma-separated file with a header row and three mandatory columns: name, gff, faa. Each row adds one named set of ORF calls to the run, treated exactly like another `--orf_caller` value downstream. `name` cannot collide with an active `--orf_caller` value, `--user_orfs_name`, or with another row's `name`. Use this for more than one user-supplied set; for a single set, `--user_orfs_gff`/`--user_orfs_faa` below is a lighter-weight alternative -- both may be combined.",
+                    "fa_icon": "fas fa-file-csv"
                 },
                 "user_orfs_faa": {
                     "type": "string",
@@ -349,7 +360,7 @@
                     "format": "file-path",
                     "exists": true,
                     "mimetype": "text/plain",
-                    "description": "Path to a protein fasta file for user-provided ORFs.",
+                    "description": "Path to a protein fasta file for a single set of user-provided ORFs. Additive with `--orf_caller` and `--user_orfs`; requires `--user_orfs_gff` too.",
                     "fa_icon": "far fa-file-code"
                 },
                 "user_orfs_gff": {
@@ -358,13 +369,13 @@
                     "format": "file-path",
                     "exists": true,
                     "mimetype": "text/plain",
-                    "description": "Path to a gff file for user-provided ORFs.",
+                    "description": "Path to a gff file for a single set of user-provided ORFs. Additive with `--orf_caller` and `--user_orfs`; requires `--user_orfs_faa` too.",
                     "fa_icon": "far fa-file-code"
                 },
                 "user_orfs_name": {
                     "type": "string",
                     "default": "user_orfs",
-                    "description": "Name to give to user-provided ORFs.",
+                    "description": "Name to give the ORFs supplied via `--user_orfs_gff`/`--user_orfs_faa`. Cannot collide with an active `--orf_caller` value, a `--user_orfs` row name, or the pipeline's own reserved names.",
                     "fa_icon": "fas fa-bezier-curve"
                 },
                 "prodigal_trainingfile": {
