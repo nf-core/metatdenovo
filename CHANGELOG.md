@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Changed`
 
+- [#491](https://github.com/nf-core/metatdenovo/pull/491) - Replace TransRate with QUAST for assembly quality statistics, addresses [#487](https://github.com/nf-core/metatdenovo/issues/487) (@erikrikarddaniel)
 - [#489](https://github.com/nf-core/metatdenovo/pull/489) - Replace the local `COLLECT_FEATURECOUNTS` module with the shared `nf-core/modules` component `custom/collectfeaturecounts`; no change to the output tables themselves, addresses [nf-core/magmap#237](https://github.com/nf-core/magmap/issues/237) (@erikrikarddaniel)
 - [#488](https://github.com/nf-core/metatdenovo/pull/488) - Replace the local `COLLECT_STATS` module with the shared `nf-core/modules` component `custom/collectstats`; the feature-count column in `<assembly>.<caller>.overall_stats.tsv.gz` is now named after the ORF caller (e.g. `prodigal`) instead of the generic `n_feature_count`, addresses [nf-core/magmap#237](https://github.com/nf-core/magmap/issues/237) (@erikrikarddaniel)
 - [#483](https://github.com/nf-core/metatdenovo/pull/483) - Keep `COLLECT_FEATURECOUNTS` generic by moving the Transdecoder-specific `cds.` ORF-ID-prefix stripping into a new local post-processing module, `TIDYVERSE_STRIPCDSPREFIX`, matching the pattern nf-core/magmap already established for its own genome-accession join; no change to the output tables themselves, addresses [nf-core/magmap#237](https://github.com/nf-core/magmap/issues/237) (@erikrikarddaniel)

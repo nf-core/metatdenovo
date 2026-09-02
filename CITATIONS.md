@@ -116,9 +116,9 @@
 
   > von Meijenfeldt FAB, Arkhipova K, Cambuy DD, Coutinho FH, Dutilh BE. Robust taxonomic classification of uncharted microbial sequences and bins with CAT and BAT. Genome Biology. 2019;20:217.
 
-- [transrate](https://hibberdlab.com/transrate/)
+- [QUAST](https://github.com/ablab/quast)
 
-  > Smith-Unna R, Boursnell C, Patro R, Hibberd J, Kelly S. TransRate: reference free quality assessment of de-novo transcriptome assemblies (2016). Genome Research doi: [http://dx.doi.org/10.1101/gr.196469.115](http://dx.doi.org/10.1101/gr.196469.115)
+  > Gurevich A, Saveliev V, Vyahhi N, Tesler G. QUAST: quality assessment tool for genome assemblies. Bioinformatics. 2013;29(8):1072-1075. doi: 10.1093/bioinformatics/btt086.
 
 ## Software packaging/containerisation tools
 
