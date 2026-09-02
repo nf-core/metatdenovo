@@ -32,6 +32,7 @@ workflow PIPELINE_INITIALISATION {
     outdir            //  string: The output directory where the results will be saved
     input             //  string: Path to input samplesheet
     diamond_dbs       //  string: Path to csv file with Diamond taxonomy dbs
+    user_orfs         //  string: Path to csv file with user-provided ORF calls
     help              // boolean: Display help message and exit
     help_full         // boolean: Show the full help message
     show_hidden       // boolean: Show hidden parameters in the help message
@@ -137,9 +138,19 @@ workflow PIPELINE_INITIALISATION {
             .fromList(samplesheetToList(diamond_dbs, "${projectDir}/assets/schema_diamond_dbs.json"))
     }
 
+    //
+    // Create channel from user-provided ORFs file provided through user_orfs
+    //
+    ch_user_orfs = channel.empty()
+    if ( user_orfs ) {
+        ch_user_orfs = channel
+            .fromList(samplesheetToList(user_orfs, "${projectDir}/assets/schema_user_orfs.json"))
+    }
+
     emit:
     samplesheet   = ch_samplesheet
     diamond_paths = ch_diamond_paths
+    user_orfs     = ch_user_orfs
     versions      = ch_versions
 }
 
