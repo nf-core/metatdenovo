@@ -1,0 +1,46 @@
+nextflow_workflow {
+
+    name "Test Subworkflow TRANSDECODER"
+    script "../main.nf"
+    workflow "TRANSDECODER"
+
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "transdecoder"
+
+    // Inputs are built inline rather than read from a fixture: the pipeline repo carries no
+    // test data of its own.
+
+    test("a much bigger batch must not be paired with a smaller batch's LongOrfs output") {
+
+        config "./nextflow.config"
+
+        when {
+            workflow {
+                """
+                // 'big' is ~500x the length of 'small', so TransDecoder.LongOrfs takes
+                // measurably longer on it -- forcing it to finish AFTER 'small' even though
+                // it's submitted first. TRANSDECODER_LONGORF.out.folder carries no meta, so if
+                // TRANSDECODER_PREDICT pairs it with ch_batches positionally (submission order)
+                // rather than a real join by id, 'big's fasta gets 'small's LongOrfs directory
+                // and vice versa -- exactly what happened on the real 82M-contig run, where
+                // contigs.1's fasta was paired with contigs.78's LongOrfs directory.
+                def rng   = new Random(42)
+                def bases = ['A', 'C', 'G', 'T']
+                def big   = (1..150000).collect { bases[rng.nextInt(4)] }.join()
+                def small = (1..2000).collect { bases[rng.nextInt(4)] }.join()
+
+                def fasta = file("\${workDir}/batches.fasta")
+                fasta.text = [ '>big', big, '>small', small, '' ].join('\\n')
+
+                input[0] = channel.of([ [ id: 'test' ], fasta ])
+                input[1] = '1.KB' // forces splitFasta to give each contig its own batch
+                """
+            }
+        }
+
+        then {
+            assert workflow.success
+        }
+    }
+}
