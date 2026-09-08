@@ -327,6 +327,13 @@
                     "fa_icon": "fas fa-arrows-alt-h",
                     "description": "Minimum fraction of both proteins that must be covered by the alignment",
                     "help_text": "Passed to MMseqs2 as `-c`, with its default bidirectional coverage mode, so the threshold applies to both the longer and the shorter sequence."
+                },
+                "annotate_only_consolidated": {
+                    "type": "boolean",
+                    "default": true,
+                    "fa_icon": "fas fa-object-ungroup",
+                    "description": "Only annotate the consolidated cluster representatives, not every individual ORF source as well",
+                    "help_text": "Every active `--orf_caller`/`--user_orfs` source is annotated as its own caller by default -- with N sources active alongside consolidation, that repeats the same annotation search up to N+1 times for whatever fraction of the genes every source agrees on. With this on (the default), EGGNOG, KOFAMSCAN, DBCAN, EUKULELE, DIAMOND_TAXONOMY and HMMCLASSIFY only see the cluster representatives, not each individual source's full protein set. Silently has no effect (falls back to annotating every source, same as before this option existed) whenever there is nothing consolidated to restrict to: only one ORF source active, or `--skip_protein_consolidation` given."
                 }
             },
             "fa_icon": "fas fa-object-group"

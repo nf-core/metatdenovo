@@ -720,6 +720,16 @@ workflow METATDENOVO {
         ch_protein = ch_protein.mix(SEQKIT_GREP.out.filter)
     }
 
+    // Restrict annotation (everything below still reading plain ch_protein) to the cluster
+    // representatives, instead of also fully re-annotating every individual source -- with N sources
+    // that's otherwise up to N-fold repeated annotation of the same gene. A silent no-op with only one
+    // ORF source active or with consolidation skipped: nothing meaningful to restrict to, and would
+    // otherwise just rename a single-caller run's output for no real savings.
+    total_orf_sources = orf_callers.size() + user_orf_names.size()
+    if ( params.annotate_only_consolidated && ! params.skip_protein_consolidation && total_orf_sources > 1 ) {
+        ch_protein = ch_protein.filter { meta, _protein -> meta.caller == protein_consolidate_name }
+    }
+
     //
     // MODULE: Create a BBMap index
     //

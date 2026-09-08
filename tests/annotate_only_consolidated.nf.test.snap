@@ -1,0 +1,324 @@
+{
+    "-profile test_annotate_only_consolidated": {
+        "content": [
+            78,
+            {
+                "BBMAP_ALIGN": {
+                    "bbmap": 39.18
+                },
+                "BBMAP_INDEX": {
+                    "bbmap": 39.18
+                },
+                "BEDTOOLS_SORT": {
+                    "bedtools": "2.31.1"
+                },
+                "CAT_FASTQ": {
+                    "cat": 9.5
+                },
+                "COLLECT_LOCUSCONSOLIDATE": {
+                    "R": "4.5.3",
+                    "dplyr": "1.2.1",
+                    "readr": "2.2.0",
+                    "stringr": "1.6.0",
+                    "dtplyr": "1.3.3",
+                    "data.table": "1.17.8"
+                },
+                "COLLECT_PROTEINCONSOLIDATE": {
+                    "R": "4.5.3",
+                    "dplyr": "1.2.1",
+                    "readr": "2.2.0",
+                    "stringr": "1.6.0",
+                    "dtplyr": "1.3.3",
+                    "data.table": "1.17.8"
+                },
+                "CUSTOM_COLLECTFEATURECOUNTS": {
+                    "R": "4.5.3",
+                    "dplyr": "1.2.1",
+                    "readr": "2.2.0",
+                    "stringr": "1.6.0",
+                    "dtplyr": "1.3.3",
+                    "data.table": "1.17.8"
+                },
+                "CUSTOM_COLLECTSTATS": {
+                    "R": "4.3.1",
+                    "dplyr": "1.1.4",
+                    "readr": "2.1.5",
+                    "purrr": "1.1.0",
+                    "tidyr": "1.3.1",
+                    "stringr": "1.5.2"
+                },
+                "FAA_CAT": {
+                    "coreutils": 9.4,
+                    "find": "4.6.0",
+                    "pigz": 2.8
+                },
+                "FASTQC": {
+                    "fastqc": "0.12.1"
+                },
+                "FEATURECOUNTS_CDS": {
+                    "subread": "2.1.1"
+                },
+                "FFN_CAT": {
+                    "coreutils": 9.4,
+                    "find": "4.6.0",
+                    "pigz": 2.8
+                },
+                "FORMAT_CLUSTERREPS": {
+                    "gzip": 1.11
+                },
+                "FORMAT_GFF2BED": {
+                    "gzip": 1.11
+                },
+                "FORMAT_LOCUSCONSOLIDATE": {
+                    "gzip": 1.11
+                },
+                "FORMAT_LOCUSFAA": {
+                    "gzip": 1.11
+                },
+                "FORMAT_PRODIGAL_GFF": {
+                    "gzip": 1.11
+                },
+                "GFF_CAT": {
+                    "coreutils": 9.4,
+                    "find": "4.6.0",
+                    "pigz": 2.8
+                },
+                "HMMER_HMMRANK": {
+                    "r-base": "4.2.3",
+                    "r-tidyverse": "2.0.0"
+                },
+                "HMMER_HMMSEARCH": {
+                    "hmmer": 3.4
+                },
+                "MEGAHIT": {
+                    "megahit": "1.2.9"
+                },
+                "MMSEQS_CREATEDB": {
+                    "mmseqs": "18.8cc5c"
+                },
+                "MMSEQS_CREATETSV": {
+                    "mmseqs": "18.8cc5c"
+                },
+                "MMSEQS_LINCLUST": {
+                    "mmseqs": "18.8cc5c"
+                },
+                "PIGZ_PE_READS_FWD": {
+                    "pigz": 2.8
+                },
+                "PIGZ_PE_READS_REV": {
+                    "pigz": 2.8
+                },
+                "PRODIGAL_MODULE": {
+                    "prodigal": "2.6.3"
+                },
+                "PROKKA": {
+                    "prokka": "1.15.6"
+                },
+                "PROKKAGFF2TSV": {
+                    "R": "4.5.3",
+                    "data.table": "1.17.8",
+                    "dtplyr": "1.3.3",
+                    "dplyr": "1.2.1",
+                    "tidyr": "1.3.2",
+                    "readr": "2.2.0",
+                    "stringr": "1.6.0"
+                },
+                "QUAST": {
+                    "quast": "5.3.0"
+                },
+                "SAMTOOLS_FLAGSTAT": {
+                    "samtools": 1.24
+                },
+                "SAMTOOLS_IDXSTATS": {
+                    "samtools": 1.24
+                },
+                "SAMTOOLS_INDEX": {
+                    "samtools": 1.24
+                },
+                "SAMTOOLS_SORT": {
+                    "samtools": 1.24
+                },
+                "SAMTOOLS_STATS": {
+                    "samtools": 1.24
+                },
+                "SEQKIT_GREP": {
+                    "seqkit": "2.13.0"
+                },
+                "SEQTK_HMMHITFAAS": {
+                    "seqtk": "1.4-r122"
+                },
+                "SEQTK_MERGEPE": {
+                    "seqtk": "1.4-r122"
+                },
+                "TIDYVERSE_STRIPCDSPREFIX": {
+                    "R": "4.5.3",
+                    "readr": "2.2.0",
+                    "dplyr": "1.2.1",
+                    "stringr": "1.6.0"
+                },
+                "TRIMGALORE": {
+                    "trimgalore": "2.3.0"
+                },
+                "UNPIGZ_GFF": {
+                    "pigz": 2.8
+                },
+                "Workflow": {
+                    "nf-core/metatdenovo": "v1.5.0dev"
+                }
+            },
+            [
+                "bbmap",
+                "bbmap/bbmap",
+                "bbmap/bbmap/SAMPLE1_PE.bbmap.log",
+                "bbmap/bbmap/SAMPLE2_PE.bbmap.log",
+                "bbmap/bbmap/SAMPLE3_PE_1.bbmap.log",
+                "featurecounts",
+                "featurecounts/SAMPLE1_PE.locus_consolidate.featureCounts.tsv",
+                "featurecounts/SAMPLE1_PE.locus_consolidate.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE1_PE.prodigal.featureCounts.tsv",
+                "featurecounts/SAMPLE1_PE.prodigal.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE1_PE.prokka.featureCounts.tsv",
+                "featurecounts/SAMPLE1_PE.prokka.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE2_PE.locus_consolidate.featureCounts.tsv",
+                "featurecounts/SAMPLE2_PE.locus_consolidate.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE2_PE.prodigal.featureCounts.tsv",
+                "featurecounts/SAMPLE2_PE.prodigal.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE2_PE.prokka.featureCounts.tsv",
+                "featurecounts/SAMPLE2_PE.prokka.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE3_PE_1.locus_consolidate.featureCounts.tsv",
+                "featurecounts/SAMPLE3_PE_1.locus_consolidate.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE3_PE_1.prodigal.featureCounts.tsv",
+                "featurecounts/SAMPLE3_PE_1.prodigal.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE3_PE_1.prokka.featureCounts.tsv",
+                "featurecounts/SAMPLE3_PE_1.prokka.featureCounts.tsv.summary",
+                "hmmer",
+                "hmmer/hits",
+                "hmmer/hits/megahit.protein_consolidate_99.PF00848.faa.gz",
+                "hmmer/hits/megahit.protein_consolidate_99.PF03477.faa.gz",
+                "hmmer/megahit.protein_consolidate_99.PF00317.tbl.gz",
+                "hmmer/megahit.protein_consolidate_99.PF00848.tbl.gz",
+                "hmmer/megahit.protein_consolidate_99.PF03477.tbl.gz",
+                "hmmer/megahit.protein_consolidate_99.PF13597.tbl.gz",
+                "megahit",
+                "megahit/megahit_assembly.contigs.fa.gz",
+                "megahit/megahit_assembly.log",
+                "multiqc",
+                "multiqc/multiqc_data",
+                "multiqc/multiqc_data/fastqc-status-check-heatmap.txt",
+                "multiqc/multiqc_data/fastqc_adapter_content_plot.txt",
+                "multiqc/multiqc_data/fastqc_overrepresented_sequences_plot.txt",
+                "multiqc/multiqc_data/fastqc_per_base_n_content_plot.txt",
+                "multiqc/multiqc_data/fastqc_per_base_sequence_quality_plot.txt",
+                "multiqc/multiqc_data/fastqc_per_sequence_gc_content_plot_Counts.txt",
+                "multiqc/multiqc_data/fastqc_per_sequence_gc_content_plot_Percentages.txt",
+                "multiqc/multiqc_data/fastqc_per_sequence_quality_scores_plot.txt",
+                "multiqc/multiqc_data/fastqc_sequence_counts_plot.txt",
+                "multiqc/multiqc_data/fastqc_sequence_duplication_levels_plot.txt",
+                "multiqc/multiqc_data/fastqc_sequence_length_distribution_plot.txt",
+                "multiqc/multiqc_data/fastqc_top_overrepresented_sequences_table.txt",
+                "multiqc/multiqc_data/llms-full.txt",
+                "multiqc/multiqc_data/multiqc.log",
+                "multiqc/multiqc_data/multiqc.parquet",
+                "multiqc/multiqc_data/multiqc_citations.txt",
+                "multiqc/multiqc_data/multiqc_data.json",
+                "multiqc/multiqc_data/multiqc_fastqc.txt",
+                "multiqc/multiqc_data/multiqc_general_stats.txt",
+                "multiqc/multiqc_data/multiqc_prodigal_stats.txt",
+                "multiqc/multiqc_data/multiqc_prokka.txt",
+                "multiqc/multiqc_data/multiqc_quast.txt",
+                "multiqc/multiqc_data/multiqc_software_versions.txt",
+                "multiqc/multiqc_data/multiqc_sources.txt",
+                "multiqc/multiqc_data/prokka_plot.txt",
+                "multiqc/multiqc_data/quast_num_contigs.txt",
+                "multiqc/multiqc_data/quast_table.txt",
+                "multiqc/multiqc_report.html",
+                "pipeline_info",
+                "pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml",
+                "prodigal",
+                "prodigal/megahit.prodigal.faa.gz",
+                "prodigal/megahit.prodigal.fna.gz",
+                "prodigal/megahit.prodigal.gff.gz",
+                "prodigal/megahit.prodigal_all.txt.gz",
+                "prodigal/megahit.prodigal_format.gff.gz",
+                "prokka",
+                "prokka/prokka.faa.gz",
+                "prokka/prokka.ffn.gz",
+                "prokka/prokka.gff.gz",
+                "protein_consolidate",
+                "protein_consolidate/megahit.protein_consolidate_99.clusters.tsv",
+                "protein_consolidate/megahit.protein_consolidate_99.representatives.fa.gz",
+                "quast",
+                "quast/megahit",
+                "quast/megahit.tsv",
+                "quast/megahit/basic_stats",
+                "quast/megahit/basic_stats/GC_content_plot.pdf",
+                "quast/megahit/basic_stats/Nx_plot.pdf",
+                "quast/megahit/basic_stats/cumulative_plot.pdf",
+                "quast/megahit/basic_stats/megahit_assembly.contigs_GC_content_plot.pdf",
+                "quast/megahit/icarus.html",
+                "quast/megahit/icarus_viewers",
+                "quast/megahit/icarus_viewers/contig_size_viewer.html",
+                "quast/megahit/quast.log",
+                "quast/megahit/report.html",
+                "quast/megahit/report.pdf",
+                "quast/megahit/report.tex",
+                "quast/megahit/report.tsv",
+                "quast/megahit/report.txt",
+                "quast/megahit/transposed_report.tex",
+                "quast/megahit/transposed_report.tsv",
+                "quast/megahit/transposed_report.txt",
+                "samtools",
+                "samtools/SAMPLE1_PE.sorted.bam",
+                "samtools/SAMPLE1_PE.sorted.bam.bai",
+                "samtools/SAMPLE2_PE.sorted.bam",
+                "samtools/SAMPLE2_PE.sorted.bam.bai",
+                "samtools/SAMPLE3_PE_1.sorted.bam",
+                "samtools/SAMPLE3_PE_1.sorted.bam.bai",
+                "samtools/megahit.SAMPLE1_PE.flagstat",
+                "samtools/megahit.SAMPLE1_PE.idxstats",
+                "samtools/megahit.SAMPLE2_PE.flagstat",
+                "samtools/megahit.SAMPLE2_PE.idxstats",
+                "samtools/megahit.SAMPLE3_PE_1.flagstat",
+                "samtools/megahit.SAMPLE3_PE_1.idxstats",
+                "summary_tables",
+                "summary_tables/megahit.locus_consolidate.counts.tsv.gz",
+                "summary_tables/megahit.prodigal.counts.tsv.gz",
+                "summary_tables/megahit.prodigal.overall_stats.tsv.gz",
+                "summary_tables/megahit.prokka.counts.tsv.gz",
+                "summary_tables/megahit.prokka.overall_stats.tsv.gz",
+                "summary_tables/megahit.prokka.prokka-annotations.tsv.gz",
+                "summary_tables/megahit.protein_consolidate_99.counts.tsv.gz",
+                "summary_tables/megahit.protein_consolidate_99.hmmrank.tsv.gz",
+                "summary_tables/megahit.protein_consolidate_99.overall_stats.tsv.gz",
+                "trimgalore",
+                "trimgalore/SAMPLE1_PE_1.fastq.gz_trimming_report.txt",
+                "trimgalore/SAMPLE1_PE_2.fastq.gz_trimming_report.txt",
+                "trimgalore/SAMPLE2_PE_1.fastq.gz_trimming_report.txt",
+                "trimgalore/SAMPLE2_PE_2.fastq.gz_trimming_report.txt",
+                "trimgalore/SAMPLE3_PE_1_1.fastq.gz_trimming_report.txt",
+                "trimgalore/SAMPLE3_PE_1_2.fastq.gz_trimming_report.txt",
+                "trimgalore/fastqc",
+                "trimgalore/fastqc/SAMPLE1_PE_1_val_1_fastqc.html",
+                "trimgalore/fastqc/SAMPLE1_PE_1_val_1_fastqc.zip",
+                "trimgalore/fastqc/SAMPLE1_PE_2_val_2_fastqc.html",
+                "trimgalore/fastqc/SAMPLE1_PE_2_val_2_fastqc.zip",
+                "trimgalore/fastqc/SAMPLE2_PE_1_val_1_fastqc.html",
+                "trimgalore/fastqc/SAMPLE2_PE_1_val_1_fastqc.zip",
+                "trimgalore/fastqc/SAMPLE2_PE_2_val_2_fastqc.html",
+                "trimgalore/fastqc/SAMPLE2_PE_2_val_2_fastqc.zip",
+                "trimgalore/fastqc/SAMPLE3_PE_1_1_val_1_fastqc.html",
+                "trimgalore/fastqc/SAMPLE3_PE_1_1_val_1_fastqc.zip",
+                "trimgalore/fastqc/SAMPLE3_PE_1_2_val_2_fastqc.html",
+                "trimgalore/fastqc/SAMPLE3_PE_1_2_val_2_fastqc.zip"
+            ],
+            [
+                "multiqc_citations.txt:md5,9af6aefe57f066cc7e3c782a93f48cf3"
+            ]
+        ],
+        "timestamp": "2026-09-08T08:57:36.390786515",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
+    }
+}

@@ -275,6 +275,8 @@ So the effect is modest in absolute terms, a few percent of loci at most, but tw
 If you run a single caller and are watching runtime, `--skip_protein_consolidation` costs you little.
 Lowering `--cluster_min_seq_id` is what makes the step start merging paralogs and strain variants, so change it deliberately rather than to "make something happen".
 
+By default, every active ORF source (each `--orf_caller`/`--user_orfs` entry) is annotated on its own, in addition to the cluster representatives above -- with N sources active, that means the same annotation search runs on essentially the same gene up to N+1 times, regardless of how few loci consolidation actually merged. `--annotate_only_consolidated` (default `true`) restricts EGGNOG, KOFAMSCAN, DBCAN, EUKULELE, DIAMOND_TAXONOMY and HMMCLASSIFY to just the consolidated representatives instead, so the two-caller example above would be annotated once (68300 proteins) rather than three times. It silently has no effect with a single ORF source active, or with `--skip_protein_consolidation`, since there is nothing consolidated to restrict to in either case.
+
 ```bash
 nextflow run nf-core/metatdenovo -profile docker --outdir results/ --input samplesheet.csv --assembler megahit --orf_caller metaeuk,transdecoder --metaeuk_db /path/to/db --cluster_min_seq_id 0.95
 ```
