@@ -15,6 +15,9 @@ While the rationale for writing the workflow was metatranscriptomes, there is no
 communities nor genomes rather than transcriptomes.
 Instead, the workflow should be usable for any project in which a de novo assembly followed by quantification and annotation is suitable.
 
+Assembly and annotation of metagenomes/metatranscriptomes is inherently memory- and compute-intensive.
+Expect to need tens to low hundreds of GB of RAM and access to an HPC cluster or cloud infrastructure for anything beyond a small test dataset -- this is not a pipeline that runs on a laptop.
+
 If you're working with a large project -- many samples, deep sequencing, or both -- and expect (or hit) memory problems during assembly, see [Coping with large datasets](large_datasets.md) for concrete params to try, and in which order.
 
 ## Running the workflow
