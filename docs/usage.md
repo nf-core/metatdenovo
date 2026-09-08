@@ -186,9 +186,20 @@ The short Prodigal calls are not necessarily wrong -- small proteins are real, a
 
 #### Provide your own ORFs
 
-You can provide a set of ORFs to the pipeline using the `--user_orfs_faa orfs.faa.gz` and `--user_orfs_gff orfs.gff.gz`
-for an amino acid fasta file and a gff file respectively.
-The name used in filenames for user provided ORFs can be set using `--user_orfs_name` parameter.
+You can add one or more sets of pre-called ORFs to the pipeline with `--user_orfs orfs.csv`, a comma-separated
+file with a header row and three columns: `name`, `gff`, `faa`. Each row supplies one named set of ORFs (a gff
+file and its matching amino acid fasta), and is treated exactly like another `--orf_caller` value from that
+point on -- it takes part in locus consolidation, protein consolidation and feature counting alongside
+whichever built-in callers are also active.
+
+`--user_orfs` is additive with `--orf_caller`, not mutually exclusive with it: provide `--orf_caller`,
+`--user_orfs`, or both, but at least one of them is required. Every row's `name` must be unique, and cannot
+collide with an active `--orf_caller` value.
+
+```csv title="orfs.csv"
+name,gff,faa
+my_caller,orfs.gff.gz,orfs.faa.gz
+```
 
 ### Read mapping and quantification options
 

@@ -1,0 +1,33 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/nf-core/metatdenovo/master/assets/schema_user_orfs.json",
+    "title": "nf-core/metatdenovo pipeline - params.user_orfs schema",
+    "description": "Schema for the file provided with params.user_orfs",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "name": {
+                "type": "string",
+                "pattern": "^\\S+$",
+                "errorMessage": "Name must be provided and cannot contain spaces",
+                "meta": ["id"]
+            },
+            "gff": {
+                "type": "string",
+                "format": "file-path",
+                "exists": true,
+                "pattern": "^\\S+\\.gff(\\.gz)?$",
+                "errorMessage": "A path to a gff file must be provided."
+            },
+            "faa": {
+                "type": "string",
+                "format": "file-path",
+                "exists": true,
+                "pattern": "^\\S+\\.(fa|faa|fasta)(\\.gz)?$",
+                "errorMessage": "A path to a protein fasta file must be provided."
+            }
+        },
+        "required": ["name", "gff", "faa"]
+    }
+}

@@ -105,6 +105,7 @@ workflow METATDENOVO {
     take:
     ch_samplesheet // channel: samplesheet read in from --input
     ch_diamond_dbs // channel: paths to Diamond taxonomy databases, read from --diamond_dbs
+    ch_user_orfs   // channel: [ meta, gff, faa ], user-provided ORF calls read from --user_orfs
     multiqc_config
     multiqc_logo
     multiqc_methods_description
@@ -112,25 +113,30 @@ workflow METATDENOVO {
 
     main:
 
-    // Exit if the user provides both --assembler and --user_assembly, or both --orf_caller and either of the two --user_orfs,
-    // or none of them
+    // Exit if the user provides both --assembler and --user_assembly, or neither
     if ( ( params.assembler && params.user_assembly ) || ( ! params.assembler && ! params.user_assembly ) ) {
         error "Provide either `--assembler` or `--user_assembly`!"
     }
-    if ( ( params.orf_caller && params.user_orfs_gff ) || ( ! params.orf_caller && ! params.user_orfs_gff ) ) {
-        error "Provide either `--orf_caller` or `--user_orfs_gff`/`--user_orfs_faa`!"
-    }
 
-    // Exit if the user forgot one of the two `--user_orfs_*`
+    // Exit if the user forgot one of --user_orfs_gff/--user_orfs_faa
     if ( params.user_orfs_gff && ! params.user_orfs_faa ) {
-        error 'When supplying ORFs, both --user_orfs_gff and --user_orfs_faa must be specified, --user_orfs_faa file is missing!'
+        error 'When supplying ORFs via --user_orfs_gff/--user_orfs_faa, both must be specified, --user_orfs_faa file is missing!'
     } else if ( params.user_orfs_faa && ! params.user_orfs_gff ) {
-        error 'When supplying ORFs, both --user_orfs_gff and --user_orfs_faa must be specified, --user_orfs_gff file is missing!'
+        error 'When supplying ORFs via --user_orfs_gff/--user_orfs_faa, both must be specified, --user_orfs_gff file is missing!'
     }
 
-    // Exit if the user set params.assembler plus any of params.user_orfs_*
-    if ( params.assembler && ( params.user_orfs_gff || params.user_orfs_faa ) ) {
-        error "You can't input your own ORFs (`--user_orfs_*`) if you call for assembly with `--assembler`."
+    // Exit if the user provides none of --orf_caller, --user_orfs, --user_orfs_gff+--user_orfs_faa.
+    // Unlike --assembler/--user_assembly above, these are NOT mutually exclusive with each other: any
+    // combination adds named ORF sets alongside whatever --orf_caller runs.
+    if ( ! params.orf_caller && ! params.user_orfs && ! ( params.user_orfs_gff && params.user_orfs_faa ) ) {
+        error "Provide `--orf_caller`, `--user_orfs`, `--user_orfs_gff`+`--user_orfs_faa`, or a combination of these!"
+    }
+
+    // Exit if the user set params.assembler plus any user-supplied-ORFs source -- ORFs supplied that
+    // way are assumed to have been called against a specific, already-fixed assembly, so pairing them
+    // with a freshly-built --assembler assembly risks a contig-id mismatch between the two.
+    if ( params.assembler && ( params.user_orfs || ( params.user_orfs_gff && params.user_orfs_faa ) ) ) {
+        error "You can't input your own ORFs (`--user_orfs`/`--user_orfs_gff`+`--user_orfs_faa`) if you call for assembly with `--assembler`."
     }
 
     // Split --orf_caller into a list and make sure every entry is a caller we know about
@@ -147,6 +153,26 @@ workflow METATDENOVO {
         error "When using `--orf_caller metaeuk`, you must also specify `--metaeuk_db`!"
     }
 
+    // Read --user_orfs synchronously here, in addition to the ch_user_orfs channel built in
+    // PIPELINE_INITIALISATION, purely so a name collision can fail fast with `error` -- channel
+    // validation can't do that at workflow-definition time. Every user-supplied-ORFs name (whether
+    // from a --user_orfs row or from --user_orfs_name) is treated exactly like a --orf_caller value
+    // downstream (see ch_gff/ch_protein below), so none of them may collide with an active
+    // --orf_caller value, each other, or the reserved names the consolidation steps further down
+    // synthesise for themselves.
+    def user_orf_names = ( params.user_orfs ? file(params.user_orfs).splitCsv(header: true).collect { row -> row.name } : [] ) +
+        ( params.user_orfs_gff && params.user_orfs_faa ? [ params.user_orfs_name ] : [] )
+    def reserved_caller_names = orf_callers + ['locus_consolidate']
+    user_orf_names.each { name ->
+        if ( name in reserved_caller_names ) {
+            error "--user_orfs/--user_orfs_name '${name}' collides with an active --orf_caller value or a name the pipeline reserves for itself. Pick a different name."
+        }
+    }
+    def duplicate_user_orf_names = user_orf_names.countBy { it }.findAll { _name, count -> count > 1 }.keySet()
+    if ( duplicate_user_orf_names ) {
+        error "Duplicate user-supplied-ORFs name(s): ${duplicate_user_orf_names.join(', ')}. Every name (--user_orfs rows and --user_orfs_name) must be unique."
+    }
+
     // --bbmap_ambiguous all keeps every top-scoring alignment, so without --featurecounts_fraction a
     // multi-mapping read is counted at full weight at EVERY site it hits. On the per-caller and
     // per-locus tables that is just featureCounts' documented -M behaviour, and some users want it.
@@ -158,7 +184,7 @@ workflow METATDENOVO {
     // Note --bbmap_ambiguous toss is deliberately NOT an error here. It discards multi-mapping reads,
     // which makes the consolidated counts conservative for duplicated genes rather than wrong, and
     // that is a legitimate choice; it is documented in usage.md instead.
-    if ( params.bbmap_ambiguous == 'all' && ! params.featurecounts_fraction && ! params.skip_protein_consolidation && orf_callers ) {
+    if ( params.bbmap_ambiguous == 'all' && ! params.featurecounts_fraction && ! params.skip_protein_consolidation && ( orf_callers || params.user_orfs ) ) {
         error "`--bbmap_ambiguous all` counts a multi-mapping read at full weight at every site it aligns to, which double-counts it when protein consolidation sums counts across a cluster. Add `--featurecounts_fraction` so each alignment is weighted 1/N, or `--skip_protein_consolidation` if you do not need the consolidated table."
     }
 
@@ -166,7 +192,8 @@ workflow METATDENOVO {
     assembler     = params.assembler
     assembly_name = params.assembler ?: params.user_assembly_name
 
-    // Deal with params from user-supplied ORFs
+    // Used only to label the pre-ORF-calling collect-stats output (see ch_collect_stats below) --
+    // just a display name, not tied to which caller(s) actually run.
     orfs_name  = params.orf_caller ?: params.user_orfs_name
 
     // Name the cross-contig consolidation level after the clustering identity it was produced at,
@@ -568,6 +595,31 @@ workflow METATDENOVO {
         )
     }
 
+    //
+    // Add any --user_orfs rows, plus a single --user_orfs_gff/--user_orfs_faa pair, in alongside the
+    // built-in callers above -- each is treated exactly like another --orf_caller value from here on
+    // (locus consolidation, protein consolidation, feature counting, all keyed on meta.caller). Route
+    // a gzipped gff through the same UNPIGZ_GFF normalisation as Prokka/Prodigal/MetaEuk's own
+    // gzipped output, so every entry in ch_gff stays uncompressed, same as today; ch_protein already
+    // tolerates either.
+    //
+    ch_user_orfs_single = params.user_orfs_gff && params.user_orfs_faa ?
+        channel.value( [ [ id: params.user_orfs_name ], file(params.user_orfs_gff), file(params.user_orfs_faa) ] ) :
+        channel.empty()
+    ch_user_orfs_named = ch_user_orfs.mix(ch_user_orfs_single)
+        .map { meta, gff, faa -> [ meta + [caller: meta.id, id: "${assembly_name}.${meta.id}"], gff, faa ] }
+    ch_gff_gz = ch_gff_gz.mix(
+        ch_user_orfs_named
+            .filter { _meta, gff, _faa -> gff =~ /\.gz$/ }
+            .map { meta, gff, _faa -> [ meta, gff ] }
+    )
+    ch_gff = ch_gff.mix(
+        ch_user_orfs_named
+            .filter { _meta, gff, _faa -> ! (gff =~ /\.gz$/) }
+            .map { meta, gff, _faa -> [ meta, gff ] }
+    )
+    ch_protein = ch_protein.mix( ch_user_orfs_named.map { meta, _gff, faa -> [ meta, faa ] } )
+
     // Single UNPIGZ_GFF call covering every gzipped-GFF caller active this run -- see the ch_gff_gz
     // comment above for why this can't be one call per caller branch.
     UNPIGZ_GFF(ch_gff_gz)
@@ -603,12 +655,6 @@ workflow METATDENOVO {
 
     ch_gff = ch_gff.mix(FORMAT_LOCUSCONSOLIDATE.out.gff)
 
-    // Populate channels if the user provided the orfs
-    if ( params.user_orfs_faa && params.user_orfs_gff ) {
-        ch_gff = channel.value ( [ [ id: "${assembly_name}.${orfs_name}", caller: orfs_name ], file(params.user_orfs_gff) ] )
-        ch_protein = channel.value ( [ [ id: "${assembly_name}.${orfs_name}", caller: orfs_name ], file(params.user_orfs_faa) ] )
-    }
-
     //
     // Consolidate calls for the same gene that ended up on DIFFERENT contigs, which coordinates
     // cannot detect: a splice-aware genomic call and a transcript-derived call for one gene share no
@@ -621,10 +667,12 @@ workflow METATDENOVO {
     //
     // Deliberately placed before ch_protein is consumed below, and dependent only on the GFFs and
     // proteins rather than on any counts, so it runs alongside mapping instead of behind it.
-    // Skipped entirely for user-supplied ORFs, which replace ch_gff/ch_protein wholesale just above
-    // and already bypass locus consolidation.
+    // --user_orfs rows are mixed into ch_gff/ch_protein above like any other caller, so they
+    // participate here too -- only truly skipped when NO caller at all is active, which can't
+    // actually happen given the --orf_caller/--user_orfs validation above, but the guard is kept for
+    // clarity and as a cheap safety net.
     ch_protein_clusters = channel.empty()
-    if ( ! params.skip_protein_consolidation && orf_callers ) {
+    if ( ! params.skip_protein_consolidation && ( orf_callers || params.user_orfs ) ) {
         // Keyed on the locus-consolidation meta.id rather than .combine()d, so this stays a genuine
         // 1:1 pairing if the pipeline ever consolidates more than one assembly in a run. Callers are
         // sorted so the two lists stay aligned and the task's inputs hash reproducibly.
@@ -778,7 +826,7 @@ workflow METATDENOVO {
     // anchored to the end -- a plain string minus removes the FIRST occurrence, which would silently
     // produce mismatched keys if an assembly name happened to contain the caller name.
     ch_protein_consolidate_counts = channel.empty()
-    if ( ! params.skip_protein_consolidation && orf_callers ) {
+    if ( ! params.skip_protein_consolidation && ( orf_callers || params.user_orfs ) ) {
         COLLECT_PROTEINCONSOLIDATE (
             ch_collect_feature.locus_consolidate
                 .map { meta, fcs -> [ meta.id.replaceAll(java.util.regex.Pattern.quote(".${meta.caller}") + '$', ''), fcs ] }
