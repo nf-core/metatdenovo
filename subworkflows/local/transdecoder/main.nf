@@ -37,7 +37,22 @@ workflow TRANSDECODER {
 
     TRANSDECODER_LONGORF ( ch_batches )
 
-    TRANSDECODER_PREDICT ( ch_batches, TRANSDECODER_LONGORF.out.folder )
+    // TRANSDECODER_LONGORF.out.folder carries no meta, so pairing it with ch_batches
+    // positionally (as two separate process inputs) relies on both channels emitting in the
+    // same order -- which isn't guaranteed once batches run concurrently: a smaller/faster
+    // batch's LongOrfs can finish before an earlier, bigger batch's, silently swapping which
+    // fasta gets paired with which batch's LongOrfs directory. Join explicitly on id instead,
+    // recovered from the folder's own parent directory name (LONGORF names it
+    // "${meta.id}/${fasta_no_gz}.transdecoder_dir").
+    ch_predict_in = ch_batches
+        .map { meta, ctg -> [ meta.id, meta, ctg ] }
+        .join( TRANSDECODER_LONGORF.out.folder.map { folder -> [ folder.getParent().getName(), folder ] } )
+        .map { _id, meta, ctg, folder -> [ meta, ctg, folder ] }
+
+    TRANSDECODER_PREDICT (
+        ch_predict_in.map { meta, ctg, _folder -> [ meta, ctg ] },
+        ch_predict_in.map { _meta, _ctg, folder -> folder }
+    )
 
     ch_pep = fasta.map { meta, _contigs -> meta }
         .combine(TRANSDECODER_PREDICT.out.pep.collect { _meta, pep -> pep }.map { peps -> [ peps ] })
