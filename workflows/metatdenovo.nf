@@ -26,6 +26,8 @@ include { WRITESPADESYAML                    } from '../modules/local/spades/wri
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
 include { validateInputSamplesheet       } from '../subworkflows/local/utils_nfcore_metatdenovo_pipeline'
+include { typecastBooleanParam           } from '../subworkflows/local/utils_nfcore_metatdenovo_pipeline'
+include { typecastIntegerParam           } from '../subworkflows/local/utils_nfcore_metatdenovo_pipeline'
 
 //
 // SUBWORKFLOW: Consisting of local modules
@@ -113,6 +115,19 @@ workflow METATDENOVO {
 
     main:
 
+    // See #478: coerce CLI-supplied boolean/integer params to their real type before
+    // branching on them below -- nf-schema's validateParameters() does not do this for us.
+    def annotate_only_consolidated = typecastBooleanParam('annotate_only_consolidated', params.annotate_only_consolidated)
+    def skip_dbcan                 = typecastBooleanParam('skip_dbcan',                 params.skip_dbcan)
+    def skip_eggnog                = typecastBooleanParam('skip_eggnog',                params.skip_eggnog)
+    def skip_eukulele              = typecastBooleanParam('skip_eukulele',              params.skip_eukulele)
+    def skip_fastqc                = typecastBooleanParam('skip_fastqc',                params.skip_fastqc)
+    def skip_kofamscan             = typecastBooleanParam('skip_kofamscan',             params.skip_kofamscan)
+    def skip_protein_consolidation = typecastBooleanParam('skip_protein_consolidation', params.skip_protein_consolidation)
+    def skip_qc                    = typecastBooleanParam('skip_qc',                    params.skip_qc)
+    def skip_trimming              = typecastBooleanParam('skip_trimming',              params.skip_trimming)
+    def min_contig_length          = typecastIntegerParam('min_contig_length',          params.min_contig_length)
+
     // Exit if the user provides both --assembler and --user_assembly, or neither
     if ( ( params.assembler && params.user_assembly ) || ( ! params.assembler && ! params.user_assembly ) ) {
         error "Provide either `--assembler` or `--user_assembly`!"
@@ -190,7 +205,7 @@ workflow METATDENOVO {
     // Note --bbmap_ambiguous toss is deliberately NOT an error here. It discards multi-mapping reads,
     // which makes the consolidated counts conservative for duplicated genes rather than wrong, and
     // that is a legitimate choice; it is documented in usage.md instead.
-    if ( params.bbmap_ambiguous == 'all' && ! params.featurecounts_fraction && ! params.skip_protein_consolidation && ( orf_callers || params.user_orfs ) ) {
+    if ( params.bbmap_ambiguous == 'all' && ! params.featurecounts_fraction && ! skip_protein_consolidation && ( orf_callers || params.user_orfs ) ) {
         error "`--bbmap_ambiguous all` counts a multi-mapping read at full weight at every site it aligns to, which double-counts it when protein consolidation sums counts across a cluster. Add `--featurecounts_fraction` so each alignment is weighted 1/N, or `--skip_protein_consolidation` if you do not need the consolidated table."
     }
 
@@ -331,15 +346,15 @@ workflow METATDENOVO {
     //
     FASTQC_TRIMGALORE (
         ch_fastq,
-        params.skip_fastqc || params.skip_qc,
-        params.skip_trimming
+        skip_fastqc || skip_qc,
+        skip_trimming
     )
 
     ch_collect_stats = ch_fastq
         .collect { meta, _fasta -> meta }
         .map { metas -> [ [ id:"${assembly_name}.${orfs_name}" ], metas ] }
 
-    if ( params.skip_trimming ) {
+    if ( skip_trimming ) {
         ch_collect_stats = ch_collect_stats
             .map { meta, samples -> [ meta, samples, [] ] }
 
@@ -464,7 +479,7 @@ workflow METATDENOVO {
     }
 
     // If the user asked for length filtering, perform that with SEQTK_SEQ (the actual length parameter is used in modules.config)
-    if ( params.min_contig_length > 0 ) {
+    if ( min_contig_length > 0 ) {
         SEQTK_SEQ_CONTIG_FILTER ( ch_assembly_contigs )
         ch_assembly_contigs = SEQTK_SEQ_CONTIG_FILTER.out.fastx
     }
@@ -679,7 +694,7 @@ workflow METATDENOVO {
     // actually happen given the --orf_caller/--user_orfs validation above, but the guard is kept for
     // clarity and as a cheap safety net.
     ch_protein_clusters = channel.empty()
-    if ( ! params.skip_protein_consolidation && ( orf_callers || params.user_orfs ) ) {
+    if ( ! skip_protein_consolidation && ( orf_callers || params.user_orfs ) ) {
         // Keyed on the locus-consolidation meta.id rather than .combine()d, so this stays a genuine
         // 1:1 pairing if the pipeline ever consolidates more than one assembly in a run. Callers are
         // sorted so the two lists stay aligned and the task's inputs hash reproducibly.
@@ -733,7 +748,7 @@ workflow METATDENOVO {
     // ORF source active or with consolidation skipped: nothing meaningful to restrict to, and would
     // otherwise just rename a single-caller run's output for no real savings.
     total_orf_sources = orf_callers.size() + user_orf_names.size()
-    if ( params.annotate_only_consolidated && ! params.skip_protein_consolidation && total_orf_sources > 1 ) {
+    if ( annotate_only_consolidated && ! skip_protein_consolidation && total_orf_sources > 1 ) {
         ch_protein = ch_protein.filter { meta, _protein -> meta.caller == protein_consolidate_name }
     }
 
@@ -843,7 +858,7 @@ workflow METATDENOVO {
     // anchored to the end -- a plain string minus removes the FIRST occurrence, which would silently
     // produce mismatched keys if an assembly name happened to contain the caller name.
     ch_protein_consolidate_counts = channel.empty()
-    if ( ! params.skip_protein_consolidation && ( orf_callers || params.user_orfs ) ) {
+    if ( ! skip_protein_consolidation && ( orf_callers || params.user_orfs ) ) {
         COLLECT_PROTEINCONSOLIDATE (
             ch_collect_feature.locus_consolidate
                 .map { meta, fcs -> [ meta.id.replaceAll(java.util.regex.Pattern.quote(".${meta.caller}") + '$', ''), fcs ] }
@@ -882,7 +897,7 @@ workflow METATDENOVO {
     //
     // SUBWORKFLOW: run eggnog_mapper on the ORF-called amino acid sequences
     //
-    if ( ! params.skip_eggnog ) {
+    if ( ! skip_eggnog ) {
         EGGNOG(ch_protein, ch_fcs_for_summary)
         ch_merge_tables = ch_merge_tables.mix ( EGGNOG.out.sumtable )
     }
@@ -890,7 +905,7 @@ workflow METATDENOVO {
     //
     // SUBWORKFLOW: run kofamscan on the ORF-called amino acid sequences
     //
-    if( !params.skip_kofamscan ) {
+    if( !skip_kofamscan ) {
         ch_kofamscan = ch_protein.map { meta, protein -> [ meta, protein ] }
         KOFAMSCAN( ch_kofamscan, ch_fcs_for_summary, params.kofam_ko_list_url, params.kofam_profiles_url )
         ch_merge_tables = ch_merge_tables.mix ( KOFAMSCAN.out.kofamscan_summary )
@@ -899,7 +914,7 @@ workflow METATDENOVO {
     //
     // SUBWORKFLOW: run dbCAN CAZyme annotation on the ORF-called amino acid sequences
     //
-    if( !params.skip_dbcan ) {
+    if( !skip_dbcan ) {
         DBCAN( ch_protein, ch_fcs_for_summary )
         ch_merge_tables = ch_merge_tables.mix ( DBCAN.out.sumtable )
     }
@@ -917,7 +932,7 @@ workflow METATDENOVO {
     //
     // SUBWORKFLOW: Eukulele
     //
-    if ( ! params.skip_eukulele ) {
+    if ( ! skip_eukulele ) {
         // Make sure the eukulele_dbpath exists
         d = new File("${params.eukulele_dbpath}")
         if ( ! d.exists() ) {

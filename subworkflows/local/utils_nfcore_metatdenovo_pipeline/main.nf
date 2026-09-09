@@ -224,6 +224,35 @@ def validateInputSamplesheet(input) {
 
     return [ metas[0], fastqs ]
 }
+
+//
+// Nextflow's classic CLI parser hands boolean/integer params through as raw
+// strings (`--skip_dbcan false` -> the *string* 'false', which is truthy in
+// Groovy). nf-schema's validateParameters() does not fix this -- it only
+// type-casts a throwaway copy of params used for its own validation, never
+// the real `params` binding. Coerce explicitly at the read site instead.
+// See https://github.com/nf-core/metatdenovo/issues/478.
+//
+def typecastBooleanParam(String name, value) {
+    if (value instanceof Boolean) {
+        return value
+    }
+    def s = value.toString()
+    if (s == 'true')  { return true }
+    if (s == 'false') { return false }
+    error("--${name} must be true or false, got '${value}'")
+}
+
+def typecastIntegerParam(String name, value) {
+    if (value instanceof Integer) {
+        return value
+    }
+    try {
+        return value.toString().toInteger()
+    } catch (NumberFormatException _e) {
+        error("--${name} must be an integer, got '${value}'")
+    }
+}
 //
 // Generate methods description for MultiQC
 //

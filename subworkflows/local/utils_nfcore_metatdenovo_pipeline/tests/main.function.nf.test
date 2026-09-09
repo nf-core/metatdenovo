@@ -1,0 +1,142 @@
+nextflow_function {
+
+    name "Test Functions"
+    script "../main.nf"
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "utils_nfcore_metatdenovo_pipeline"
+    tag "subworkflows/utils_nfcore_metatdenovo_pipeline"
+
+    // See https://github.com/nf-core/metatdenovo/issues/478: Nextflow's classic CLI
+    // parser hands boolean/integer params through as raw strings, and nf-schema's
+    // validateParameters() does not coerce the real `params` binding (only a
+    // throwaway copy it uses for its own validation). These functions are the
+    // fix -- they're what workflows/metatdenovo.nf calls at the top of `main:`.
+
+    test("typecastBooleanParam passes an already-real Boolean through unchanged") {
+        function "typecastBooleanParam"
+
+        when {
+            function {
+                """
+                input[0] = 'skip_dbcan'
+                input[1] = false
+                """
+            }
+        }
+
+        then {
+            assert function.success
+            assert function.result == false
+        }
+    }
+
+    test("typecastBooleanParam coerces the CLI string 'false' to Boolean false") {
+        function "typecastBooleanParam"
+
+        when {
+            function {
+                """
+                input[0] = 'skip_dbcan'
+                input[1] = 'false'
+                """
+            }
+        }
+
+        then {
+            assert function.success
+            assert function.result == false
+        }
+    }
+
+    test("typecastBooleanParam coerces the CLI string 'true' to Boolean true") {
+        function "typecastBooleanParam"
+
+        when {
+            function {
+                """
+                input[0] = 'skip_dbcan'
+                input[1] = 'true'
+                """
+            }
+        }
+
+        then {
+            assert function.success
+            assert function.result == true
+        }
+    }
+
+    test("typecastBooleanParam errors on an unparseable value instead of defaulting to truthy") {
+        function "typecastBooleanParam"
+
+        when {
+            function {
+                """
+                input[0] = 'skip_dbcan'
+                input[1] = 'maybe'
+                """
+            }
+        }
+
+        then {
+            assert !function.success
+            assert function.stdout.toString().contains('--skip_dbcan must be true or false')
+        }
+    }
+
+    test("typecastIntegerParam passes an already-real Integer through unchanged") {
+        function "typecastIntegerParam"
+
+        when {
+            function {
+                """
+                input[0] = 'min_contig_length'
+                input[1] = 500
+                """
+            }
+        }
+
+        then {
+            assert function.success
+            assert function.result == 500
+        }
+    }
+
+    test("typecastIntegerParam coerces the CLI string '500' to Integer 500") {
+        function "typecastIntegerParam"
+
+        when {
+            function {
+                """
+                input[0] = 'min_contig_length'
+                input[1] = '500'
+                """
+            }
+        }
+
+        then {
+            assert function.success
+            assert function.result == 500
+            assert function.result instanceof Integer
+        }
+    }
+
+    test("typecastIntegerParam errors on a non-numeric value") {
+        function "typecastIntegerParam"
+
+        when {
+            function {
+                """
+                input[0] = 'min_contig_length'
+                input[1] = 'abc'
+                """
+            }
+        }
+
+        then {
+            assert !function.success
+            assert function.stdout.toString().contains('--min_contig_length must be an integer')
+        }
+    }
+}
