@@ -117,16 +117,16 @@ workflow METATDENOVO {
 
     // See #478: coerce CLI-supplied boolean/integer params to their real type before
     // branching on them below -- nf-schema's validateParameters() does not do this for us.
-    def annotate_only_consolidated = typecastBooleanParam('annotate_only_consolidated', params.annotate_only_consolidated)
-    def skip_dbcan                 = typecastBooleanParam('skip_dbcan',                 params.skip_dbcan)
-    def skip_eggnog                = typecastBooleanParam('skip_eggnog',                params.skip_eggnog)
-    def skip_eukulele              = typecastBooleanParam('skip_eukulele',              params.skip_eukulele)
-    def skip_fastqc                = typecastBooleanParam('skip_fastqc',                params.skip_fastqc)
-    def skip_kofamscan             = typecastBooleanParam('skip_kofamscan',             params.skip_kofamscan)
-    def skip_protein_consolidation = typecastBooleanParam('skip_protein_consolidation', params.skip_protein_consolidation)
-    def skip_qc                    = typecastBooleanParam('skip_qc',                    params.skip_qc)
-    def skip_trimming              = typecastBooleanParam('skip_trimming',              params.skip_trimming)
-    def min_contig_length          = typecastIntegerParam('min_contig_length',          params.min_contig_length)
+    def annotate_only_consolidated = typecastBooleanParam('annotate_only_consolidated')
+    def skip_dbcan                 = typecastBooleanParam('skip_dbcan')
+    def skip_eggnog                = typecastBooleanParam('skip_eggnog')
+    def skip_eukulele              = typecastBooleanParam('skip_eukulele')
+    def skip_fastqc                = typecastBooleanParam('skip_fastqc')
+    def skip_kofamscan             = typecastBooleanParam('skip_kofamscan')
+    def skip_protein_consolidation = typecastBooleanParam('skip_protein_consolidation')
+    def skip_qc                    = typecastBooleanParam('skip_qc')
+    def skip_trimming              = typecastBooleanParam('skip_trimming')
+    def min_contig_length          = typecastIntegerParam('min_contig_length')
 
     // Exit if the user provides both --assembler and --user_assembly, or neither
     if ( ( params.assembler && params.user_assembly ) || ( ! params.assembler && ! params.user_assembly ) ) {

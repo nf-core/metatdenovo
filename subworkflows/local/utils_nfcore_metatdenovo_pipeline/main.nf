@@ -233,7 +233,8 @@ def validateInputSamplesheet(input) {
 // the real `params` binding. Coerce explicitly at the read site instead.
 // See https://github.com/nf-core/metatdenovo/issues/478.
 //
-def typecastBooleanParam(String name, value) {
+def typecastBooleanParam(String name) {
+    def value = params.get(name)
     if (value instanceof Boolean) {
         return value
     }
@@ -243,7 +244,8 @@ def typecastBooleanParam(String name, value) {
     error("--${name} must be true or false, got '${value}'")
 }
 
-def typecastIntegerParam(String name, value) {
+def typecastIntegerParam(String name) {
+    def value = params.get(name)
     if (value instanceof Integer) {
         return value
     }

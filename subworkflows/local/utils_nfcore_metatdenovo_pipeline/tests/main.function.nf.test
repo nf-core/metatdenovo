@@ -17,10 +17,12 @@ nextflow_function {
         function "typecastBooleanParam"
 
         when {
+            params {
+                skip_dbcan = false
+            }
             function {
                 """
                 input[0] = 'skip_dbcan'
-                input[1] = false
                 """
             }
         }
@@ -35,10 +37,12 @@ nextflow_function {
         function "typecastBooleanParam"
 
         when {
+            params {
+                skip_dbcan = 'false'
+            }
             function {
                 """
                 input[0] = 'skip_dbcan'
-                input[1] = 'false'
                 """
             }
         }
@@ -53,10 +57,12 @@ nextflow_function {
         function "typecastBooleanParam"
 
         when {
+            params {
+                skip_dbcan = 'true'
+            }
             function {
                 """
                 input[0] = 'skip_dbcan'
-                input[1] = 'true'
                 """
             }
         }
@@ -71,10 +77,12 @@ nextflow_function {
         function "typecastBooleanParam"
 
         when {
+            params {
+                skip_dbcan = 'maybe'
+            }
             function {
                 """
                 input[0] = 'skip_dbcan'
-                input[1] = 'maybe'
                 """
             }
         }
@@ -89,10 +97,12 @@ nextflow_function {
         function "typecastIntegerParam"
 
         when {
+            params {
+                min_contig_length = 500
+            }
             function {
                 """
                 input[0] = 'min_contig_length'
-                input[1] = 500
                 """
             }
         }
@@ -107,10 +117,12 @@ nextflow_function {
         function "typecastIntegerParam"
 
         when {
+            params {
+                min_contig_length = '500'
+            }
             function {
                 """
                 input[0] = 'min_contig_length'
-                input[1] = '500'
                 """
             }
         }
@@ -126,10 +138,12 @@ nextflow_function {
         function "typecastIntegerParam"
 
         when {
+            params {
+                min_contig_length = 'abc'
+            }
             function {
                 """
                 input[0] = 'min_contig_length'
-                input[1] = 'abc'
                 """
             }
         }
