@@ -38,13 +38,22 @@ nextflow_process {
                     ['k59_1.p1',                'k59_1',       '183',      '611',      '+',   '429', '0']
                 ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
 
-                def provenance = file("\${workDir}/test.provenance.tsv")
-                provenance.text = [
+                // Gzipped, matching FORMAT_LOCUSCONSOLIDATE's real output -- the module reads this
+                // via `zcat` (not fread()'s own gzip support, which needs the R.utils package and
+                // isn't reliably present in every container build), so an uncompressed fixture here
+                // would silently skip exercising that code path.
+                def provenanceRows = [
                     ['ID', 'callers', 'n_calls'],
                     ['locus_k59_0_1_447_+',     'metaeuk,transdecoder', '2'],
                     ['k59_1.p1',                'transdecoder',         '1'],
                     ['NP_011412.1|k59_1|-|191', 'metaeuk',              '1']
                 ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+
+                def provenanceBaos = new java.io.ByteArrayOutputStream()
+                new java.util.zip.GZIPOutputStream(provenanceBaos).withCloseable { gz -> gz.write(provenanceRows.getBytes('UTF-8')) }
+
+                def provenance = file("\${workDir}/test.provenance.tsv.gz")
+                provenance.bytes = provenanceBaos.toByteArray()
 
                 // Headerless MMseqs2 output: representative, member. The representative is always a
                 // member of its own cluster.

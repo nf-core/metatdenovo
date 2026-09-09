@@ -8,6 +8,7 @@ keywords:
   - eukaryotes
   - gene prediction
 components:
+  - metaeuk/download
   - metaeuk/easypredict
   - find/concatenate
   - format/metaeuk/gff
@@ -19,13 +20,20 @@ input:
         Channel containing metadata and an assembly fasta file
         Structure: [ val(meta), path(fasta) ]
       pattern: "*.{fa,fasta,fa.gz,fasta.gz}"
-  - database:
-      type: file
+  - db_path:
+      type: string
       description: |
-        Either a protein fasta file, or a directory containing an
-        mmseqs2-formatted protein database, used as the MetaEuk homology
-        reference
-        Structure: path(database)
+        Path to a pre-built MetaEuk homology reference -- either a protein
+        fasta file, or a directory containing an mmseqs2-formatted protein
+        database. Falsy (e.g. null) to have METAEUK_DOWNLOAD build db_name
+        instead.
+        Structure: value
+  - db_name:
+      type: string
+      description: |
+        Name of a reference database that `metaeuk databases` can download
+        and build, used only when db_path is falsy
+        Structure: value
   - batchsize:
       type: string
       description: |

@@ -148,9 +148,15 @@ workflow METATDENOVO {
         }
     }
 
-    // Exit if the user asked for metaeuk without also providing a reference database
-    if ( 'metaeuk' in orf_callers && ! params.metaeuk_db ) {
-        error "When using `--orf_caller metaeuk`, you must also specify `--metaeuk_db`!"
+    // If a pre-built MetaEuk database directory is supplied, fail fast when it doesn't look
+    // like an mmseqs2-formatted one -- otherwise METAEUK_EASYPREDICT's own failure deep inside
+    // `metaeuk easy-predict` is confusing and easy to mistake for something else (e.g. an OOM
+    // kill). A plain fasta file needs no such check.
+    if ( 'metaeuk' in orf_callers && params.metaeuk_db ) {
+        def metaeuk_db_path = file(params.metaeuk_db)
+        if ( metaeuk_db_path.isDirectory() && ! metaeuk_db_path.listFiles().any { f -> f.name.endsWith('.version') } ) {
+            error "--metaeuk_db points at a directory (${params.metaeuk_db}) with no '*.version' file inside -- this doesn't look like an mmseqs2-formatted MetaEuk database. See docs/usage.md for the expected layout."
+        }
     }
 
     // Read --user_orfs synchronously here, in addition to the ch_user_orfs channel built in
@@ -564,7 +570,8 @@ workflow METATDENOVO {
     if ( 'metaeuk' in orf_callers ) {
         METAEUK (
             ch_assembly_contigs.map { _meta, contigs -> [ [id: "${assembly_name}.metaeuk", caller: 'metaeuk' ], contigs ] },
-            file(params.metaeuk_db, checkIfExists: true),
+            params.metaeuk_db,
+            params.metaeuk_db_name,
             params.metaeuk_batchsize
         )
         ch_protein = ch_protein.mix(METAEUK.out.faa)

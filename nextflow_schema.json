@@ -402,8 +402,31 @@
                 "metaeuk_db": {
                     "type": "string",
                     "default": null,
-                    "description": "Path to a reference protein database for MetaEuk, either a protein fasta file or a directory containing an mmseqs2-formatted database. Required when `--orf_caller metaeuk` is used.",
+                    "description": "Path to a pre-built reference protein database for MetaEuk, either a protein fasta file or a directory containing an mmseqs2-formatted database. Optional -- when unset, `--metaeuk_db_name` is downloaded and built automatically.",
                     "fa_icon": "far fa-file-code"
+                },
+                "metaeuk_db_name": {
+                    "type": "string",
+                    "default": "UniRef50",
+                    "enum": [
+                        "UniRef100",
+                        "UniRef90",
+                        "UniRef50",
+                        "UniProtKB",
+                        "UniProtKB/TrEMBL",
+                        "UniProtKB/Swiss-Prot",
+                        "NR",
+                        "GTDB",
+                        "PDB"
+                    ],
+                    "description": "Name of the amino-acid reference database to download and build for MetaEuk when `--metaeuk_db` isn't set. Restricted to the amino-acid databases `metaeuk databases -h` lists (its nucleotide/profile entries aren't valid MetaEuk homology references); see the table in usage.md for which of these we've actually confirmed downloadable.",
+                    "fa_icon": "fas fa-download"
+                },
+                "metaeuk_db_dir": {
+                    "type": "string",
+                    "default": "./metaeuk_db/",
+                    "description": "Path to a directory to store the downloaded MetaEuk database in. Will be created if it doesn't exist. Ignored when `--metaeuk_db` is set.",
+                    "fa_icon": "fas fa-folder-open"
                 },
                 "metaeuk_batchsize": {
                     "type": "integer",

@@ -3,6 +3,7 @@
 // its GFF for downstream featureCounts
 //
 
+include { METAEUK_DOWNLOAD                    } from '../../../modules/local/metaeuk/download/main'
 include { METAEUK_EASYPREDICT                 } from '../../../modules/nf-core/metaeuk/easypredict/main'
 include { FIND_CONCATENATE as METAEUK_FAA_CAT } from '../../../modules/nf-core/find/concatenate/main'
 include { FIND_CONCATENATE as METAEUK_GFF_CAT } from '../../../modules/nf-core/find/concatenate/main'
@@ -13,10 +14,22 @@ workflow METAEUK {
 
     take:
     fasta     // channel: [ val(meta), path(fasta) ]
-    database  // channel: path(database)
+    db_path   // value: path to a pre-built database (file or directory), or falsy to auto-download
+    db_name   // value: database name `metaeuk databases` understands, used only when db_path is falsy
     batchsize // channel: strings like '10.MB'. Usually from params.metaeuk_batchsize
 
     main:
+
+    // A pre-built database is used as-is; otherwise METAEUK_DOWNLOAD builds one under
+    // params.metaeuk_db_dir. db_name is a plain value rather than a channel, so METAEUK_DOWNLOAD
+    // runs exactly once and Nextflow reuses its single output for every fasta this subworkflow
+    // receives, same as any process whose inputs are plain values rather than queue channels.
+    if ( db_path ) {
+        ch_database = file(db_path, checkIfExists: true)
+    } else {
+        METAEUK_DOWNLOAD( db_name )
+        ch_database = METAEUK_DOWNLOAD.out.database
+    }
 
     // MetaEuk's splice-aware ORF calling is per-contig, so splitting the assembly into
     // batches (same rationale/mechanism as PROKKA_SUBSETS) is safe, and directly bounds
@@ -28,7 +41,7 @@ workflow METAEUK {
             .map { _meta, contigs -> contigs }
             .splitFasta(size: batchsize, file: true)
             .map { ctg -> [ [ id: ctg.getBaseName() ], ctg ] },
-        database
+        ch_database
     )
 
     ch_faa = fasta.map { meta, _contigs -> meta }
