@@ -1,0 +1,112 @@
+nextflow_process {
+
+    name "Test Process COLLECT_FEATURECOUNTSSUMMARY"
+    script "../main.nf"
+    process "COLLECT_FEATURECOUNTSSUMMARY"
+
+    tag "modules"
+    tag "modules_local"
+    tag "collect"
+    tag "collect/featurecountssummary"
+
+    // Input is built inline rather than read from a fixture: the pipeline repo carries no test
+    // data of its own. Shape matches SUBREAD_FEATURECOUNTS's own *.summary output: a "Status"
+    // column plus one data column per BAM.
+
+    test("one file per Unassigned_* category is emitted, Assigned is skipped") {
+
+        when {
+            process {
+                """
+                def summary1 = file("\${workDir}/sample1.prodigal.featureCounts.tsv.summary")
+                summary1.text = [
+                    ['Status', 'sample1.sorted.bam'],
+                    ['Assigned', '1000'],
+                    ['Unassigned_Unmapped', '0'],
+                    ['Unassigned_MultiMapping', '5'],
+                    ['Unassigned_NoFeatures', '200'],
+                    ['Unassigned_Ambiguity', '30'],
+                ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+
+                def summary2 = file("\${workDir}/sample2.prodigal.featureCounts.tsv.summary")
+                summary2.text = [
+                    ['Status', 'sample2.sorted.bam'],
+                    ['Assigned', '2000'],
+                    ['Unassigned_Unmapped', '0'],
+                    ['Unassigned_MultiMapping', '7'],
+                    ['Unassigned_NoFeatures', '400'],
+                    ['Unassigned_Ambiguity', '60'],
+                ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+
+                input[0] = [ [ id:'test.prodigal', caller:'prodigal' ], [ summary1, summary2 ] ]
+                """
+            }
+        }
+
+        then {
+            def outfiles = process.out.unassigned[0][1].collect { f -> file(f).name }
+            def nofeatures = path(
+                process.out.unassigned[0][1].find { f -> file(f).name == 'prodigal.Unassigned_NoFeatures.featureCounts.tsv' }
+            ).csv(sep: '\t', header: true)
+
+            assertAll(
+                { assert process.success },
+                { assert outfiles.contains('prodigal.Unassigned_NoFeatures.featureCounts.tsv') },
+                { assert outfiles.contains('prodigal.Unassigned_Ambiguity.featureCounts.tsv') },
+                { assert outfiles.contains('prodigal.Unassigned_MultiMapping.featureCounts.tsv') },
+                { assert outfiles.contains('prodigal.Unassigned_Unmapped.featureCounts.tsv') },
+                { assert !outfiles.any { name -> name.contains('Assigned.featureCounts.tsv') && !name.contains('Unassigned') } },
+                { assert nofeatures.columns["sample"].sort() == ['sample1', 'sample2'] },
+                { assert nofeatures.columns["count"].sort() == [200, 400] },
+                { assert snapshot(process.out.unassigned).match() }
+            )
+        }
+    }
+
+    test("a caller with no Unassigned_* rows emits nothing") {
+
+        when {
+            process {
+                """
+                def summary1 = file("\${workDir}/sample1.prodigal.featureCounts.tsv.summary")
+                summary1.text = [
+                    ['Status', 'sample1.sorted.bam'],
+                    ['Assigned', '1000'],
+                ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+
+                input[0] = [ [ id:'test.prodigal', caller:'prodigal' ], [ summary1 ] ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert process.out.unassigned.size() == 0 }
+            )
+        }
+    }
+
+    test("one file per Unassigned_* category is emitted - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                def summary1 = file("\${workDir}/sample1.prodigal.featureCounts.tsv.summary")
+                summary1.text = ''
+
+                input[0] = [ [ id:'test.prodigal', caller:'prodigal' ], [ summary1 ] ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+}

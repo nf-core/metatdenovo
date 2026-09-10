@@ -7,6 +7,7 @@
 //
 // MODULE: local
 //
+include { COLLECT_FEATURECOUNTSSUMMARY       } from '../modules/local/collect/featurecountssummary/'
 include { COLLECT_LOCUSCONSOLIDATE           } from '../modules/local/collect/locusconsolidate/'
 include { COLLECT_PROTEINCONSOLIDATE         } from '../modules/local/collect/proteinconsolidate/'
 include { FORMAT_CLUSTERREPS                 } from '../modules/local/format/clusterreps/'
@@ -871,6 +872,20 @@ workflow METATDENOVO {
         ch_protein_consolidate_counts = COLLECT_PROTEINCONSOLIDATE.out.counts
     }
 
+    //
+    // MODULE: extract per-category Unassigned_* diagnostic counts (#451) from FEATURECOUNTS_CDS's
+    // own *.summary files -- same caller-level grouping as ch_collect_feature above, minus
+    // locus_consolidate, which never reaches CUSTOM_COLLECTSTATS as a caller in its own right.
+    //
+    ch_collect_summary = FEATURECOUNTS_CDS.out.summary
+        .map { meta, summary -> [ meta.caller, summary ] }
+        .groupTuple()
+        .map { caller, summaries -> [ [ id: "${assembly_name}.${caller}", caller: caller ], summaries ] }
+        .filter { meta, _summaries -> meta.caller != 'locus_consolidate' }
+
+    COLLECT_FEATURECOUNTSSUMMARY ( ch_collect_summary )
+    ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTSSUMMARY.out.versions)
+
     CUSTOM_COLLECTFEATURECOUNTS ( ch_collect_feature.other )
 
     // CUSTOM_COLLECTFEATURECOUNTS itself is kept generic (no Transdecoder-specific ID handling), so this
@@ -1054,17 +1069,35 @@ workflow METATDENOVO {
         // as a null meta and kill CUSTOM_COLLECTSTATS on tag "$meta.id" -- drop it instead, so a future
         // wiring mistake degrades to a missing stats row rather than a crash far from its cause.
         .filter { _caller, meta, _fcs, _mergetab -> meta != null }
-        .map { _caller, meta, fcs, mergetab -> [ meta, fcs, mergetab ?: [] ] }
+        // Left-join the #451 Unassigned_* diagnostic files onto the same caller key. remainder: true
+        // because COLLECT_FEATURECOUNTSSUMMARY's output is `optional: true` -- a caller whose
+        // featureCounts summaries had no Unassigned_* rows at all (not observed in practice, but not
+        // ruled out either) never emits a tuple for that caller, rather than emitting one with an
+        // empty list, so a missing right side has to default to [] rather than being treated as a
+        // wiring error the way a missing left side (meta == null, above) is.
+        .map { caller, meta, fcs, mergetab -> [ caller, meta, fcs, mergetab ] }
+        .join(
+            COLLECT_FEATURECOUNTSSUMMARY.out.unassigned.map { meta, unassigned -> [ meta.caller, unassigned ] },
+            remainder: true
+        )
+        .filter { _caller, meta, _fcs, _mergetab, _unassigned -> meta != null }
+        .map { _caller, meta, fcs, mergetab, unassigned ->
+            // A single-file glob match collapses to a bare Path rather than a List -- same trap the
+            // "wrapped in a list" comment below already works around for the counts file.
+            def unassignedFiles = unassigned == null ? [] : (unassigned instanceof List ? unassigned : [ unassigned ])
+            [ meta, fcs, mergetab ?: [], unassignedFiles ]
+        }
 
     ch_collect_stats = ch_collect_stats
         .combine( ch_fcs_mergetab_per_caller )
-        .map { _origMeta, samples, trimlogs, bblogs, idxstats, callerMeta, fcs, mergetab ->
+        .map { _origMeta, samples, trimlogs, bblogs, idxstats, callerMeta, fcs, mergetab, unassigned ->
             // CUSTOM_COLLECTSTATS's `fcs` input accepts one or more files and derives each one's
             // feature-count column name from the text between the first and second dot of its
             // filename -- wrapped in a list here so a single caller's counts file (named
             // "<assembly>.<caller>.counts.tsv.gz") still stages as a list, giving a column named
-            // after the caller.
-            [ callerMeta, samples, trimlogs, bblogs, idxstats, [ fcs ], mergetab ]
+            // after the caller. The #451 Unassigned_* files (named "<caller>.<Status>.featureCounts.tsv")
+            // are appended the same way, each contributing its own Status-named column.
+            [ callerMeta, samples, trimlogs, bblogs, idxstats, [ fcs ] + unassigned, mergetab ]
         }
 
     CUSTOM_COLLECTSTATS(ch_collect_stats)
