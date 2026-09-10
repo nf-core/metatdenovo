@@ -1,7 +1,7 @@
 {
     "-profile test_single": {
         "content": [
-            80,
+            79,
             {
                 "BBMAP_ALIGN": {
                     "bbmap": 39.18
@@ -271,7 +271,7 @@
                 "sample\tn_post_trimming\tn_non_contaminated\tidxs_n_mapped\tidxs_n_unmapped\tUnassigned_Ambiguity\tUnassigned_Chimera\tUnassigned_Duplicate\tUnassigned_FragmentLength\tUnassigned_MappingQuality\tUnassigned_MultiMapping\tUnassigned_NoFeatures\tUnassigned_NonSplit\tUnassigned_Overlapping_Length\tUnassigned_Read_Type\tUnassigned_Secondary\tUnassigned_Singleton\tUnassigned_Unmapped\tprodigal"
             ]
         ],
-        "timestamp": "2026-09-10T13:12:16.631047901",
+        "timestamp": "2026-09-10T15:26:15.678237407",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

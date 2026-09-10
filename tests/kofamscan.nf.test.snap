@@ -1,7 +1,7 @@
 {
     "-profile test_kofamscan": {
         "content": [
-            59,
+            58,
             {
                 "BBMAP_ALIGN": {
                     "bbmap": 39.18
@@ -267,7 +267,7 @@
                 "multiqc_citations.txt:md5,2d1a8ef8ba06c7eada06ab3e96552ea4"
             ]
         ],
-        "timestamp": "2026-09-10T12:34:11.518090116",
+        "timestamp": "2026-09-10T14:56:56.411538028",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"
