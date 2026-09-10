@@ -80,7 +80,7 @@ cd /path/to/work/3f/8a1b2c...
 ls megahit_out/
 ```
 
-The module doesn't set Megahit's `-o` explicitly, so Megahit always writes to `megahit_out/` inside the task's own work directory. If you see `checkpoints.txt`, `options.json` and a populated `intermediate_contigs/`, there's a checkpoint to resume from. `cat megahit_out/log` shows how far it got -- e.g. a last line like `Extracting solid (k+1)-mers and building sdbg for k = 69` means every earlier k was completed and only that in-progress step needs to be redone.
+When running, nf-core/metatdenovo doesn't set Megahit's `-o` explicitly, so Megahit always writes to `megahit_out/` inside the task's own work directory. If you see `checkpoints.txt`, `options.json` and a populated `intermediate_contigs/`, there's a checkpoint to resume from. `tail megahit_out/log` shows how far it got -- e.g. a last line like `Extracting solid (k+1)-mers and building sdbg for k = 69` means every earlier k was completed and only that in-progress step needs to be redone.
 
 If `checkpoints.txt` doesn't exist yet, Megahit hadn't reached its first checkpoint -- there's nothing to resume, and a fresh run is the only option (in practice rare, since the first checkpoint comes early relative to the k-mer stages that take days).
 
