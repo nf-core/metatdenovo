@@ -920,9 +920,15 @@ workflow METATDENOVO {
         ch_unassigned_protein_consolidate = ch_unassigned_per_caller.locus_consolidate
             .flatMap { _meta, unassigned -> (unassigned instanceof List) ? unassigned : [ unassigned ] }
             .collectFile { f ->
+                // Fewer than 2 lines -- empty (a -stub run's file has no header at all,
+                // unlike the real script's write_tsv() output) or header-only (zero data
+                // rows, a legitimate real-run outcome too) -- would otherwise crash
+                // lines[1..-1] on an out-of-range slice.
                 def lines = file(f).readLines()
-                def widened = ( [ lines[0] + '\tcallers\tn_calls\tn_loci\tloci' ] +
-                    lines[1..-1].collect { line -> line + '\t\t\t\t' } ).join('\n') + '\n'
+                def widened = lines.size() < 2
+                    ? ( lines ? lines[0] + '\tcallers\tn_calls\tn_loci\tloci\n' : '' )
+                    : ( [ lines[0] + '\tcallers\tn_calls\tn_loci\tloci' ] +
+                        lines[1..-1].collect { line -> line + '\t\t\t\t' } ).join('\n') + '\n'
                 [ file(f).name, widened ]
             }
             .collect()
