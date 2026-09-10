@@ -87,6 +87,58 @@ nextflow_process {
         }
     }
 
+    test("a caller name containing a quote doesn't break the generated R") {
+
+        when {
+            process {
+                """
+                def summary1 = file("\${workDir}/sample1.it's.featureCounts.tsv.summary")
+                summary1.text = [
+                    ['Status', 'sample1.sorted.bam'],
+                    ['Unassigned_NoFeatures', '200'],
+                ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+
+                input[0] = [ [ id:"test.it's", caller:"it's" ], [ summary1 ] ]
+                """
+            }
+        }
+
+        then {
+            // Only one Unassigned_* category here, so the output glob collapses to a bare
+            // path rather than a list -- wrap it before treating it as a collection.
+            def outfiles = process.out.unassigned[0][1]
+            outfiles = outfiles instanceof List ? outfiles : [ outfiles ]
+            assertAll(
+                { assert process.success },
+                { assert outfiles.collect { f -> file(f).name }.contains("it's.Unassigned_NoFeatures.featureCounts.tsv") }
+            )
+        }
+    }
+
+    test("a summary filename that doesn't match <sample>.<caller> fails loudly instead of mislabeling sample") {
+
+        when {
+            process {
+                """
+                def summary1 = file("\${workDir}/sample1.wrong_caller.featureCounts.tsv.summary")
+                summary1.text = [
+                    ['Status', 'sample1.sorted.bam'],
+                    ['Unassigned_NoFeatures', '200'],
+                ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+
+                input[0] = [ [ id:'test.prodigal', caller:'prodigal' ], [ summary1 ] ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert !process.success },
+                { assert process.stdout.toString().contains("didn't match the expected <sample>.<caller> pattern") }
+            )
+        }
+    }
+
     test("one file per Unassigned_* category is emitted - stub") {
 
         options "-stub"

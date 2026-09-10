@@ -1,7 +1,7 @@
 {
     "-profile test_annotate_only_consolidated": {
         "content": [
-            80,
+            81,
             {
                 "BBMAP_ALIGN": {
                     "bbmap": 39.18
@@ -321,7 +321,7 @@
                 "multiqc_citations.txt:md5,9af6aefe57f066cc7e3c782a93f48cf3"
             ]
         ],
-        "timestamp": "2026-09-10T09:25:02.499319274",
+        "timestamp": "2026-09-10T12:01:36.376723518",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

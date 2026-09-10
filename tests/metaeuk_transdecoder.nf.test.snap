@@ -1,7 +1,7 @@
 {
     "-profile test_metaeuk_transdecoder": {
         "content": [
-            77,
+            78,
             {
                 "BBMAP_ALIGN": {
                     "bbmap": 39.18
@@ -331,7 +331,7 @@
                 "k59_1.p1\tk59_1\t183\t611\t+\t429\tRPL28_GENOMIC\t12\t153410.553411\ttransdecoder\t1\t1\tk59_1.p1"
             ]
         ],
-        "timestamp": "2026-09-10T10:05:19.343161157",
+        "timestamp": "2026-09-10T11:49:25.779347183",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

@@ -194,6 +194,14 @@ workflow METATDENOVO {
     if ( duplicate_user_orf_names ) {
         error "Duplicate user-supplied-ORFs name(s): ${duplicate_user_orf_names.join(', ')}. Every name (--user_orfs rows and --user_orfs_name) must be unique."
     }
+    // A caller name becomes a filename component in several places downstream (e.g.
+    // COLLECT_FEATURECOUNTSSUMMARY's "<caller>.<Status>.featureCounts.tsv", parsed back apart by
+    // CUSTOM_COLLECTSTATS on the text between the first and second dot) -- a dot in the name itself
+    // would be silently misparsed there rather than raising an error.
+    def dotted_user_orf_names = user_orf_names.findAll { name -> name.contains('.') }
+    if ( dotted_user_orf_names ) {
+        error "--user_orfs/--user_orfs_name name(s) ${dotted_user_orf_names.join(', ')} contain a '.', which is not allowed in a caller name. Pick a different name."
+    }
 
     // --bbmap_ambiguous all keeps every top-scoring alignment, so without --featurecounts_fraction a
     // multi-mapping read is counted at full weight at EVERY site it hits. On the per-caller and
@@ -874,17 +882,53 @@ workflow METATDENOVO {
 
     //
     // MODULE: extract per-category Unassigned_* diagnostic counts from FEATURECOUNTS_CDS's own
-    // *.summary files -- same caller-level grouping as ch_collect_feature above, minus
-    // locus_consolidate, which never reaches CUSTOM_COLLECTSTATS as a caller in its own right.
+    // *.summary files -- same caller-level grouping as ch_collect_feature above.
     //
     ch_collect_summary = FEATURECOUNTS_CDS.out.summary
         .map { meta, summary -> [ meta.caller, summary ] }
         .groupTuple()
         .map { caller, summaries -> [ [ id: "${assembly_name}.${caller}", caller: caller ], summaries ] }
-        .filter { meta, _summaries -> meta.caller != 'locus_consolidate' }
+        // locus_consolidate's own summaries are only needed below when protein consolidation is
+        // going to reuse them -- skip the invocation entirely otherwise, same guard as that reuse.
+        .filter { meta, _summaries ->
+            meta.caller != 'locus_consolidate' || ( ! skip_protein_consolidation && ( orf_callers || params.user_orfs ) )
+        }
 
     COLLECT_FEATURECOUNTSSUMMARY ( ch_collect_summary )
     ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTSSUMMARY.out.versions)
+
+    // locus_consolidate never gets its own CUSTOM_COLLECTSTATS invocation, but
+    // protein_consolidate's counts are a pure re-aggregation of locus_consolidate's -- summed
+    // across protein clusters, not recounted -- so the read-to-locus assignment behind
+    // locus_consolidate's Unassigned_* diagnostics is exactly protein_consolidate's too. Relabel
+    // and reuse it there instead of leaving protein_consolidate as the one caller whose
+    // overall_stats.tsv.gz lacks these columns.
+    ch_unassigned_per_caller = COLLECT_FEATURECOUNTSSUMMARY.out.unassigned
+        .branch { meta, _unassigned ->
+            locus_consolidate: meta.caller == 'locus_consolidate'
+            other: true
+        }
+    ch_unassigned_protein_consolidate = channel.empty()
+    if ( ! skip_protein_consolidation && ( orf_callers || params.user_orfs ) ) {
+        // protein_consolidate's own counts table carries 4 extra provenance columns
+        // (callers/n_calls/n_loci/loci, see COLLECT_PROTEINCONSOLIDATE) that every other
+        // caller's plain counts table doesn't -- CUSTOM_COLLECTSTATS requires every fcs file
+        // in one invocation to share columns, so pad the reused diagnostic files to match
+        // before relabeling them. The original filenames are kept -- CUSTOM_COLLECTSTATS only
+        // reads the text between the first and second dot, so the "locus_consolidate" prefix
+        // is discarded either way.
+        ch_unassigned_protein_consolidate = ch_unassigned_per_caller.locus_consolidate
+            .flatMap { _meta, unassigned -> (unassigned instanceof List) ? unassigned : [ unassigned ] }
+            .collectFile { f ->
+                def lines = file(f).readLines()
+                def widened = ( [ lines[0] + '\tcallers\tn_calls\tn_loci\tloci' ] +
+                    lines[1..-1].collect { line -> line + '\t\t\t\t' } ).join('\n') + '\n'
+                [ file(f).name, widened ]
+            }
+            .collect()
+            .map { widened -> [ [ id: "${assembly_name}.${protein_consolidate_name}", caller: protein_consolidate_name ], widened ] }
+    }
+    ch_unassigned_per_caller = ch_unassigned_per_caller.other.mix(ch_unassigned_protein_consolidate)
 
     CUSTOM_COLLECTFEATURECOUNTS ( ch_collect_feature.other )
 
@@ -1071,9 +1115,8 @@ workflow METATDENOVO {
         .filter { _caller, meta, _fcs, _mergetab -> meta != null }
         // COLLECT_FEATURECOUNTSSUMMARY's output is `optional: true`, so a caller with no
         // Unassigned_* rows never emits a tuple for it -- remainder: true, default to [].
-        .map { caller, meta, fcs, mergetab -> [ caller, meta, fcs, mergetab ] }
         .join(
-            COLLECT_FEATURECOUNTSSUMMARY.out.unassigned.map { meta, unassigned -> [ meta.caller, unassigned ] },
+            ch_unassigned_per_caller.map { meta, unassigned -> [ meta.caller, unassigned ] },
             remainder: true
         )
         .filter { _caller, meta, _fcs, _mergetab, _unassigned -> meta != null }

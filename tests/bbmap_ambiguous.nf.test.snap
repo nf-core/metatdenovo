@@ -1,7 +1,7 @@
 {
     "-profile test_bbmap_ambiguous": {
         "content": [
-            52,
+            53,
             {
                 "BBMAP_ALIGN": {
                     "bbmap": 39.18
@@ -232,7 +232,7 @@
                 "orf\tchr\tstart\tend\tstrand\tlength\tsample\tcount\ttpm"
             ]
         ],
-        "timestamp": "2026-09-10T09:33:27.841224776",
+        "timestamp": "2026-09-10T12:20:15.815679089",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

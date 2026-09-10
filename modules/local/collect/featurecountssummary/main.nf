@@ -1,3 +1,9 @@
+// Safely quote a Groovy value as a single-quoted R string literal -- without this, a value
+// containing a quote or backslash could break the generated R syntax.
+def rq(v) {
+    return "'" + v.toString().replace('\\', '\\\\').replace("'", "\\'") + "'"
+}
+
 process COLLECT_FEATURECOUNTSSUMMARY {
     tag "$meta.id"
     label 'process_single'
@@ -32,9 +38,15 @@ process COLLECT_FEATURECOUNTSSUMMARY {
     summaries <- bind_rows(lapply(Sys.glob('*.featureCounts.tsv.summary'), function(f) {
         read_tsv(f, col_types = cols(Status = col_character(), .default = col_integer())) %>%
             rename(count = 2) %>%
-            mutate(sample = str_remove(basename(f), '\\\\.${meta.caller}\\\\.featureCounts\\\\.tsv\\\\.summary\$')) %>%
+            mutate(sample = str_remove(basename(f), paste0('\\\\.', ${rq(meta.caller)}, '\\\\.featureCounts\\\\.tsv\\\\.summary\$'))) %>%
             select(status = Status, sample, count)
     }))
+    # str_remove() returns its input unchanged on no match, so a mismatched suffix would
+    # otherwise silently leave the full filename as "sample" instead of failing.
+    stopifnot(
+        "a *.featureCounts.tsv.summary filename didn't match the expected <sample>.<caller> pattern" =
+            ! any(str_detect(summaries\$sample, '\\\\.featureCounts\\\\.tsv\\\\.summary\$'))
+    )
 
     # CUSTOM_COLLECTSTATS reads all fcs files together in one call, so every file must share
     # the same columns as CUSTOM_COLLECTFEATURECOUNTS's own counts table, even though only
@@ -46,7 +58,7 @@ process COLLECT_FEATURECOUNTSSUMMARY {
                 orf = NA_character_, chr = NA_character_, start = NA_integer_, end = NA_integer_,
                 strand = NA_character_, length = NA_integer_, sample, count, tpm = NA_real_
             ) %>%
-            write_tsv(paste0('${meta.caller}.', s, '.featureCounts.tsv'))
+            write_tsv(paste0(${rq(meta.caller)}, '.', s, '.featureCounts.tsv'))
     }
 
     writeLines(

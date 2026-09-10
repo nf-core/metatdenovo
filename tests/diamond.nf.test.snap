@@ -1,7 +1,7 @@
 {
     "-profile test_diamond": {
         "content": [
-            64,
+            65,
             {
                 "BBMAP_ALIGN": {
                     "bbmap": 39.18
@@ -271,7 +271,7 @@
                 "multiqc_citations.txt:md5,2d1a8ef8ba06c7eada06ab3e96552ea4"
             ]
         ],
-        "timestamp": "2026-09-10T09:39:35.091733903",
+        "timestamp": "2026-09-10T12:29:36.274877934",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"
