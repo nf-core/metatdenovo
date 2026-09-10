@@ -25,20 +25,10 @@ process COLLECT_FEATURECOUNTSSUMMARY {
     library(dplyr)
     library(stringr)
 
-    # featureCounts' *.summary file is a wide table: one "Status" row per outcome
-    # category, one data column per input BAM. Reshape every sample's summary into a
-    # long (status, sample, count) table, then write one narrow file per "Unassigned_*"
-    # category -- CUSTOM_COLLECTSTATS derives a table column's name from the text
-    # between the first and second dot of each fcs file it's handed, so
-    # "\${meta.caller}.<Status>.featureCounts.tsv" gives that category its own column.
-    # "Assigned" is skipped: it's already the caller's per-sample total, reported as
-    # the caller-named column CUSTOM_COLLECTFEATURECOUNTS's own output produces.
-    #
-    # CUSTOM_COLLECTSTATS reads every fcs file it's given in one combined read_tsv()
-    # call, which requires them all to share the same columns -- so each file here
-    # carries the same 9 columns CUSTOM_COLLECTFEATURECOUNTS's own counts.tsv.gz does
-    # (orf/chr/start/end/strand/length/sample/count/tpm), with only sample and count
-    # actually populated.
+    # CUSTOM_COLLECTSTATS names a table column from the text between a file's first and
+    # second dot, so name each output "<caller>.<Status>.featureCounts.tsv". Skip
+    # "Assigned": CUSTOM_COLLECTFEATURECOUNTS's own output already reports it, as the
+    # caller-named column.
     summaries <- bind_rows(lapply(Sys.glob('*.featureCounts.tsv.summary'), function(f) {
         read_tsv(f, col_types = cols(Status = col_character(), .default = col_integer())) %>%
             rename(count = 2) %>%
@@ -46,6 +36,9 @@ process COLLECT_FEATURECOUNTSSUMMARY {
             select(status = Status, sample, count)
     }))
 
+    # CUSTOM_COLLECTSTATS reads all fcs files together in one call, so every file must share
+    # the same columns as CUSTOM_COLLECTFEATURECOUNTS's own counts table, even though only
+    # sample/count are populated here.
     for ( s in unique(summaries\$status[str_starts(summaries\$status, 'Unassigned_')]) ) {
         summaries %>%
             filter(status == s) %>%
