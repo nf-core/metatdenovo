@@ -45,8 +45,8 @@ process COLLECT_FEATURECOUNTSSUMMARY {
             mutate(sample = if (str_ends(name, fixed(suffix))) str_sub(name, 1, -nchar(suffix) - 1) else name) %>%
             select(status = Status, sample, count)
     }))
-    # str_remove() returns its input unchanged on no match, so a mismatched suffix would
-    # otherwise silently leave the full filename as "sample" instead of failing.
+    # The `else name` branch above leaves the full filename as "sample" on a mismatched
+    # suffix, so this guard is what turns that into a failure instead of silently wrong stats.
     stopifnot(
         "a *.featureCounts.tsv.summary filename didn't match the expected <sample>.<caller> pattern" =
             ! any(str_detect(summaries\$sample, '\\\\.featureCounts\\\\.tsv\\\\.summary\$'))
