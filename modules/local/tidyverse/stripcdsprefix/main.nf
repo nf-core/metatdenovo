@@ -46,8 +46,11 @@ process TIDYVERSE_STRIPCDSPREFIX {
     stub:
     prefix = task.ext.prefix ?: "${meta.id}"
     """
-    touch ${prefix}.counts.tsv
-    gzip ${prefix}.counts.tsv
+    # ${prefix}.counts.tsv.gz matches the staged input's own filename, a symlink -- write
+    # elsewhere and mv into place rather than redirect straight into it, which would follow
+    # the symlink and overwrite the input task's cached file.
+    echo "" | gzip > stub.counts.tsv.gz
+    mv -f stub.counts.tsv.gz ${prefix}.counts.tsv.gz
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

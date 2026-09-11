@@ -50,4 +50,16 @@ process FORMAT_EUKULELE_TAX {
         "versions.yml"
     )
     """
+
+    stub:
+    def prefix = task.ext.prefix ?: "${meta.id}"
+    """
+    echo "" | gzip > ${prefix}.taxonomy_classification.tsv.gz
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        R: 4.5.3
+        dplyr: 1.2.1
+    END_VERSIONS
+    """
 }
