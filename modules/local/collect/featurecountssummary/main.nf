@@ -78,8 +78,11 @@ process COLLECT_FEATURECOUNTSSUMMARY {
     """
 
     stub:
+    // Single-quoted and quote-escaped, matching the same caller-name-safety concern as the
+    // script: block above, but for bash rather than R.
+    def safeCaller = meta.caller.replace("'", "'\\''")
     """
-    touch ${meta.caller}.Unassigned_NoFeatures.featureCounts.tsv
+    touch '${safeCaller}.Unassigned_NoFeatures.featureCounts.tsv'
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

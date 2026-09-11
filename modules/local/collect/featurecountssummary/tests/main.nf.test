@@ -191,4 +191,29 @@ nextflow_process {
             )
         }
     }
+
+    test("a caller name containing shell metacharacters doesn't break the stub - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                def summary1 = file("\${workDir}/sample1.orf;v2.featureCounts.tsv.summary")
+                summary1.text = ''
+
+                input[0] = [ [ id:"test.orf;v2", caller:'orf;v2' ], [ summary1 ] ]
+                """
+            }
+        }
+
+        then {
+            def outfiles = process.out.unassigned[0][1]
+            outfiles = outfiles instanceof List ? outfiles : [ outfiles ]
+            assertAll(
+                { assert process.success },
+                { assert outfiles.collect { f -> file(f).name }.contains('orf;v2.Unassigned_NoFeatures.featureCounts.tsv') }
+            )
+        }
+    }
 }
