@@ -59,4 +59,21 @@ process PROKKAGFF2TSV {
         "versions.yml"
     )
     """
+
+    stub:
+    def prefix = task.ext.prefix ?: "${meta.id}"
+    """
+    echo "" | gzip > ${prefix}.prokka-annotations.tsv.gz
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        R: 4.5.3
+        data.table: 1.17.8
+        dtplyr: 1.3.3
+        dplyr: 1.2.1
+        tidyr: 1.3.2
+        readr: 2.2.0
+        stringr: 1.6.0
+    END_VERSIONS
+    """
 }

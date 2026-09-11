@@ -1,0 +1,41 @@
+nextflow_pipeline {
+
+    name "Test pipeline"
+    script "../main.nf"
+    profile "test_stub"
+    options "-stub"
+    tag "pipeline"
+
+    test("-profile test_stub -stub") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+        }
+
+        then {
+            def succeeded = workflow.trace.succeeded()
+            // WorkflowTask.name carries the trace file's own "name" column: the fully
+            // qualified process path plus a "(tag)" suffix -- strip the tag before counting.
+            def countsByProcess = succeeded.collect { it.name.replaceAll(/ \(.*\)$/, '') }.countBy { it }
+            def tasksFor = { String processName -> countsByProcess.findAll { name, _n -> name.endsWith(":${processName}") }.values().sum() ?: 0 }
+
+            assertAll(
+                { assert workflow.success },
+                // One task per active protein set (prokka, transdecoder, the mmseqs-clustered
+                // consolidation) reaching each annotation tool -- if a channel-wiring change
+                // ever drops one of the three, exactly one of these silently goes to 1 or 2.
+                { assert tasksFor('EGGNOGMAPPER') == 3 },
+                { assert tasksFor('KOFAMSCAN_SCAN') == 3 },
+                { assert tasksFor('RUNDBCAN_CAZYMEANNOTATION') == 3 },
+                { assert tasksFor('EUKULELE_SEARCH') == 3 },
+                { assert tasksFor('HMMER_HMMSEARCH') == 12 }, // 3 protein sets * 4 hmmfiles
+                { assert succeeded.size() == 148 },
+                { assert snapshot(
+                    removeNextflowVersion("$outputDir/pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml")
+                ).match() }
+            )
+        }
+    }
+}

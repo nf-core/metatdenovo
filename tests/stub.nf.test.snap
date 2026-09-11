@@ -1,0 +1,261 @@
+{
+    "-profile test_stub -stub": {
+        "content": [
+            {
+                "BBMAP_ALIGN": {
+                    "bbmap": 39.18
+                },
+                "BBMAP_BBDUK": {
+                    "bbmap": 39.18
+                },
+                "BBMAP_INDEX": {
+                    "bbmap": 39.18
+                },
+                "BEDTOOLS_SORT": {
+                    "bedtools": "2.31.1"
+                },
+                "CAT_FASTQ": {
+                    "cat": 9.5
+                },
+                "COLLECT_FEATURECOUNTSSUMMARY": {
+                    "R": "4.1.0",
+                    "readr": "2.0.0",
+                    "dplyr": "1.0.7",
+                    "stringr": "1.5.0"
+                },
+                "COLLECT_LOCUSCONSOLIDATE": {
+                    "R": "4.1.0",
+                    "dplyr": "1.0.7",
+                    "dtplyr": "1.1.0",
+                    "data.table": "1.14.0"
+                },
+                "COLLECT_PROTEINCONSOLIDATE": {
+                    "R": "4.1.0",
+                    "dplyr": "1.0.7",
+                    "dtplyr": "1.1.0",
+                    "data.table": "1.14.0"
+                },
+                "CUSTOM_COLLECTFEATURECOUNTS": {
+                    "R": "4.5.3",
+                    "dplyr": "1.2.1",
+                    "readr": "2.2.0",
+                    "stringr": "1.6.0",
+                    "dtplyr": "1.3.3",
+                    "data.table": "1.17.8"
+                },
+                "CUSTOM_COLLECTSTATS": {
+                    "R": "4.1.0",
+                    "dplyr": "1.0.7",
+                    "readr": "2.0.0",
+                    "purrr": "0.3.4",
+                    "tidyr": "1.1.3",
+                    "stringr": "1.4.0"
+                },
+                "DBCAN_FORMAT": {
+                    "gzip": 1.11
+                },
+                "DBCAN_SUM": {
+                    "R": 4.0
+                },
+                "EGGNOGMAPPER": {
+                    "eggnog-mapper": "2.1.13"
+                },
+                "EGGNOG_FORMAT": {
+                    "gzip": 1.11
+                },
+                "EGGNOG_SUM": {
+                    "R": 4.0
+                },
+                "EUKULELE_SEARCH": {
+                    "eukulele": "2.1.2"
+                },
+                "FAA_CAT": {
+                    "coreutils": 9.4,
+                    "find": "4.6.0",
+                    "pigz": 2.8
+                },
+                "FASTQC": {
+                    "fastqc": "0.12.1"
+                },
+                "FEATURECOUNTS_CDS": {
+                    "subread": "2.1.1"
+                },
+                "FFN_CAT": {
+                    "coreutils": 9.4,
+                    "find": "4.6.0",
+                    "pigz": 2.8
+                },
+                "FORMAT_CLUSTERREPS": {
+                    "gzip": 1.11
+                },
+                "FORMAT_EUKULELE_TAX": {
+                    "R": "4.5.3",
+                    "dplyr": "1.2.1"
+                },
+                "FORMAT_GFF2BED": {
+                    "gzip": 1.11
+                },
+                "FORMAT_LOCUSCONSOLIDATE": {
+                    "gzip": 1.11
+                },
+                "FORMAT_LOCUSFAA": {
+                    "gzip": 1.11
+                },
+                "GFF_CAT": {
+                    "coreutils": 9.4,
+                    "find": "4.6.0",
+                    "pigz": 2.8
+                },
+                "HMMER_HMMRANK": {
+                    "r-base": "4.2.3",
+                    "r-tidyverse": "2.0.0"
+                },
+                "HMMER_HMMSEARCH": {
+                    "hmmer": 3.4
+                },
+                "KOFAMSCAN_FORMAT": {
+                    "gzip": 1.11
+                },
+                "KOFAMSCAN_SCAN": {
+                    "kofamscan": "1.3.0"
+                },
+                "KOFAMSCAN_SUM": {
+                    "R": 4.0
+                },
+                "KOFAMSCAN_UNIQUE": {
+                    "R": "4.1.0",
+                    "dplyr": "1.0.7",
+                    "readr": "2.0.0",
+                    "purrr": "0.3.4",
+                    "tidyr": "1.1.3",
+                    "stringr": "1.4.0"
+                },
+                "MEGAHIT": {
+                    "megahit": "1.2.9"
+                },
+                "MERGE_TABLES": {
+                    "R": 4.0
+                },
+                "MMSEQS_CREATEDB": {
+                    "mmseqs": "18.8cc5c"
+                },
+                "MMSEQS_CREATETSV": {
+                    "mmseqs": "18.8cc5c"
+                },
+                "MMSEQS_LINCLUST": {
+                    "mmseqs": "18.8cc5c"
+                },
+                "PIGZ_PE_READS_FWD": {
+                    "pigz": 2.8
+                },
+                "PIGZ_PE_READS_REV": {
+                    "pigz": 2.8
+                },
+                "PIGZ_TRANSDECODER_BED": {
+                    "pigz": 2.8
+                },
+                "PIGZ_TRANSDECODER_CDS": {
+                    "pigz": 2.8
+                },
+                "PIGZ_TRANSDECODER_GFF": {
+                    "pigz": 2.8
+                },
+                "PIGZ_TRANSDECODER_PEP": {
+                    "pigz": 2.8
+                },
+                "PROKKA": {
+                    "prokka": "1.15.6"
+                },
+                "PROKKAGFF2TSV": {
+                    "R": "4.5.3",
+                    "data.table": "1.17.8",
+                    "dtplyr": "1.3.3",
+                    "dplyr": "1.2.1",
+                    "tidyr": "1.3.2",
+                    "readr": "2.2.0",
+                    "stringr": "1.6.0"
+                },
+                "QUAST": {
+                    "quast": "5.3.0"
+                },
+                "RUNDBCAN_CAZYMEANNOTATION": {
+                    "rundbcan": "5.2.9"
+                },
+                "SAMTOOLS_FLAGSTAT": {
+                    "samtools": 1.24
+                },
+                "SAMTOOLS_IDXSTATS": {
+                    "samtools": 1.24
+                },
+                "SAMTOOLS_INDEX": {
+                    "samtools": 1.24
+                },
+                "SAMTOOLS_SORT": {
+                    "samtools": 1.24
+                },
+                "SAMTOOLS_STATS": {
+                    "samtools": 1.24
+                },
+                "SEQKIT_GREP": {
+                    "seqkit": "2.13.0"
+                },
+                "SEQTK_HMMHITFAAS": {
+                    "seqtk": "1.4-r122"
+                },
+                "SEQTK_MERGEPE": {
+                    "seqtk": "1.4-r122"
+                },
+                "SUM_EUKULELE_TAXONOMY": {
+                    "R": "4.0,",
+                    "tidyverse": 2.0
+                },
+                "TIDYVERSE_STRIPCDSPREFIX": {
+                    "R": "4.1.0",
+                    "readr": "2.0.0",
+                    "dplyr": "1.0.7",
+                    "stringr": "1.5.0"
+                },
+                "TRANSDECODER_BED_CAT": {
+                    "coreutils": 9.4,
+                    "find": "4.6.0",
+                    "pigz": 2.8
+                },
+                "TRANSDECODER_CDS_CAT": {
+                    "coreutils": 9.4,
+                    "find": "4.6.0",
+                    "pigz": 2.8
+                },
+                "TRANSDECODER_GFF_CAT": {
+                    "coreutils": 9.4,
+                    "find": "4.6.0",
+                    "pigz": 2.8
+                },
+                "TRANSDECODER_LONGORF": {
+                    "transdecoder": "5.7.1"
+                },
+                "TRANSDECODER_PEP_CAT": {
+                    "coreutils": 9.4,
+                    "find": "4.6.0",
+                    "pigz": 2.8
+                },
+                "TRANSDECODER_PREDICT": {
+                    "transdecoder": "5.7.1"
+                },
+                "TRIMGALORE": {
+                    "trimgalore": "2.3.0"
+                },
+                "UNPIGZ_GFF": {
+                    "pigz": 2.8
+                },
+                "Workflow": {
+                    "nf-core/metatdenovo": "v1.5.0dev"
+                }
+            }
+        ],
+        "timestamp": "2026-09-11T12:34:12.786053133",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
+    }
+}

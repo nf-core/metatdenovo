@@ -184,7 +184,7 @@
                     },
                     "seqkit/grep": {
                         "branch": "master",
-                        "git_sha": "d07a945f421a4a91ce4e5a22db63e0e7f8741607",
+                        "git_sha": "504cddfc189c20124336b8f2c88cc97dbd543928",
                         "installed_by": ["modules"]
                     },
                     "seqtk/mergepe": {
