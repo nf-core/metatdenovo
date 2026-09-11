@@ -36,9 +36,13 @@ process COLLECT_FEATURECOUNTSSUMMARY {
     # "Assigned": CUSTOM_COLLECTFEATURECOUNTS's own output already reports it, as the
     # caller-named column.
     summaries <- bind_rows(lapply(Sys.glob('*.featureCounts.tsv.summary'), function(f) {
+        # A caller name can contain regex metacharacters (only '.' is rejected upstream), so
+        # strip the suffix by literal length rather than matching it as a regex.
+        suffix <- paste0('.', ${rq(meta.caller)}, '.featureCounts.tsv.summary')
+        name <- basename(f)
         read_tsv(f, col_types = cols(Status = col_character(), .default = col_integer())) %>%
             rename(count = 2) %>%
-            mutate(sample = str_remove(basename(f), paste0('\\\\.', ${rq(meta.caller)}, '\\\\.featureCounts\\\\.tsv\\\\.summary\$'))) %>%
+            mutate(sample = if (str_ends(name, fixed(suffix))) str_sub(name, 1, -nchar(suffix) - 1) else name) %>%
             select(status = Status, sample, count)
     }))
     # str_remove() returns its input unchanged on no match, so a mismatched suffix would
