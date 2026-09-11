@@ -1,0 +1,38 @@
+name: "collect_featurecountssummary"
+description: Reshape featureCounts' per-sample *.summary files (one row per outcome
+  category, one column per BAM) into one narrow (sample, count) table per
+  "Unassigned_*" category, across all samples of one ORF caller
+keywords:
+  - featurecounts
+  - summary
+  - unassigned
+input:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing caller information
+        e.g. [ id:'test.prodigal', caller:'prodigal' ]
+  - summaries:
+      type: file
+      description: One or more *.featureCounts.tsv.summary files, as produced by
+        SUBREAD_FEATURECOUNTS, for every sample of the same ORF caller
+      pattern: "*.featureCounts.tsv.summary"
+output:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing caller information
+        e.g. [ id:'test.prodigal', caller:'prodigal' ]
+  - unassigned:
+      type: file
+      description: One (sample, count) TSV per "Unassigned_*" category found in the
+        input summaries, named "<caller>.<Status>.featureCounts.tsv"
+      pattern: "*.featureCounts.tsv"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+authors:
+  - "@erikrikarddaniel"
+maintainers:
+  - "@erikrikarddaniel"

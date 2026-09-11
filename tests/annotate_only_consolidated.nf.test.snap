@@ -1,7 +1,7 @@
 {
     "-profile test_annotate_only_consolidated": {
         "content": [
-            78,
+            81,
             {
                 "BBMAP_ALIGN": {
                     "bbmap": 39.18
@@ -14,6 +14,12 @@
                 },
                 "CAT_FASTQ": {
                     "cat": 9.5
+                },
+                "COLLECT_FEATURECOUNTSSUMMARY": {
+                    "R": "4.5.3",
+                    "readr": "2.2.0",
+                    "dplyr": "1.2.1",
+                    "stringr": "1.6.0"
                 },
                 "COLLECT_LOCUSCONSOLIDATE": {
                     "R": "4.5.3",
@@ -315,7 +321,7 @@
                 "multiqc_citations.txt:md5,9af6aefe57f066cc7e3c782a93f48cf3"
             ]
         ],
-        "timestamp": "2026-09-08T08:57:36.390786515",
+        "timestamp": "2026-09-10T12:01:36.376723518",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"
