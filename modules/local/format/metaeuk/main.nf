@@ -24,6 +24,8 @@ process FORMAT_METAEUK_GFF {
     // A CDS record with no TCS_ID= attribute must fail rather than silently emit an empty-string
     // id ("ID=;") -- that would still parse as a match downstream (FORMAT_GFF2BED's own ID=
     // extraction), merging unrelated loci into one instead of losing this one record loudly.
+    // FORMAT_GFF2BED (modules/local/format/gff2bed/main.nf) guards its own match() the same way --
+    // keep both in sync if this guard's contract ever changes.
     """
     $cat_input \\
         | awk 'BEGIN{FS=OFS="\\t"}

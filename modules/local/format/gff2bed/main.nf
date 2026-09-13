@@ -26,7 +26,9 @@ process FORMAT_GFF2BED {
     // Target_ID=/TCS_ID= attributes, which also contain the substring "ID=". A record with no
     // match at all (RSTART == 0) must fail rather than silently emit an empty-string id -- an
     // empty id is indistinguishable from every other unmatched record downstream, which merges
-    // unrelated loci into one instead of losing this one record loudly.
+    // unrelated loci into one instead of losing this one record loudly. FORMAT_METAEUK_GFF
+    // (modules/local/format/metaeuk/main.nf) guards its own match() the same way -- keep both in
+    // sync if this guard's contract ever changes.
     // The "cds." prefix strip mirrors TIDYVERSE_STRIPCDSPREFIX's existing TransDecoder-ID normalization
     // (modules/local/tidyverse/stripcdsprefix/main.nf), so a locus this caller is the sole contributor to
     // inherits an ID matching that caller's own per-caller counts table exactly.
