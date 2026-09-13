@@ -1,0 +1,67 @@
+nextflow_workflow {
+
+    name "Test Subworkflow USER_ORFS"
+    script "../main.nf"
+    workflow "USER_ORFS"
+
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "user_orfs"
+
+    // Inputs are built inline rather than read from a fixture: the pipeline repo carries no test
+    // data of its own, and a one-CDS gff/fasta pair is small enough to state literally.
+
+    test("raw metaeuk gff/faa - gets normalised") {
+
+        when {
+            workflow {
+                """
+                def gff = file("\${workDir}/metaeuk.gff")
+                gff.text = 'k1\\tMetaEuk\\tCDS\\t1\\t100\\t.\\t+\\t.\\tTarget_ID=P1;TCS_ID=P1|k1|+|0_CDS_0;Parent=P1|k1|+|0_exon_0\\n'
+
+                def faa = file("\${workDir}/metaeuk.faa")
+                faa.text = '>P1|k1|+|282|1e-75|1|0|100|0[0]:100[100]:100[100]\\nMPSRFTK\\n'
+
+                input[0] = channel.of([ [ id: 'test' ], gff, faa ])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                // A raw MetaEuk gff has no ID= attribute at all -- without normalisation this
+                // would reach FORMAT_GFF2BED and (once #508's other fix lands) fail outright, or
+                // (before it) silently produce an empty-string id that collapses every such locus
+                // into one. The fasta header must match the same id for the same reason.
+                { assert path(workflow.out.gff[0][1]).linesGzip[0].contains('ID=P1|k1|+|0;') },
+                { assert path(workflow.out.faa[0][1]).linesGzip[0] == '>P1|k1|+|0' }
+            )
+        }
+    }
+
+    test("already-normalised gff/faa - passed through unchanged") {
+
+        when {
+            workflow {
+                """
+                def gff = file("\${workDir}/generic.gff")
+                gff.text = 'k1\\tprodigal\\tCDS\\t1\\t100\\t.\\t+\\t0\\tID=gene1\\n'
+
+                def faa = file("\${workDir}/generic.faa")
+                faa.text = '>gene1\\nMPSRFTK\\n'
+
+                input[0] = channel.of([ [ id: 'test' ], gff, faa ])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert path(workflow.out.gff[0][1]).fileName.toString() == 'generic.gff' },
+                { assert path(workflow.out.faa[0][1]).fileName.toString() == 'generic.faa' }
+            )
+        }
+    }
+}
