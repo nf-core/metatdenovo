@@ -21,9 +21,22 @@ process FORMAT_METAEUK_GFF {
     prefix    = task.ext.prefix ?: "${meta.id}"
     cat_input = gff =~ /\.gz$/ ? "gunzip -c ${gff}" : "cat ${gff}"
 
+    // A CDS record with no TCS_ID= attribute must fail rather than silently emit an empty-string
+    // id ("ID=;") -- that would still parse as a match downstream (FORMAT_GFF2BED's own ID=
+    // extraction), merging unrelated loci into one instead of losing this one record loudly.
     """
     $cat_input \\
-        | awk 'BEGIN{FS=OFS="\\t"} \$3=="CDS" { match(\$9, /TCS_ID=[^;]+/); id = substr(\$9, RSTART+7, RLENGTH-7); sub(/_CDS_[0-9]+\$/, "", id); print \$1,\$2,\$3,\$4,\$5,\$6,\$7,\$8,"ID="id";"\$9 }' \\
+        | awk 'BEGIN{FS=OFS="\\t"}
+            \$3=="CDS" {
+                match(\$9, /TCS_ID=[^;]+/)
+                if (RSTART == 0) {
+                    printf "ERROR: CDS record has no TCS_ID= attribute: %s\\n", \$0 > "/dev/stderr"
+                    exit 1
+                }
+                id = substr(\$9, RSTART+7, RLENGTH-7)
+                sub(/_CDS_[0-9]+\$/, "", id)
+                print \$1,\$2,\$3,\$4,\$5,\$6,\$7,\$8,"ID="id";"\$9
+            }' \\
         | gzip -c > ${prefix}_format.gff.gz
     """
 
