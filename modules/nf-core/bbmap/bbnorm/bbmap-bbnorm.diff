@@ -2,7 +2,7 @@ Changes in component 'nf-core/bbmap/bbnorm'
 Changes in 'bbmap/bbnorm/main.nf':
 --- modules/nf-core/bbmap/bbnorm/main.nf
 +++ modules/nf-core/bbmap/bbnorm/main.nf
-@@ -29,9 +29,13 @@
+@@ -29,9 +29,11 @@
      if ( ! task.memory ) {
          log.info '[BBNorm]: Available memory not known, defaulting to 3 GB. Specify process memory requirements to change this.'
      } else {
@@ -10,14 +10,12 @@ Changes in 'bbmap/bbnorm/main.nf':
 +        memory = "-Xmx${Math.round(Math.max(1, Math.floor(task.memory.toGiga() * 0.8)))}g"
      }
  
-+    // tmpdir=.: force multipass temp files into the task's own (bound) work dir
-+    // instead of the host's \$TMPDIR, which Nextflow forwards into Singularity/Apptainer
-+    // containers without bind-mounting it, causing a spurious "cannot run program bgzip"
-+    // failure when that path doesn't exist inside the container.
++    // Nextflow forwards the host's \$TMPDIR into Singularity/Apptainer containers without
++    // bind-mounting it, so multipass temp files must stay under the task's own (bound) work dir.
      """
      bbnorm.sh \\
          $input \\
-@@ -39,6 +43,7 @@
+@@ -39,6 +41,7 @@
          $args \\
          threads=$task.cpus \\
          $memory \\

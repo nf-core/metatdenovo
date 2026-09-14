@@ -32,10 +32,8 @@ process BBMAP_BBNORM {
         memory = "-Xmx${Math.round(Math.max(1, Math.floor(task.memory.toGiga() * 0.8)))}g"
     }
 
-    // tmpdir=.: force multipass temp files into the task's own (bound) work dir
-    // instead of the host's \$TMPDIR, which Nextflow forwards into Singularity/Apptainer
-    // containers without bind-mounting it, causing a spurious "cannot run program bgzip"
-    // failure when that path doesn't exist inside the container.
+    // Nextflow forwards the host's \$TMPDIR into Singularity/Apptainer containers without
+    // bind-mounting it, so multipass temp files must stay under the task's own (bound) work dir.
     """
     bbnorm.sh \\
         $input \\
