@@ -60,6 +60,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 | multiqc     | 1.34             | 1.35        |
 | trim-galore | 2.1.0            | 2.3.0       |
 | prokka      | 1.14.6           | 1.15.6      |
+| nft-utils   | 0.0.3            | 1.2.0       |
 
 ### `Deprecated`
 
