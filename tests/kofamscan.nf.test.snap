@@ -17,33 +17,33 @@
                 },
                 "COLLECT_FEATURECOUNTSSUMMARY": {
                     "R": "4.5.3",
-                    "readr": "2.2.0",
                     "dplyr": "1.2.1",
+                    "readr": "2.2.0",
                     "stringr": "1.6.0"
                 },
                 "COLLECT_LOCUSCONSOLIDATE": {
                     "R": "4.5.3",
+                    "data.table": "1.17.8",
                     "dplyr": "1.2.1",
-                    "readr": "2.2.0",
-                    "stringr": "1.6.0",
                     "dtplyr": "1.3.3",
-                    "data.table": "1.17.8"
+                    "readr": "2.2.0",
+                    "stringr": "1.6.0"
                 },
                 "CUSTOM_COLLECTFEATURECOUNTS": {
                     "R": "4.5.3",
+                    "data.table": "1.17.8",
                     "dplyr": "1.2.1",
-                    "readr": "2.2.0",
-                    "stringr": "1.6.0",
                     "dtplyr": "1.3.3",
-                    "data.table": "1.17.8"
+                    "readr": "2.2.0",
+                    "stringr": "1.6.0"
                 },
                 "CUSTOM_COLLECTSTATS": {
                     "R": "4.3.1",
                     "dplyr": "1.1.4",
-                    "readr": "2.1.5",
                     "purrr": "1.1.0",
-                    "tidyr": "1.3.1",
-                    "stringr": "1.5.2"
+                    "readr": "2.1.5",
+                    "stringr": "1.5.2",
+                    "tidyr": "1.3.1"
                 },
                 "FASTQC": {
                     "fastqc": "0.12.1"
@@ -68,34 +68,34 @@
                 },
                 "KOFAMSCAN_SUM": {
                     "R": "4.2.3",
+                    "data.table": "1.14.8",
                     "dplyr": "1.1.2",
                     "dtplyr": "1.3.1",
-                    "data.table": "1.14.8",
-                    "readr": "2.1.4",
                     "purrr": "1.0.1",
-                    "tidyr": "1.3.0",
-                    "stringr": "1.5.0"
+                    "readr": "2.1.4",
+                    "stringr": "1.5.0",
+                    "tidyr": "1.3.0"
                 },
                 "KOFAMSCAN_UNIQUE": {
                     "R": "4.2.3",
                     "dplyr": "1.1.2",
-                    "readr": "2.1.4",
                     "purrr": "1.0.1",
-                    "tidyr": "1.3.0",
-                    "stringr": "1.5.0"
+                    "readr": "2.1.4",
+                    "stringr": "1.5.0",
+                    "tidyr": "1.3.0"
                 },
                 "MEGAHIT": {
                     "megahit": "1.2.9"
                 },
                 "MERGE_TABLES": {
                     "R": "4.2.3",
+                    "data.table": "1.14.8",
                     "dplyr": "1.1.2",
                     "dtplyr": "1.3.1",
-                    "data.table": "1.14.8",
-                    "readr": "2.1.4",
                     "purrr": "1.0.1",
-                    "tidyr": "1.3.0",
-                    "stringr": "1.5.0"
+                    "readr": "2.1.4",
+                    "stringr": "1.5.0",
+                    "tidyr": "1.3.0"
                 },
                 "PIGZ_PE_READS_FWD": {
                     "pigz": 2.8
@@ -129,8 +129,8 @@
                 },
                 "TIDYVERSE_STRIPCDSPREFIX": {
                     "R": "4.5.3",
-                    "readr": "2.2.0",
                     "dplyr": "1.2.1",
+                    "readr": "2.2.0",
                     "stringr": "1.6.0"
                 },
                 "TRIMGALORE": {
@@ -267,10 +267,10 @@
                 "multiqc_citations.txt:md5,2d1a8ef8ba06c7eada06ab3e96552ea4"
             ]
         ],
-        "timestamp": "2026-09-10T14:56:56.411538028",
+        "timestamp": "2026-09-13T21:46:09.157691534",
         "meta": {
             "nf-test": "0.9.5",
-            "nextflow": "26.04.6"
+            "nextflow": "25.10.4"
         }
     }
 }
