@@ -32,6 +32,8 @@ process BBMAP_BBNORM {
         memory = "-Xmx${Math.round(Math.max(1, Math.floor(task.memory.toGiga() * 0.8)))}g"
     }
 
+    // Nextflow forwards the host's \$TMPDIR into Singularity/Apptainer containers without
+    // bind-mounting it, so multipass temp files must stay under the task's own (bound) work dir.
     """
     bbnorm.sh \\
         $input \\
@@ -39,6 +41,7 @@ process BBMAP_BBNORM {
         $args \\
         threads=$task.cpus \\
         $memory \\
+        tmpdir=. \\
         &> ${prefix}.bbnorm.log
     """
 }

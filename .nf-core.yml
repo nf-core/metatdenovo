@@ -18,4 +18,4 @@ template:
   name: metatdenovo
   org: nf-core
   outdir: .
-  version: 1.4.0
+  version: 1.4.1
