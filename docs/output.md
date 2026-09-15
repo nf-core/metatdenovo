@@ -27,6 +27,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and the results
     - [TransDecoder](#transdecoder) - Output from transdecoder (optional)
   - [Quantification](#quantification) - Quantify expression of features
     - [BBMap](#bbmap) - Align reads to contigs
+    - [Samtools](#samtools) - Sort/index alignments and compute mapping statistics
     - [FeatureCounts](#featurecounts) - Quantify features
   - [Functional and taxonomic annotation](#functional-and-taxonomic-annotation) - Predict the function and the taxonomy of ORFs
     - [EggNOG](#eggnog) - Output from EggNOG-mapper (default; optional)
@@ -242,6 +243,20 @@ Align reads to contigs with [BBMap](https://sourceforge.net/projects/bbmap/)
 - `bbmap/bbmap/`
   - `*.bam`: alignments in bam format if enabled with `--save_bam`.
   - `*.bbmap.log`: log files
+
+</details>
+
+#### Samtools
+
+Sort and index the BBMap alignments with [Samtools](https://www.htslib.org), and compute mapping statistics.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `samtools/`
+  - `*.sorted.bam`: coordinate-sorted alignments, if enabled with `--save_bam`.
+  - `*.sorted.bam.bai`: BAM index, if enabled with `--save_bam`.
+  - `*.flagstat`, `*.idxstats`: mapping statistics from `samtools flagstat`/`samtools idxstats`, if enabled with `--save_samtools` (on by default).
 
 </details>
 

@@ -210,16 +210,6 @@
                 "quast/megahit/transposed_report.tsv",
                 "quast/megahit/transposed_report.txt",
                 "samtools",
-                "samtools/SAMPLE1_SE.sorted.bam",
-                "samtools/SAMPLE1_SE.sorted.bam.bai",
-                "samtools/SAMPLE2_SE.sorted.bam",
-                "samtools/SAMPLE2_SE.sorted.bam.bai",
-                "samtools/SAMPLE3_SE.sorted.bam",
-                "samtools/SAMPLE3_SE.sorted.bam.bai",
-                "samtools/SAMPLE4_PE_1.sorted.bam",
-                "samtools/SAMPLE4_PE_1.sorted.bam.bai",
-                "samtools/SAMPLE5_PE.sorted.bam",
-                "samtools/SAMPLE5_PE.sorted.bam.bai",
                 "samtools/megahit.SAMPLE1_SE.flagstat",
                 "samtools/megahit.SAMPLE1_SE.idxstats",
                 "samtools/megahit.SAMPLE2_SE.flagstat",
@@ -271,10 +261,10 @@
                 "sample\tn_post_trimming\tn_non_contaminated\tidxs_n_mapped\tidxs_n_unmapped\tUnassigned_Ambiguity\tUnassigned_Chimera\tUnassigned_Duplicate\tUnassigned_FragmentLength\tUnassigned_MappingQuality\tUnassigned_MultiMapping\tUnassigned_NoFeatures\tUnassigned_NonSplit\tUnassigned_Overlapping_Length\tUnassigned_Read_Type\tUnassigned_Secondary\tUnassigned_Singleton\tUnassigned_Unmapped\tprodigal"
             ]
         ],
-        "timestamp": "2026-09-13T22:07:10.123753986",
         "meta": {
-            "nf-test": "0.9.5",
+            "nf-test": "0.9.3",
             "nextflow": "25.10.4"
-        }
+        },
+        "timestamp": "2026-09-15T17:52:47.331518"
     }
 }
