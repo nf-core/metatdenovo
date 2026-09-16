@@ -188,12 +188,6 @@
                 "quast/spades/transposed_report.tsv",
                 "quast/spades/transposed_report.txt",
                 "samtools",
-                "samtools/SAMPLE1_PE.sorted.bam",
-                "samtools/SAMPLE1_PE.sorted.bam.bai",
-                "samtools/SAMPLE2_PE.sorted.bam",
-                "samtools/SAMPLE2_PE.sorted.bam.bai",
-                "samtools/SAMPLE3_PE_1.sorted.bam",
-                "samtools/SAMPLE3_PE_1.sorted.bam.bai",
                 "samtools/spades.SAMPLE1_PE.flagstat",
                 "samtools/spades.SAMPLE1_PE.idxstats",
                 "samtools/spades.SAMPLE2_PE.flagstat",
@@ -243,10 +237,10 @@
                 "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tUnassigned_Ambiguity\tUnassigned_Chimera\tUnassigned_Duplicate\tUnassigned_FragmentLength\tUnassigned_MappingQuality\tUnassigned_MultiMapping\tUnassigned_NoFeatures\tUnassigned_NonSplit\tUnassigned_Overlapping_Length\tUnassigned_Read_Type\tUnassigned_Secondary\tUnassigned_Singleton\tUnassigned_Unmapped\tprodigal"
             ]
         ],
-        "timestamp": "2026-09-13T22:06:36.846218803",
         "meta": {
-            "nf-test": "0.9.5",
+            "nf-test": "0.9.3",
             "nextflow": "25.10.4"
-        }
+        },
+        "timestamp": "2026-09-15T18:21:48.020948"
     }
 }
