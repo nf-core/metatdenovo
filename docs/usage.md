@@ -128,6 +128,7 @@ The default "flavour" of Spades is set to RNA, but this can be changed using the
 
 You can also choose to input contigs from an assembly that you made outside the pipeline using the `--user_assembly file.fna.gz` (where `file.fna.gz` is the name of a fasta file with contigs) parameter.
 When you use your own assembly, the name of this -- used in output file names -- can be set using the `--user_assembly_name` parameter.
+This is also the way back in if a long Megahit assembly gets killed partway through -- see [Recovering a Megahit run that was killed partway through](large_datasets.md#recovering-a-megahit-run-that-was-killed-partway-through).
 
 ### ORF caller options
 
@@ -659,6 +660,8 @@ If `-profile` is not specified, the pipeline will run locally and expect all sof
 Specify this when restarting a pipeline. Nextflow will use cached results from any pipeline steps where the inputs are the same, continuing from where it got to previously. For input to be considered the same, not only the names must be identical but the files' contents as well. For more info about this parameter, see [this blog post](https://www.nextflow.io/blog/2019/demystifying-nextflow-resume.html).
 
 You can also supply a run name to resume a specific run: `-resume [run-name]`. Use the `nextflow log` command to show previous run names.
+
+Note that `-resume` only skips tasks that already finished successfully -- a task killed partway through (e.g. by a walltime limit or an out-of-memory kill) is not cached and reruns from scratch on the next `-resume`, however far it had already got. For a long Megahit assembly, that can mean losing days of progress; see [Recovering a Megahit run that was killed partway through](large_datasets.md#recovering-a-megahit-run-that-was-killed-partway-through) for a way to recover Megahit's own internal progress instead.
 
 ### `-c`
 
