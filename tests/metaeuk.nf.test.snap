@@ -1,7 +1,7 @@
 {
     "-profile test_metaeuk": {
         "content": [
-            50,
+            51,
             {
                 "BBMAP_ALIGN": {
                     "bbmap": 39.18
@@ -12,29 +12,35 @@
                 "BEDTOOLS_SORT": {
                     "bedtools": "2.31.1"
                 },
-                "COLLECT_LOCUSCONSOLIDATE": {
+                "COLLECT_FEATURECOUNTSSUMMARY": {
                     "R": "4.5.3",
                     "dplyr": "1.2.1",
                     "readr": "2.2.0",
-                    "stringr": "1.6.0",
+                    "stringr": "1.6.0"
+                },
+                "COLLECT_LOCUSCONSOLIDATE": {
+                    "R": "4.5.3",
+                    "data.table": "1.17.8",
+                    "dplyr": "1.2.1",
                     "dtplyr": "1.3.3",
-                    "data.table": "1.17.8"
+                    "readr": "2.2.0",
+                    "stringr": "1.6.0"
                 },
                 "CUSTOM_COLLECTFEATURECOUNTS": {
                     "R": "4.5.3",
+                    "data.table": "1.17.8",
                     "dplyr": "1.2.1",
-                    "readr": "2.2.0",
-                    "stringr": "1.6.0",
                     "dtplyr": "1.3.3",
-                    "data.table": "1.17.8"
+                    "readr": "2.2.0",
+                    "stringr": "1.6.0"
                 },
                 "CUSTOM_COLLECTSTATS": {
                     "R": "4.3.1",
                     "dplyr": "1.1.4",
-                    "readr": "2.1.5",
                     "purrr": "1.1.0",
-                    "tidyr": "1.3.1",
-                    "stringr": "1.5.2"
+                    "readr": "2.1.5",
+                    "stringr": "1.5.2",
+                    "tidyr": "1.3.1"
                 },
                 "FASTQC": {
                     "fastqc": "0.12.1"
@@ -93,8 +99,8 @@
                 },
                 "TIDYVERSE_STRIPCDSPREFIX": {
                     "R": "4.5.3",
-                    "readr": "2.2.0",
                     "dplyr": "1.2.1",
+                    "readr": "2.2.0",
                     "stringr": "1.6.0"
                 },
                 "TRIMGALORE": {
@@ -228,13 +234,13 @@
                 "orf\tchr\tstart\tend\tstrand\tlength\tsample\tcount\ttpm"
             ],
             [
-                "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tmetaeuk"
+                "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tUnassigned_Ambiguity\tUnassigned_Chimera\tUnassigned_Duplicate\tUnassigned_FragmentLength\tUnassigned_MappingQuality\tUnassigned_MultiMapping\tUnassigned_NoFeatures\tUnassigned_NonSplit\tUnassigned_Overlapping_Length\tUnassigned_Read_Type\tUnassigned_Secondary\tUnassigned_Singleton\tUnassigned_Unmapped\tmetaeuk"
             ]
         ],
-        "timestamp": "2026-09-02T11:01:13.082870387",
+        "timestamp": "2026-09-13T21:59:49.11852724",
         "meta": {
             "nf-test": "0.9.5",
-            "nextflow": "26.04.6"
+            "nextflow": "25.10.4"
         }
     }
 }

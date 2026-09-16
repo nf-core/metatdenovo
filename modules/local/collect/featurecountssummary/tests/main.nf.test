@@ -1,0 +1,219 @@
+nextflow_process {
+
+    name "Test Process COLLECT_FEATURECOUNTSSUMMARY"
+    script "../main.nf"
+    process "COLLECT_FEATURECOUNTSSUMMARY"
+
+    tag "modules"
+    tag "modules_local"
+    tag "collect"
+    tag "collect/featurecountssummary"
+
+    // Input is built inline rather than read from a fixture: the pipeline repo carries no test
+    // data of its own. Shape matches SUBREAD_FEATURECOUNTS's own *.summary output: a "Status"
+    // column plus one data column per BAM.
+
+    test("one file per Unassigned_* category is emitted, Assigned is skipped") {
+
+        when {
+            process {
+                """
+                def summary1 = file("\${workDir}/sample1.prodigal.featureCounts.tsv.summary")
+                summary1.text = [
+                    ['Status', 'sample1.sorted.bam'],
+                    ['Assigned', '1000'],
+                    ['Unassigned_Unmapped', '0'],
+                    ['Unassigned_MultiMapping', '5'],
+                    ['Unassigned_NoFeatures', '200'],
+                    ['Unassigned_Ambiguity', '30'],
+                ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+
+                def summary2 = file("\${workDir}/sample2.prodigal.featureCounts.tsv.summary")
+                summary2.text = [
+                    ['Status', 'sample2.sorted.bam'],
+                    ['Assigned', '2000'],
+                    ['Unassigned_Unmapped', '0'],
+                    ['Unassigned_MultiMapping', '7'],
+                    ['Unassigned_NoFeatures', '400'],
+                    ['Unassigned_Ambiguity', '60'],
+                ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+
+                input[0] = [ [ id:'test.prodigal', caller:'prodigal' ], [ summary1, summary2 ] ]
+                """
+            }
+        }
+
+        then {
+            def outfiles = process.out.unassigned[0][1].collect { f -> file(f).name }
+            def nofeatures = path(
+                process.out.unassigned[0][1].find { f -> file(f).name == 'prodigal.Unassigned_NoFeatures.featureCounts.tsv' }
+            ).csv(sep: '\t', header: true)
+
+            assertAll(
+                { assert process.success },
+                { assert outfiles.contains('prodigal.Unassigned_NoFeatures.featureCounts.tsv') },
+                { assert outfiles.contains('prodigal.Unassigned_Ambiguity.featureCounts.tsv') },
+                { assert outfiles.contains('prodigal.Unassigned_MultiMapping.featureCounts.tsv') },
+                { assert outfiles.contains('prodigal.Unassigned_Unmapped.featureCounts.tsv') },
+                { assert !outfiles.any { name -> name.contains('Assigned.featureCounts.tsv') && !name.contains('Unassigned') } },
+                { assert nofeatures.columns["sample"].sort() == ['sample1', 'sample2'] },
+                { assert nofeatures.columns["count"].sort() == [200, 400] },
+                { assert snapshot(process.out.unassigned).match() }
+            )
+        }
+    }
+
+    test("a caller with no Unassigned_* rows emits nothing") {
+
+        when {
+            process {
+                """
+                def summary1 = file("\${workDir}/sample1.prodigal.featureCounts.tsv.summary")
+                summary1.text = [
+                    ['Status', 'sample1.sorted.bam'],
+                    ['Assigned', '1000'],
+                ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+
+                input[0] = [ [ id:'test.prodigal', caller:'prodigal' ], [ summary1 ] ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert process.out.unassigned.size() == 0 }
+            )
+        }
+    }
+
+    test("a caller name containing a quote doesn't break the generated R") {
+
+        when {
+            process {
+                """
+                def summary1 = file("\${workDir}/sample1.it's.featureCounts.tsv.summary")
+                summary1.text = [
+                    ['Status', 'sample1.sorted.bam'],
+                    ['Unassigned_NoFeatures', '200'],
+                ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+
+                input[0] = [ [ id:"test.it's", caller:"it's" ], [ summary1 ] ]
+                """
+            }
+        }
+
+        then {
+            // Only one Unassigned_* category here, so the output glob collapses to a bare
+            // path rather than a list -- wrap it before treating it as a collection.
+            def outfiles = process.out.unassigned[0][1]
+            outfiles = outfiles instanceof List ? outfiles : [ outfiles ]
+            assertAll(
+                { assert process.success },
+                { assert outfiles.collect { f -> file(f).name }.contains("it's.Unassigned_NoFeatures.featureCounts.tsv") }
+            )
+        }
+    }
+
+    test("a caller name containing regex metacharacters is matched literally") {
+
+        when {
+            process {
+                """
+                def summary1 = file("\${workDir}/sample1.orf+v2.featureCounts.tsv.summary")
+                summary1.text = [
+                    ['Status', 'sample1.sorted.bam'],
+                    ['Unassigned_NoFeatures', '200'],
+                ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+
+                input[0] = [ [ id:'test.orf+v2', caller:'orf+v2' ], [ summary1 ] ]
+                """
+            }
+        }
+
+        then {
+            // Only one Unassigned_* category here, so the output glob collapses to a bare
+            // path rather than a list -- wrap it before treating it as a collection.
+            def outfiles = process.out.unassigned[0][1]
+            outfiles = outfiles instanceof List ? outfiles : [ outfiles ]
+            def nofeatures = path(outfiles[0]).csv(sep: '\t', header: true)
+            assertAll(
+                { assert process.success },
+                { assert outfiles.collect { f -> file(f).name }.contains('orf+v2.Unassigned_NoFeatures.featureCounts.tsv') },
+                { assert nofeatures.columns["sample"] == ['sample1'] }
+            )
+        }
+    }
+
+    test("a summary filename that doesn't match <sample>.<caller> fails loudly instead of mislabeling sample") {
+
+        when {
+            process {
+                """
+                def summary1 = file("\${workDir}/sample1.wrong_caller.featureCounts.tsv.summary")
+                summary1.text = [
+                    ['Status', 'sample1.sorted.bam'],
+                    ['Unassigned_NoFeatures', '200'],
+                ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+
+                input[0] = [ [ id:'test.prodigal', caller:'prodigal' ], [ summary1 ] ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert !process.success },
+                { assert process.stdout.toString().contains("didn't match the expected <sample>.<caller> pattern") }
+            )
+        }
+    }
+
+    test("one file per Unassigned_* category is emitted - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                def summary1 = file("\${workDir}/sample1.prodigal.featureCounts.tsv.summary")
+                summary1.text = ''
+
+                input[0] = [ [ id:'test.prodigal', caller:'prodigal' ], [ summary1 ] ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+
+    test("a caller name containing shell metacharacters doesn't break the stub - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                def summary1 = file("\${workDir}/sample1.orf;v2.featureCounts.tsv.summary")
+                summary1.text = ''
+
+                input[0] = [ [ id:"test.orf;v2", caller:'orf;v2' ], [ summary1 ] ]
+                """
+            }
+        }
+
+        then {
+            def outfiles = process.out.unassigned[0][1]
+            outfiles = outfiles instanceof List ? outfiles : [ outfiles ]
+            assertAll(
+                { assert process.success },
+                { assert outfiles.collect { f -> file(f).name }.contains('orf;v2.Unassigned_NoFeatures.featureCounts.tsv') }
+            )
+        }
+    }
+}

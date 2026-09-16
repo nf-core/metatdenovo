@@ -1,7 +1,7 @@
 {
     "-profile test_annotate_only_consolidated": {
         "content": [
-            78,
+            81,
             {
                 "BBMAP_ALIGN": {
                     "bbmap": 39.18
@@ -15,37 +15,43 @@
                 "CAT_FASTQ": {
                     "cat": 9.5
                 },
-                "COLLECT_LOCUSCONSOLIDATE": {
+                "COLLECT_FEATURECOUNTSSUMMARY": {
                     "R": "4.5.3",
                     "dplyr": "1.2.1",
                     "readr": "2.2.0",
-                    "stringr": "1.6.0",
+                    "stringr": "1.6.0"
+                },
+                "COLLECT_LOCUSCONSOLIDATE": {
+                    "R": "4.5.3",
+                    "data.table": "1.17.8",
+                    "dplyr": "1.2.1",
                     "dtplyr": "1.3.3",
-                    "data.table": "1.17.8"
+                    "readr": "2.2.0",
+                    "stringr": "1.6.0"
                 },
                 "COLLECT_PROTEINCONSOLIDATE": {
                     "R": "4.5.3",
+                    "data.table": "1.17.8",
                     "dplyr": "1.2.1",
-                    "readr": "2.2.0",
-                    "stringr": "1.6.0",
                     "dtplyr": "1.3.3",
-                    "data.table": "1.17.8"
+                    "readr": "2.2.0",
+                    "stringr": "1.6.0"
                 },
                 "CUSTOM_COLLECTFEATURECOUNTS": {
                     "R": "4.5.3",
+                    "data.table": "1.17.8",
                     "dplyr": "1.2.1",
-                    "readr": "2.2.0",
-                    "stringr": "1.6.0",
                     "dtplyr": "1.3.3",
-                    "data.table": "1.17.8"
+                    "readr": "2.2.0",
+                    "stringr": "1.6.0"
                 },
                 "CUSTOM_COLLECTSTATS": {
                     "R": "4.3.1",
                     "dplyr": "1.1.4",
-                    "readr": "2.1.5",
                     "purrr": "1.1.0",
-                    "tidyr": "1.3.1",
-                    "stringr": "1.5.2"
+                    "readr": "2.1.5",
+                    "stringr": "1.5.2",
+                    "tidyr": "1.3.1"
                 },
                 "FAA_CAT": {
                     "coreutils": 9.4,
@@ -117,11 +123,11 @@
                 "PROKKAGFF2TSV": {
                     "R": "4.5.3",
                     "data.table": "1.17.8",
-                    "dtplyr": "1.3.3",
                     "dplyr": "1.2.1",
-                    "tidyr": "1.3.2",
+                    "dtplyr": "1.3.3",
                     "readr": "2.2.0",
-                    "stringr": "1.6.0"
+                    "stringr": "1.6.0",
+                    "tidyr": "1.3.2"
                 },
                 "QUAST": {
                     "quast": "5.3.0"
@@ -152,8 +158,8 @@
                 },
                 "TIDYVERSE_STRIPCDSPREFIX": {
                     "R": "4.5.3",
-                    "readr": "2.2.0",
                     "dplyr": "1.2.1",
+                    "readr": "2.2.0",
                     "stringr": "1.6.0"
                 },
                 "TRIMGALORE": {
@@ -315,10 +321,10 @@
                 "multiqc_citations.txt:md5,9af6aefe57f066cc7e3c782a93f48cf3"
             ]
         ],
-        "timestamp": "2026-09-08T08:57:36.390786515",
+        "timestamp": "2026-09-13T21:31:05.474987034",
         "meta": {
             "nf-test": "0.9.5",
-            "nextflow": "26.04.6"
+            "nextflow": "25.10.4"
         }
     }
 }

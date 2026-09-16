@@ -381,7 +381,7 @@ Filenames start with assembly program and ORF caller, to allow reruns of the pip
 <summary>Output files</summary>
 
 - `summary_tables/`
-  - `<assembly_name>.<orfcaller_name>.overall_stats.tsv.gz`: overall statistics from the pipeline, e.g. number of reads, number of called ORFs, number of reads mapping back to contigs/ORFs etc.
+  - `<assembly_name>.<orfcaller_name>.overall_stats.tsv.gz`: overall statistics from the pipeline, e.g. number of reads, number of called ORFs, number of reads mapping back to contigs/ORFs etc. Includes one column per featureCounts `Unassigned_*` category (`Unassigned_NoFeatures`, `Unassigned_Ambiguity`, etc.), for diagnosing reads that mapped but weren't counted. Column order isn't fixed: the caller-named count column can move depending on what else is present, so read this table by column name, not position.
   - `<assembly_name>.<orfcaller_name>.counts.tsv.gz`: read counts per ORF and sample.
   - `<assembly_name>.locus_consolidate.counts.tsv.gz`: read counts per sample after merging overlapping CDS calls from different ORF callers on the same contig into single loci, so one gene is not counted once per caller that found it. Adds `callers` and `n_calls` columns recording what was merged. Identical to a single caller's own table when only one caller is active.
   - `<assembly_name>.protein_consolidate_<identity>.counts.tsv.gz`: read counts per sample after additionally merging calls on _different_ contigs whose proteins cluster together at `--cluster_min_seq_id` -- typically a gene assembled both from genomic DNA and from its transcript. Adds `n_loci` and `loci` on top of `callers`/`n_calls`. See [Consolidating calls for the same gene](usage.md#consolidating-calls-for-the-same-gene).
