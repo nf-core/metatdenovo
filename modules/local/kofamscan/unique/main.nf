@@ -53,7 +53,7 @@ process KOFAMSCAN_UNIQUE {
     def prefix = task.ext.prefix ?: "${meta.id}"
 
     """
-    gzip -c /dev/null > ${prefix}.unique.tsv.gz
+    gzip -c /dev/null > ${prefix}.kofamscan-uniq.tsv.gz
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
