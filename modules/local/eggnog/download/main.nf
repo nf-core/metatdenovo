@@ -37,10 +37,9 @@ process EGGNOG_DOWNLOAD {
 
     stub:
     """
-    mkdir eggnog
-    touch ./eggnog/eggnog.db
-    touch ./eggnog/eggnog.taxa.db
-    touch ./eggnog/eggnog.taxa.db.traverse.pkl
-    ln -s eggnog/* ./
+    touch eggnog.db
+    touch eggnog_proteins.dmnd
+    touch eggnog.taxa.db
+    touch eggnog.taxa.db.traverse.pkl
     """
 }
