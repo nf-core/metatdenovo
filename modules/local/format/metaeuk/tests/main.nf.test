@@ -60,6 +60,7 @@ nextflow_process {
             // then also fails to match -- turning one malformed record into a second, harder-to-trace
             // failure a module downstream. Catch it at the source instead.
             assert process.failed
+            assert process.errorReport.contains("ERROR: CDS record has no TCS_ID= attribute")
         }
     }
 
