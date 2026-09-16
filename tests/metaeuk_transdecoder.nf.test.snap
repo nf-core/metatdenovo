@@ -262,12 +262,6 @@
                 "quast/megahit/transposed_report.tsv",
                 "quast/megahit/transposed_report.txt",
                 "samtools",
-                "samtools/RPL28_GENOMIC.sorted.bam",
-                "samtools/RPL28_GENOMIC.sorted.bam.bai",
-                "samtools/RPL28_MRNA.sorted.bam",
-                "samtools/RPL28_MRNA.sorted.bam.bai",
-                "samtools/RPL28_MRNA_RECODED.sorted.bam",
-                "samtools/RPL28_MRNA_RECODED.sorted.bam.bai",
                 "samtools/megahit.RPL28_GENOMIC.flagstat",
                 "samtools/megahit.RPL28_GENOMIC.idxstats",
                 "samtools/megahit.RPL28_MRNA.flagstat",
@@ -331,10 +325,10 @@
                 "k59_1.p1\tk59_1\t183\t611\t+\t429\tRPL28_GENOMIC\t12\t153410.553411\ttransdecoder\t1\t1\tk59_1.p1"
             ]
         ],
-        "timestamp": "2026-09-13T22:00:03.438195122",
         "meta": {
-            "nf-test": "0.9.5",
+            "nf-test": "0.9.3",
             "nextflow": "25.10.4"
-        }
+        },
+        "timestamp": "2026-09-15T17:47:04.138452"
     }
 }

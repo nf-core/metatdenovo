@@ -274,12 +274,6 @@
                 "quast/megahit/transposed_report.tsv",
                 "quast/megahit/transposed_report.txt",
                 "samtools",
-                "samtools/SAMPLE1_PE.sorted.bam",
-                "samtools/SAMPLE1_PE.sorted.bam.bai",
-                "samtools/SAMPLE2_PE.sorted.bam",
-                "samtools/SAMPLE2_PE.sorted.bam.bai",
-                "samtools/SAMPLE3_PE_1.sorted.bam",
-                "samtools/SAMPLE3_PE_1.sorted.bam.bai",
                 "samtools/megahit.SAMPLE1_PE.flagstat",
                 "samtools/megahit.SAMPLE1_PE.idxstats",
                 "samtools/megahit.SAMPLE2_PE.flagstat",
@@ -321,10 +315,10 @@
                 "multiqc_citations.txt:md5,9af6aefe57f066cc7e3c782a93f48cf3"
             ]
         ],
-        "timestamp": "2026-09-13T21:31:05.474987034",
         "meta": {
-            "nf-test": "0.9.5",
+            "nf-test": "0.9.3",
             "nextflow": "25.10.4"
-        }
+        },
+        "timestamp": "2026-09-15T12:43:00.341771"
     }
 }
