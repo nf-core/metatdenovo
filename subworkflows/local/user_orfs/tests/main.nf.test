@@ -115,6 +115,7 @@ nextflow_workflow {
             // silently break every downstream join keyed on ORF id between the counts table
             // (from the gff) and the annotation table (from the fasta).
             assert workflow.failed
+            assert workflow.errorReport.contains("gff and faa disagree on whether they're raw MetaEuk output or already normalised ")
         }
     }
 }
