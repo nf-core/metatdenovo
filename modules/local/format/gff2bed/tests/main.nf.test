@@ -59,6 +59,7 @@ nextflow_process {
             // this caller ever fails to identify, merging unrelated loci downstream -- so it must
             // error instead of writing a bed line with an empty name.
             assert process.failed
+            assert process.errorReport.contains("ERROR: CDS record has no ID= attribute")
         }
     }
 
