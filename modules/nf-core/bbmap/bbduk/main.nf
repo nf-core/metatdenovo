@@ -27,9 +27,17 @@ process BBMAP_BBDUK {
     def trimmed  = meta.single_end ? "out=${prefix}.fastq.gz" : "out1=${prefix}_1.fastq.gz out2=${prefix}_2.fastq.gz"
     def contaminants_fa = contaminants ? "ref=$contaminants" : ''
     def matched  = (contaminants && task.ext.save_removed) ? (meta.single_end ? "outm=${prefix}.matched.fq.gz" : "outm1=${prefix}_1.matched.fq.gz outm2=${prefix}_2.matched.fq.gz") : ''
+
+    memory = '-Xmx3g'
+    if ( ! task.memory ) {
+        log.info '[BBDuk]: Available memory not known, defaulting to 3 GB. Specify process memory requirements to change this.'
+    } else {
+        memory = "-Xmx${Math.round(Math.max(1, Math.floor(task.memory.toGiga() * 0.9)))}g"
+    }
+
     """
     bbduk.sh \\
-        -Xmx${task.memory.toGiga()}g \\
+        $memory \\
         $raw \\
         $trimmed \\
         threads=$task.cpus \\

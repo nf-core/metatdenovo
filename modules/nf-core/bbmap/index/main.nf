@@ -19,12 +19,20 @@ process BBMAP_INDEX {
 
     script:
     def args = task.ext.args ?: ''
+
+    memory = '-Xmx3g'
+    if ( ! task.memory ) {
+        log.info '[BBMap Index]: Available memory not known, defaulting to 3 GB. Specify process memory requirements to change this.'
+    } else {
+        memory = "-Xmx${Math.round(Math.max(1, Math.floor(task.memory.toGiga() * 0.9)))}g"
+    }
+
     """
     bbmap.sh \\
         ref=${fasta} \\
         $args \\
         threads=$task.cpus \\
-        -Xmx${task.memory.toGiga()}g
+        $memory
     """
     stub:
     """
