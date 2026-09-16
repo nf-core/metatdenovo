@@ -33,7 +33,8 @@ nextflow_process {
                 { assert process.success },
                 // The "(^|;)ID=" anchor must grab the real ID= attribute, not something inside the
                 // Target_ID=/TCS_ID= attributes that also contain the substring "ID=".
-                { assert path(process.out.bed[0][1]).text == "k1\t0\t100\tprokka:gene1\t0\t+\n" }
+                { assert path(process.out.bed[0][1]).csv(sep: "\t", header: false).rows[0] ==
+                    ["C0": "k1", "C1": 0, "C2": 100, "C3": "prokka:gene1", "C4": 0, "C5": "+"] }
             )
         }
     }

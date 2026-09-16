@@ -58,8 +58,7 @@ nextflow_workflow {
         then {
             assertAll(
                 { assert workflow.success },
-                { assert path(workflow.out.gff[0][1]).fileName.toString() == 'generic.gff' },
-                { assert path(workflow.out.faa[0][1]).fileName.toString() == 'generic.faa' }
+                { assert snapshot(sanitizeOutput(workflow.out)).match() }
             )
         }
     }
@@ -88,8 +87,7 @@ nextflow_workflow {
         then {
             assertAll(
                 { assert workflow.success },
-                { assert path(workflow.out.gff[0][1]).fileName.toString() == 'already_formatted.gff' },
-                { assert path(workflow.out.faa[0][1]).fileName.toString() == 'already_formatted.faa' }
+                { assert snapshot(sanitizeOutput(workflow.out)).match() }
             )
         }
     }
