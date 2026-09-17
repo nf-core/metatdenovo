@@ -3,9 +3,11 @@ process EGGNOG_DOWNLOAD {
     label 'process_low'
 
     conda "${moduleDir}/environment.yml"
+    // storeDir can point at an s3:// path; Nextflow's AWS Batch executor stages that copy by
+    // shelling out to `aws` inside the task's own container, which the plain eggnog-mapper image lacks.
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/eggnog-mapper:2.1.9--pyhdfd78af_0':
-        'biocontainers/eggnog-mapper:2.1.9--pyhdfd78af_0' }"
+        'oras://community.wave.seqera.io/library/eggnog-mapper_awscli:34a6ca5baa89f396':
+        'community.wave.seqera.io/library/eggnog-mapper_awscli:635add8f85922662' }"
 
     output:
     path "eggnog.db"                  , emit: eggnog_db

@@ -996,8 +996,8 @@ workflow METATDENOVO {
     // SUBWORKFLOW: Eukulele
     //
     if ( ! skip_eukulele ) {
-        // Make sure the eukulele_dbpath exists
-        d = new File("${params.eukulele_dbpath}")
+        // Make sure the eukulele_dbpath exists. file() (not java.io.File) resolves remote paths like s3://.
+        d = file(params.eukulele_dbpath)
         if ( ! d.exists() ) {
             d.mkdirs()
         }

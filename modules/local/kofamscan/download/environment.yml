@@ -5,3 +5,4 @@ channels:
   - bioconda
 dependencies:
   - conda-forge::wget=1.21.4
+  - conda-forge::awscli=2.36.42

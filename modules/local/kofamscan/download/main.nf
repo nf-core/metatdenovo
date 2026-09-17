@@ -3,9 +3,11 @@ process KOFAMSCAN_DOWNLOAD {
     label 'process_long'
 
     conda "${moduleDir}/environment.yml"
+    // storeDir can point at an s3:// path; Nextflow's AWS Batch executor stages that copy by
+    // shelling out to `aws` inside the task's own container, which the plain wget image lacks.
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/3b/3b54fa9135194c72a18d00db6b399c03248103f87e43ca75e4b50d61179994b3/data':
-        'community.wave.seqera.io/library/wget:1.21.4--8b0fcde81c17be5e' }"
+        'oras://community.wave.seqera.io/library/wget_awscli:340260e7e9dd32f7':
+        'community.wave.seqera.io/library/wget_awscli:9510e6a6af2abe94' }"
 
     input:
     val ko_list_url
