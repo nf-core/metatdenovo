@@ -43,6 +43,7 @@ include { KOFAMSCAN               } from '../subworkflows/local/kofamscan/'
 include { DBCAN                   } from '../subworkflows/local/dbcan/'
 include { TRANSDECODER            } from '../subworkflows/local/transdecoder/'
 include { METAEUK                 } from '../subworkflows/local/metaeuk/'
+include { USER_ORFS               } from '../subworkflows/local/user_orfs/'
 include { PIPELINE_INITIALISATION } from '../subworkflows/local/utils_nfcore_metatdenovo_pipeline'
 include { PIPELINE_COMPLETION     } from '../subworkflows/local/utils_nfcore_metatdenovo_pipeline'
 
@@ -629,7 +630,9 @@ workflow METATDENOVO {
     //
     // Add any --user_orfs rows, plus a single --user_orfs_gff/--user_orfs_faa pair, in alongside the
     // built-in callers above -- each is treated exactly like another --orf_caller value from here on
-    // (locus consolidation, protein consolidation, feature counting, all keyed on meta.caller). Route
+    // (locus consolidation, protein consolidation, feature counting, all keyed on meta.caller).
+    // USER_ORFS normalises a raw MetaEuk gff/fasta pair the same way a pipeline-internal MetaEuk run
+    // already is (see subworkflows/local/user_orfs), passing anything else through unchanged. Route
     // a gzipped gff through the same UNPIGZ_GFF normalisation as Prokka/Prodigal/MetaEuk's own
     // gzipped output, so every entry in ch_gff stays uncompressed, same as today; ch_protein already
     // tolerates either.
@@ -639,17 +642,12 @@ workflow METATDENOVO {
         channel.empty()
     ch_user_orfs_named = ch_user_orfs.mix(ch_user_orfs_single)
         .map { meta, gff, faa -> [ meta + [caller: meta.id, id: "${assembly_name}.${meta.id}"], gff, faa ] }
-    ch_gff_gz = ch_gff_gz.mix(
-        ch_user_orfs_named
-            .filter { _meta, gff, _faa -> gff =~ /\.gz$/ }
-            .map { meta, gff, _faa -> [ meta, gff ] }
-    )
-    ch_gff = ch_gff.mix(
-        ch_user_orfs_named
-            .filter { _meta, gff, _faa -> ! (gff =~ /\.gz$/) }
-            .map { meta, gff, _faa -> [ meta, gff ] }
-    )
-    ch_protein = ch_protein.mix( ch_user_orfs_named.map { meta, _gff, faa -> [ meta, faa ] } )
+
+    USER_ORFS ( ch_user_orfs_named )
+
+    ch_gff_gz = ch_gff_gz.mix( USER_ORFS.out.gff.filter { _meta, gff -> gff =~ /\.gz$/ } )
+    ch_gff    = ch_gff.mix( USER_ORFS.out.gff.filter { _meta, gff -> ! (gff =~ /\.gz$/) } )
+    ch_protein = ch_protein.mix( USER_ORFS.out.faa )
 
     // Single UNPIGZ_GFF call covering every gzipped-GFF caller active this run -- see the ch_gff_gz
     // comment above for why this can't be one call per caller branch.

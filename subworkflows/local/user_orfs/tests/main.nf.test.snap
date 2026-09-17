@@ -1,0 +1,56 @@
+{
+    "already-normalised metaeuk gff/faa - not reprocessed": {
+        "content": [
+            {
+                "faa": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "already_formatted.faa:md5,a366d177a59b045fd39c9452b8572a68"
+                    ]
+                ],
+                "gff": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "already_formatted.gff:md5,8c0148b323bdd2036d05efded5069248"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-09-16T10:27:43.824679232",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
+    },
+    "already-normalised gff/faa - passed through unchanged": {
+        "content": [
+            {
+                "faa": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "generic.faa:md5,9a69877204c3c3883c8a4579499ff9b4"
+                    ]
+                ],
+                "gff": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "generic.gff:md5,95eeda63f999d18ed8f32411f05411fe"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-09-16T10:27:36.523099001",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
+    }
+}

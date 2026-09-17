@@ -1,0 +1,89 @@
+nextflow_process {
+
+    name "Test Process FORMAT_GFF2BED"
+    script "../main.nf"
+    process "FORMAT_GFF2BED"
+
+    tag "modules"
+    tag "modules_local"
+    tag "format"
+    tag "format/gff2bed"
+
+    // Inputs are built inline rather than read from a fixture: the pipeline repo carries no
+    // test data of its own, and a couple of CDS lines are small enough to state literally.
+
+    test("cds with ID= attribute - bed line produced") {
+
+        when {
+            process {
+                """
+                def gff = file("\${workDir}/test.gff")
+                gff.text = [
+                    'k1\\tprokka\\tCDS\\t1\\t100\\t.\\t+\\t0\\tID=gene1;Target_ID=x;TCS_ID=y',
+                    ''
+                ].join('\\n')
+
+                input[0] = [ [ id:'test', caller:'prokka' ], gff ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                // The "(^|;)ID=" anchor must grab the real ID= attribute, not something inside the
+                // Target_ID=/TCS_ID= attributes that also contain the substring "ID=".
+                { assert path(process.out.bed[0][1]).csv(sep: "\t", header: false).rows[0] ==
+                    ["C0": "k1", "C1": 0, "C2": 100, "C3": "prokka:gene1", "C4": 0, "C5": "+"] }
+            )
+        }
+    }
+
+    test("cds with no ID= attribute - fails loudly") {
+
+        when {
+            process {
+                """
+                def gff = file("\${workDir}/test.gff")
+                gff.text = [
+                    'k1\\tMetaEuk\\tCDS\\t1\\t100\\t.\\t+\\t0\\tTarget_ID=x;TCS_ID=x|k1|+|0',
+                    ''
+                ].join('\\n')
+
+                input[0] = [ [ id:'test', caller:'metaeuk' ], gff ]
+                """
+            }
+        }
+
+        then {
+            // A silently empty id would make this locus indistinguishable from every other CDS
+            // this caller ever fails to identify, merging unrelated loci downstream -- so it must
+            // error instead of writing a bed line with an empty name.
+            assert process.failed
+            assert process.errorReport.contains("ERROR: CDS record has no ID= attribute")
+        }
+    }
+
+    test("gff2bed - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                def gff = file("\${workDir}/test.gff")
+                gff.text = 'k1\\tprokka\\tCDS\\t1\\t100\\t.\\t+\\t0\\tID=gene1\\n'
+
+                input[0] = [ [ id:'test', caller:'prokka' ], gff ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(sanitizeOutput(process.out)).match() }
+            )
+        }
+    }
+}

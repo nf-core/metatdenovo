@@ -1,0 +1,89 @@
+nextflow_process {
+
+    name "Test Process FORMAT_METAEUK_GFF"
+    script "../main.nf"
+    process "FORMAT_METAEUK_GFF"
+
+    tag "modules"
+    tag "modules_local"
+    tag "format"
+    tag "format/metaeuk"
+
+    // Inputs are built inline rather than read from a fixture: the pipeline repo carries no
+    // test data of its own, and a couple of CDS lines are small enough to state literally.
+
+    test("cds with TCS_ID= attribute - ID= prepended") {
+
+        when {
+            process {
+                """
+                def gff = file("\${workDir}/metaeuk.gff")
+                gff.text = [
+                    'k1\\tMetaEuk\\tCDS\\t1\\t100\\t.\\t+\\t.\\tTarget_ID=P1;TCS_ID=P1|k1|+|0_CDS_0;Parent=P1|k1|+|0_exon_0',
+                    ''
+                ].join('\\n')
+
+                input[0] = [ [ id:'test' ], gff ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                // The trailing "_CDS_0" suffix is stripped so this id matches the mRNA/gene records'
+                // own TCS_ID (which never carries it), and FORMAT_METAEUKFAA's rewritten fasta header.
+                { assert path(process.out.format_gff[0][1]).linesGzip[0] ==
+                    'k1\tMetaEuk\tCDS\t1\t100\t.\t+\t.\tID=P1|k1|+|0;Target_ID=P1;TCS_ID=P1|k1|+|0_CDS_0;Parent=P1|k1|+|0_exon_0' }
+            )
+        }
+    }
+
+    test("cds with no TCS_ID= attribute - fails loudly") {
+
+        when {
+            process {
+                """
+                def gff = file("\${workDir}/metaeuk.gff")
+                gff.text = [
+                    'k1\\tMetaEuk\\tCDS\\t1\\t100\\t.\\t+\\t.\\tTarget_ID=P1;Parent=P1_exon_0',
+                    ''
+                ].join('\\n')
+
+                input[0] = [ [ id:'test' ], gff ]
+                """
+            }
+        }
+
+        then {
+            // A silently empty id here reaches FORMAT_GFF2BED as "ID=;", which its own ID= anchor
+            // then also fails to match -- turning one malformed record into a second, harder-to-trace
+            // failure a module downstream. Catch it at the source instead.
+            assert process.failed
+            assert process.errorReport.contains("ERROR: CDS record has no TCS_ID= attribute")
+        }
+    }
+
+    test("metaeuk gff - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                def gff = file("\${workDir}/metaeuk.gff")
+                gff.text = 'k1\\tMetaEuk\\tCDS\\t1\\t100\\t.\\t+\\t.\\tTCS_ID=P1|k1|+|0_CDS_0\\n'
+
+                input[0] = [ [ id:'test' ], gff ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(sanitizeOutput(process.out)).match() }
+            )
+        }
+    }
+}
