@@ -47,6 +47,7 @@ spades/spades.spades.log
 spades/spades.yaml
 spades/*.gz
 summary_tables/*.tsv.gz
+summary_tables/*.parquet
 protein_consolidate/*
 transdecoder/*.gz
 # MetaEuk's own output, and the two files this pipeline derives from it, are not
