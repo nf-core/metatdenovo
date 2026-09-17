@@ -31,11 +31,7 @@ nextflow_pipeline {
                 { assert tasksFor('RUNDBCAN_CAZYMEANNOTATION') == 3 },
                 { assert tasksFor('EUKULELE_SEARCH') == 3 },
                 { assert tasksFor('HMMER_HMMSEARCH') == 12 }, // 3 protein sets * 4 hmmfiles
-                // One Parquet conversion per summary_tables/ tsv: 3 protein sets * 6 annotation
-                // tables (dbcan/kofamscan/kofamscan-uniq/emapper/taxonomy_classification/hmmrank)
-                // + 4 counts tables (prokka/transdecoder/locus_consolidate/protein_consolidate)
-                // + 3 overall_stats + 1 prokka-annotations.
-                { assert tasksFor('DUCKDB_TABLE2PARQUET') == 26 },
+                { assert tasksFor('DUCKDB_TABLE2PARQUET') == 26 }, // one per summary_tables/ tsv
                 { assert succeeded.size() == 174 },
                 { assert snapshot(
                     removeNextflowVersion("$outputDir/pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml")
