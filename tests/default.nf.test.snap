@@ -55,6 +55,9 @@
                     "stringr": "1.5.2",
                     "tidyr": "1.3.1"
                 },
+                "DUCKDB_TABLE2PARQUET": {
+                    "duckdb": "1.5.5"
+                },
                 "FASTQC": {
                     "fastqc": "0.12.1"
                 },
@@ -257,12 +260,19 @@
                 "samtools/megahit.SAMPLE3_PE_1.flagstat",
                 "samtools/megahit.SAMPLE3_PE_1.idxstats",
                 "summary_tables",
+                "summary_tables/megahit.locus_consolidate.counts.parquet",
                 "summary_tables/megahit.locus_consolidate.counts.tsv.gz",
+                "summary_tables/megahit.prodigal.counts.parquet",
                 "summary_tables/megahit.prodigal.counts.tsv.gz",
+                "summary_tables/megahit.prodigal.hmmrank.parquet",
                 "summary_tables/megahit.prodigal.hmmrank.tsv.gz",
+                "summary_tables/megahit.prodigal.overall_stats.parquet",
                 "summary_tables/megahit.prodigal.overall_stats.tsv.gz",
+                "summary_tables/megahit.protein_consolidate_99.counts.parquet",
                 "summary_tables/megahit.protein_consolidate_99.counts.tsv.gz",
+                "summary_tables/megahit.protein_consolidate_99.hmmrank.parquet",
                 "summary_tables/megahit.protein_consolidate_99.hmmrank.tsv.gz",
+                "summary_tables/megahit.protein_consolidate_99.overall_stats.parquet",
                 "summary_tables/megahit.protein_consolidate_99.overall_stats.tsv.gz",
                 "trimgalore",
                 "trimgalore/SAMPLE1_PE_1.fastq.gz_trimming_report.txt",
@@ -286,7 +296,14 @@
                 "trimgalore/fastqc/SAMPLE3_PE_1_2_val_2_fastqc.zip"
             ],
             [
-                "multiqc_citations.txt:md5,2d1a8ef8ba06c7eada06ab3e96552ea4"
+                "multiqc_citations.txt:md5,2d1a8ef8ba06c7eada06ab3e96552ea4",
+                "megahit.locus_consolidate.counts.parquet:md5,38562cf8c1f4b0b52f77458580c5d3cb",
+                "megahit.prodigal.counts.parquet:md5,b6539712fd8e0dfa0e99cce586f54c48",
+                "megahit.prodigal.hmmrank.parquet:md5,30f507a5b2130ba8d6dbec0c2c86c4c0",
+                "megahit.prodigal.overall_stats.parquet:md5,dd927f9e1f3c302be865cb5af5a22225",
+                "megahit.protein_consolidate_99.counts.parquet:md5,6e4edb2bf41bf4215f89fc0a60701b7f",
+                "megahit.protein_consolidate_99.hmmrank.parquet:md5,30f507a5b2130ba8d6dbec0c2c86c4c0",
+                "megahit.protein_consolidate_99.overall_stats.parquet:md5,e6426b73cae87deab5ea7a525aeafed8"
             ],
             16,
             [
@@ -301,10 +318,10 @@
                 "sample\tn_post_trimming\tn_non_contaminated\tidxs_n_mapped\tidxs_n_unmapped\tUnassigned_Ambiguity\tUnassigned_Chimera\tUnassigned_Duplicate\tUnassigned_FragmentLength\tUnassigned_MappingQuality\tUnassigned_MultiMapping\tUnassigned_NoFeatures\tUnassigned_NonSplit\tUnassigned_Overlapping_Length\tUnassigned_Read_Type\tUnassigned_Secondary\tUnassigned_Singleton\tUnassigned_Unmapped\tprodigal"
             ]
         ],
+        "timestamp": "2026-09-17T15:01:41.286506348",
         "meta": {
-            "nf-test": "0.9.3",
-            "nextflow": "25.10.4"
-        },
-        "timestamp": "2026-09-15T12:33:29.685787"
+            "nf-test": "0.9.4",
+            "nextflow": "26.04.6"
+        }
     }
 }
