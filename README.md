@@ -102,6 +102,7 @@ For more details about the output files and reports, please refer to the
 > [!NOTE]
 > Tables in the `summary_tables` directory under the output directory are made especially for further analysis in tools like R or Python.
 > Their formats are standardized and column names consistent between tables.
+> With `--save_parquet`, each table is also written as Parquet, alongside the default gzipped TSV.
 
 ## Credits
 
