@@ -19,7 +19,7 @@
                     },
                     "bbmap/bbnorm": {
                         "branch": "master",
-                        "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",
+                        "git_sha": "57ce8038e3afe6bc6c6fdd2b3bf2abf5077b96a7",
                         "installed_by": ["modules"],
                         "patch": "modules/nf-core/bbmap/bbnorm/bbmap-bbnorm.diff"
                     },
