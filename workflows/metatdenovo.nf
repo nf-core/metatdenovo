@@ -996,8 +996,11 @@ workflow METATDENOVO {
     // SUBWORKFLOW: Eukulele
     //
     if ( ! skip_eukulele ) {
-        // Make sure the eukulele_dbpath exists
-        d = new File("${params.eukulele_dbpath}")
+        // Make sure the eukulele_dbpath exists. Resolved with Nextflow's own file(), not
+        // java.io.File, since eukulele_dbpath can be a remote path (e.g. s3://) that only
+        // Nextflow's NIO-backed Path understands -- a plain File silently treats it as a
+        // nonexistent local path and creates a bogus local directory tree instead.
+        d = file(params.eukulele_dbpath)
         if ( ! d.exists() ) {
             d.mkdirs()
         }

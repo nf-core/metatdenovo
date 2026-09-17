@@ -5,3 +5,4 @@ channels:
   - bioconda
 dependencies:
   - eggnog-mapper=2.1.9
+  - conda-forge::awscli=2.36.42

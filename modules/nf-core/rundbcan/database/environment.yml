@@ -5,3 +5,4 @@ channels:
   - bioconda
 dependencies:
   - bioconda::dbcan=5.2.9
+  - conda-forge::awscli=2.36.42
