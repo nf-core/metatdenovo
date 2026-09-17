@@ -409,6 +409,7 @@ Filenames start with assembly program and ORF caller, to allow reruns of the pip
   - `<assembly_name>.<orfcaller_name>.<database>.diamond.taxonomy.tsv.gz`: diamond taxonomy parsed into individual taxa
   - `<assembly_name>.<orfcaller_name>.<database>.taxonomy-taxdump.tsv.gz`: diamond taxonomy parse with taxdump data. Only if `parse_with_taxdump` was set in the input file
   - `<assembly_name>.<orfcaller_name>.hmmrank.tsv.gz`: ranked summary table from HMMER results.
+  - `*.parquet`: with `--save_parquet`, each table above is also written as Parquet, same basename minus the `.tsv.gz`/`.tsv` suffix. The TSVs are unaffected either way.
 
 </details>
 

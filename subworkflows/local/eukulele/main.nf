@@ -31,4 +31,5 @@ workflow EUKULELE {
     taxonomy_estimation = EUKULELE_SEARCH.out.taxonomy_estimation
     taxonomy_counts     = EUKULELE_SEARCH.out.taxonomy_counts
     diamond             = EUKULELE_SEARCH.out.diamond
+    tax                 = FORMAT_EUKULELE_TAX.out.tax
 }
