@@ -6,6 +6,7 @@ keywords:
   - protein sequences
 components:
   - interproscan/download
+  - interproscan/stripasterisk
   - interproscan
   - interproscan/format
   - interproscan/sum
