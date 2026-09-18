@@ -494,6 +494,19 @@ once, then reuse the data" advice above applies here too).
 Since the pipeline only runs dbCAN's protein-mode CAZyme annotation (not its gene-cluster/CGC analysis), the download skips the CGC-related
 database assets to save space and time.
 
+A fourth option is [InterProScan](https://interproscan-docs.readthedocs.io) (Pfam, PANTHER, and other member-database domain/GO
+annotation), run by default and skippable with `--skip_interproscan`.
+Its (large) lookup-service database is downloaded automatically, with the path settable through `--interproscan_dbpath directory`
+(the same "let the pipeline download it once, then reuse the data" advice above applies here too).
+By default only a fast, curated subset of member databases is run (`--interproscan_applications Pfam,PANTHER`); widen this to run
+against more member databases (Gene3D, SMART, etc.) at the cost of runtime.
+GO term annotation (`--goterms`) is always enabled; pathway mapping (`--pathways`) is not run.
+
+:::note
+The pipeline uses the InterProScan version pinned by the underlying nf-core/modules component (5.59-91.0, from 2022) -- not the
+current InterProScan release -- since that is what its container ships.
+:::
+
 A more targeted annotation option offered by the workflow is the possibility for the user to provide a set of
 [HMMER HMM profiles](http://eddylab.org/software/hmmer/Userguide.pdf) through the `--hmmdir dir` or `--hmmfiles file0.hmm,file1.hmm,...,filen.hmm`
 parameters.
@@ -502,7 +515,7 @@ which each ORF-HMM combination will be ranked according to score and E-value.
 
 #### How to manually download the databases for functional annotation
 
-There are some cases (e.g. offline run) where you prefer to download the databases before running the pipeline. Currently, `eggnog-mapper`, `kofamscan` and `dbcan` use databases that can be downloaded.
+There are some cases (e.g. offline run) where you prefer to download the databases before running the pipeline. Currently, `eggnog-mapper`, `kofamscan`, `dbcan` and `interproscan` use databases that can be downloaded.
 
 ##### Eggnog databases
 
@@ -544,6 +557,17 @@ The `--no-cgc` flag matches what the pipeline itself uses, since only protein-mo
 
 ```bash
 run_dbcan database --db_dir dbcan --aws_s3 --no-cgc
+```
+
+##### InterProScan database
+
+Download and extract the release archive matching the pipeline's pinned InterProScan version (5.59-91.0), then point
+`--interproscan_dbpath` at the extracted `data/` directory:
+
+```bash
+wget https://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/5.59-91.0/interproscan-5.59-91.0-64-bit.tar.gz
+tar -zxf interproscan-5.59-91.0-64-bit.tar.gz
+mv interproscan-5.59-91.0/data interproscan
 ```
 
 ## Example pipeline command with some common features
