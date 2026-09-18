@@ -492,6 +492,12 @@ Currently, the standard download procedure for the eggNOG database using the `do
 Since release 1.4.0, this pipeline therefore fetches files directly from [the current download site](http://eggnog5.embl.de/download/emapperdb-5.0.2) instead, using Nextflow's own file staging so it works even on compute nodes without network access.
 :::
 
+:::note
+Both the eggNOG and KofamScan databases are large (eggNOG's files total over 10 GB; KofamScan's `profiles.tar.gz` is around 1.5 GB), and Nextflow's own file staging has no resume support: an interrupted transfer restarts from scratch, up to a few retries, rather than continuing where it left off.
+Over an unreliable connection this can fail repeatedly on the largest files.
+If that happens, download the files yourself with a tool that supports resuming (e.g. `wget -c` or `aria2c`), unpack them, and point `--eggnog_dbpath`/`--kofam_dir` at the result so the pipeline reuses them instead of downloading.
+:::
+
 A third functional annotation option is CAZyme annotation using [dbCAN](https://bcb.unl.edu/dbCAN2/) (`run_dbcan`), which is also run by
 default and can be skipped with `--skip_dbcan`.
 Its database is downloaded automatically, with the path settable through `--dbcan_dbpath directory` (the same "let the pipeline download it
