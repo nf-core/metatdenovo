@@ -66,6 +66,7 @@ include { CAT_FASTQ            	                     } from '../modules/nf-core/
 include { CUSTOM_COLLECTFEATURECOUNTS                } from '../modules/nf-core/custom/collectfeaturecounts/main'
 include { CUSTOM_COLLECTSTATS                        } from '../modules/nf-core/custom/collectstats/main'
 include { DIAMOND_BLASTP as DIAMOND_TAXONOMY         } from '../modules/nf-core/diamond/blastp/'
+include { DUCKDB_TABLE2PARQUET                       } from '../modules/nf-core/duckdb/table2parquet/main'
 include { FASTQC                                     } from '../modules/nf-core/fastqc/'
 include { MEGAHIT                                    } from '../modules/nf-core/megahit/'
 include { MULTIQC                                    } from '../modules/nf-core/multiqc/'
@@ -120,6 +121,7 @@ workflow METATDENOVO {
     // See #478: coerce CLI-supplied boolean/integer params to their real type before
     // branching on them below -- nf-schema's validateParameters() does not do this for us.
     def annotate_only_consolidated = typecastBooleanParam('annotate_only_consolidated')
+    def save_parquet               = typecastBooleanParam('save_parquet')
     def skip_dbcan                 = typecastBooleanParam('skip_dbcan')
     def skip_eggnog                = typecastBooleanParam('skip_eggnog')
     def skip_eukulele              = typecastBooleanParam('skip_eukulele')
@@ -506,6 +508,10 @@ workflow METATDENOVO {
     // (e.g. --orf_caller prokka,prodigal) even though it worked fine for any single caller alone.
     ch_gff_gz   = channel.empty()
 
+    // Accumulates every summary_tables/ tsv this run produces, across whichever optional
+    // annotation subworkflows are active, for the optional Parquet mirror further down.
+    ch_parquet_tables = channel.empty()
+
     //
     // SUBWORKFLOW: Run PROKKA_SUBSETS on assmebly output, but split the fasta file in chunks of 10 MB, then concatenate and compress output.
     //
@@ -515,6 +521,8 @@ workflow METATDENOVO {
         ch_multiqc_files = ch_multiqc_files.mix(PROKKA_SUBSETS.out.prokka_log)
 
         ch_gff_gz = ch_gff_gz.mix( PROKKA_SUBSETS.out.gff.map { meta, gff -> [ meta + [caller: 'prokka'], gff ] } )
+
+        ch_parquet_tables = ch_parquet_tables.mix( PROKKA_SUBSETS.out.gfftsv.map { _meta, tsv -> tsv } )
     }
 
     //
@@ -962,7 +970,8 @@ workflow METATDENOVO {
     //
     if ( ! skip_eggnog ) {
         EGGNOG(ch_protein, ch_fcs_for_summary)
-        ch_merge_tables = ch_merge_tables.mix ( EGGNOG.out.sumtable )
+        ch_merge_tables   = ch_merge_tables.mix ( EGGNOG.out.sumtable )
+        ch_parquet_tables = ch_parquet_tables.mix( EGGNOG.out.emappertsv.map { _meta, tsv -> tsv } )
     }
 
     //
@@ -971,7 +980,10 @@ workflow METATDENOVO {
     if( !skip_kofamscan ) {
         ch_kofamscan = ch_protein.map { meta, protein -> [ meta, protein ] }
         KOFAMSCAN( ch_kofamscan, ch_fcs_for_summary, params.kofam_ko_list_url, params.kofam_profiles_url )
-        ch_merge_tables = ch_merge_tables.mix ( KOFAMSCAN.out.kofamscan_summary )
+        ch_merge_tables   = ch_merge_tables.mix ( KOFAMSCAN.out.kofamscan_summary )
+        ch_parquet_tables = ch_parquet_tables
+            .mix( KOFAMSCAN.out.kofam_table_tsv.map { _meta, tsv -> tsv } )
+            .mix( KOFAMSCAN.out.kofam_table_uniq.map { _meta, tsv -> tsv } )
     }
 
     //
@@ -979,7 +991,8 @@ workflow METATDENOVO {
     //
     if( !skip_dbcan ) {
         DBCAN( ch_protein, ch_fcs_for_summary )
-        ch_merge_tables = ch_merge_tables.mix ( DBCAN.out.sumtable )
+        ch_merge_tables   = ch_merge_tables.mix ( DBCAN.out.sumtable )
+        ch_parquet_tables = ch_parquet_tables.mix( DBCAN.out.cazyme_annotation.map { _meta, tsv -> tsv } )
     }
 
     //
@@ -1018,7 +1031,8 @@ workflow METATDENOVO {
             .map { meta, fasta, database, directory -> [ [ id: "${meta.id}.${database}", caller: meta.caller ], fasta, database, directory ] }
         EUKULELE(ch_eukulele, ch_fcs_for_summary)
 
-        ch_merge_tables = ch_merge_tables.mix(EUKULELE.out.taxonomy_summary)
+        ch_merge_tables   = ch_merge_tables.mix(EUKULELE.out.taxonomy_summary)
+        ch_parquet_tables = ch_parquet_tables.mix( EUKULELE.out.tax.map { _meta, tsv -> tsv } )
     }
 
     //
@@ -1142,6 +1156,24 @@ workflow METATDENOVO {
         }
 
     CUSTOM_COLLECTSTATS(ch_collect_stats)
+
+    //
+    // MODULE: Also write every summary_tables/ tsv as Parquet -- re-keyed on each table's own
+    // filename rather than its upstream meta, since several of these channels' metas collide
+    // (e.g. multiple callers sharing an id) while the published filenames are already unique.
+    //
+    if ( save_parquet ) {
+        DUCKDB_TABLE2PARQUET(
+            ch_parquet_tables
+                .mix( ch_counts_per_caller.map { _meta, tsv -> tsv } )
+                .mix( COLLECT_LOCUSCONSOLIDATE.out.counts.map { _meta, tsv -> tsv } )
+                .mix( HMMCLASSIFY.out.hmmrank.map { _meta, tsv -> tsv } )
+                .mix( FORMAT_DIAMOND_TAX_RANKLIST.out.taxonomy.map { _meta, tsv -> tsv } )
+                .mix( FORMAT_DIAMOND_TAX_TAXDUMP.out.taxonomy.map { _meta, tsv -> tsv } )
+                .mix( CUSTOM_COLLECTSTATS.out.overall_stats.map { _meta, tsv -> tsv } )
+                .map { tsv -> [ [ id: tsv.name.replaceAll(/\.tsv(\.gz)?$/, '') ], tsv ] }
+        )
+    }
 
     //
     // MODULE: MultiQC

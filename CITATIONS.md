@@ -120,6 +120,10 @@
 
   > Gurevich A, Saveliev V, Vyahhi N, Tesler G. QUAST: quality assessment tool for genome assemblies. Bioinformatics. 2013;29(8):1072-1075. doi: 10.1093/bioinformatics/btt086.
 
+- [DuckDB](https://duckdb.org)
+
+  > Raasveldt M, Mühleisen H. DuckDB: an Embeddable Analytical Database. In: Proceedings of the 2019 International Conference on Management of Data (SIGMOD '19). 2019 Jun 25:1981-1984. doi: 10.1145/3299869.3320212.
+
 ## Software packaging/containerisation tools
 
 - [Anaconda](https://anaconda.com)

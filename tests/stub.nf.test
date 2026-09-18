@@ -31,7 +31,8 @@ nextflow_pipeline {
                 { assert tasksFor('RUNDBCAN_CAZYMEANNOTATION') == 3 },
                 { assert tasksFor('EUKULELE_SEARCH') == 3 },
                 { assert tasksFor('HMMER_HMMSEARCH') == 12 }, // 3 protein sets * 4 hmmfiles
-                { assert succeeded.size() == 148 },
+                { assert tasksFor('DUCKDB_TABLE2PARQUET') == 26 }, // one per summary_tables/ tsv
+                { assert succeeded.size() == 174 },
                 { assert snapshot(
                     removeNextflowVersion("$outputDir/pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml")
                 ).match() }
