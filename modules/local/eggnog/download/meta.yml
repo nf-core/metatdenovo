@@ -5,7 +5,16 @@ keywords:
   - download
   - database
   - functional annotation
-input: none
+input:
+  - eggnog_db_gz:
+      type: file
+      description: Gzipped EggNOG database file, staged from a URL via Nextflow's own file() so it works on network-isolated compute nodes
+  - eggnog_dmnd_gz:
+      type: file
+      description: Gzipped DIAMOND-formatted EggNOG protein database, staged from a URL via Nextflow's own file()
+  - eggnog_taxa_targz:
+      type: file
+      description: Gzipped tar archive of the EggNOG taxonomy database, staged from a URL via Nextflow's own file()
 output:
   eggnog_db:
     type: file

@@ -10,8 +10,8 @@ process KOFAMSCAN_DOWNLOAD {
         'community.wave.seqera.io/library/wget_awscli:9510e6a6af2abe94' }"
 
     input:
-    val ko_list_url
-    val profiles_url
+    path ko_list_gz
+    path profiles_targz
 
     output:
     path "ko_list"     , emit: ko_list
@@ -23,11 +23,9 @@ process KOFAMSCAN_DOWNLOAD {
     script:
 
     """
-    wget ${ko_list_url} -O ko_list.gz
-    gunzip ko_list.gz
+    gunzip -c ${ko_list_gz} > ko_list
 
-    wget ${profiles_url} -O profiles.tar.gz
-    tar -zxf profiles.tar.gz
+    tar -zxf ${profiles_targz}
     """
 
     stub:

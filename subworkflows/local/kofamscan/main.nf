@@ -18,7 +18,7 @@ workflow KOFAMSCAN {
 
     main:
 
-    KOFAMSCAN_DOWNLOAD( ko_list_url, profiles_url )
+    KOFAMSCAN_DOWNLOAD( file(ko_list_url), file(profiles_url) )
 
     KOFAMSCAN_SCAN( kofamscan, KOFAMSCAN_DOWNLOAD.out.koprofiles, KOFAMSCAN_DOWNLOAD.out.ko_list )
 

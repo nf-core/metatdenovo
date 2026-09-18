@@ -9,6 +9,11 @@ process EGGNOG_DOWNLOAD {
         'oras://community.wave.seqera.io/library/eggnog-mapper_awscli:34a6ca5baa89f396':
         'community.wave.seqera.io/library/eggnog-mapper_awscli:635add8f85922662' }"
 
+    input:
+    path eggnog_db_gz
+    path eggnog_dmnd_gz
+    path eggnog_taxa_targz
+
     output:
     path "eggnog.db"                  , emit: eggnog_db
     path "eggnog_proteins.dmnd"       , emit: dmnd
@@ -20,21 +25,12 @@ process EGGNOG_DOWNLOAD {
     task.ext.when == null || task.ext.when
 
     script:
-    def args = task.ext.args ?: ''
     """
-    # This commented for the moment since the tool tries to access a domain that doesn't exist anymore
-    #download_eggnog_data.py \\
-    #    $args \\
-    #    -y \\
-    #    --data_dir .
-
-    # Temporary solution, until version 3 of the tool
-    wget http://eggnog6.embl.de/download/emapperdb-5.0.2/eggnog.db.gz
-    gunzip eggnog.db.gz
-    wget http://eggnog6.embl.de/download/emapperdb-5.0.2/eggnog_proteins.dmnd.gz
-    gunzip eggnog_proteins.dmnd.gz
-    wget http://eggnog6.embl.de/download/emapperdb-5.0.2/eggnog.taxa.tar.gz
-    tar xzf eggnog.taxa.tar.gz
+    # Temporary solution, until version 3 of the tool: download_eggnog_data.py
+    # itself tries to reach a domain that no longer exists.
+    gunzip -c ${eggnog_db_gz} > eggnog.db
+    gunzip -c ${eggnog_dmnd_gz} > eggnog_proteins.dmnd
+    tar xzf ${eggnog_taxa_targz}
     """
 
     stub:
