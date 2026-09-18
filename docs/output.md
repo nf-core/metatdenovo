@@ -360,7 +360,7 @@ member databases (Pfam and PANTHER by default, configurable with `--interproscan
 <summary>Output files</summary>
 
 - `interproscan/`
-  - `<assembly_name>.<orfcaller_name>.tsv`: raw InterProScan output.
+  - `<assembly_name>.<orfcaller_name>.{tsv,xml,gff3,json}`: raw InterProScan output, in each of its supported formats.
 - `summary_tables/`
   - `<assembly_name>.<orfcaller_name>.interproscan.tsv.gz`: reformatted InterProScan output, with a header row added
 

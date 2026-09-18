@@ -2,10 +2,11 @@
 // Run InterProScan on called ORFs, first downloading the required database
 //
 
-include { INTERPROSCAN_DATABASE } from '../../../modules/local/interproscan/download/main'
-include { INTERPROSCAN          } from '../../../modules/nf-core/interproscan/main'
-include { INTERPROSCAN_FORMAT   } from '../../../modules/local/interproscan/format/main'
-include { INTERPROSCAN_SUM      } from '../../../modules/local/interproscan/sum/main'
+include { INTERPROSCAN_DATABASE      } from '../../../modules/local/interproscan/download/main'
+include { INTERPROSCAN_STRIPASTERISK } from '../../../modules/local/interproscan/stripasterisk/main'
+include { INTERPROSCAN               } from '../../../modules/nf-core/interproscan/main'
+include { INTERPROSCAN_FORMAT        } from '../../../modules/local/interproscan/format/main'
+include { INTERPROSCAN_SUM           } from '../../../modules/local/interproscan/sum/main'
 
 workflow INTERPROSCAN_ANNOTATION {
     take:
@@ -16,7 +17,9 @@ workflow INTERPROSCAN_ANNOTATION {
 
     INTERPROSCAN_DATABASE(params.interproscan_db_url)
 
-    INTERPROSCAN(faa, INTERPROSCAN_DATABASE.out.db)
+    INTERPROSCAN_STRIPASTERISK(faa)
+
+    INTERPROSCAN(INTERPROSCAN_STRIPASTERISK.out.faa, INTERPROSCAN_DATABASE.out.db)
 
     INTERPROSCAN_FORMAT(INTERPROSCAN.out.tsv)
 

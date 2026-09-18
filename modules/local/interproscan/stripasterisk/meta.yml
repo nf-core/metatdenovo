@@ -1,0 +1,34 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "interproscan_stripasterisk"
+description: Strip trailing stop-codon '*' characters from a protein FASTA, which InterProScan rejects
+keywords:
+  - interproscan
+  - fasta
+
+input:
+  - - meta:
+        type: map
+        description: |
+          Groovy Map containing sample information
+          e.g. `[ id:'sample1' ]`
+    - faa:
+        type: file
+        description: Protein sequences in FASTA format, optionally gzipped
+        pattern: "*.{faa,faa.gz,fasta,fasta.gz}"
+
+output:
+  faa:
+    - - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. `[ id:'sample1' ]`
+      - "*.faa":
+          type: file
+          description: Protein sequences with '*' characters removed
+          pattern: "*.faa"
+
+authors:
+  - "@danilodileo"
+maintainers:
+  - "@danilodileo"

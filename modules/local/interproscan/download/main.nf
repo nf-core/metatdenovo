@@ -22,12 +22,19 @@ process INTERPROSCAN_DATABASE {
     """
     wget ${database_url} -O interproscan_db.tar.gz
 
-    # The upstream tarball extracts to interproscan-<version>/{bin,data,lib,...} -- the module
-    # supplies its own bin/lib via the container's conda install, so only the (large) data/
-    # subdirectory is needed, staged directly as INTERPROSCAN's `data` input.
+    # The full upstream release tarball extracts to interproscan-<version>/{bin,data,lib,...} --
+    # the module supplies its own bin/lib via the container's conda install, so only the (large)
+    # data/ subdirectory is needed, staged directly as INTERPROSCAN's `data` input. The small
+    # test-only archive (nf-core/test-datasets, used by the vendored module's own tests) instead
+    # extracts data/ directly at the tarball's top level, with no version-named wrapper directory.
     tar -zxf interproscan_db.tar.gz
-    mv interproscan-*/data interproscan_db
-    rm -rf interproscan-* interproscan_db.tar.gz
+    if [ -d data ]; then
+        mv data interproscan_db
+    else
+        mv interproscan-*/data interproscan_db
+        rm -rf interproscan-*
+    fi
+    rm -f interproscan_db.tar.gz
     """
 
     stub:
