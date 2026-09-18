@@ -15,9 +15,9 @@ workflow EGGNOG {
     main:
 
     EGGNOG_DOWNLOAD(
-        file('http://eggnog6.embl.de/download/emapperdb-5.0.2/eggnog.db.gz'),
-        file('http://eggnog6.embl.de/download/emapperdb-5.0.2/eggnog_proteins.dmnd.gz'),
-        file('http://eggnog6.embl.de/download/emapperdb-5.0.2/eggnog.taxa.tar.gz')
+        file('http://eggnog5.embl.de/download/emapperdb-5.0.2/eggnog.db.gz'),
+        file('http://eggnog5.embl.de/download/emapperdb-5.0.2/eggnog_proteins.dmnd.gz'),
+        file('http://eggnog5.embl.de/download/emapperdb-5.0.2/eggnog.taxa.tar.gz')
     )
 
     ch_search_mode_db = EGGNOG_DOWNLOAD.out.dmnd.map { dmnd -> [ 'diamond', dmnd ] }

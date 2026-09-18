@@ -489,7 +489,7 @@ It is practical to let the pipeline download the files on the first run, and the
 
 :::note
 Currently, the standard download procedure for the eggNOG database using the `download_eggnog_data.py` tool (v.2.1.9) doesn't work because the domain it tries to download from doesn't exist.
-Since release 1.4.0, this pipeline therefore uses `wget` to fetch files from [the current download site](http://eggnog6.embl.de/download/emapperdb-5.0.2).
+Since release 1.4.0, this pipeline therefore fetches files directly from [the current download site](http://eggnog5.embl.de/download/emapperdb-5.0.2) instead, using Nextflow's own file staging so it works even on compute nodes without network access.
 :::
 
 A third functional annotation option is CAZyme annotation using [dbCAN](https://bcb.unl.edu/dbCAN2/) (`run_dbcan`), which is also run by
