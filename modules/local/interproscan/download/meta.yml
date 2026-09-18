@@ -1,0 +1,23 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "interproscan_database"
+description: Download and unpack InterProScan's lookup-service data directory
+keywords:
+  - interproscan
+  - database
+  - download
+
+input:
+  - database_url:
+      type: string
+      description: URL to the InterProScan `-64-bit.tar.gz` release archive to download
+
+output:
+  - db:
+      type: directory
+      description: InterProScan's `data/` directory, ready to stage into the INTERPROSCAN module
+      pattern: "interproscan_db"
+
+authors:
+  - "@danilodileo"
+maintainers:
+  - "@danilodileo"
