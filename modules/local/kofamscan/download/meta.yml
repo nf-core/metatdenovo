@@ -6,12 +6,12 @@ keywords:
   - orthology
   - download
 input:
-  - ko_list_url:
-      type: string
-      description: URL to download the KOfam ko_list file from
-  - profiles_url:
-      type: string
-      description: URL to download the KOfam HMM profiles archive from
+  - ko_list_gz:
+      type: file
+      description: Gzipped KOfam ko_list file, staged from a URL via Nextflow's own file() so it works on network-isolated compute nodes
+  - profiles_targz:
+      type: file
+      description: Gzipped tar archive of KOfam HMM profiles, staged from a URL via Nextflow's own file()
 output:
   ko_list:
     type: file
@@ -25,10 +25,10 @@ output:
     - - "${task.process}":
           type: string
           description: The name of the process
-      - wget:
+      - gzip:
           type: string
           description: The name of the tool
-      - wget --version 2>&1 | head -n 1 | awk "{print \$3}":
+      - gzip --version | head -n 1 | awk "{print \$2}":
           type: eval
           description: The expression to obtain the version of the tool
 topics:
@@ -36,10 +36,10 @@ topics:
     - - "${task.process}":
           type: string
           description: The name of the process
-      - wget:
+      - gzip:
           type: string
           description: The name of the tool
-      - wget --version 2>&1 | head -n 1 | awk "{print \$3}":
+      - gzip --version | head -n 1 | awk "{print \$2}":
           type: eval
           description: The expression to obtain the version of the tool
 authors:
