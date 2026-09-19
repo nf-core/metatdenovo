@@ -18,7 +18,7 @@ Instead, the workflow should be usable for any project in which a de novo assemb
 Assembly and annotation of metagenomes/metatranscriptomes is inherently memory- and compute-intensive.
 Expect to need tens to low hundreds of GB of RAM and access to an HPC cluster or cloud infrastructure for anything beyond a small test dataset -- this is not a pipeline that runs on a laptop.
 
-If you're working with a large project -- many samples, deep sequencing, or both -- and expect (or hit) memory problems during assembly, see [Coping with large datasets](large_datasets.md) for concrete params to try, and in which order.
+If you're working with a large project -- many samples, deep sequencing, or both -- and expect (or hit) memory problems during assembly, see [Coping with large datasets](usage_large_datasets.md) for concrete params to try, and in which order.
 
 ## Running the workflow
 
@@ -110,7 +110,7 @@ Since normalized reads are only used for the assembly (see the note above), this
 
 > Please, check the [bbnorm](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbnorm-guide/) documentation for further information about these programs and how digital normalization works. Remember to check [Parameters](https://nf-co.re/metatdenovo/parameters) page for the all options that can be used for this step.
 
-See [Coping with large datasets](large_datasets.md) for concrete `--bbnorm_target`/`--bbnorm_min` starting values, how this combines with the [Assembler options](#assembler-options) below, and in which order to try them.
+See [Coping with large datasets](usage_large_datasets.md) for concrete `--bbnorm_target`/`--bbnorm_min` starting values, how this combines with the [Assembler options](#assembler-options) below, and in which order to try them.
 
 ### Assembler options
 
@@ -121,14 +121,14 @@ If Megahit still runs out of memory on very large datasets, a few hidden paramet
 Raising `--megahit_min_count` prunes low-frequency, often erroneous k-mers before the graph is built, and is a more surgical adjustment than the k-mer options.
 Raising `--megahit_k_min` skips the smallest, most memory-hungry k-mer iterations, but at the cost of sensitivity to low-coverage or short reads -- treat it more as a last resort.
 None of these parameters have a pipeline default; when left unset, Megahit uses its own built-in defaults, which are recorded in its own log file (under `megahit/`) for each run.
-See the [Megahit documentation](https://github.com/voutcn/megahit) for the full meaning of these options, and [Coping with large datasets](large_datasets.md) for concrete starting values and where these fit relative to [digital normalization](#digital-normalization) above.
+See the [Megahit documentation](https://github.com/voutcn/megahit) for the full meaning of these options, and [Coping with large datasets](usage_large_datasets.md) for concrete starting values and where these fit relative to [digital normalization](#digital-normalization) above.
 
 The workflow also supports Spades (`--assembler spades` ) as an alternative.
 The default "flavour" of Spades is set to RNA, but this can be changed using the `--spades_flavor` parameter (see [parameter documentation](/metatdenovo/parameters/#spades_flavor))
 
 You can also choose to input contigs from an assembly that you made outside the pipeline using the `--user_assembly file.fna.gz` (where `file.fna.gz` is the name of a fasta file with contigs) parameter.
 When you use your own assembly, the name of this -- used in output file names -- can be set using the `--user_assembly_name` parameter.
-This is also the way back in if a long Megahit assembly gets killed partway through -- see [Recovering a Megahit run that was killed partway through](large_datasets.md#recovering-a-megahit-run-that-was-killed-partway-through).
+This is also the way back in if a long Megahit assembly gets killed partway through -- see [Recovering a Megahit run that was killed partway through](usage_large_datasets.md#recovering-a-megahit-run-that-was-killed-partway-through).
 
 ### ORF caller options
 
@@ -336,7 +336,7 @@ NCBI-style taxon dump plus a mapping file in which protein accessions are transl
 ##### Building a database with nf-core/createtaxdb
 
 The recommended way to build your own taxonomy-aware Diamond database is with [nf-core/createtaxdb](https://nf-co.re/createtaxdb), which wraps `diamond makedb` and its taxonomy inputs into a reproducible pipeline of its own.
-Below is a worked example that builds and validates a database from [MarFERReT](https://zenodo.org/records/10170983) v1.1, a curated marine microbial eukaryote protein reference -- useful if your community has a substantial eukaryotic fraction not well represented in NCBI RefSeq/GTDB (see also [Coping with large datasets](large_datasets.md) and [issue #459](https://github.com/nf-core/metatdenovo/issues/459) for related eukaryote-focused work).
+Below is a worked example that builds and validates a database from [MarFERReT](https://zenodo.org/records/10170983) v1.1, a curated marine microbial eukaryote protein reference -- useful if your community has a substantial eukaryotic fraction not well represented in NCBI RefSeq/GTDB (see also [Coping with large datasets](usage_large_datasets.md) and [issue #459](https://github.com/nf-core/metatdenovo/issues/459) for related eukaryote-focused work).
 
 A minimal `samplesheet.csv`:
 
@@ -667,7 +667,7 @@ Specify this when restarting a pipeline. Nextflow will use cached results from a
 
 You can also supply a run name to resume a specific run: `-resume [run-name]`. Use the `nextflow log` command to show previous run names.
 
-Note that `-resume` only skips tasks that already finished successfully -- a task killed partway through (e.g. by a walltime limit or an out-of-memory kill) is not cached and reruns from scratch on the next `-resume`, however far it had already got. For a long Megahit assembly, that can mean losing days of progress; see [Recovering a Megahit run that was killed partway through](large_datasets.md#recovering-a-megahit-run-that-was-killed-partway-through) for a way to recover Megahit's own internal progress instead.
+Note that `-resume` only skips tasks that already finished successfully -- a task killed partway through (e.g. by a walltime limit or an out-of-memory kill) is not cached and reruns from scratch on the next `-resume`, however far it had already got. For a long Megahit assembly, that can mean losing days of progress; see [Recovering a Megahit run that was killed partway through](usage_large_datasets.md#recovering-a-megahit-run-that-was-killed-partway-through) for a way to recover Megahit's own internal progress instead.
 
 ### `-c`
 
