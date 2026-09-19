@@ -370,7 +370,7 @@ At the time of writing, users of the pipeline need to craft their own databases,
 
 #### Hmmsearch
 
-You can run [hmmsearch](https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch) on ORFs using a set of HMM profiles provided to the pipeline (see the `--hmmdir`, `--hmmpatern` and `--hmmfiles` parameters).
+You can run [hmmsearch](https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch) on ORFs using a set of HMM profiles provided to the pipeline (see the `--hmmdir`, `--hmmpattern` and `--hmmfiles` parameters).
 
 <details markdown="1">
 <summary>Output files</summary>

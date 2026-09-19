@@ -118,8 +118,8 @@ workflow METATDENOVO {
 
     main:
 
-    // See #478: coerce CLI-supplied boolean/integer params to their real type before
-    // branching on them below -- nf-schema's validateParameters() does not do this for us.
+    // Coerce CLI-supplied boolean/integer params to their real type before branching on them
+    // below -- nf-schema's validateParameters() does not do this for us, and 'false' is truthy.
     def annotate_only_consolidated = typecastBooleanParam('annotate_only_consolidated')
     def save_parquet               = typecastBooleanParam('save_parquet')
     def skip_dbcan                 = typecastBooleanParam('skip_dbcan')
@@ -665,7 +665,7 @@ workflow METATDENOVO {
     //
     // Consolidate overlapping same-contig CDS calls from different active callers into single loci
     // before counting, so a read supporting one real gene isn't counted once per caller that called
-    // it (#463). Runs unconditionally, even with a single active caller: FORMAT_LOCUSCONSOLIDATE only
+    // it. Runs unconditionally, even with a single active caller: FORMAT_LOCUSCONSOLIDATE only
     // ever merges calls from DIFFERENT callers, so with one caller nothing merges, every locus keeps
     // that caller's own ORF id, and the consolidated table is identical in content to that caller's
     // own -- graceful degradation, no separate code path. Rides through the existing, unmodified
@@ -695,7 +695,7 @@ workflow METATDENOVO {
     //
     // Consolidate calls for the same gene that ended up on DIFFERENT contigs, which coordinates
     // cannot detect: a splice-aware genomic call and a transcript-derived call for one gene share no
-    // coordinate system, but converge on nearly the same protein (#460). Cluster the proteins and
+    // coordinate system, but converge on nearly the same protein. Cluster the proteins and
     // treat one cluster as one gene.
     //
     // Clustering runs on loci rather than on each caller's raw ORFs, because the counts table this
@@ -864,8 +864,7 @@ workflow METATDENOVO {
     // Third consolidation level: sum the per-locus counts above across each protein cluster, so a
     // gene called on two contigs is reported once. Safe to sum after the fact rather than recount,
     // because a read only aligns to one contig -- provided each read was exclusively assigned to one
-    // feature at counting time, which is what --bbmap_ambiguous/--featurecounts_fraction control
-    // (#464).
+    // feature at counting time, which is what --bbmap_ambiguous/--featurecounts_fraction control.
     //
     // Keyed on the assembly name rather than meta.id, since the three inputs carry three different
     // caller names; meta.id is "<assembly>.<caller>" throughout, so stripping the caller recovers a

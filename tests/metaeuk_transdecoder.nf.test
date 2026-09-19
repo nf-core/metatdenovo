@@ -34,18 +34,18 @@ nextflow_pipeline {
                     // independent confirmation that one caller's results aren't contaminated by the other.
                     path("${params.outdir}/summary_tables/megahit.metaeuk.counts.tsv.gz").linesGzip.findAll { l -> l.contains('orf') },
                     path("${params.outdir}/summary_tables/megahit.transdecoder.counts.tsv.gz").linesGzip.findAll { l -> l.contains('orf') },
-                    // The locus-consolidated table itself (#463) -- small enough on this test dataset to
+                    // The locus-consolidated table itself -- small enough on this test dataset to
                     // snapshot verbatim rather than just its header, so any regression in the
                     // ID-inheritance rule, coordinate round-tripping, or provenance columns shows up as a
                     // diff here.
                     path("${params.outdir}/summary_tables/megahit.locus_consolidate.counts.tsv.gz").linesGzip,
-                    // Likewise the protein-consolidated table (#460), verbatim.
+                    // Likewise the protein-consolidated table, verbatim.
                     path("${params.outdir}/summary_tables/megahit.protein_consolidate_99.counts.tsv.gz").linesGzip,
                 ).match() },
                 { assert path("${params.outdir}/megahit/megahit_assembly.log").readLines().any { l -> l.contains('ALL DONE') } },
                 { assert path("${params.outdir}/megahit/megahit_assembly.contigs.fa.gz").linesGzip.size() >= 4 },
 
-                // === #463: locus consolidation must not double-count reads shared by two callers ===
+                // === Locus consolidation must not double-count reads shared by two callers ===
                 // k59_0 is the RPL28_MRNA_RECODED locus where MetaEuk and TransDecoder call the exact
                 // same coordinates (1-447, +) for the same real gene: metaeuk's own solo table and
                 // transdecoder's own solo table each independently report all 400 aligned reads for that
@@ -90,7 +90,7 @@ nextflow_pipeline {
                     }
                 ) },
 
-                // === #460: cross-contig consolidation, which coordinates cannot do ===
+                // === Cross-contig consolidation, which coordinates cannot do ===
                 // This dataset co-assembles one gene twice: contig k59_1 carries the spliced genomic
                 // RPL28 call (two exons, - strand) and contig k59_0 the synonymously recoded mRNA
                 // version (one exon, + strand). They share no coordinate system, so locus
