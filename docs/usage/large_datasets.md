@@ -1,5 +1,3 @@
-<!-- Keep `usage` or `output` in this file's name: the nf-core website only builds a page for docs files whose path contains one of those, and anything else 404s there while still rendering on GitHub. -->
-
 # nf-core/metatdenovo: Coping with large datasets
 
 ## Introduction
