@@ -92,6 +92,38 @@ nextflow_workflow {
         }
     }
 
+    test("normalised gff behind a long GFF3 header - passed through unchanged") {
+
+        when {
+            workflow {
+                """
+                // A GFF3 header is one ##gff-version line plus one ##sequence-region per contig,
+                // so on a real assembly the first feature line is thousands of lines in. Comment
+                // lines must not count toward the how-many-lines-to-read limit, or a perfectly
+                // normal Prokka gff is read as raw MetaEuk output and the run aborts claiming the
+                // gff and faa disagree. Every other case here has a zero-line header, so none of
+                // them can catch that.
+                def header = '##gff-version 3\\n' + ('##sequence-region k1 1 5000\\n' * 25)
+
+                def gff = file("\${workDir}/long_header.gff")
+                gff.text = header + 'k1\\tprodigal\\tCDS\\t1\\t100\\t.\\t+\\t0\\tID=gene1\\n'
+
+                def faa = file("\${workDir}/long_header.faa")
+                faa.text = '>gene1\\nMPSRFTK\\n'
+
+                input[0] = channel.of([ [ id: 'test' ], gff, faa ])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert snapshot(sanitizeOutput(workflow.out)).match() }
+            )
+        }
+    }
+
     test("gff and faa disagree on raw/normalised state - fails loudly") {
 
         when {

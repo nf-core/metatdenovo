@@ -1,4 +1,31 @@
 {
+    "normalised gff behind a long GFF3 header - passed through unchanged": {
+        "content": [
+            {
+                "faa": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "long_header.faa:md5,9a69877204c3c3883c8a4579499ff9b4"
+                    ]
+                ],
+                "gff": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "long_header.gff:md5,a657a52161008316262ddb3cf3caa0f0"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-09-19T09:06:56.095885013",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "26.04.6"
+        }
+    },
     "already-normalised metaeuk gff/faa - not reprocessed": {
         "content": [
             {

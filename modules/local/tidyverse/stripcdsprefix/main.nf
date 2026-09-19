@@ -26,10 +26,15 @@ process TIDYVERSE_STRIPCDSPREFIX {
     library(dplyr)
     library(stringr)
 
+    # ${prefix}.counts.tsv.gz matches the staged input's own filename, a symlink -- write
+    # elsewhere and rename into place rather than straight into it, which would follow the
+    # symlink and overwrite the input task's cached file.
     read_tsv("${counts}", show_col_types = FALSE) %>%
         # Transdecoder appends "cds." to ORF IDs in the gff file, but does not in the fasta file. Remove to make compatible between tables.
         mutate(orf = str_remove(orf, '^cds\\\\.')) %>%
-        write_tsv("${prefix}.counts.tsv.gz")
+        write_tsv("stripped.counts.tsv.gz")
+
+    file.rename("stripped.counts.tsv.gz", "${prefix}.counts.tsv.gz")
 
     writeLines(
         c(
