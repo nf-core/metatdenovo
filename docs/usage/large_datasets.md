@@ -19,7 +19,7 @@ Megahit (the pipeline's default, `--assembler megahit`) is substantially less me
 2. **`--megahit_min_count`** -- a smaller, more surgical adjustment to Megahit's own graph construction; try this if normalization alone doesn't get you far enough, or if you'd rather not touch the input reads at all.
 3. **`--megahit_k_min` / `--megahit_k_max` / `--megahit_k_step`** -- the most aggressive option, since it skips Megahit's most sensitive (and most memory-hungry) low-k iterations entirely. Treat this as a last resort.
 
-See [Usage: Digital normalization](usage.md#digital-normalization) and [Usage: Assembler options](usage.md#assembler-options) for what each param does; this page is just about what values to try.
+See [Usage: Digital normalization](../usage.md#digital-normalization) and [Usage: Assembler options](../usage.md#assembler-options) for what each param does; this page is just about what values to try.
 
 ### 1. Digital normalization
 
@@ -48,7 +48,7 @@ A large assembly can run for days, and Megahit steps up through an increasing se
 
 `-resume` on its own does not help here. Nextflow's resume works at the level of whole tasks: a task is either cached (it previously finished with exit code 0) or it is not, and Nextflow has no visibility into how far a killed task's own process got internally. A killed `MEGAHIT` task is simply not cached, so a plain `-resume` reruns it from scratch -- discarding however many days of progress it had already made, even though nothing downstream needs to be redone.
 
-Megahit itself, independent of Nextflow, keeps its own checkpoint inside its output directory and can pick up from the last one it completed with `megahit --continue`. That's the tool this section uses to recover, before handing the finished assembly back to the pipeline as a user-provided assembly (see [Assembler options](usage.md#assembler-options)).
+Megahit itself, independent of Nextflow, keeps its own checkpoint inside its output directory and can pick up from the last one it completed with `megahit --continue`. That's the tool this section uses to recover, before handing the finished assembly back to the pipeline as a user-provided assembly (see [Assembler options](../usage.md#assembler-options)).
 
 > [!WARNING]
 > Don't run `nextflow clean` on the run, and don't move or delete the work directory, before completing the recovery below.
