@@ -1,0 +1,72 @@
+nextflow_workflow {
+
+    name "Test Subworkflow PROKKA_SUBSETS"
+    script "../main.nf"
+    workflow "PROKKA_SUBSETS"
+
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "prokka_subsets"
+
+    // Inputs are built inline rather than read from a fixture: the pipeline repo carries no
+    // test data of its own.
+
+    test("per-batch summaries are summed across batches, not taken from one of them") {
+
+        config "./nextflow.config"
+
+        when {
+            workflow {
+                """
+                // Every pipeline profile assembles contigs far smaller than the default
+                // prokka_batchsize of 10 MB, so splitFasta always yields exactly one batch and
+                // nothing downstream of it has ever run with more. Two contigs plus a 1.KB
+                // batch size give one batch each, which is what makes the assertions below
+                // able to fail: PROKKA reports 'contigs:' and 'bases:' per batch, and the
+                // merged summary has to be their sum rather than whichever file arrived first.
+                // Real sequence, from the same fixture the vendored PROKKA module's own test
+                // uses. Synthetic sequence does not work here: PROKKA runs fine on it but
+                // Prodigal scores no ORFs, leaving a gff with no feature lines, and
+                // PROKKAGFF2TSV then fails on an empty table.
+                def seq = file(params.modules_testdata_base_path + 'genomics/sarscov2/genome/genome.fasta')
+                    .readLines()
+                    .findAll { l -> ! l.startsWith('>') }
+                    .join()
+
+                // Two contigs, each over the 1.KB batch size below, so PROKKA runs once per
+                // contig. Both carry the same sequence under different names: a shorter slice
+                // would be simpler, but PROKKA calls no genes on a few kb of this genome, and a
+                // contig with no features cannot demonstrate that both batches reach the
+                // concatenated gff.
+                def fasta = file("\${workDir}/contigs.fasta")
+                fasta.text = [ '>contig_a', seq, '>contig_b', seq, '' ].join('\\n')
+
+                input[0] = channel.of([ [ id: 'test' ], fasta ])
+                input[1] = '1.KB'
+                """
+            }
+        }
+
+        then {
+            def summary = path(workflow.out.prokka_log[0]).text
+
+            assertAll(
+                { assert workflow.success },
+
+                // The cross-batch sum. Taking a single batch's file rather than summing would
+                // give 'contigs: 1', whichever batch won the race to be collected first.
+                { assert summary.contains('contigs: 2') },
+                { assert summary.readLines().find { l -> l.startsWith('CDS:') }?.split(':')[1]?.trim()?.toInteger() > 0 },
+
+                // The merged summary carries a real per-assembly sample name; PROKKA's own
+                // per-batch files all say the same literal "Genus species strain", which would
+                // collide in MultiQC.
+                { assert summary.contains('organism: Genus species test_prokka') },
+
+                // Both batches reach the concatenated outputs, not just one.
+                { assert path(workflow.out.gff[0][1]).linesGzip.any { l -> l.startsWith('contig_a\t') } },
+                { assert path(workflow.out.gff[0][1]).linesGzip.any { l -> l.startsWith('contig_b\t') } }
+            )
+        }
+    }
+}
