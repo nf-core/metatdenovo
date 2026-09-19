@@ -33,7 +33,7 @@ nextflow_pipeline {
                 ).match() },
                 { assert path("${params.outdir}/megahit/megahit_assembly.log").readLines().any { l -> l.contains('ALL DONE') } },
 
-                // === #464: --bbmap_ambiguous all actually reaches BBMap and produces real
+                // === --bbmap_ambiguous all actually reaches BBMap and produces real
                 // multi-mapping (impossible under the default `best`, which BBMap's own docs
                 // describe as reporting only the first best site per read). ===
                 { assert (
