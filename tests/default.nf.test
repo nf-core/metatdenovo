@@ -46,7 +46,7 @@ nextflow_pipeline {
                 ).match() },
                 { assert path("${params.outdir}/megahit/megahit_assembly.log").readLines().any { l -> l.contains('ALL DONE') } },
 
-                // === #463 single-caller degeneracy, the property the consolidation levels rest on ===
+                // === Single-caller degeneracy, the property the consolidation levels rest on ===
                 // With one caller nothing can merge, so the locus-consolidated table must reproduce
                 // Prodigal's own table exactly (minus the provenance columns it adds). This is the
                 // assertion that would have caught locus consolidation fusing overlapping ADJACENT
@@ -67,7 +67,7 @@ nextflow_pipeline {
                         .every { r -> r["callers"] == 'prodigal' && (r["n_calls"] as int) == 1 }
                 ) },
 
-                // === #460 outputs. These are in tests/.nftignore -- they derive from the assembly and
+                // === Protein-consolidation outputs. These are in tests/.nftignore -- they derive from the assembly and
                 // MEGAHIT is not deterministic between runs, so md5s would flake -- hence assertions
                 // on their shape and cross-consistency instead of on their checksums. ===
                 //
