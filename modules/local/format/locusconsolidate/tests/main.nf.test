@@ -111,6 +111,55 @@ nextflow_process {
         }
     }
 
+    test("spliced gene whose exons straddle another locus stays one locus") {
+
+        when {
+            process {
+                """
+                // Real coordinates from a three-caller run. The MetaEuk call is spliced, and the gap
+                // between its exons holds calls from the other two. Sorted by start, exon 1 is alone
+                // when the first prokka call arrives past its end, so its group closes with one
+                // member; exon 2 then lands in the group the other callers built. Both groups are the
+                // same gene, so they must end up in one locus -- otherwise the members table maps
+                // this ORF to two ids, FORMAT_LOCUSFAA can only resolve a protein for the second, and
+                // the other locus has neither protein nor counts.
+                def bed = file("\${workDir}/spliced.bed")
+                bed.text = [
+                    ['k127_1000001', '3',   '450',  'metaeuk:UniRef50_D8LSF2|k127_1000001|-|3', '0', '-'],
+                    ['k127_1000001', '560', '926',  'prokka:PAJFOBNA_01986',                    '0', '-'],
+                    ['k127_1000001', '560', '1115', 'transdecoder:k127_1000001.p2',             '0', '-'],
+                    ['k127_1000001', '656', '1115', 'metaeuk:UniRef50_D8LSF2|k127_1000001|-|3', '0', '-'],
+                    ['k127_1000001', '928', '1111', 'prokka:PAJFOBNA_01987',                    '0', '-']
+                ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+
+                input[0] = [ [ id:'test' ], bed ]
+                """
+            }
+        }
+
+        then {
+            def gff     = path(process.out.gff[0][1]).linesGzip
+            def prov    = path(process.out.provenance[0][1]).linesGzip.findAll { l -> !l.startsWith('ID\t') }
+            def members = path(process.out.members[0][1]).linesGzip.findAll { l -> !l.startsWith('ID\t') }
+            def loci_per_orf = members.groupBy { l -> l.split('\t')[1] + ':' + l.split('\t')[2] }
+                                      .collectEntries { orf, rows -> [orf, rows.collect { r -> r.split('\t')[0] }.unique().size()] }
+            assertAll(
+                { assert process.success },
+                // The invariant: no ORF may be a member of more than one locus.
+                { assert loci_per_orf.every { orf, n -> n == 1 } },
+                // Both exon groups keep the id exon 1 established, so the GFF still has a row per
+                // group and featureCounts sums them as one meta-feature.
+                { assert gff.size() == 3 },
+                { assert gff.findAll { l -> l.endsWith('ID=UniRef50_D8LSF2|k127_1000001|-|3') }.size() == 2 },
+                { assert gff.any { l -> l.endsWith('ID=PAJFOBNA_01987') } },
+                { assert prov.size() == 2 },
+                { assert prov.any { l -> l == 'UniRef50_D8LSF2|k127_1000001|-|3\tmetaeuk,prokka,transdecoder\t3' } },
+                { assert prov.any { l -> l == 'PAJFOBNA_01987\tprokka\t1' } },
+                { assert snapshot(process.out.gff, process.out.provenance, process.out.members).match() }
+            )
+        }
+    }
+
     test("bed - stub") {
 
         options "-stub"
