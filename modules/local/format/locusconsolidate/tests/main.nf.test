@@ -116,13 +116,10 @@ nextflow_process {
         when {
             process {
                 """
-                // Real coordinates from a three-caller run. The MetaEuk call is spliced, and the gap
-                // between its exons holds calls from the other two. Sorted by start, exon 1 is alone
-                // when the first prokka call arrives past its end, so its group closes with one
-                // member; exon 2 then lands in the group the other callers built. Both groups are the
-                // same gene, so they must end up in one locus -- otherwise the members table maps
-                // this ORF to two ids, FORMAT_LOCUSFAA can only resolve a protein for the second, and
-                // the other locus has neither protein nor counts.
+                // Real coordinates from a three-caller run. One spliced MetaEuk gene, with calls from
+                // the other two callers in the gap between its exons. Exon 1 closes a group on its
+                // own, exon 2 falls into the group the other callers build, and both must still end
+                // up in one locus.
                 def bed = file("\${workDir}/spliced.bed")
                 bed.text = [
                     ['k127_1000001', '3',   '450',  'metaeuk:UniRef50_D8LSF2|k127_1000001|-|3', '0', '-'],
@@ -145,10 +142,9 @@ nextflow_process {
                                       .collectEntries { orf, rows -> [orf, rows.collect { r -> r.split('\t')[0] }.unique().size()] }
             assertAll(
                 { assert process.success },
-                // The invariant: no ORF may be a member of more than one locus.
+                // No ORF may be in more than one locus.
                 { assert loci_per_orf.every { orf, n -> n == 1 } },
-                // Both exon groups keep the id exon 1 established, so the GFF still has a row per
-                // group and featureCounts sums them as one meta-feature.
+                // One GFF row per group, the gene's two groups under one id, summed by -g ID.
                 { assert gff.size() == 3 },
                 { assert gff.findAll { l -> l.endsWith('ID=UniRef50_D8LSF2|k127_1000001|-|3') }.size() == 2 },
                 { assert gff.any { l -> l.endsWith('ID=PAJFOBNA_01987') } },
@@ -165,10 +161,8 @@ nextflow_process {
         when {
             process {
                 """
-                // The mirror of the case above: this time exon 1 is the exon that picks up another
-                // caller, so the locus is named from coordinates before exon 2 turns up alone. Exon 2
-                // has to join that locus rather than open one under the MetaEuk id -- the same gene
-                // in two loci either way round.
+                // The case above with the exons swapped round: exon 1 is the one that merges, so the
+                // locus is already named from coordinates when exon 2 turns up alone.
                 def bed = file("\${workDir}/spliced_merge_first.bed")
                 bed.text = [
                     ['k141_7', '0',   '400',  'metaeuk:NP_012345.1|k141_7|+|0', '0', '+'],

@@ -56,11 +56,13 @@ process FORMAT_LOCUSCONSOLIDATE {
     // Provenance and members are accumulated by locus ID and written at END rather than per group,
     // because a multi-exon gene contributes several non-overlapping groups that all inherit the same
     // ID. Emitting per group would repeat that ID with per-segment counts, and any consumer joining
-    // on it would fan out and duplicate the locus's counts. That shared ID is what the ORF-to-locus
-    // map in flush() enforces: an ORF names its locus once, and every later group it appears in joins
-    // that locus rather than starting another. A locus reached this way keeps the ID its first group
-    // gave it, so a multi-contributor locus can carry a contributing ORF's own ID instead of a
-    // coordinate-derived one -- the provenance table, not the ID, says how many callers agreed.
+    // on it would fan out and duplicate the locus's counts.
+    //
+    // An ORF belongs to exactly one locus. A spliced gene's exons fall into several groups, so
+    // flush() looks its members up in a per-contig ORF-to-locus map and reuses the locus found there
+    // instead of naming a new one. A locus keeps the ID its first group gave it, so one with several
+    // contributors can be named after a contributing ORF rather than its coordinates; the provenance
+    // table is what records how many callers agreed.
     """
     LC_ALL=C sort -k1,1 -k2,2n -k3,3n -k6,6 -k4,4 ${sorted_bed} \\
         | awk 'BEGIN { FS = OFS = "\\t"; SEP = SUBSEP }
@@ -74,10 +76,9 @@ process FORMAT_LOCUSCONSOLIDATE {
             for (i = 1; i <= n; i++) {
                 if (!(parts[i] in seen_member)) { seen_member[parts[i]] = 1; cnt++ }
             }
-            # A spliced gene reaches this sweep as one interval per exon, so the same ORF can be in
-            # several groups on a contig. Those groups are one locus, and the first of them names it:
-            # minting a second ID would put one gene in two loci, leaving whichever locus the members
-            # table no longer points at with no protein and no counts.
+            # Reuse the locus a member ORF is already in. Its other exons formed earlier groups, and
+            # a new ID here would split one gene over two loci -- the members table maps an ORF to one
+            # locus, so the other would end up with no protein and no counts.
             id = ""
             n_found = 0
             for (i = 1; i <= n; i++) {
@@ -87,7 +88,7 @@ process FORMAT_LOCUSCONSOLIDATE {
                 }
             }
             if (n_found > 1) {
-                printf "ERROR: group at %s:%d-%d(%s) belongs to %d loci that are already named; two callers in one group both have exons elsewhere\\n", \\
+                printf "ERROR: group at %s:%d-%d(%s) holds ORFs from %d different loci, which cannot be merged here\\n", \\
                     g_chrom[key], g_start[key] + 1, g_end[key], g_strand[key], n_found > "/dev/stderr"
                 exit 1
             }
@@ -113,8 +114,8 @@ process FORMAT_LOCUSCONSOLIDATE {
                     else                    prov_members[id] = parts[i]
                 }
             }
-            # Every group state for this key goes, not just g_end: the sweep sees one key per contig
-            # and strand, so keeping the closed group would hold a row per contig for the whole run.
+            # Drop all of the group state, not just g_end. There is one key per contig and strand, so
+            # anything left here is a row per contig for the rest of the run.
             delete g_chrom[key]
             delete g_start[key]
             delete g_end[key]
@@ -123,9 +124,9 @@ process FORMAT_LOCUSCONSOLIDATE {
             delete g_members[key]
         }
 
-        # Groups never span contigs, so every open group is closed when the contig changes. That
-        # bounds the per-contig ORF-to-locus map, and fixes the emission order of the last group on
-        # each contig, which an END sweep over an unordered array would leave up to the awk.
+        # Groups never span contigs, so close them all when the contig changes. This keeps the
+        # ORF-to-locus map small and gives the last group on each contig a defined emission order,
+        # which an END sweep over an unordered array does not.
         function flush_contig(   i, n, keys) {
             n = 0
             for (i in open_keys) keys[++n] = i
