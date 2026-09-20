@@ -704,11 +704,9 @@ workflow METATDENOVO {
     //
     // Deliberately placed before ch_protein is consumed below, and dependent only on the GFFs and
     // proteins rather than on any counts, so it runs alongside mapping instead of behind it.
-    // User-supplied ORFs are mixed into ch_gff/ch_protein above like any other caller, so they
-    // participate here too -- only truly skipped when NO ORF source at all is active, which can't
-    // actually happen given the --orf_caller/--user_orfs/--user_orfs_gff validation above, but the
-    // guard is kept for clarity and as a cheap safety net. user_orf_names, not params.user_orfs:
-    // the latter is null for a --user_orfs_gff/--user_orfs_faa pair, which is a valid ORF source.
+    // User-supplied ORFs are mixed into ch_gff/ch_protein above like any other caller, so this runs
+    // for them too. user_orf_names, not params.user_orfs: the latter is null for a
+    // --user_orfs_gff/--user_orfs_faa pair, which is a valid ORF source.
     ch_protein_clusters = channel.empty()
     if ( ! skip_protein_consolidation && ( orf_callers || user_orf_names ) ) {
         // Keyed on the locus-consolidation meta.id rather than .combine()d, so this stays a genuine

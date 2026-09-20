@@ -97,12 +97,10 @@ nextflow_workflow {
         when {
             workflow {
                 """
-                // A GFF3 header is one ##gff-version line plus one ##sequence-region per contig,
-                // so on a real assembly the first feature line is thousands of lines in. Comment
-                // lines must not count toward the how-many-lines-to-read limit, or a perfectly
-                // normal Prokka gff is read as raw MetaEuk output and the run aborts claiming the
-                // gff and faa disagree. Every other case here has a zero-line header, so none of
-                // them can catch that.
+                // A GFF3 header carries one ##sequence-region per contig, so a real assembly's
+                // first feature line is thousands of lines in. If those count toward the
+                // read limit, a normal Prokka gff is taken for raw MetaEuk output and the run
+                // aborts. Every other case here has a zero-line header, so none can catch it.
                 def header = '##gff-version 3\\n' + ('##sequence-region k1 1 5000\\n' * 25)
 
                 def gff = file("\${workDir}/long_header.gff")
