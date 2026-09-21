@@ -14,14 +14,18 @@ include { FORMAT_METAEUK_GFF } from '../../../modules/local/format/metaeuk/main'
 // Target_ID=/TCS_ID= attributes -- so those remain present even after formatting) or any other
 // caller with its own GFF3 ID=. Checking for TCS_ID='s mere presence instead would misfire on
 // that same already-normalised MetaEuk output and reformat it a second time. Reads at most 20
-// lines, decompressing if needed, regardless of how large the underlying file is -- these can be
-// tens of GB for a real assembly.
+// feature lines, decompressing if needed -- a real assembly's GFF can be tens of GB. Comment lines
+// are filtered before the limit applies: a GFF3 header carries one `##sequence-region` per contig,
+// so the first feature line is thousands of lines in.
 def hasIdAttribute(gff) {
     def reader = gff.name.endsWith('.gz') ?
         new java.util.zip.GZIPInputStream(gff.newInputStream()).newReader() :
         gff.newReader()
     reader.withCloseable { r ->
-        r.lines().limit(20).anyMatch { line -> line.contains('\tID=') || line.contains(';ID=') }
+        r.lines()
+            .filter { line -> ! line.startsWith('#') }
+            .limit(20)
+            .anyMatch { line -> line.contains('\tID=') || line.contains(';ID=') }
     }
 }
 

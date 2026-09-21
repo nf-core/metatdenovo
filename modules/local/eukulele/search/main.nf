@@ -3,7 +3,7 @@ process EUKULELE_SEARCH {
     label 'process_high'
 
     conda "${moduleDir}/environment.yml"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+    container "${ workflow.containerEngine in ['singularity', 'apptainer'] && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/eukulele:2.1.2--pyhdfd78af_0' :
         'biocontainers/eukulele:2.1.2--pyhdfd78af_0' }"
 
