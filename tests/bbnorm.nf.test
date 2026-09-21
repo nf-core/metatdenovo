@@ -1,0 +1,42 @@
+nextflow_pipeline {
+
+    name "Test pipeline with digital normalization"
+    script "../main.nf"
+    tag "pipeline"
+    profile "test_bbnorm"
+
+    test("-profile test_bbnorm") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+        }
+
+        then {
+            def stable_path = getAllFilesFromDir(params.outdir, relative: true, includeDir: true, ignore: ['pipeline_info/*.{html,json,txt}', 'multiqc/multiqc_plots', 'multiqc/multiqc_plots/**' ])
+            assert workflow.success
+            assertAll(
+                // Paths and the versions file only, no file contents. BBNorm sizes its k-mer
+                // hash tables from the memory it gets, so which low-abundance k-mers survive --
+                // and the assembly below them -- varies with the machine.
+                { assert snapshot(
+                    removeNextflowVersion("$outputDir/pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml"),
+                    stable_path,
+                ).match() },
+
+                // Only the assembler sees normalised reads; quantification maps the full set.
+                // A leak would drop every count here, silently and proportionally.
+                { assert path("${params.outdir}/summary_tables/megahit.prodigal.overall_stats.tsv.gz")
+                    .csv(sep: '\t', decompress: true, header: true)
+                    .columns["n_post_trimming"].every { n -> n.toInteger() > 0 } },
+
+                // Evidence BBNorm ran, from the log its MultiQC section is built from.
+                { assert path("${params.outdir}/bbmap/bbnorm/all_samples.bbnorm.log").readLines()
+                    .any { l -> l.contains('Total reads in:') } },
+
+                { assert path("${params.outdir}/megahit/megahit_assembly.log").readLines().any { l -> l.contains('ALL DONE') } }
+            )
+        }
+    }
+}

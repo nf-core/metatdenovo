@@ -1,4 +1,37 @@
 {
+    "spliced gene whose exons straddle another locus stays one locus": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test.gff.gz:md5,d00606b00bcc6556f2e044a8d293b584"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test.provenance.tsv.gz:md5,e2c05c6695ffcef171e4b145c7b6eaf4"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test.members.tsv.gz:md5,e9c5eb3482b7f05e23430b8c3c295193"
+                ]
+            ]
+        ],
+        "timestamp": "2026-09-20T14:39:37.924098856",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "26.04.6"
+        }
+    },
     "tie order must not change the grouping": {
         "content": [
             [

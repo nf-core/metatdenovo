@@ -537,7 +537,7 @@ will be called with the option `--eggnog_dbpath`
 
 ##### Kofamscan databases
 
-You can use `wget` to download the file in a new directory that will be used with `--kofamscan_dbpath`
+You can use `wget` to download the file in a new directory that will be used with `--kofam_dir`
 
 ```bash
 wget https://www.genome.jp/ftp/db/kofam/ko_list.gz
@@ -560,10 +560,10 @@ run_dbcan database --db_dir dbcan --aws_s3 --no-cgc
 ## Example pipeline command with some common features
 
 ```bash
-nextflow run nf-core/metatdenovo -profile docker --input samplesheet.csv --assembler spades --orf_caller prokka --eggnog --eukulele_db gtdb
+nextflow run nf-core/metatdenovo -profile docker --input samplesheet.csv --assembler spades --orf_caller prokka --eukulele_db gtdb
 ```
 
-In this example, we are running metatdenovo with `spades` as assembler, `prokka` as ORF caller, `eggnog` for functional annotation and EUKulele with the GTDB database for taxonomic annotation.
+In this example, we are running metatdenovo with `spades` as assembler, `prokka` as ORF caller and EUKulele with the GTDB database for taxonomic annotation. eggNOG-mapper runs by default, as do the other annotation tools; each can be turned off with its own `--skip_*` parameter.
 
 Note that the pipeline will create the following files in your working directory:
 

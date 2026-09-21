@@ -118,8 +118,8 @@ workflow METATDENOVO {
 
     main:
 
-    // See #478: coerce CLI-supplied boolean/integer params to their real type before
-    // branching on them below -- nf-schema's validateParameters() does not do this for us.
+    // Coerce CLI-supplied boolean/integer params to their real type before branching on them
+    // below -- nf-schema's validateParameters() does not do this for us, and 'false' is truthy.
     def annotate_only_consolidated = typecastBooleanParam('annotate_only_consolidated')
     def save_parquet               = typecastBooleanParam('save_parquet')
     def skip_dbcan                 = typecastBooleanParam('skip_dbcan')
@@ -187,7 +187,20 @@ workflow METATDENOVO {
     // synthesise for themselves.
     def user_orf_names = ( params.user_orfs ? file(params.user_orfs).splitCsv(header: true).collect { row -> row.name } : [] ) +
         ( params.user_orfs_gff && params.user_orfs_faa ? [ params.user_orfs_name ] : [] )
-    def reserved_caller_names = orf_callers + ['locus_consolidate']
+    // Name the cross-contig consolidation level after the clustering identity it was produced at,
+    // rounded to whole percent, so reruns at a different --cluster_min_seq_id don't overwrite each
+    // other's tables -- the same reason assembler and ORF caller are already in output filenames.
+    // Computed once here and threaded from here; it's used as a caller name, so it ends up in the
+    // counts table's filename and in every annotation table derived from the cluster representatives,
+    // and it has to be reserved against user-supplied names below.
+    // BigDecimal from the string form, not Math.round: rounding to whole percent made 0.995 and 1.0
+    // both "100", so two runs at different identities would overwrite each other's tables -- exactly
+    // what putting the identity in the name is meant to prevent. Trailing zeros are stripped and the
+    // decimal point becomes "_", so 0.99 -> 99, 1.0 -> 100, 0.995 -> 99_5.
+    cluster_pct              = new java.math.BigDecimal(params.cluster_min_seq_id.toString()).multiply(new java.math.BigDecimal("100"))
+    protein_consolidate_name = "protein_consolidate_" + cluster_pct.stripTrailingZeros().toPlainString().replace('.', '_')
+
+    def reserved_caller_names = orf_callers + ['locus_consolidate', protein_consolidate_name]
     user_orf_names.each { name ->
         if ( name in reserved_caller_names ) {
             error "--user_orfs/--user_orfs_name '${name}' collides with an active --orf_caller value or a name the pipeline reserves for itself. Pick a different name."
@@ -217,7 +230,7 @@ workflow METATDENOVO {
     // Note --bbmap_ambiguous toss is deliberately NOT an error here. It discards multi-mapping reads,
     // which makes the consolidated counts conservative for duplicated genes rather than wrong, and
     // that is a legitimate choice; it is documented in usage.md instead.
-    if ( params.bbmap_ambiguous == 'all' && ! params.featurecounts_fraction && ! skip_protein_consolidation && ( orf_callers || params.user_orfs ) ) {
+    if ( params.bbmap_ambiguous == 'all' && ! params.featurecounts_fraction && ! skip_protein_consolidation && ( orf_callers || user_orf_names ) ) {
         error "`--bbmap_ambiguous all` counts a multi-mapping read at full weight at every site it aligns to, which double-counts it when protein consolidation sums counts across a cluster. Add `--featurecounts_fraction` so each alignment is weighted 1/N, or `--skip_protein_consolidation` if you do not need the consolidated table."
     }
 
@@ -228,19 +241,6 @@ workflow METATDENOVO {
     // Used only to label the pre-ORF-calling collect-stats output (see ch_collect_stats below) --
     // just a display name, not tied to which caller(s) actually run.
     orfs_name  = params.orf_caller ?: params.user_orfs_name
-
-    // Name the cross-contig consolidation level after the clustering identity it was produced at,
-    // rounded to whole percent, so reruns at a different --cluster_min_seq_id don't overwrite each
-    // other's tables -- the same reason assembler and ORF caller are already in output filenames.
-    // Computed once here and threaded from here; it's used as a caller name, so it ends up in the
-    // counts table's filename and in every annotation table derived from the cluster representatives.
-    // BigDecimal from the string form, not Math.round: rounding to whole percent made 0.995 and 1.0
-    // both "100", so two runs at different identities would overwrite each other's tables -- exactly
-    // what putting the identity in the name is meant to prevent. Trailing zeros are stripped and the
-    // decimal point becomes "_", so 0.99 -> 99, 1.0 -> 100, 0.995 -> 99_5.
-    cluster_pct              = new java.math.BigDecimal(params.cluster_min_seq_id.toString()).multiply(new java.math.BigDecimal("100"))
-    protein_consolidate_name = "protein_consolidate_" + cluster_pct.stripTrailingZeros().toPlainString().replace('.', '_')
-
 
     // If the user supplied hmm files, we will run hmmsearch and then rank the results.
     // Create a channel for hmm files.
@@ -665,7 +665,7 @@ workflow METATDENOVO {
     //
     // Consolidate overlapping same-contig CDS calls from different active callers into single loci
     // before counting, so a read supporting one real gene isn't counted once per caller that called
-    // it (#463). Runs unconditionally, even with a single active caller: FORMAT_LOCUSCONSOLIDATE only
+    // it. Runs unconditionally, even with a single active caller: FORMAT_LOCUSCONSOLIDATE only
     // ever merges calls from DIFFERENT callers, so with one caller nothing merges, every locus keeps
     // that caller's own ORF id, and the consolidated table is identical in content to that caller's
     // own -- graceful degradation, no separate code path. Rides through the existing, unmodified
@@ -695,7 +695,7 @@ workflow METATDENOVO {
     //
     // Consolidate calls for the same gene that ended up on DIFFERENT contigs, which coordinates
     // cannot detect: a splice-aware genomic call and a transcript-derived call for one gene share no
-    // coordinate system, but converge on nearly the same protein (#460). Cluster the proteins and
+    // coordinate system, but converge on nearly the same protein. Cluster the proteins and
     // treat one cluster as one gene.
     //
     // Clustering runs on loci rather than on each caller's raw ORFs, because the counts table this
@@ -704,12 +704,11 @@ workflow METATDENOVO {
     //
     // Deliberately placed before ch_protein is consumed below, and dependent only on the GFFs and
     // proteins rather than on any counts, so it runs alongside mapping instead of behind it.
-    // --user_orfs rows are mixed into ch_gff/ch_protein above like any other caller, so they
-    // participate here too -- only truly skipped when NO caller at all is active, which can't
-    // actually happen given the --orf_caller/--user_orfs validation above, but the guard is kept for
-    // clarity and as a cheap safety net.
+    // User-supplied ORFs are mixed into ch_gff/ch_protein above like any other caller, so this runs
+    // for them too. user_orf_names, not params.user_orfs: the latter is null for a
+    // --user_orfs_gff/--user_orfs_faa pair, which is a valid ORF source.
     ch_protein_clusters = channel.empty()
-    if ( ! skip_protein_consolidation && ( orf_callers || params.user_orfs ) ) {
+    if ( ! skip_protein_consolidation && ( orf_callers || user_orf_names ) ) {
         // Keyed on the locus-consolidation meta.id rather than .combine()d, so this stays a genuine
         // 1:1 pairing if the pipeline ever consolidates more than one assembly in a run. Callers are
         // sorted so the two lists stay aligned and the task's inputs hash reproducibly.
@@ -864,8 +863,7 @@ workflow METATDENOVO {
     // Third consolidation level: sum the per-locus counts above across each protein cluster, so a
     // gene called on two contigs is reported once. Safe to sum after the fact rather than recount,
     // because a read only aligns to one contig -- provided each read was exclusively assigned to one
-    // feature at counting time, which is what --bbmap_ambiguous/--featurecounts_fraction control
-    // (#464).
+    // feature at counting time, which is what --bbmap_ambiguous/--featurecounts_fraction control.
     //
     // Keyed on the assembly name rather than meta.id, since the three inputs carry three different
     // caller names; meta.id is "<assembly>.<caller>" throughout, so stripping the caller recovers a
@@ -873,7 +871,7 @@ workflow METATDENOVO {
     // anchored to the end -- a plain string minus removes the FIRST occurrence, which would silently
     // produce mismatched keys if an assembly name happened to contain the caller name.
     ch_protein_consolidate_counts = channel.empty()
-    if ( ! skip_protein_consolidation && ( orf_callers || params.user_orfs ) ) {
+    if ( ! skip_protein_consolidation && ( orf_callers || user_orf_names ) ) {
         COLLECT_PROTEINCONSOLIDATE (
             ch_collect_feature.locus_consolidate
                 .map { meta, fcs -> [ meta.id.replaceAll(java.util.regex.Pattern.quote(".${meta.caller}") + '$', ''), fcs ] }
@@ -897,7 +895,7 @@ workflow METATDENOVO {
         // locus_consolidate's own summaries are only needed below when protein consolidation is
         // going to reuse them -- skip the invocation entirely otherwise, same guard as that reuse.
         .filter { meta, _summaries ->
-            meta.caller != 'locus_consolidate' || ( ! skip_protein_consolidation && ( orf_callers || params.user_orfs ) )
+            meta.caller != 'locus_consolidate' || ( ! skip_protein_consolidation && ( orf_callers || user_orf_names ) )
         }
 
     COLLECT_FEATURECOUNTSSUMMARY ( ch_collect_summary )
@@ -915,7 +913,7 @@ workflow METATDENOVO {
             other: true
         }
     ch_unassigned_protein_consolidate = channel.empty()
-    if ( ! skip_protein_consolidation && ( orf_callers || params.user_orfs ) ) {
+    if ( ! skip_protein_consolidation && ( orf_callers || user_orf_names ) ) {
         // protein_consolidate's own counts table carries 4 extra provenance columns
         // (callers/n_calls/n_loci/loci, see COLLECT_PROTEINCONSOLIDATE) that every other
         // caller's plain counts table doesn't -- CUSTOM_COLLECTSTATS requires every fcs file
