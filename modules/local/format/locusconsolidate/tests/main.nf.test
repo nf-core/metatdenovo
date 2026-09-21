@@ -111,6 +111,84 @@ nextflow_process {
         }
     }
 
+    test("spliced gene whose exons straddle another locus stays one locus") {
+
+        when {
+            process {
+                """
+                // Real coordinates from a three-caller run. One spliced MetaEuk gene, with calls from
+                // the other two callers in the gap between its exons. Exon 1 closes a group on its
+                // own, exon 2 falls into the group the other callers build, and both must still end
+                // up in one locus.
+                def bed = file("\${workDir}/spliced.bed")
+                bed.text = [
+                    ['k127_1000001', '3',   '450',  'metaeuk:UniRef50_D8LSF2|k127_1000001|-|3', '0', '-'],
+                    ['k127_1000001', '560', '926',  'prokka:PAJFOBNA_01986',                    '0', '-'],
+                    ['k127_1000001', '560', '1115', 'transdecoder:k127_1000001.p2',             '0', '-'],
+                    ['k127_1000001', '656', '1115', 'metaeuk:UniRef50_D8LSF2|k127_1000001|-|3', '0', '-'],
+                    ['k127_1000001', '928', '1111', 'prokka:PAJFOBNA_01987',                    '0', '-']
+                ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+
+                input[0] = [ [ id:'test' ], bed ]
+                """
+            }
+        }
+
+        then {
+            def gff     = path(process.out.gff[0][1]).linesGzip
+            def prov    = path(process.out.provenance[0][1]).linesGzip.findAll { l -> !l.startsWith('ID\t') }
+            def members = path(process.out.members[0][1]).linesGzip.findAll { l -> !l.startsWith('ID\t') }
+            def loci_per_orf = members.groupBy { l -> l.split('\t')[1] + ':' + l.split('\t')[2] }
+                                      .collectEntries { orf, rows -> [orf, rows.collect { r -> r.split('\t')[0] }.unique().size()] }
+            assertAll(
+                { assert process.success },
+                // No ORF may be in more than one locus.
+                { assert loci_per_orf.every { orf, n -> n == 1 } },
+                // One GFF row per group, the gene's two groups under one id, summed by -g ID.
+                { assert gff.size() == 3 },
+                { assert gff.findAll { l -> l.endsWith('ID=UniRef50_D8LSF2|k127_1000001|-|3') }.size() == 2 },
+                { assert gff.any { l -> l.endsWith('ID=PAJFOBNA_01987') } },
+                { assert prov.size() == 2 },
+                { assert prov.any { l -> l == 'UniRef50_D8LSF2|k127_1000001|-|3\tmetaeuk,prokka,transdecoder\t3' } },
+                { assert prov.any { l -> l == 'PAJFOBNA_01987\tprokka\t1' } },
+                { assert snapshot(process.out.gff, process.out.provenance, process.out.members).match() }
+            )
+        }
+    }
+
+    test("spliced gene whose first exon is the one that merges stays one locus") {
+
+        when {
+            process {
+                """
+                // The case above with the exons swapped round: exon 1 is the one that merges, so the
+                // locus is already named from coordinates when exon 2 turns up alone.
+                def bed = file("\${workDir}/spliced_merge_first.bed")
+                bed.text = [
+                    ['k141_7', '0',   '400',  'metaeuk:NP_012345.1|k141_7|+|0', '0', '+'],
+                    ['k141_7', '0',   '400',  'prokka:GENE_00007',             '0', '+'],
+                    ['k141_7', '900', '1200', 'metaeuk:NP_012345.1|k141_7|+|0', '0', '+']
+                ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+
+                input[0] = [ [ id:'test' ], bed ]
+                """
+            }
+        }
+
+        then {
+            def gff     = path(process.out.gff[0][1]).linesGzip
+            def prov    = path(process.out.provenance[0][1]).linesGzip.findAll { l -> !l.startsWith('ID\t') }
+            def members = path(process.out.members[0][1]).linesGzip.findAll { l -> !l.startsWith('ID\t') }
+            assertAll(
+                { assert process.success },
+                { assert members.collect { l -> l.split('\t')[0] }.unique().size() == 1 },
+                { assert gff.size() == 2 },
+                { assert gff.every { l -> l.endsWith('ID=locus_k141_7_1_400_+') } },
+                { assert prov == ['locus_k141_7_1_400_+\tmetaeuk,prokka\t2'] }
+            )
+        }
+    }
+
     test("bed - stub") {
 
         options "-stub"

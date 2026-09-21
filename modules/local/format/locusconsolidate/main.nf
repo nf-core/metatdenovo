@@ -57,12 +57,18 @@ process FORMAT_LOCUSCONSOLIDATE {
     // because a multi-exon gene contributes several non-overlapping groups that all inherit the same
     // ID. Emitting per group would repeat that ID with per-segment counts, and any consumer joining
     // on it would fan out and duplicate the locus's counts.
+    //
+    // An ORF belongs to exactly one locus. A spliced gene's exons fall into several groups, so
+    // flush() looks its members up in a per-contig ORF-to-locus map and reuses the locus found there
+    // instead of naming a new one. A locus keeps the ID its first group gave it, so one with several
+    // contributors can be named after a contributing ORF rather than its coordinates; the provenance
+    // table is what records how many callers agreed.
     """
     LC_ALL=C sort -k1,1 -k2,2n -k3,3n -k6,6 -k4,4 ${sorted_bed} \\
         | awk 'BEGIN { FS = OFS = "\\t"; SEP = SUBSEP }
 
         # Close the open group for one contig/strand: assign the locus its ID and record provenance.
-        function flush(key,   i, n, parts, cnt, id, sep, seen_member) {
+        function flush(key,   i, n, parts, cnt, id, sep, seen_member, n_found) {
             if (!(key in g_end)) return
             n = split(g_members[key], parts, SEP)
             delete seen_member
@@ -70,12 +76,31 @@ process FORMAT_LOCUSCONSOLIDATE {
             for (i = 1; i <= n; i++) {
                 if (!(parts[i] in seen_member)) { seen_member[parts[i]] = 1; cnt++ }
             }
-            if (cnt == 1) {
-                sep = index(parts[1], ":")
-                id  = substr(parts[1], sep + 1)
-            } else {
-                id = "locus_" g_chrom[key] "_" (g_start[key] + 1) "_" g_end[key] "_" g_strand[key]
+            # Reuse the locus a member ORF is already in. Its other exons formed earlier groups, and
+            # a new ID here would split one gene over two loci -- the members table maps an ORF to one
+            # locus, so the other would end up with no protein and no counts.
+            id = ""
+            n_found = 0
+            for (i = 1; i <= n; i++) {
+                if (parts[i] in orf_locus && orf_locus[parts[i]] != id) {
+                    id = orf_locus[parts[i]]
+                    n_found++
+                }
             }
+            if (n_found > 1) {
+                printf "ERROR: group at %s:%d-%d(%s) holds ORFs from %d different loci, which cannot be merged here\\n", \\
+                    g_chrom[key], g_start[key] + 1, g_end[key], g_strand[key], n_found > "/dev/stderr"
+                exit 1
+            }
+            if (id == "") {
+                if (cnt == 1) {
+                    sep = index(parts[1], ":")
+                    id  = substr(parts[1], sep + 1)
+                } else {
+                    id = "locus_" g_chrom[key] "_" (g_start[key] + 1) "_" g_end[key] "_" g_strand[key]
+                }
+            }
+            for (i = 1; i <= n; i++) orf_locus[parts[i]] = id
             print g_chrom[key], "locus_consolidate", "CDS", g_start[key] + 1, g_end[key], ".", g_strand[key], ".", "ID=" id \\
                 | "sort -k1,1 -k4,4n -k5,5n -k7,7 | gzip -c > ${prefix}.gff.gz"
             if (!(id in prov_seen)) { prov_seen[id] = 1; prov_order[++n_prov] = id }
@@ -89,7 +114,27 @@ process FORMAT_LOCUSCONSOLIDATE {
                     else                    prov_members[id] = parts[i]
                 }
             }
+            # Drop all of the group state, not just g_end. There is one key per contig and strand, so
+            # anything left here is a row per contig for the rest of the run.
+            delete g_chrom[key]
+            delete g_start[key]
             delete g_end[key]
+            delete g_strand[key]
+            delete g_callers[key]
+            delete g_members[key]
+        }
+
+        # Groups never span contigs, so close them all when the contig changes. This keeps the
+        # ORF-to-locus map small and gives the last group on each contig a defined emission order,
+        # which an END sweep over an unordered array does not.
+        function flush_contig(   i, n, keys) {
+            n = 0
+            for (i in open_keys) keys[++n] = i
+            for (i = 1; i <= n; i++) flush(keys[i])
+            delete open_keys
+            delete orf_locus
+            # Locus ids are contig-scoped, so the member-dedup set can go with the contig too.
+            delete member_seen
         }
 
         {
@@ -98,6 +143,12 @@ process FORMAT_LOCUSCONSOLIDATE {
             key    = \$1 SEP strand
             sep    = index(name, ":")
             caller = substr(name, 1, sep - 1)
+
+            if (\$1 != contig) {
+                if (contig != "") flush_contig()
+                contig = \$1
+            }
+            open_keys[key] = 1
 
             if ((key in g_end) && \$2 <= g_end[key] && index(g_callers[key], SEP caller SEP) == 0) {
                 if (\$3 > g_end[key]) g_end[key] = \$3
@@ -115,7 +166,7 @@ process FORMAT_LOCUSCONSOLIDATE {
         }
 
         END {
-            for (key in g_end) flush(key)
+            if (contig != "") flush_contig()
 
             print "ID", "callers", "n_calls" | "gzip -c > ${prefix}.provenance.tsv.gz"
             print "ID", "caller", "orf"      | "gzip -c > ${prefix}.members.tsv.gz"
