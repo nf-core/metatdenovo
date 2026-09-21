@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Added`
 
+- [#534](https://github.com/nf-core/metatdenovo/pull/534) - Add a pipeline test for the `test_bbnorm` profile, checking that BBNorm-normalised reads reach only the assembly step and not quantification (@erikrikarddaniel)
 - [#526](https://github.com/nf-core/metatdenovo/pull/526) - Add `--save_parquet` to also write every `summary_tables/` tsv as Parquet, alongside the default gzipped TSV, using the shared `nf-core/modules` component `duckdb/table2parquet` (ported from nf-core/magmap). Off by default; the TSVs are unaffected either way, addresses [#473](https://github.com/nf-core/metatdenovo/issues/473) (@erikrikarddaniel)
 - [#506](https://github.com/nf-core/metatdenovo/pull/506) - Add a `-stub` pipeline test (`test_stub`) covering multiple ORF callers with every annotation tool enabled at once, catching channel-wiring bugs that the per-tool test profiles can't afford to run for real, addresses [#476](https://github.com/nf-core/metatdenovo/issues/476) (@erikrikarddaniel)
 - [#505](https://github.com/nf-core/metatdenovo/pull/505) - Document how to recover a Megahit assembly that was killed partway through a long run, using Megahit's own `--continue` checkpoint mechanism and `--user_assembly` to hand the finished assembly back to the pipeline (`docs/large_datasets.md`, linked from `docs/usage.md`) (@erikrikarddaniel)
