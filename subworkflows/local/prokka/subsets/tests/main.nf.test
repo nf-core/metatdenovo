@@ -1,0 +1,60 @@
+nextflow_workflow {
+
+    name "Test Subworkflow PROKKA_SUBSETS"
+    script "../main.nf"
+    workflow "PROKKA_SUBSETS"
+
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "prokka_subsets"
+
+    test("per-batch summaries are summed across batches, not taken from one of them") {
+
+        config "./nextflow.config"
+
+        when {
+            workflow {
+                """
+                // The default prokka_batchsize is 10 MB, so every pipeline profile produces a
+                // single batch and nothing downstream of the split has ever seen more. Two
+                // contigs plus the 1.KB batch size below give one batch each.
+                // Real sequence, not synthetic: PROKKA runs on synthetic sequence but Prodigal
+                // calls no genes, and PROKKAGFF2TSV then fails on the empty table.
+                def seq = file(params.modules_testdata_base_path + 'genomics/sarscov2/genome/genome.fasta')
+                    .readLines()
+                    .findAll { l -> ! l.startsWith('>') }
+                    .join()
+
+                // Both contigs carry the same genome under different names. A shorter slice
+                // would do, except PROKKA calls no genes on a few kb of it, and a contig with
+                // no features cannot show that both batches reach the concatenated gff.
+                def fasta = file("\${workDir}/contigs.fasta")
+                fasta.text = [ '>contig_a', seq, '>contig_b', seq, '' ].join('\\n')
+
+                input[0] = channel.of([ [ id: 'test' ], fasta ])
+                input[1] = '1.KB'
+                """
+            }
+        }
+
+        then {
+            def summary = path(workflow.out.prokka_log[0]).text
+
+            assertAll(
+                { assert workflow.success },
+
+                // The cross-batch sum: one batch's file alone would say 'contigs: 1'.
+                { assert summary.contains('contigs: 2') },
+                { assert summary.readLines().find { l -> l.startsWith('CDS:') }?.split(':')[1]?.trim()?.toInteger() > 0 },
+
+                // A per-assembly sample name. PROKKA's per-batch files all carry the same
+                // literal "Genus species strain", which would collide in MultiQC.
+                { assert summary.contains('organism: Genus species test_prokka') },
+
+                // Both batches reach the concatenated outputs, not just one.
+                { assert path(workflow.out.gff[0][1]).linesGzip.any { l -> l.startsWith('contig_a\t') } },
+                { assert path(workflow.out.gff[0][1]).linesGzip.any { l -> l.startsWith('contig_b\t') } }
+            )
+        }
+    }
+}
