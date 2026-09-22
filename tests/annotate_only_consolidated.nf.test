@@ -31,15 +31,12 @@ nextflow_pipeline {
                     stable_path,
                 ).match() },
 
-                // === --annotate_only_consolidated (on by default): with two ORF callers plus
-                // protein consolidation, HMMCLASSIFY should only have run on the cluster
-                // representatives, not on either caller's own full protein set as well. ===
+                // Only cluster representatives are annotated.
                 { assert path("${params.outdir}/summary_tables/megahit.protein_consolidate_99.hmmrank.tsv.gz").exists() },
                 { assert ! path("${params.outdir}/summary_tables/megahit.prokka.hmmrank.tsv.gz").exists() },
                 { assert ! path("${params.outdir}/summary_tables/megahit.prodigal.hmmrank.tsv.gz").exists() },
 
-                // Each caller's own (non-annotation) counts tables are untouched by the restriction --
-                // it only narrows what gets annotated, not what gets called/counted.
+                // Counting is unaffected; only annotation is narrowed.
                 { assert path("${params.outdir}/summary_tables/megahit.prokka.counts.tsv.gz").exists() },
                 { assert path("${params.outdir}/summary_tables/megahit.prodigal.counts.tsv.gz").exists() },
             )
@@ -59,9 +56,7 @@ nextflow_pipeline {
             assertAll(
                 { assert workflow.success },
 
-                // === With the restriction switched off, every source is annotated: both callers'
-                // own hmmrank tables AND the consolidated representatives' -- proving the default-on
-                // test above is actually exercising this param, not some other unconditional path. ===
+                // Switched off, every source is annotated: proves the test above depends on the param.
                 { assert path("${params.outdir}/summary_tables/megahit.protein_consolidate_99.hmmrank.tsv.gz").exists() },
                 { assert path("${params.outdir}/summary_tables/megahit.prokka.hmmrank.tsv.gz").exists() },
                 { assert path("${params.outdir}/summary_tables/megahit.prodigal.hmmrank.tsv.gz").exists() },

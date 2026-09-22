@@ -14,8 +14,7 @@ workflow HMMCLASSIFY {
             .map { meta, hmm, seqdb -> [ [ id: "${meta.id}.${hmm.baseName}", caller: meta.caller ], hmm, seqdb, false, true, false ] }
     )
 
-    // Group hmm-search summaries by caller before ranking, so a caller's HMMER_HMMRANK invocation
-    // only ever sees its own hmm files' summaries -- not another simultaneously-active caller's.
+    // Grouped by caller, so each HMMER_HMMRANK sees only its own caller's summaries.
     HMMER_HMMRANK (
         HMMER_HMMSEARCH.out.target_summary
             .map { meta, summary -> [ meta.caller, summary ] }

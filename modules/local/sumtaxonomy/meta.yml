@@ -10,7 +10,6 @@ tools:
       description: "R script that summarises taxonomy tables"
 
 input:
-  # Only when we have meta
   - - meta:
         type: map
         description: |

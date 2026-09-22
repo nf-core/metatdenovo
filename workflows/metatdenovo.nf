@@ -118,8 +118,7 @@ workflow METATDENOVO {
 
     main:
 
-    // Coerce CLI-supplied boolean/integer params to their real type before branching on them
-    // below -- nf-schema's validateParameters() does not do this for us, and 'false' is truthy.
+    // CLI params arrive as strings, and 'false' is truthy; nf-schema does not cast them
     def annotate_only_consolidated = typecastBooleanParam('annotate_only_consolidated')
     def save_parquet               = typecastBooleanParam('save_parquet')
     def skip_dbcan                 = typecastBooleanParam('skip_dbcan')
@@ -132,33 +131,26 @@ workflow METATDENOVO {
     def skip_trimming              = typecastBooleanParam('skip_trimming')
     def min_contig_length          = typecastIntegerParam('min_contig_length')
 
-    // Exit if the user provides both --assembler and --user_assembly, or neither
     if ( ( params.assembler && params.user_assembly ) || ( ! params.assembler && ! params.user_assembly ) ) {
         error "Provide either `--assembler` or `--user_assembly`!"
     }
 
-    // Exit if the user forgot one of --user_orfs_gff/--user_orfs_faa
     if ( params.user_orfs_gff && ! params.user_orfs_faa ) {
         error 'When supplying ORFs via --user_orfs_gff/--user_orfs_faa, both must be specified, --user_orfs_faa file is missing!'
     } else if ( params.user_orfs_faa && ! params.user_orfs_gff ) {
         error 'When supplying ORFs via --user_orfs_gff/--user_orfs_faa, both must be specified, --user_orfs_gff file is missing!'
     }
 
-    // Exit if the user provides none of --orf_caller, --user_orfs, --user_orfs_gff+--user_orfs_faa.
-    // Unlike --assembler/--user_assembly above, these are NOT mutually exclusive with each other: any
-    // combination adds named ORF sets alongside whatever --orf_caller runs.
+    // ORF sources are additive, not mutually exclusive
     if ( ! params.orf_caller && ! params.user_orfs && ! ( params.user_orfs_gff && params.user_orfs_faa ) ) {
         error "Provide `--orf_caller`, `--user_orfs`, `--user_orfs_gff`+`--user_orfs_faa`, or a combination of these!"
     }
 
-    // Exit if the user set params.assembler plus any user-supplied-ORFs source -- ORFs supplied that
-    // way are assumed to have been called against a specific, already-fixed assembly, so pairing them
-    // with a freshly-built --assembler assembly risks a contig-id mismatch between the two.
+    // User ORFs refer to contig ids of a fixed assembly, which a fresh --assembler run won't match
     if ( params.assembler && ( params.user_orfs || ( params.user_orfs_gff && params.user_orfs_faa ) ) ) {
         error "You can't input your own ORFs (`--user_orfs`/`--user_orfs_gff`+`--user_orfs_faa`) if you call for assembly with `--assembler`."
     }
 
-    // Split --orf_caller into a list and make sure every entry is a caller we know about
     orf_callers = params.orf_caller ? params.orf_caller.tokenize(',').collect { caller -> caller.trim() } : []
     def valid_orf_callers = ['prodigal', 'prokka', 'transdecoder', 'metaeuk']
     orf_callers.each { caller ->
@@ -167,10 +159,7 @@ workflow METATDENOVO {
         }
     }
 
-    // If a pre-built MetaEuk database directory is supplied, fail fast when it doesn't look
-    // like an mmseqs2-formatted one -- otherwise METAEUK_EASYPREDICT's own failure deep inside
-    // `metaeuk easy-predict` is confusing and easy to mistake for something else (e.g. an OOM
-    // kill). A plain fasta file needs no such check.
+    // Fail fast: metaeuk's own error on a non-mmseqs2 directory is easy to mistake for an OOM kill
     if ( 'metaeuk' in orf_callers && params.metaeuk_db ) {
         def metaeuk_db_path = file(params.metaeuk_db)
         if ( metaeuk_db_path.isDirectory() && ! metaeuk_db_path.listFiles().any { f -> f.name.endsWith('.version') } ) {
@@ -178,25 +167,12 @@ workflow METATDENOVO {
         }
     }
 
-    // Read --user_orfs synchronously here, in addition to the ch_user_orfs channel built in
-    // PIPELINE_INITIALISATION, purely so a name collision can fail fast with `error` -- channel
-    // validation can't do that at workflow-definition time. Every user-supplied-ORFs name (whether
-    // from a --user_orfs row or from --user_orfs_name) is treated exactly like a --orf_caller value
-    // downstream (see ch_gff/ch_protein below), so none of them may collide with an active
-    // --orf_caller value, each other, or the reserved names the consolidation steps further down
-    // synthesise for themselves.
+    // Read synchronously so name collisions can `error` before any task runs. User ORF names act as
+    // caller names downstream, so must not clash with callers, each other or reserved names.
     def user_orf_names = ( params.user_orfs ? file(params.user_orfs).splitCsv(header: true).collect { row -> row.name } : [] ) +
         ( params.user_orfs_gff && params.user_orfs_faa ? [ params.user_orfs_name ] : [] )
-    // Name the cross-contig consolidation level after the clustering identity it was produced at,
-    // rounded to whole percent, so reruns at a different --cluster_min_seq_id don't overwrite each
-    // other's tables -- the same reason assembler and ORF caller are already in output filenames.
-    // Computed once here and threaded from here; it's used as a caller name, so it ends up in the
-    // counts table's filename and in every annotation table derived from the cluster representatives,
-    // and it has to be reserved against user-supplied names below.
-    // BigDecimal from the string form, not Math.round: rounding to whole percent made 0.995 and 1.0
-    // both "100", so two runs at different identities would overwrite each other's tables -- exactly
-    // what putting the identity in the name is meant to prevent. Trailing zeros are stripped and the
-    // decimal point becomes "_", so 0.99 -> 99, 1.0 -> 100, 0.995 -> 99_5.
+    // Identity in the name keeps runs at different --cluster_min_seq_id apart. BigDecimal, not
+    // Math.round, so 0.995 and 1.0 differ: 0.99 -> 99, 1.0 -> 100, 0.995 -> 99_5.
     cluster_pct              = new java.math.BigDecimal(params.cluster_min_seq_id.toString()).multiply(new java.math.BigDecimal("100"))
     protein_consolidate_name = "protein_consolidate_" + cluster_pct.stripTrailingZeros().toPlainString().replace('.', '_')
 
@@ -210,40 +186,24 @@ workflow METATDENOVO {
     if ( duplicate_user_orf_names ) {
         error "Duplicate user-supplied-ORFs name(s): ${duplicate_user_orf_names.join(', ')}. Every name (--user_orfs rows and --user_orfs_name) must be unique."
     }
-    // A caller name becomes a filename component in several places downstream (e.g.
-    // COLLECT_FEATURECOUNTSSUMMARY's "<caller>.<Status>.featureCounts.tsv", parsed back apart by
-    // CUSTOM_COLLECTSTATS on the text between the first and second dot) -- a dot in the name itself
-    // would be silently misparsed there rather than raising an error.
+    // Caller names become filename components that CUSTOM_COLLECTSTATS splits on dots
     def dotted_user_orf_names = user_orf_names.findAll { name -> name.contains('.') }
     if ( dotted_user_orf_names ) {
         error "--user_orfs/--user_orfs_name name(s) ${dotted_user_orf_names.join(', ')} contain a '.', which is not allowed in a caller name. Pick a different name."
     }
 
-    // --bbmap_ambiguous all keeps every top-scoring alignment, so without --featurecounts_fraction a
-    // multi-mapping read is counted at full weight at EVERY site it hits. On the per-caller and
-    // per-locus tables that is just featureCounts' documented -M behaviour, and some users want it.
-    // Protein consolidation, though, sums per-locus counts across a cluster -- and a gene duplicated
-    // across contigs is exactly the read set that multi-maps -- so those reads get counted once per
-    // copy in a single cluster row. Fail rather than warn: the resulting table looks entirely
-    // ordinary, so a missed warning ships as a wrong number.
-    //
-    // Note --bbmap_ambiguous toss is deliberately NOT an error here. It discards multi-mapping reads,
-    // which makes the consolidated counts conservative for duplicated genes rather than wrong, and
-    // that is a legitimate choice; it is documented in usage.md instead.
+    // Error, not warning: the double-counted cluster table looks ordinary. `toss` is allowed, its
+    // counts are conservative, not wrong.
     if ( params.bbmap_ambiguous == 'all' && ! params.featurecounts_fraction && ! skip_protein_consolidation && ( orf_callers || user_orf_names ) ) {
         error "`--bbmap_ambiguous all` counts a multi-mapping read at full weight at every site it aligns to, which double-counts it when protein consolidation sums counts across a cluster. Add `--featurecounts_fraction` so each alignment is weighted 1/N, or `--skip_protein_consolidation` if you do not need the consolidated table."
     }
 
-    // Deal with user-supplied assembly to make sure output names are correct
     assembler     = params.assembler
     assembly_name = params.assembler ?: params.user_assembly_name
 
-    // Used only to label the pre-ORF-calling collect-stats output (see ch_collect_stats below) --
-    // just a display name, not tied to which caller(s) actually run.
+    // Display label only, not tied to which callers run
     orfs_name  = params.orf_caller ?: params.user_orfs_name
 
-    // If the user supplied hmm files, we will run hmmsearch and then rank the results.
-    // Create a channel for hmm files.
     ch_hmmrs = channel.empty()
     if ( params.hmmdir ) {
         channel
@@ -259,7 +219,6 @@ workflow METATDENOVO {
     def ch_versions = channel.empty()
     def ch_multiqc_files = channel.empty()
 
-    // Form a fastq channel from the samplesheet channel
     // DL: I'm not sure which parts are still required after nf-schema. The branch { } certainly is needed.
     ch_fastq = ch_samplesheet
         .flatMap { meta, fastq_files ->
@@ -270,14 +229,6 @@ workflow METATDENOVO {
                 return [[ meta.id, pairs.collect { pair -> meta + [id: "${meta.id}_${pairs.indexOf(pair) + 1}"] }, fastq_files ]]
             }
         }
-        /** DL: In my testing, this fails as entries come in with single meta, multiple read files when appear for single ends
-        .map { id, metas, fastq_files ->
-            // Ensure single_end is set correctly in meta
-            def updatedMetas = metas
-                .collect { it + [single_end: (fastq_files.size() / metas.size() == 1)] }
-            return [id, updatedMetas, fastq_files]
-        }
-        **/
         .map { row -> validateInputSamplesheet(row) }
         .branch {
             meta, fastqs ->
@@ -296,14 +247,8 @@ workflow METATDENOVO {
 
     ch_versions = channel.empty()
     ch_multiqc_files = channel.empty()
-    //
-    // Gzip unzipped read files
-    //
-    // We're only doing this for samples having a single row in the sample sheet since those with more than one
-    // were gzipped by CAT_FASTQ above.
-    //
+    // Only single-row samples: CAT_FASTQ already gzips the rest
 
-    // Paired end, forward
     fwd = ch_fastq.single
         .filter { meta, _f -> ! meta.single_end }
         .map { meta, fastqs -> [ meta, fastqs[0] ] }
@@ -316,7 +261,6 @@ workflow METATDENOVO {
         }
     PIGZ_PE_READS_FWD(fwd.unzipped)
 
-    // Paired end, reverse
     rev = ch_fastq.single
         .filter { meta, _f -> ! meta.single_end }
         .map { meta, fastqs -> [ meta, fastqs[1] ] }
@@ -329,7 +273,6 @@ workflow METATDENOVO {
         }
     PIGZ_PE_READS_REV(rev.unzipped)
 
-    // Single end
     se = ch_fastq.single
         .filter { meta, _f -> meta.single_end }
         .map { meta, fastqs -> [ meta, fastqs[0] ] }
@@ -342,7 +285,6 @@ workflow METATDENOVO {
         }
     PIGZ_SE_READS(se.unzipped)
 
-    // Join the three channels with the originally zipped to form a new ch_fastq of the same structure as the original
     ch_fastq = fwd.zipped.concat(PIGZ_PE_READS_FWD.out.archive)
         .join(rev.zipped.concat(PIGZ_PE_READS_REV.out.archive))
         .map { meta, fwd_read, rev_read -> [ meta, [ fwd_read, rev_read ] ] }
@@ -440,7 +382,7 @@ workflow METATDENOVO {
     // MODULE: Run Megahit or Spades on all interleaved fastq files
     //
     if ( params.user_assembly ) {
-        // If the input assembly is not gzipped, do that since all downstream calls assume this
+        // Downstream assumes a gzipped assembly
         if ( ! params.user_assembly.endsWith('.gz') ) {
             PIGZ_ASSEMBLY(
                 channel
@@ -453,13 +395,11 @@ workflow METATDENOVO {
                 .value ( [ [ id: assembly_name ], file(params.user_assembly) ] )
         }
     } else if ( assembler == 'spades' ) {
-        // 1. Write a yaml file for Spades
         WRITESPADESYAML (
             ch_pe_reads_to_assembly.toList(),
             ch_se_reads_to_assembly.toList()
         )
 
-        // 2. Call the module with a channel with all fastq files plus the yaml
         ch_spades = ch_pe_reads_to_assembly
             .mix(ch_se_reads_to_assembly)
             .collect()
@@ -490,7 +430,7 @@ workflow METATDENOVO {
         error 'Assembler not specified!'
     }
 
-    // If the user asked for length filtering, perform that with SEQTK_SEQ (the actual length parameter is used in modules.config)
+    // Length threshold is set in modules.config
     if ( min_contig_length > 0 ) {
         SEQTK_SEQ_CONTIG_FILTER ( ch_assembly_contigs )
         ch_assembly_contigs = SEQTK_SEQ_CONTIG_FILTER.out.fastx
@@ -501,19 +441,13 @@ workflow METATDENOVO {
     //
     ch_gff      = channel.empty()
     ch_protein  = channel.empty()
-    // PROKKA_SUBSETS/PRODIGAL/METAEUK all emit gzipped GFFs that need UNPIGZ_GFF -- accumulated here
-    // and unzipped in ONE call after all three `if` blocks below, rather than one UNPIGZ_GFF call per
-    // block: Nextflow doesn't allow the same unaliased process to be invoked more than once in the
-    // same workflow context, which broke as soon as two of these callers were active simultaneously
-    // (e.g. --orf_caller prokka,prodigal) even though it worked fine for any single caller alone.
+    // Gathered for a single UNPIGZ_GFF call: an unaliased process can only be invoked once per workflow
     ch_gff_gz   = channel.empty()
 
-    // Accumulates every summary_tables/ tsv this run produces, across whichever optional
-    // annotation subworkflows are active, for the optional Parquet mirror further down.
     ch_parquet_tables = channel.empty()
 
     //
-    // SUBWORKFLOW: Run PROKKA_SUBSETS on assmebly output, but split the fasta file in chunks of 10 MB, then concatenate and compress output.
+    // SUBWORKFLOW: Run Prokka on batches of the assembly
     //
     if ( 'prokka' in orf_callers ) {
         PROKKA_SUBSETS(ch_assembly_contigs, params.prokka_batchsize)
@@ -532,9 +466,7 @@ workflow METATDENOVO {
         PRODIGAL( ch_assembly_contigs.map { _meta, contigs -> [ [id: "${assembly_name}.prodigal", caller: 'prodigal'], contigs  ] } )
         ch_protein      = ch_protein.mix(PRODIGAL.out.faa)
         ch_gff_gz       = ch_gff_gz.mix(PRODIGAL.out.gff)
-        // No MultiQC-native module for Prodigal (unlike Prokka, handled via
-        // PROKKA_SUBSETS.out.prokka_log above), so build a small custom-content CSV of basic
-        // ORF/protein stats from its amino-acid FASTA output.
+        // No MultiQC module for Prodigal, so write custom content
         ch_multiqc_files = ch_multiqc_files.mix(
             PRODIGAL.out.faa.collectFile { meta, faa ->
                 def n_orfs   = 0
@@ -573,8 +505,6 @@ workflow METATDENOVO {
         PIGZ_TRANSDECODER_GFF(TRANSDECODER.out.gff)
         PIGZ_TRANSDECODER_PEP(TRANSDECODER.out.pep)
 
-        // No MultiQC-native module for TransDecoder either -- same custom-content approach as
-        // the Prodigal branch above.
         ch_multiqc_files = ch_multiqc_files.mix(
             TRANSDECODER.out.pep.collectFile { meta, pep ->
                 def n_orfs   = 0
@@ -611,8 +541,6 @@ workflow METATDENOVO {
 
         ch_gff_gz  = ch_gff_gz.mix(METAEUK.out.gff)
 
-        // No MultiQC-native module for MetaEuk either -- same custom-content approach as
-        // the Prodigal/TransDecoder branches above.
         ch_multiqc_files = ch_multiqc_files.mix(
             METAEUK.out.faa.collectFile { meta, faa ->
                 def n_orfs   = 0
@@ -635,16 +563,7 @@ workflow METATDENOVO {
         )
     }
 
-    //
-    // Add any --user_orfs rows, plus a single --user_orfs_gff/--user_orfs_faa pair, in alongside the
-    // built-in callers above -- each is treated exactly like another --orf_caller value from here on
-    // (locus consolidation, protein consolidation, feature counting, all keyed on meta.caller).
-    // USER_ORFS normalises a raw MetaEuk gff/fasta pair the same way a pipeline-internal MetaEuk run
-    // already is (see subworkflows/local/user_orfs), passing anything else through unchanged. Route
-    // a gzipped gff through the same UNPIGZ_GFF normalisation as Prokka/Prodigal/MetaEuk's own
-    // gzipped output, so every entry in ch_gff stays uncompressed, same as today; ch_protein already
-    // tolerates either.
-    //
+    // User ORF sets act as further callers from here on. ch_gff must stay uncompressed.
     ch_user_orfs_single = params.user_orfs_gff && params.user_orfs_faa ?
         channel.value( [ [ id: params.user_orfs_name ], file(params.user_orfs_gff), file(params.user_orfs_faa) ] ) :
         channel.empty()
@@ -657,29 +576,11 @@ workflow METATDENOVO {
     ch_gff    = ch_gff.mix( USER_ORFS.out.gff.filter { _meta, gff -> ! (gff =~ /\.gz$/) } )
     ch_protein = ch_protein.mix( USER_ORFS.out.faa )
 
-    // Single UNPIGZ_GFF call covering every gzipped-GFF caller active this run -- see the ch_gff_gz
-    // comment above for why this can't be one call per caller branch.
     UNPIGZ_GFF(ch_gff_gz)
     ch_gff = ch_gff.mix(UNPIGZ_GFF.out.file)
 
-    //
-    // Consolidate overlapping same-contig CDS calls from different active callers into single loci
-    // before counting, so a read supporting one real gene isn't counted once per caller that called
-    // it. Runs unconditionally, even with a single active caller: FORMAT_LOCUSCONSOLIDATE only
-    // ever merges calls from DIFFERENT callers, so with one caller nothing merges, every locus keeps
-    // that caller's own ORF id, and the consolidated table is identical in content to that caller's
-    // own -- graceful degradation, no separate code path. Rides through the existing, unmodified
-    // ch_featurecounts cross-product and FEATURECOUNTS_CDS call below by being mixed into ch_gff as
-    // just another caller.
-    //
-    // The grouping deliberately does NOT use bedtools merge: merging on overlap alone cannot tell
-    // two callers agreeing on one gene from one caller calling two adjacent genes, and prokaryotic
-    // genes overlap routinely, so it fused 14.8% of Prodigal's ORFs on this pipeline's own test data.
-    //
-    // versions_gzip/versions_bedtools are topic:versions tuple emits, not versions.yml Paths --
-    // like every other module's topic-based version emit in this pipeline, they're picked up
-    // automatically by the global channel.topic("versions") collection below and must not be
-    // mixed into ch_versions directly (that expects Path entries only).
+    // Only calls from different callers merge, so one caller gives its own table. Not bedtools merge:
+    // overlap alone fuses adjacent genes of one caller.
     FORMAT_GFF2BED ( ch_gff )
 
     ch_locus_bed = FORMAT_GFF2BED.out.bed
@@ -692,26 +593,11 @@ workflow METATDENOVO {
 
     ch_gff = ch_gff.mix(FORMAT_LOCUSCONSOLIDATE.out.gff)
 
-    //
-    // Consolidate calls for the same gene that ended up on DIFFERENT contigs, which coordinates
-    // cannot detect: a splice-aware genomic call and a transcript-derived call for one gene share no
-    // coordinate system, but converge on nearly the same protein. Cluster the proteins and
-    // treat one cluster as one gene.
-    //
-    // Clustering runs on loci rather than on each caller's raw ORFs, because the counts table this
-    // feeds aggregates the per-locus counts locus consolidation produces above -- so cluster members
-    // have to BE loci. FORMAT_LOCUSFAA resolves each locus back to one protein sequence for that.
-    //
-    // Deliberately placed before ch_protein is consumed below, and dependent only on the GFFs and
-    // proteins rather than on any counts, so it runs alongside mapping instead of behind it.
-    // User-supplied ORFs are mixed into ch_gff/ch_protein above like any other caller, so this runs
-    // for them too. user_orf_names, not params.user_orfs: the latter is null for a
-    // --user_orfs_gff/--user_orfs_faa pair, which is a valid ORF source.
+    // Cluster locus proteins to join one gene called on different contigs. Members must be loci,
+    // since the counts table sums per-locus counts. params.user_orfs is null for a gff/faa pair.
     ch_protein_clusters = channel.empty()
     if ( ! skip_protein_consolidation && ( orf_callers || user_orf_names ) ) {
-        // Keyed on the locus-consolidation meta.id rather than .combine()d, so this stays a genuine
-        // 1:1 pairing if the pipeline ever consolidates more than one assembly in a run. Callers are
-        // sorted so the two lists stay aligned and the task's inputs hash reproducibly.
+        // Joined on meta.id to stay 1:1 with several assemblies; sorted for a stable task hash
         FORMAT_LOCUSFAA (
             FORMAT_LOCUSCONSOLIDATE.out.members
                 .map { meta, members -> [ meta.id, meta, members ] }
@@ -733,20 +619,11 @@ workflow METATDENOVO {
             'linclust'
         )
 
-        // Re-pick each cluster's representative as its lexicographically smallest member, so the
-        // cluster id is a function of the cluster content rather than of the order MMseqs2 happened
-        // to see the sequences in. Everything downstream reads the rewritten table, so the counts
-        // table and the annotated representatives cannot disagree about a cluster name.
+        // Smallest member as representative, so cluster ids do not depend on MMseqs2 input order
         FORMAT_CLUSTERREPS ( MMSEQS_FASTA_CLUSTER.out.clusters )
         ch_protein_clusters = FORMAT_CLUSTERREPS.out.clusters
 
-        // Annotate one protein per cluster in addition to each caller's own ORFs, by feeding the
-        // cluster representatives into ch_protein as another caller. The sequence ids here are locus
-        // ids, which is exactly what the cluster counts table's 'orf' column holds, so every
-        // annotation summary module's join against the counts finds them without special-casing.
-
-        // 'fa', not 'faa': SEQKIT_GREP appends the input's own .gz itself, and only *.fa.gz/*.fq.gz
-        // match its output declaration, so anything else here fails as a missing output file.
+        // 'fa', not 'faa': SEQKIT_GREP only declares *.fa.gz/*.fq.gz outputs
         SEQKIT_GREP (
             MMSEQS_FASTA_CLUSTER.out.seqs,
             FORMAT_CLUSTERREPS.out.representatives.map { _meta, representatives -> representatives },
@@ -756,11 +633,6 @@ workflow METATDENOVO {
         ch_protein = ch_protein.mix(SEQKIT_GREP.out.filter)
     }
 
-    // Restrict annotation (everything below still reading plain ch_protein) to the cluster
-    // representatives, instead of also fully re-annotating every individual source -- with N sources
-    // that's otherwise up to N-fold repeated annotation of the same gene. A silent no-op with only one
-    // ORF source active or with consolidation skipped: nothing meaningful to restrict to, and would
-    // otherwise just rename a single-caller run's output for no real savings.
     total_orf_sources = orf_callers.size() + user_orf_names.size()
     if ( annotate_only_consolidated && ! skip_protein_consolidation && total_orf_sources > 1 ) {
         ch_protein = ch_protein.filter { meta, _protein -> meta.caller == protein_consolidate_name }
@@ -785,7 +657,7 @@ workflow METATDENOVO {
     HMMCLASSIFY ( ch_hmmclassify )
 
     //
-    // MODULE: FeatureCounts. Create a table for each samples that provides raw counts as result of the alignment.
+    // MODULE: FeatureCounts
     //
     BAM_SORT_STATS_SAMTOOLS (
         BBMAP_ALIGN.out.bam,
@@ -793,10 +665,9 @@ workflow METATDENOVO {
     )
 
     ch_featurecounts = BAM_SORT_STATS_SAMTOOLS.out.bam
-        .combine(ch_gff)   // deliberate cross product: every sample x every active caller
+        .combine(ch_gff)   // every sample x every caller
         .map { sampleMeta, bam, callerMeta, gff ->
-            // sampleMeta + [...] (not a fresh map) so fields FEATURECOUNTS_CDS itself reads off the
-            // sample side (e.g. single_end, which picks the -p/paired-end flag) survive the rename.
+            // Keep sample meta: FEATURECOUNTS_CDS reads single_end from it
             [ sampleMeta + [ id: "${sampleMeta.id}.${callerMeta.caller}", caller: callerMeta.caller ], bam, gff ]
         }
 
@@ -846,12 +717,7 @@ workflow METATDENOVO {
             other: true
         }
 
-    // Locus-consolidated counts get their own collect module (provenance join), branched out here
-    // so CUSTOM_COLLECTFEATURECOUNTS itself -- and every other caller's table -- stays untouched.
-    // Keyed by meta.id (not .combine(), which would cross-join every assembly's featureCounts
-    // group against every assembly's provenance file if this pipeline ever ran multiple
-    // simultaneous assemblies) -- matches ch_featurecounts/ch_collect_feature's own convention
-    // just above of staying joinable rather than relying on positional/cardinality pairing.
+    // Joined on meta.id: .combine() would cross assemblies if several ever run together
     COLLECT_LOCUSCONSOLIDATE (
         ch_collect_feature.locus_consolidate
             .map { meta, fcs -> [ meta.id, meta, fcs ] }
@@ -860,16 +726,8 @@ workflow METATDENOVO {
     )
     ch_versions = ch_versions.mix(COLLECT_LOCUSCONSOLIDATE.out.versions)
 
-    // Third consolidation level: sum the per-locus counts above across each protein cluster, so a
-    // gene called on two contigs is reported once. Safe to sum after the fact rather than recount,
-    // because a read only aligns to one contig -- provided each read was exclusively assigned to one
-    // feature at counting time, which is what --bbmap_ambiguous/--featurecounts_fraction control.
-    //
-    // Keyed on the assembly name rather than meta.id, since the three inputs carry three different
-    // caller names; meta.id is "<assembly>.<caller>" throughout, so stripping the caller recovers a
-    // key they share without assuming there is only ever one assembly in flight. The strip is
-    // anchored to the end -- a plain string minus removes the FIRST occurrence, which would silently
-    // produce mismatched keys if an assembly name happened to contain the caller name.
+    // Keyed on assembly, as the inputs differ in caller. End-anchored strip: string minus removes the
+    // first match, which breaks when the assembly name contains the caller name.
     ch_protein_consolidate_counts = channel.empty()
     if ( ! skip_protein_consolidation && ( orf_callers || user_orf_names ) ) {
         COLLECT_PROTEINCONSOLIDATE (
@@ -885,15 +743,13 @@ workflow METATDENOVO {
     }
 
     //
-    // MODULE: extract per-category Unassigned_* diagnostic counts from FEATURECOUNTS_CDS's own
-    // *.summary files -- same caller-level grouping as ch_collect_feature above.
+    // MODULE: Unassigned_* counts from featureCounts summaries
     //
     ch_collect_summary = FEATURECOUNTS_CDS.out.summary
         .map { meta, summary -> [ meta.caller, summary ] }
         .groupTuple()
         .map { caller, summaries -> [ [ id: "${assembly_name}.${caller}", caller: caller ], summaries ] }
-        // locus_consolidate's own summaries are only needed below when protein consolidation is
-        // going to reuse them -- skip the invocation entirely otherwise, same guard as that reuse.
+        // locus_consolidate summaries are only used by protein consolidation
         .filter { meta, _summaries ->
             meta.caller != 'locus_consolidate' || ( ! skip_protein_consolidation && ( orf_callers || user_orf_names ) )
         }
@@ -901,12 +757,7 @@ workflow METATDENOVO {
     COLLECT_FEATURECOUNTSSUMMARY ( ch_collect_summary )
     ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTSSUMMARY.out.versions)
 
-    // locus_consolidate never gets its own CUSTOM_COLLECTSTATS invocation, but
-    // protein_consolidate's counts are a pure re-aggregation of locus_consolidate's -- summed
-    // across protein clusters, not recounted -- so the read-to-locus assignment behind
-    // locus_consolidate's Unassigned_* diagnostics is exactly protein_consolidate's too. Relabel
-    // and reuse it there instead of leaving protein_consolidate as the one caller whose
-    // overall_stats.tsv.gz lacks these columns.
+    // Protein consolidation re-aggregates locus counts, so reuse the locus Unassigned_* counts for it
     ch_unassigned_per_caller = COLLECT_FEATURECOUNTSSUMMARY.out.unassigned
         .branch { meta, _unassigned ->
             locus_consolidate: meta.caller == 'locus_consolidate'
@@ -914,20 +765,11 @@ workflow METATDENOVO {
         }
     ch_unassigned_protein_consolidate = channel.empty()
     if ( ! skip_protein_consolidation && ( orf_callers || user_orf_names ) ) {
-        // protein_consolidate's own counts table carries 4 extra provenance columns
-        // (callers/n_calls/n_loci/loci, see COLLECT_PROTEINCONSOLIDATE) that every other
-        // caller's plain counts table doesn't -- CUSTOM_COLLECTSTATS requires every fcs file
-        // in one invocation to share columns, so pad the reused diagnostic files to match
-        // before relabeling them. The original filenames are kept -- CUSTOM_COLLECTSTATS only
-        // reads the text between the first and second dot, so the "locus_consolidate" prefix
-        // is discarded either way.
+        // Pad to the 4 provenance columns: CUSTOM_COLLECTSTATS needs all fcs files in a call to share columns
         ch_unassigned_protein_consolidate = ch_unassigned_per_caller.locus_consolidate
             .flatMap { _meta, unassigned -> (unassigned instanceof List) ? unassigned : [ unassigned ] }
             .collectFile { f ->
-                // Fewer than 2 lines -- empty (a -stub run's file has no header at all,
-                // unlike the real script's write_tsv() output) or header-only (zero data
-                // rows, a legitimate real-run outcome too) -- would otherwise crash
-                // lines[1..-1] on an out-of-range slice.
+                // Empty (-stub) or header-only files would break lines[1..-1]
                 def lines = file(f).readLines()
                 def widened = lines.size() < 2
                     ? ( lines ? lines[0] + '\tcallers\tn_calls\tn_loci\tloci\n' : '' )
@@ -942,25 +784,14 @@ workflow METATDENOVO {
 
     CUSTOM_COLLECTFEATURECOUNTS ( ch_collect_feature.other )
 
-    // CUSTOM_COLLECTFEATURECOUNTS itself is kept generic (no Transdecoder-specific ID handling), so this
-    // caller-agnostic strip -- a no-op for every caller but transdecoder -- happens as a separate
-    // post-processing step, matching the id-reconciliation pattern nf-core/magmap already
-    // established for its own genome-accession join (see nf-core/magmap#238).
+    // Strips TransDecoder's cds. prefix; a no-op for other callers
     TIDYVERSE_STRIPCDSPREFIX ( CUSTOM_COLLECTFEATURECOUNTS.out.counts )
     ch_versions           = ch_versions.mix(TIDYVERSE_STRIPCDSPREFIX.out.versions)
 
-    // [ meta(caller), tsv ] -- kept as a proper tuple (not stripped) so every consumer below can
-    // join it against other per-caller channels instead of relying on positional channel pairing.
-    //
-    // The cluster representatives are annotated as just another caller, so their counts have to be
-    // available to the annotation subworkflows on the same footing. This also keeps CUSTOM_COLLECTSTATS
-    // correct: it left-joins MERGE_TABLES's output onto this channel with remainder: true, so a
-    // caller present in ch_merge_tables but missing here would emit an entry with a null meta that
-    // CUSTOM_COLLECTSTATS cannot consume. Empty, hence a no-op, when consolidation is skipped.
+    // Must hold every annotated caller: CUSTOM_COLLECTSTATS left-joins onto it
     ch_counts_per_caller  = TIDYVERSE_STRIPCDSPREFIX.out.counts.mix(ch_protein_consolidate_counts)
     ch_fcs_for_summary    = ch_counts_per_caller
 
-    // Initialize ch_merge_tables that will be populated with tables from annotation tools and used by the MERGE_TABLES module which output will then be passed to the CUSTOM_COLLECTSTATS module
     ch_merge_tables = channel.empty()
 
     //
@@ -994,7 +825,7 @@ workflow METATDENOVO {
     }
 
     //
-    // MODULE: Use QUAST to judge assembly quality, piped into MultiQC via its native report.tsv parser
+    // MODULE: QUAST assembly statistics
     //
     QUAST(
         ch_assembly_contigs,
@@ -1007,13 +838,13 @@ workflow METATDENOVO {
     // SUBWORKFLOW: Eukulele
     //
     if ( ! skip_eukulele ) {
-        // Make sure the eukulele_dbpath exists. file() (not java.io.File) resolves remote paths like s3://.
+        // file(), not java.io.File, so s3:// paths work
         d = file(params.eukulele_dbpath)
         if ( ! d.exists() ) {
             d.mkdirs()
         }
 
-        // Create a channel for EUKulele either with a named database or not. The latter means a user-provided database in a directory.
+        // No --eukulele_db means a user-provided database directory
         ch_eukulele_db = channel.empty()
         if ( params.eukulele_db ) {
             ch_eukulele_db = channel
@@ -1034,12 +865,8 @@ workflow METATDENOVO {
     }
 
     //
-    // Call Diamond for taxonomy with amino acid sequences
+    // MODULE: Diamond taxonomy, every caller x every db
     //
-    // Explicit .combine() (rather than relying on ch_protein having historically carried only one
-    // item) so every active caller's proteins are searched against every diamond db -- with N>1
-    // callers, ch_protein is a genuine multi-item queue channel and an implicit pairing would risk
-    // silently degrading to positional lockstep instead of the intended full cross product.
     ch_diamond_input = ch_protein.combine( ch_diamond_dbs.map { db -> [ db[0], db[1] ] } )
 
     DIAMOND_TAXONOMY(
@@ -1049,12 +876,7 @@ workflow METATDENOVO {
         []
     )
 
-    // Create a unified channel of the output from Diamond together with the diamond db info to
-    // make sure the channels are synchronized before calling TAXONKIT_LINEAGE.
-    // .join() is unsafe here: with N>1 callers, multiple items (one per caller) share the same db
-    // name, but ch_diamond_dbs has only one row per db -- Nextflow's join() silently drops all but
-    // one matching left-side item per key when the left side has duplicate keys. .combine() + a
-    // .filter() on matching db name gives the same pairing without that pitfall.
+    // Not .join(): callers share db names, and join mishandles duplicate keys
     ch_taxonkit_lineage = DIAMOND_TAXONOMY.out.tsv
         .map { it -> [ [ id: "${it[0].id}.${it[0].db}.lineage", db: it[0].db, caller: it[0].caller ], it[1] ] }
         .combine(ch_diamond_dbs)
@@ -1084,9 +906,7 @@ workflow METATDENOVO {
             .map { archiveMeta, archiveFile, _dbMeta, _dmnd, names, nodes, ranks, _parse -> [ [ id: archiveMeta.id - ".lineage" + ".diamond", db: archiveMeta.db, caller: archiveMeta.caller ], archiveFile, names, nodes, ranks ] }
     )
 
-    // Same .join()-with-duplicate-keys pitfall as above: FORMAT_DIAMOND_TAX_RANKLIST.out.taxonomy has
-    // multiple items (one per db) sharing the same caller, but ch_fcs_for_summary has one item per
-    // caller -- .combine() + .filter() instead of .join().
+    // Not .join(): dbs share caller names
     ch_diamondtax_sum_input = FORMAT_DIAMOND_TAX_RANKLIST.out.taxonomy
         .combine( ch_fcs_for_summary )
         .filter { meta, _taxonomy, fcsMeta, _fcs -> meta.caller == fcsMeta.caller }
@@ -1099,12 +919,7 @@ workflow METATDENOVO {
     //
     // MODULE: Collect statistics from mapping analysis
     //
-    // MERGE_TABLES only runs for callers that actually have >=1 annotation table -- matching the
-    // pre-multi-caller behavior, where MERGE_TABLES was never invoked at all (not invoked-with-an-
-    // empty-list; genuinely zero invocations, since .collect() on a channel that never emits produces
-    // no output either) whenever every annotation subworkflow was skipped. MERGE_TABLES's own R script
-    // isn't written to handle being called with zero input tables (glob-of-nothing breaks its
-    // pivot_wider), so preserving "don't call it at all" here, rather than "call it with []", matters.
+    // Never call MERGE_TABLES with zero tables: its pivot_wider fails
     MERGE_TABLES (
         ch_merge_tables
             .map { meta, tsv -> [ meta.caller, tsv ] }
@@ -1112,25 +927,16 @@ workflow METATDENOVO {
             .map { caller, tsvs -> [ [ id: "${assembly_name}.${caller}", caller: caller ], tsvs ] }
     )
 
-    // CUSTOM_COLLECTSTATS must still run once per ACTIVE caller regardless of whether that caller got a
-    // MERGE_TABLES output -- left-join (remainder: true) onto CUSTOM_COLLECTFEATURECOUNTS.out.counts (which
-    // always has exactly one item per active caller) so a caller with no annotation tables still gets
-    // a CUSTOM_COLLECTSTATS invocation, with mergetab defaulting to [] -- CUSTOM_COLLECTSTATS's own script already
-    // handles a missing mergetab gracefully (`if (mergetab) {...} else {...}`), mirroring what the
-    // pre-multi-caller code's `.ifEmpty { [ [] ] }` fallback did for the single-run case.
+    // Left join, so callers without annotation tables still get stats
     ch_fcs_mergetab_per_caller = ch_counts_per_caller
         .map { meta, fcs -> [ meta.caller, meta, fcs ] }
         .join(
             MERGE_TABLES.out.merged_table.map { meta, mergetab -> [ meta.caller, mergetab ] },
             remainder: true
         )
-        // remainder: true also emits right-only entries, i.e. a caller that produced annotation tables
-        // but no counts. That cannot happen for any reachable config today, but it would arrive here
-        // as a null meta and kill CUSTOM_COLLECTSTATS on tag "$meta.id" -- drop it instead, so a future
-        // wiring mistake degrades to a missing stats row rather than a crash far from its cause.
+        // Drop right-only entries: a null meta would crash CUSTOM_COLLECTSTATS
         .filter { _caller, meta, _fcs, _mergetab -> meta != null }
-        // COLLECT_FEATURECOUNTSSUMMARY's output is `optional: true`, so a caller with no
-        // Unassigned_* rows never emits a tuple for it -- remainder: true, default to [].
+        // Optional output: callers without Unassigned_* rows emit nothing
         .join(
             ch_unassigned_per_caller.map { meta, unassigned -> [ meta.caller, unassigned ] },
             remainder: true
@@ -1145,20 +951,14 @@ workflow METATDENOVO {
     ch_collect_stats = ch_collect_stats
         .combine( ch_fcs_mergetab_per_caller )
         .map { _origMeta, samples, trimlogs, bblogs, idxstats, callerMeta, fcs, mergetab, unassigned ->
-            // CUSTOM_COLLECTSTATS's `fcs` input accepts one or more files and derives each one's
-            // feature-count column name from the text between the first and second dot of its
-            // filename -- wrapped in a list here so a single caller's counts file still stages as
-            // a list. The Unassigned_* files are appended the same way, each contributing its own
-            // Status-named column.
+            // Each fcs file becomes a column, named from its filename between the first two dots
             [ callerMeta, samples, trimlogs, bblogs, idxstats, [ fcs ] + unassigned, mergetab ]
         }
 
     CUSTOM_COLLECTSTATS(ch_collect_stats)
 
     //
-    // MODULE: Also write every summary_tables/ tsv as Parquet -- re-keyed on each table's own
-    // filename rather than its upstream meta, since several of these channels' metas collide
-    // (e.g. multiple callers sharing an id) while the published filenames are already unique.
+    // MODULE: Write summary_tables/ as Parquet, keyed on filename since metas collide
     //
     if ( save_parquet ) {
         DUCKDB_TABLE2PARQUET(

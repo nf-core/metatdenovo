@@ -30,14 +30,12 @@ nextflow_pipeline {
                     // All files with stable contents
                     stable_path,
                 ).match() },
-                // The two diamond dbs are tiny fixtures built from this test's own ORFs, tagged
-                // with real (ncbi-refseq-test) resp. surrogate (gtdb-r220-test) taxids -- see
-                // https://github.com/nf-core/test-datasets/blob/metatdenovo/test_data/diamond_taxonomy/README.md
+                // Fixture dbs: https://github.com/nf-core/test-datasets/blob/metatdenovo/test_data/diamond_taxonomy/README.md
                 { assert path("${params.outdir}/diamond_taxonomy/megahit.prodigal.ncbi-refseq-test.tsv.gz").linesGzip.size() > 0 },
                 { assert path("${params.outdir}/diamond_taxonomy/megahit.prodigal.gtdb-r220-test.tsv.gz").linesGzip.size() > 0 },
-                // parse_with_taxdump is set for ncbi-refseq-test: confirm the real NCBI taxon name comes through
+                // parse_with_taxdump (ncbi-refseq-test) gives NCBI taxon names
                 { assert path("${params.outdir}/summary_tables/megahit.prodigal.ncbi-refseq-test.diamond.taxonomy-taxdump.tsv.gz").linesGzip.findAll { l -> l.contains('Escherichia coli') || l.contains('cerevisiae') }.size() > 0 },
-                // ranks is set for gtdb-r220-test: confirm the ranked lineage columns are populated
+                // ranks (gtdb-r220-test) gives ranked lineage columns
                 { assert path("${params.outdir}/summary_tables/megahit.prodigal.gtdb-r220-test.diamond.taxonomy.tsv.gz").linesGzip.findAll { l -> l.contains('Acinetobacter') || l.contains('Bacteroides') }.size() > 0 },
             )
         }

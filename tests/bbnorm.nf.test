@@ -17,21 +17,18 @@ nextflow_pipeline {
             def stable_path = getAllFilesFromDir(params.outdir, relative: true, includeDir: true, ignore: ['pipeline_info/*.{html,json,txt}', 'multiqc/multiqc_plots', 'multiqc/multiqc_plots/**' ])
             assert workflow.success
             assertAll(
-                // Paths and the versions file only, no file contents. BBNorm sizes its k-mer
-                // hash tables from the memory it gets, so which low-abundance k-mers survive --
-                // and the assembly below them -- varies with the machine.
+                // No file contents: BBNorm sizes its hash tables from available memory, so output varies by machine.
                 { assert snapshot(
                     removeNextflowVersion("$outputDir/pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml"),
                     stable_path,
                 ).match() },
 
-                // Only the assembler sees normalised reads; quantification maps the full set.
-                // A leak would drop every count here, silently and proportionally.
+                // Only the assembler sees normalised reads; a leak into quantification would lower every count.
                 { assert path("${params.outdir}/summary_tables/megahit.prodigal.overall_stats.tsv.gz")
                     .csv(sep: '\t', decompress: true, header: true)
                     .columns["n_post_trimming"].every { n -> n.toInteger() > 0 } },
 
-                // Evidence BBNorm ran, from the log its MultiQC section is built from.
+                // Evidence BBNorm ran.
                 { assert path("${params.outdir}/bbmap/bbnorm/all_samples.bbnorm.log").readLines()
                     .any { l -> l.contains('Total reads in:') } },
 

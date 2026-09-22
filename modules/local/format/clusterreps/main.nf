@@ -1,7 +1,6 @@
 process FORMAT_CLUSTERREPS {
     tag "$meta.id"
-    // Buffers every cluster's members to re-pick the representative, so memory scales with the
-    // number of loci; process_medium rather than process_low for that.
+    // Buffers every cluster's members, so memory scales with the number of loci.
     label 'process_medium'
 
     conda "${moduleDir}/environment.yml"
@@ -23,24 +22,13 @@ process FORMAT_CLUSTERREPS {
     script:
     prefix = task.ext.prefix ?: "${meta.id}"
 
-    // MMseqs2 names one member of each cluster as its representative, in column 1 of a table with one
-    // row per member. Which member it picks depends on the order sequences were fed in, so an
-    // unrelated change upstream -- a different sort, an extra caller -- can silently rename a cluster
-    // even though its membership is identical. That name is the cluster id in the counts table and
-    // the sequence id handed to the annotation tools, so it should be a function of the cluster
-    // content and nothing else.
-    //
-    // Re-pick it as the lexicographically smallest member and rewrite the table, so the counts table
-    // and the annotated representatives can never disagree about what a cluster is called. Clusters
-    // are emitted in order of first appearance, and members sorted within a cluster, so the output
-    // does not depend on input order either.
+    // MMseqs2 picks representatives by input order, so an unrelated upstream change can rename a
+    // cluster. Re-pick the smallest member and sort, so ids depend on cluster content only.
     """
     awk 'BEGIN { FS = OFS = "\\t" }
         {
             if (!(\$1 in group_seen)) { group_seen[\$1] = 1; group_order[++n_groups] = \$1 }
-            # if/else rather than a ternary on the right of the assignment: some awks create the
-            # target element before evaluating the right-hand side, which would prepend an empty
-            # member on the first append.
+            # if/else, not ternary: mawk creates the element before evaluating the RHS.
             if (\$1 in members) members[\$1] = members[\$1] SUBSEP \$2
             else                members[\$1] = \$2
         }

@@ -21,14 +21,8 @@ process FORMAT_METAEUKFAA {
     prefix    = task.ext.prefix ?: "${meta.id}"
     cat_input = faa =~ /\.gz$/ ? "gunzip -c ${faa}" : "cat ${faa}"
 
-    // MetaEuk's protein fasta header and the ID= attribute FORMAT_METAEUK_GFF derives from the gff's
-    // TCS_ID are NOT the same string, which silently breaks every join keyed on ORF id (the counts
-    // tables come from the gff, the annotation tables from the fasta). The header is
-    //     target|contig|strand|bitscore|evalue|nExons|lowCoord|highCoord|exonCoords...
-    // while TCS_ID is target|contig|strand|lowCoord, i.e. fields 1,2,3,7 -- field 4 is the bitscore
-    // and never appears in the gff id. Rewrite the header to match, and fail the task rather than
-    // pass a header through unchanged if it has too few fields, so a future MetaEuk header change
-    // surfaces as an error instead of as ids that silently stop matching.
+    // MetaEuk fasta headers (target|contig|strand|bitscore|evalue|nExons|lowCoord|...) must match
+    // the gff TCS_ID (fields 1,2,3,7) for id joins to work. Fail on headers with too few fields.
     """
     $cat_input \\
         | awk 'BEGIN{FS="|"; OFS="|"}

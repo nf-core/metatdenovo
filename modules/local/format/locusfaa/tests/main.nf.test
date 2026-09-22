@@ -9,10 +9,8 @@ nextflow_process {
     tag "format"
     tag "format/locusfaa"
 
-    // Inputs are built inline rather than read from a fixture: the pipeline repo carries no test
-    // data of its own. The ids below are real output from the metaeuk_transdecoder test profile --
-    // two loci on different contigs whose proteins are identical (the point of cross-contig
-    // consolidation), plus an unrelated one, and one locus two callers both called.
+    // Real ids from test_metaeuk_transdecoder: two identical proteins on different contigs,
+    // one unrelated locus, and one locus called by two callers.
 
     test("three loci, one of them multi-caller") {
 
@@ -42,9 +40,7 @@ nextflow_process {
                     ''
                 ].join('\\n')
 
-                // TransDecoder fasta: header carries a description after the id, which must be
-                // dropped, and k59_0.p1 is deliberately SHORTER so the longest-wins rule is tested
-                // rather than accidentally satisfied by a tie.
+                // Header has a description to drop; k59_0.p1 is shorter so longest-wins is tested.
                 def transdecoder = file("\${workDir}/transdecoder.faa")
                 transdecoder.text = [
                     '>k59_0.p1 GENE.k59_0~~k59_0.p1  ORF type:3prime_partial (+)',
@@ -65,16 +61,12 @@ nextflow_process {
             def seqs  = [ids, lines.findAll { l -> !l.startsWith('>') }].transpose().collectEntries()
             assertAll(
                 { assert process.success },
-                // One sequence per locus, emitted in members-table order for reproducibility.
+                // One sequence per locus, in members-table order.
                 { assert ids == ['>locus_k59_0_1_447_+', '>k59_1.p1', '>NP_011412.1|k59_1|-|191'] },
-                // The multi-caller locus takes the LONGEST contributor, i.e. MetaEuk's 37-residue
-                // sequence, not TransDecoder's 19-residue one.
+                // Multi-caller locus takes the longest contributor (MetaEuk, 37 residues).
                 { assert seqs['>locus_k59_0_1_447_+'] == 'MPSRFTKTRKHRGHVSAGKGRIGKHRKHPGGRGMAGG' },
-                // Single-contributor loci simply take their own caller's sequence, and the
-                // TransDecoder description after the id must not have confused the lookup.
                 { assert seqs['>k59_1.p1'] == 'MRLSDQFNNTTSSSDFFFSQLGDESSFDDNWNIWNST*' },
-                // The two cross-contig loci end up with identical sequences -- this is what makes
-                // them cluster together downstream.
+                // Identical sequences, so these cluster downstream.
                 { assert seqs['>NP_011412.1|k59_1|-|191'] == seqs['>locus_k59_0_1_447_+'] },
                 { assert snapshot(process.out.faa).match() }
             )

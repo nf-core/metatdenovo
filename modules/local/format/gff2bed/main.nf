@@ -21,17 +21,9 @@ process FORMAT_GFF2BED {
     prefix    = task.ext.prefix ?: "${meta.id}"
     cat_input = gff =~ /\.gz$/ ? "gunzip -c ${gff}" : "cat ${gff}"
 
-    // BED is 0-based half-open, GFF is 1-based inclusive: start shifts by one, end is unchanged.
-    // The "(^|;)ID=" anchor (rather than a bare "ID=") avoids matching inside MetaEuk's
-    // Target_ID=/TCS_ID= attributes, which also contain the substring "ID=". A record with no
-    // match at all (RSTART == 0) must fail rather than silently emit an empty-string id -- an
-    // empty id is indistinguishable from every other unmatched record downstream, which merges
-    // unrelated loci into one instead of losing this one record loudly. FORMAT_METAEUK_GFF
-    // (modules/local/format/metaeuk/main.nf) guards its own match() the same way -- keep both in
-    // sync if this guard's contract ever changes.
-    // The "cds." prefix strip mirrors TIDYVERSE_STRIPCDSPREFIX's existing TransDecoder-ID normalization
-    // (modules/local/tidyverse/stripcdsprefix/main.nf), so a locus this caller is the sole contributor to
-    // inherits an ID matching that caller's own per-caller counts table exactly.
+    // BED is 0-based half-open, GFF 1-based inclusive: start shifts by one.
+    // "(^|;)ID=" skips MetaEuk's Target_ID=/TCS_ID=; no match must fail, since empty ids merge
+    // unrelated loci (same guard as FORMAT_METAEUK_GFF). Strip "cds." like TIDYVERSE_STRIPCDSPREFIX.
     """
     $cat_input \\
         | awk -v caller="${meta.caller}" 'BEGIN{FS="\\t"; OFS="\\t"}

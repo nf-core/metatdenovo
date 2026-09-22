@@ -20,7 +20,6 @@ process FORMAT_DIAMOND_TAX_RANKLIST {
     script:
     def prefix = task.ext.prefix ?: "${meta.id}"
 
-    // Call separate if we have a list of ranks
     def sep = ""
     if ( ranks ) {
         sep = "separate(taxonomy, c(\"${ranks.tokenize(';').join('\",\"')}\"), remove = FALSE, extra = \"merge\", fill = \"right\", sep = \";\") %>%"

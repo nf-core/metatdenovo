@@ -9,11 +9,8 @@ nextflow_process {
     tag "collect"
     tag "collect/proteinconsolidate"
 
-    // Inputs are built inline rather than read from a fixture: the pipeline repo carries no test
-    // data of its own. The loci, coordinates and counts below are real values from the
-    // metaeuk_transdecoder test profile -- one gene called on two different contigs (a spliced
-    // genomic call on k59_1 and a synonymously recoded mRNA call on k59_0) whose proteins are
-    // identical and therefore cluster together, plus one unrelated ORF that must not.
+    // Real values from test_metaeuk_transdecoder: one gene called on two contigs with identical
+    // proteins, which must cluster, plus one unrelated ORF, which must not.
 
     test("two loci of one gene on different contigs are summed into one cluster") {
 
@@ -38,10 +35,7 @@ nextflow_process {
                     ['k59_1.p1',                'k59_1',       '183',      '611',      '+',   '429', '0']
                 ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
 
-                // Gzipped, matching FORMAT_LOCUSCONSOLIDATE's real output -- the module reads this
-                // via `zcat` (not fread()'s own gzip support, which needs the R.utils package and
-                // isn't reliably present in every container build), so an uncompressed fixture here
-                // would silently skip exercising that code path.
+                // Gzipped like the real input, so the module's zcat path is exercised.
                 def provenanceRows = [
                     ['ID', 'callers', 'n_calls'],
                     ['locus_k59_0_1_447_+',     'metaeuk,transdecoder', '2'],
@@ -55,8 +49,7 @@ nextflow_process {
                 def provenance = file("\${workDir}/test.provenance.tsv.gz")
                 provenance.bytes = provenanceBaos.toByteArray()
 
-                // Headerless MMseqs2 output: representative, member. The representative is always a
-                // member of its own cluster.
+                // Headerless MMseqs2 output: representative, member.
                 def clusters = file("\${workDir}/test.clusters.tsv")
                 clusters.text = [
                     ['NP_011412.1|k59_1|-|191', 'NP_011412.1|k59_1|-|191'],
@@ -82,8 +75,7 @@ nextflow_process {
                 { assert merged.find { r -> r["sample"] == 'RPL28_GENOMIC' }["count"] as int == 69 },
                 { assert merged.find { r -> r["sample"] == 'RPL28_MRNA_RECODED' }["count"] as int == 400 },
 
-                // Provenance is unioned across the cluster's members, not taken from the
-                // representative alone: the mRNA locus contributed the transdecoder call.
+                // Provenance is the union over members, not the representative alone.
                 { assert merged.every { r -> r["callers"] == 'metaeuk,transdecoder' } },
                 { assert merged.every { r -> (r["n_loci"] as int) == 2 } },
                 { assert merged.every { r -> (r["n_calls"] as int) == 3 } },

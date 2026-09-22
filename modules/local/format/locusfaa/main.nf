@@ -1,7 +1,6 @@
 process FORMAT_LOCUSFAA {
     tag "$meta.id"
-    // Holds every protein sequence in memory to pick the longest per locus, so memory scales with
-    // the total protein sequence; process_medium rather than process_low for that.
+    // Holds all protein sequences in memory, so memory scales with total protein length.
     label 'process_medium'
 
     conda "${moduleDir}/environment.yml"
@@ -22,23 +21,14 @@ process FORMAT_LOCUSFAA {
     script:
     prefix = task.ext.prefix ?: "${meta.id}"
 
-    // Each caller's protein fasta gets its sequence ids rewritten to the same "<caller>:<ORF id>"
-    // form FORMAT_GFF2BED puts in the bed name column, which is what the members table is keyed on.
-    // Only the first whitespace-delimited token of a header is the id -- Prokka appends a product
-    // description and Prodigal a "# start # end # ..." coordinate block. Compression differs per
-    // caller (Prokka's faa is gzipped, MetaEuk's fas is not), hence the per-file decompression
-    // choice made here rather than in the shell.
+    // Ids are rewritten to "<caller>:<ORF id>", the members-table key; only the first header token is the id.
     def normalise = [callers, faas].transpose().collect { caller, faa ->
         def cat_input = faa.name.endsWith('.gz') ? "gunzip -c ${faa}" : "cat ${faa}"
         "${cat_input} | awk -v caller='${caller}' '/^>/ { split(substr(\$0, 2), a, \" \"); print \">\" caller \":\" a[1]; next } { print }' >> all_proteins.faa"
     }.join('\n    ')
 
-    // One protein per consolidated locus, named after the locus. A locus with a single contributor
-    // trivially takes that contributor's sequence; a locus several callers agreed on takes the
-    // longest of their near-identical sequences, breaking ties on the lexicographically smallest
-    // "<caller>:<ORF id>" so the choice is reproducible rather than dependent on file order.
-    // Emission follows the order loci first appear in the members table -- awk's for-in iteration
-    // order is unspecified and would make the output non-deterministic between runs.
+    // Longest sequence per locus, ties broken on smallest "<caller>:<ORF id>";
+    // emitted in members-table order since awk for-in order is unspecified.
     """
     : > all_proteins.faa
     ${normalise}
@@ -80,11 +70,7 @@ process FORMAT_LOCUSFAA {
                     if (l in best_seq) { print ">" l "\\n" best_seq[l]; n_emitted++ }
                     else if (n_missing++ < 5) missing = missing " " l
                 }
-                # A locus with no resolvable protein would otherwise vanish silently: it gets no
-                # cluster, and the inner join in the counts collector then drops its reads while tpm is
-                # renormalised over what is left, so the totals still look self-consistent. Fail
-                # loudly instead -- this only happens when the fasta ids of some caller stop matching
-                # its gff ids, which is exactly the bug class FORMAT_METAEUKFAA exists to fix.
+                # A locus without a protein would silently lose its counts downstream, so fail.
                 if (n_emitted < n_loci) {
                     printf "ERROR: %d of %d loci had no matching protein sequence, e.g.%s\\n", \\
                         n_loci - n_emitted, n_loci, missing > "/dev/stderr"

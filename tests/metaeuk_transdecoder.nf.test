@@ -29,35 +29,25 @@ nextflow_pipeline {
                     stable_name,
                     // All files with stable contents
                     stable_path,
-                    // Per-caller values, in the same style as the existing solo metaeuk test
-                    // (tests/metaeuk.nf.test) -- directly comparable to that test's own .snap values as
-                    // independent confirmation that one caller's results aren't contaminated by the other.
+                    // Should match tests/metaeuk.nf.test's snapshot, showing the callers do not contaminate each other.
                     path("${params.outdir}/summary_tables/megahit.metaeuk.counts.tsv.gz").linesGzip.findAll { l -> l.contains('orf') },
                     path("${params.outdir}/summary_tables/megahit.transdecoder.counts.tsv.gz").linesGzip.findAll { l -> l.contains('orf') },
-                    // The locus-consolidated table itself -- small enough on this test dataset to
-                    // snapshot verbatim rather than just its header, so any regression in the
-                    // ID-inheritance rule, coordinate round-tripping, or provenance columns shows up as a
-                    // diff here.
+                    // Small enough to snapshot verbatim.
                     path("${params.outdir}/summary_tables/megahit.locus_consolidate.counts.tsv.gz").linesGzip,
-                    // Likewise the protein-consolidated table, verbatim.
+                    // Likewise the protein-consolidated table.
                     path("${params.outdir}/summary_tables/megahit.protein_consolidate_99.counts.tsv.gz").linesGzip,
                 ).match() },
                 { assert path("${params.outdir}/megahit/megahit_assembly.log").readLines().any { l -> l.contains('ALL DONE') } },
                 { assert path("${params.outdir}/megahit/megahit_assembly.contigs.fa.gz").linesGzip.size() >= 4 },
 
-                // === Locus consolidation must not double-count reads shared by two callers ===
-                // k59_0 is the RPL28_MRNA_RECODED locus where MetaEuk and TransDecoder call the exact
-                // same coordinates (1-447, +) for the same real gene: metaeuk's own solo table and
-                // transdecoder's own solo table each independently report all 400 aligned reads for that
-                // sample (naively summing the two per-caller tables would give 800 -- double the true
-                // read count). The consolidated table must report exactly the true, once-only count.
+                // Both callers call k59_0 at 1-447 (+) with 400 reads each; the consolidated count must be 400, not 800.
                 { assert (
                     path("${params.outdir}/summary_tables/megahit.locus_consolidate.counts.tsv.gz")
                         .csv(sep: '\t', decompress: true, header: true).rows
                         .findAll { r -> r["sample"] == 'RPL28_MRNA_RECODED' }
                         .sum { r -> r["count"] as int }
                 ) == 400 },
-                // Provenance on that same merged locus: both callers contributed, two independent calls.
+                // Both callers contributed, two calls.
                 { assert (
                     path("${params.outdir}/summary_tables/megahit.locus_consolidate.counts.tsv.gz")
                         .csv(sep: '\t', decompress: true, header: true).rows
@@ -65,10 +55,7 @@ nextflow_pipeline {
                         .with { r -> [ r["callers"].tokenize(',').toSet(), r["n_calls"] as int ] }
                 ) == [ ['metaeuk', 'transdecoder'] as Set, 2 ] },
 
-                // === k59_1: MetaEuk's splice-aware call (two exons, - strand) and TransDecoder's
-                // unspliced call (+ strand) overlap in genomic position but are different real gene
-                // models on opposite strands -- the grouping is strand-aware and must keep them as two
-                // separate loci, never merged into one. ===
+                // k59_1: MetaEuk (-) and TransDecoder (+) overlap on opposite strands, so must stay two loci.
                 { assert (
                     path("${params.outdir}/summary_tables/megahit.locus_consolidate.counts.tsv.gz")
                         .csv(sep: '\t', decompress: true, header: true).rows
@@ -76,9 +63,7 @@ nextflow_pipeline {
                         .every { r -> (r["n_calls"] as int) == 1 }
                 ) },
 
-                // Per-sample locus-consolidated read counts never exceed that sample's total aligned
-                // reads (samtools flagstat) -- the general form of the no-double-counting property above,
-                // checked for every sample rather than just the one hand-picked case.
+                // No sample's locus counts may exceed its aligned reads (samtools flagstat).
                 { assert (
                     ['RPL28_GENOMIC', 'RPL28_MRNA', 'RPL28_MRNA_RECODED'].every { sample ->
                         def consolidated_total = path("${params.outdir}/summary_tables/megahit.locus_consolidate.counts.tsv.gz")
@@ -90,13 +75,8 @@ nextflow_pipeline {
                     }
                 ) },
 
-                // === Cross-contig consolidation, which coordinates cannot do ===
-                // This dataset co-assembles one gene twice: contig k59_1 carries the spliced genomic
-                // RPL28 call (two exons, - strand) and contig k59_0 the synonymously recoded mRNA
-                // version (one exon, + strand). They share no coordinate system, so locus
-                // consolidation above necessarily leaves them as two separate loci -- but their
-                // proteins are identical, so protein clustering must merge them into one row per
-                // sample, carrying provenance from both contributing loci.
+                // k59_1 (spliced, -) and k59_0 (recoded mRNA, +) are the same gene on different contigs.
+                // Locus consolidation cannot merge them; protein clustering must, with provenance from both.
                 { assert (
                     path("${params.outdir}/summary_tables/megahit.protein_consolidate_99.counts.tsv.gz")
                         .csv(sep: '\t', decompress: true, header: true).rows
@@ -107,17 +87,14 @@ nextflow_pipeline {
                             (r["n_calls"] as int) == 3
                         }
                 ) },
-                // The unrelated opposite-strand TransDecoder call on k59_1 is a genuinely different
-                // protein and must NOT be swept into that cluster.
+                // The opposite-strand TransDecoder call on k59_1 is a different protein and must stay out.
                 { assert (
                     path("${params.outdir}/summary_tables/megahit.protein_consolidate_99.counts.tsv.gz")
                         .csv(sep: '\t', decompress: true, header: true).rows
                         .findAll { r -> r["orf"] == 'k59_1.p1' }
                         .every { r -> (r["n_loci"] as int) == 1 && r["callers"] == 'transdecoder' }
                 ) },
-                // Consolidating must not invent or lose reads: every sample's total is unchanged from
-                // the locus level, since clustering only regroups rows, and still within what actually
-                // aligned.
+                // Clustering regroups rows: per-sample totals equal the locus level.
                 { assert (
                     ['RPL28_GENOMIC', 'RPL28_MRNA', 'RPL28_MRNA_RECODED'].every { sample ->
                         def total = { table ->
@@ -128,11 +105,8 @@ nextflow_pipeline {
                         total('megahit.protein_consolidate_99.counts.tsv.gz') == total('megahit.locus_consolidate.counts.tsv.gz')
                     }
                 ) },
-                // The cluster representatives handed to the annotation tools must be keyed exactly
-                // like the counts table's 'orf' column, or every annotation join silently returns
-                // nothing -- the same class of bug this PR fixes for MetaEuk.
-                // Cluster table shape -- it is in tests/.nftignore (assembly-derived, so md5s would
-                // flake on MEGAHIT non-determinism), so assert its structure instead of its checksum.
+                // Representatives must be keyed like the counts table's 'orf' column, or annotation joins are empty.
+                // The cluster table is in .nftignore (MEGAHIT is not deterministic), so assert its shape.
                 { assert (
                     path("${params.outdir}/protein_consolidate/megahit.protein_consolidate_99.clusters.tsv").readLines()
                         .every { l -> l.tokenize('\t').size() == 2 }

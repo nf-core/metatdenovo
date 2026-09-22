@@ -1,22 +1,12 @@
 //
-// Normalise user-supplied ORFs (--user_orfs_gff/--user_orfs_faa) before they join the pipeline's
-// own callers. A GFF/FASTA pair re-supplied from a MetaEuk run (e.g. re-fed after MetaEuk's own
-// resume/cache broke on a large run) is raw MetaEuk output, not yet through the same
-// FORMAT_METAEUK_GFF/FORMAT_METAEUKFAA rewrite a pipeline-internal `--orf_caller metaeuk` run
-// always gets first -- so it carries `TCS_ID=`/`Target_ID=` attributes instead of a plain `ID=`.
+// Normalise user-supplied ORFs. A re-supplied raw MetaEuk gff/faa pair gets the same rewrite as an internal MetaEuk run.
 //
 
 include { FORMAT_METAEUKFAA  } from '../../../modules/local/format/metaeukfaa/main'
 include { FORMAT_METAEUK_GFF } from '../../../modules/local/format/metaeuk/main'
 
-// A GFF already carrying a proper ID= attribute needs no further work, whether that's from a
-// pipeline-internal MetaEuk run (which prepends one in front of its own untouched
-// Target_ID=/TCS_ID= attributes -- so those remain present even after formatting) or any other
-// caller with its own GFF3 ID=. Checking for TCS_ID='s mere presence instead would misfire on
-// that same already-normalised MetaEuk output and reformat it a second time. Reads at most 20
-// feature lines, decompressing if needed -- a real assembly's GFF can be tens of GB. Comment lines
-// are filtered before the limit applies: a GFF3 header carries one `##sequence-region` per contig,
-// so the first feature line is thousands of lines in.
+// Test ID=, not TCS_ID=: normalised MetaEuk output keeps TCS_ID=.
+// Comments are skipped before the 20-line limit; a GFF3 header has one ##sequence-region per contig.
 def hasIdAttribute(gff) {
     def reader = gff.name.endsWith('.gz') ?
         new java.util.zip.GZIPInputStream(gff.newInputStream()).newReader() :
@@ -29,10 +19,7 @@ def hasIdAttribute(gff) {
     }
 }
 
-// A raw MetaEuk header has >= 7 pipe-delimited fields (see FORMAT_METAEUKFAA); an already-rewritten
-// one has exactly 4. Used only to cross-check against the gff's own raw/normalised call below --
-// gff and faa are supposed to be a matched pair from the same source, and disagreeing on which
-// state they're in means one of them is not.
+// Raw MetaEuk headers have >= 7 pipe-delimited fields, rewritten ones 4. Cross-checks the gff.
 def hasRawMetaeukHeader(faa) {
     def reader = faa.name.endsWith('.gz') ?
         new java.util.zip.GZIPInputStream(faa.newInputStream()).newReader() :

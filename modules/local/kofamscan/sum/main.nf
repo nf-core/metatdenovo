@@ -28,7 +28,6 @@ process KOFAMSCAN_SUM {
     library(stringr)
     library(tidyverse)
 
-    # call the tables into variables
     kofams <- read_tsv("$kofmascan", show_col_types = FALSE ) %>%
         select(-"#") %>%
         slice(-1) %>%

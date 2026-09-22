@@ -30,14 +30,10 @@ process COLLECT_PROTEINCONSOLIDATE {
 
     setDTthreads($task.cpus)
 
-    # MMseqs2 cluster membership, no header: representative id, then one row per member. The
-    # representative is always a member of its own cluster, which is what lets the cluster inherit
-    # its length below.
+    # MMseqs2 clusters, no header: representative, member. A representative is its own member.
     clusters <- fread('${clusters}', sep = '\\t', header = FALSE, col.names = c('cluster', 'orf'))
 
-    # FORMAT_LOCUSCONSOLIDATE emits one provenance row per locus, but dedupe on ID defensively: a
-    # second row for the same ID differing in any column would survive a plain distinct() and fan the
-    # join out, inflating n_loci/n_calls and duplicating the loci list.
+    # Dedupe on ID: a duplicate row would fan the join out and inflate counts.
     provenance <- fread(cmd = "zcat '${provenance}'", sep = '\\t') %>% distinct(ID, .keep_all = TRUE)
 
     counts <- tibble(f = Sys.glob('*.featureCounts.tsv')) %>%
@@ -58,9 +54,7 @@ process COLLECT_PROTEINCONSOLIDATE {
         mutate(orf = str_remove(orf, '^cds\\\\.')) %>%
         select(-f)
 
-    # Coordinates belong to the locus, not to the (cluster, sample) pair, so they're summarised
-    # separately from the counts and joined back afterwards. Ordering by locus id keeps the
-    # semicolon/comma-joined columns reproducible.
+    # Coordinates are per locus, so summarised apart from counts; order by locus id for reproducibility.
     cluster_attrs <- clusters %>%
         left_join(counts %>% distinct(orf, chr, start, end, strand, length), by = 'orf') %>%
         left_join(provenance, by = c('orf' = 'ID')) %>%
@@ -71,7 +65,7 @@ process COLLECT_PROTEINCONSOLIDATE {
             start   = paste(start, collapse = ';'),
             end     = paste(end, collapse = ';'),
             strand  = paste(strand, collapse = ';'),
-            # The representative's own length, not a sum: it's what tpm is normalised by below.
+            # Representative length, not a sum: tpm is normalised by it.
             length  = length[orf == cluster][1],
             callers = paste(sort(unique(unlist(strsplit(paste(callers, collapse = ','), ',')))), collapse = ','),
             n_calls = sum(n_calls),
@@ -80,13 +74,9 @@ process COLLECT_PROTEINCONSOLIDATE {
             .groups = 'drop'
         )
 
-    # A read only ever aligns to one contig, so per-locus counts can simply be summed across a
-    # cluster's members without double counting -- provided each read was exclusively assigned to one
-    # feature at counting time, which is what --bbmap_ambiguous/--featurecounts_fraction control.
-    # tpm is recomputed from the summed counts rather than summed from the per-locus tpms.
-    # An inner join here would silently drop any locus missing from the cluster table, and because tpm
-    # is renormalised over the survivors the output would still look internally consistent while
-    # under-reporting reads relative to the locus-level table. Fail instead.
+    # Summing member counts is safe only while each read is assigned to one feature
+    # (--bbmap_ambiguous/--featurecounts_fraction). tpm is recomputed from the sums.
+    # Fail on loci missing from the cluster table: dropping them would silently lose reads.
     orphans <- counts %>% filter(count > 0) %>% distinct(orf) %>% anti_join(clusters, by = 'orf')
     if (nrow(orphans) > 0) {
         stop(sprintf(

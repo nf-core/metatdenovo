@@ -33,9 +33,7 @@ nextflow_pipeline {
                 ).match() },
                 { assert path("${params.outdir}/megahit/megahit_assembly.log").readLines().any { l -> l.contains('ALL DONE') } },
 
-                // === --bbmap_ambiguous all actually reaches BBMap and produces real
-                // multi-mapping (impossible under the default `best`, which BBMap's own docs
-                // describe as reporting only the first best site per read). ===
+                // ambig=all reaches BBMap: the default `best` never writes secondary alignments.
                 { assert (
                     ['SAMPLE1_PE', 'SAMPLE2_PE', 'SAMPLE3_PE_1'].every { sample ->
                         path("${params.outdir}/samtools/megahit.${sample}.flagstat")
@@ -45,21 +43,14 @@ nextflow_pipeline {
                     }
                 ) },
 
-                // === --featurecounts_fraction actually reaches featureCounts: with real
-                // multi-mapped reads present, at least one ORF's count is fractional -- Subread
-                // only ever emits fractional counts when --fraction is in effect. ===
+                // --fraction reaches featureCounts: only it produces fractional counts.
                 { assert (
                     path("${params.outdir}/summary_tables/megahit.prodigal.counts.tsv.gz")
                         .csv(sep: '\t', decompress: true, header: true).rows
                         .any { r -> (r["count"] as double) != Math.floor(r["count"] as double) }
                 ) },
 
-                // === Fractional weighting keeps totals conserved, not inflated: a multi-mapped
-                // read still contributes at most ~1.0 total across all the ORFs it hits, so the
-                // sum of counts for a sample can never exceed that sample's total primary mapped
-                // reads (it will usually be well below, since not every mapped read lands inside
-                // a called CDS). Without --fraction (full weight per site), this would very
-                // likely be violated instead. ===
+                // Fractional weighting cannot push a sample's total above its mapped reads.
                 { assert (
                     ['SAMPLE1_PE', 'SAMPLE2_PE', 'SAMPLE3_PE_1'].every { sample ->
                         def primary_reads = path("${params.outdir}/samtools/megahit.${sample}.flagstat")

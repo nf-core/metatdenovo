@@ -37,14 +37,10 @@ nextflow_pipeline {
                 { assert path("${params.outdir}/megahit/megahit_assembly.log").readLines().any { l -> l.contains('ALL DONE') } },
                 { assert path("${params.outdir}/megahit/megahit_assembly.contigs.fa.gz").linesGzip.size() >= 4 },
                 { assert path("${params.outdir}/metaeuk/megahit.metaeuk_format.gff.gz").linesGzip.findAll { l -> l.contains('CDS') }.size() >= 2 },
-                // The behaviour this PR adds: MetaEuk's splice-aware, multi-exon gene call must
-                // be summed into ONE featureCounts row spanning both exon coordinates, not split
-                // into one row per exon (which is what the raw MetaEuk GFF, un-formatted, would do).
+                // A spliced MetaEuk gene is one featureCounts row, not one per exon.
                 { assert path("${params.outdir}/summary_tables/megahit.metaeuk.counts.tsv.gz").csv(sep: '\t', decompress: true, header: true).columns["chr"].any { c -> c.contains(';') } },
 
-                // Graceful degradation: with only one caller active, locus consolidation has
-                // nothing to merge, so the ID-inheritance rule must reproduce MetaEuk's own solo table
-                // exactly (same rows, minus the callers/n_calls provenance columns it adds).
+                // With one caller, the locus table must equal MetaEuk's own (minus provenance).
                 { assert (
                     ['orf', 'chr', 'start', 'end', 'strand', 'length', 'sample', 'count', 'tpm'].collect { c ->
                         path("${params.outdir}/summary_tables/megahit.metaeuk.counts.tsv.gz").csv(sep: '\t', decompress: true, header: true).columns[c]
@@ -60,13 +56,8 @@ nextflow_pipeline {
                         .every { r -> r["callers"] == 'metaeuk' && (r["n_calls"] as int) == 1 }
                 ) },
 
-                // MetaEuk's own two outputs disagree on ORF ids -- its protein fasta header is
-                // target|contig|strand|bitscore|evalue|nExons|lowCoord|... while the gff's TCS_ID (and
-                // hence the counts tables) is target|contig|strand|lowCoord. Every join keyed on 'orf'
-                // (eggnog/kofamscan/dbcan/eukulele summary tables) silently returns zero rows unless
-                // the two are reconciled, and no test caught it because every metaeuk profile skips
-                // those tools. Assert the reconciliation directly: the published protein fasta's
-                // sequence ids must be exactly the set of ORF ids in the counts table.
+                // MetaEuk's fasta headers and gff TCS_IDs differ, so every 'orf' join is empty unless reconciled:
+                // fasta ids must equal the counts table's ORF ids.
                 { assert (
                     path("${params.outdir}/metaeuk/megahit.metaeuk_format.faa.gz").linesGzip
                         .findAll { l -> l.startsWith('>') }

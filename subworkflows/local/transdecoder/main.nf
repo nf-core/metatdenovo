@@ -18,18 +18,7 @@ workflow TRANSDECODER {
 
     main:
 
-    // TransDecoder.LongOrfs works per-transcript, so splitting into batches (same
-    // rationale/mechanism as PROKKA_SUBSETS/METAEUK) is safe there. TransDecoder.Predict is a
-    // different story: it self-trains a coding/noncoding hexamer model from the top longest
-    // ORFs in whatever input it's given (-T, default 500 of the top 5000 candidates), and its
-    // CLI has no option to reuse a model trained elsewhere. Batching therefore means each
-    // batch trains its own model from its own slice of the assembly rather than one model
-    // over the whole thing -- the same ORF sequence can in principle score slightly
-    // differently depending on which batch it lands in. A large --transdecoder_batchsize
-    // (bigger than the assembly) recovers the unbatched, single-model behaviour exactly; the
-    // default trades some of that consistency for the same resilience/resume benefits
-    // Prokka and MetaEuk batching already get -- a killed/failed batch only costs re-running
-    // that batch, not a multi-hour whole-assembly job.
+    // Predict self-trains per batch, so a batch size above the assembly size recovers unbatched results.
     ch_batches = fasta
         .map { _meta, contigs -> contigs }
         .splitFasta(size: batchsize, file: true)
@@ -37,13 +26,7 @@ workflow TRANSDECODER {
 
     TRANSDECODER_LONGORF ( ch_batches )
 
-    // TRANSDECODER_LONGORF.out.folder carries no meta, so pairing it with ch_batches
-    // positionally (as two separate process inputs) relies on both channels emitting in the
-    // same order -- which isn't guaranteed once batches run concurrently: a smaller/faster
-    // batch's LongOrfs can finish before an earlier, bigger batch's, silently swapping which
-    // fasta gets paired with which batch's LongOrfs directory. Join explicitly on id instead,
-    // recovered from the folder's own parent directory name (LONGORF names it
-    // "${meta.id}/${fasta_no_gz}.transdecoder_dir").
+    // LongOrfs output has no meta and emits out of order; join on the id from its parent dir name.
     ch_predict_in = ch_batches
         .map { meta, ctg -> [ meta.id, meta, ctg ] }
         .join( TRANSDECODER_LONGORF.out.folder.map { folder -> [ folder.getParent().getName(), folder ] } )

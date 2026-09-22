@@ -26,10 +26,10 @@ process TIDYVERSE_STRIPCDSPREFIX {
     library(dplyr)
     library(stringr)
 
-    # The output name matches the staged input, which is a symlink. Write elsewhere and rename,
-    # or write_tsv follows the symlink and overwrites the upstream task's cached file.
+    # Output name equals the staged input symlink: write elsewhere and rename,
+    # or write_tsv overwrites the upstream task cache.
     read_tsv("${counts}", show_col_types = FALSE) %>%
-        # Transdecoder appends "cds." to ORF IDs in the gff file, but does not in the fasta file. Remove to make compatible between tables.
+        # TransDecoder prefixes gff ORF IDs with "cds.", but not fasta ones.
         mutate(orf = str_remove(orf, '^cds\\\\.')) %>%
         write_tsv("stripped.counts.tsv.gz")
 
@@ -50,9 +50,7 @@ process TIDYVERSE_STRIPCDSPREFIX {
     stub:
     prefix = task.ext.prefix ?: "${meta.id}"
     """
-    # ${prefix}.counts.tsv.gz matches the staged input's own filename, a symlink -- write
-    # elsewhere and mv into place rather than redirect straight into it, which would follow
-    # the symlink and overwrite the input task's cached file.
+    # Same symlink hazard as above: write elsewhere, then mv.
     echo "" | gzip > stub.counts.tsv.gz
     mv -f stub.counts.tsv.gz ${prefix}.counts.tsv.gz
 

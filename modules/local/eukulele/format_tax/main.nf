@@ -27,7 +27,6 @@ process FORMAT_EUKULELE_TAX {
     library(dplyr)
     library(tidyr)
 
-    # Create and write a table with taxonomy categories in each column
     read_tsv("${taxtable}") %>%
         select(-1) %>%
         rename(orf = transcript_name) %>%
