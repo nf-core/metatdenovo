@@ -11,14 +11,13 @@ workflow EGGNOG {
     take:
     faa           // channel: [ val(meta), path(faa) ]
     feature_counts // channel: [ val(meta), path(fcs) ] -- meta.caller must match faa's
+    db_url         // string: URL of eggnog.db.gz
+    dmnd_url       // string: URL of eggnog_proteins.dmnd.gz
+    taxa_url       // string: URL of eggnog.taxa.tar.gz
 
     main:
 
-    EGGNOG_DOWNLOAD(
-        file('http://eggnog5.embl.de/download/emapperdb-5.0.2/eggnog.db.gz'),
-        file('http://eggnog5.embl.de/download/emapperdb-5.0.2/eggnog_proteins.dmnd.gz'),
-        file('http://eggnog5.embl.de/download/emapperdb-5.0.2/eggnog.taxa.tar.gz')
-    )
+    EGGNOG_DOWNLOAD( file(db_url), file(dmnd_url), file(taxa_url) )
 
     ch_search_mode_db = EGGNOG_DOWNLOAD.out.dmnd.map { dmnd -> [ 'diamond', dmnd ] }
 

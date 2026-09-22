@@ -798,7 +798,7 @@ workflow METATDENOVO {
     // SUBWORKFLOW: run eggnog_mapper on the ORF-called amino acid sequences
     //
     if ( ! skip_eggnog ) {
-        EGGNOG(ch_protein, ch_fcs_for_summary)
+        EGGNOG(ch_protein, ch_fcs_for_summary, params.eggnog_db_url, params.eggnog_dmnd_url, params.eggnog_taxa_url)
         ch_merge_tables   = ch_merge_tables.mix ( EGGNOG.out.sumtable )
         ch_parquet_tables = ch_parquet_tables.mix( EGGNOG.out.emappertsv.map { _meta, tsv -> tsv } )
     }
