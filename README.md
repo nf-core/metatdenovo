@@ -36,7 +36,7 @@ On release, automated continuous integration tests run the pipeline on a full-si
 5. Optional: Normalize the sequencing depth with [`BBnorm`](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbnorm-guide/)
 6. Merge trimmed, pair-end reads ([`Seqtk`](https://github.com/lh3/seqtk))
 7. Choice of de novo assembly programs:
-   1. [`RNAspades`](https://cab.spbu.ru/software/rnaspades/) suggested for both prokaryote and eukaryote assembly
+   1. [`SPAdes`](https://github.com/ablab/spades), by default rnaSPAdes (`--spades_flavor`), suggested for both prokaryote and eukaryote assembly
    2. [`Megahit`](https://github.com/voutcn/megahit) suggested for both prokaryote and eukaryote assembly; requires less resources
 8. Assembly statistics ([`QUAST`](https://github.com/ablab/quast))
 9. Choice of one or more ORF callers, and/or user-supplied ORFs:
