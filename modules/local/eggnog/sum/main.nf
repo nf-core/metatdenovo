@@ -30,7 +30,6 @@ process EGGNOG_SUM {
     library(stringr)
     library(tidyverse)
 
-    # call the tables into variables
     eggnog <- read_tsv("${eggnog}", show_col_types = FALSE )
 
     counts <- list.files(pattern = "*.counts.tsv.gz") %>%

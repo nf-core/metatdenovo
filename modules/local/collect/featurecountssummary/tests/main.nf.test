@@ -9,9 +9,7 @@ nextflow_process {
     tag "collect"
     tag "collect/featurecountssummary"
 
-    // Input is built inline rather than read from a fixture: the pipeline repo carries no test
-    // data of its own. Shape matches SUBREAD_FEATURECOUNTS's own *.summary output: a "Status"
-    // column plus one data column per BAM.
+    // Shape of SUBREAD_FEATURECOUNTS *.summary: a Status column plus one column per BAM.
 
     test("one file per Unassigned_* category is emitted, Assigned is skipped") {
 
@@ -104,8 +102,7 @@ nextflow_process {
         }
 
         then {
-            // Only one Unassigned_* category here, so the output glob collapses to a bare
-            // path rather than a list -- wrap it before treating it as a collection.
+            // One Unassigned_* category makes the glob a bare path, so wrap it.
             def outfiles = process.out.unassigned[0][1]
             outfiles = outfiles instanceof List ? outfiles : [ outfiles ]
             assertAll(
@@ -132,8 +129,7 @@ nextflow_process {
         }
 
         then {
-            // Only one Unassigned_* category here, so the output glob collapses to a bare
-            // path rather than a list -- wrap it before treating it as a collection.
+            // One Unassigned_* category makes the glob a bare path, so wrap it.
             def outfiles = process.out.unassigned[0][1]
             outfiles = outfiles instanceof List ? outfiles : [ outfiles ]
             def nofeatures = path(outfiles[0]).csv(sep: '\t', header: true)

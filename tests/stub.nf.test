@@ -16,16 +16,13 @@ nextflow_pipeline {
 
         then {
             def succeeded = workflow.trace.succeeded()
-            // WorkflowTask.name carries the trace file's own "name" column: the fully
-            // qualified process path plus a "(tag)" suffix -- strip the tag before counting.
+            // Trace names carry a "(tag)" suffix; strip it before counting.
             def countsByProcess = succeeded.collect { it.name.replaceAll(/ \(.*\)$/, '') }.countBy { it }
             def tasksFor = { String processName -> countsByProcess.findAll { name, _n -> name.endsWith(":${processName}") }.values().sum() ?: 0 }
 
             assertAll(
                 { assert workflow.success },
-                // One task per active protein set (prokka, transdecoder, the mmseqs-clustered
-                // consolidation) reaching each annotation tool -- if a channel-wiring change
-                // ever drops one of the three, exactly one of these silently goes to 1 or 2.
+                // One task per protein set (prokka, transdecoder, consolidated) for each annotation tool.
                 { assert tasksFor('EGGNOGMAPPER') == 3 },
                 { assert tasksFor('KOFAMSCAN_SCAN') == 3 },
                 { assert tasksFor('RUNDBCAN_CAZYMEANNOTATION') == 3 },

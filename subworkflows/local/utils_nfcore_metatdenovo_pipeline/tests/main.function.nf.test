@@ -7,11 +7,7 @@ nextflow_function {
     tag "utils_nfcore_metatdenovo_pipeline"
     tag "subworkflows/utils_nfcore_metatdenovo_pipeline"
 
-    // See https://github.com/nf-core/metatdenovo/issues/478: Nextflow's classic CLI
-    // parser hands boolean/integer params through as raw strings, and nf-schema's
-    // validateParameters() does not coerce the real `params` binding (only a
-    // throwaway copy it uses for its own validation). These functions are the
-    // fix -- they're what workflows/metatdenovo.nf calls at the top of `main:`.
+    // CLI params arrive as strings ('false' is truthy); these functions coerce them.
 
     test("typecastBooleanParam passes an already-real Boolean through unchanged") {
         function "typecastBooleanParam"

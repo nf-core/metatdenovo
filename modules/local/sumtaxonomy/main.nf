@@ -26,13 +26,11 @@ process SUMTAXONOMY {
 
     library(tidyverse)
 
-    # Read the taxonomy and counts tables
     taxonomy <- read_tsv("${taxonomy}", show_col_types = FALSE )
 
     counts <- read_tsv("${feature_counts}", show_col_types = FALSE) %>%
         mutate(sample = as.character(sample))
 
-    # Join the two and count the number of ORFs with assigned taxonomy
     counts %>%
         inner_join(taxonomy, by = 'orf') %>%
         group_by(sample) %>%

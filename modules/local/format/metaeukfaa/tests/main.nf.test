@@ -9,9 +9,7 @@ nextflow_process {
     tag "format"
     tag "format/metaeukfaa"
 
-    // Inputs are built inline rather than read from a fixture: the pipeline repo carries no
-    // test data of its own, and a two-record MetaEuk fasta is small enough to state literally.
-    // The headers below are real MetaEuk output from the pipeline's own metaeuk test profile.
+    // Real headers from the metaeuk test profile.
 
     test("metaeuk fasta - headers rewritten to the gff id form") {
 
@@ -37,10 +35,8 @@ nextflow_process {
             def ids = path(process.out.format_faa[0][1]).linesGzip.findAll { l -> l.startsWith('>') }
             assertAll(
                 { assert process.success },
-                // Fields 1,2,3,7 of the header -- NOT the first four, which would wrongly keep the
-                // bitscore (310/318) and drop the low coordinate (0/191) the gff id actually uses.
+                // Fields 1,2,3,7, not the first four: field 4 is the bitscore.
                 { assert ids == ['>NP_011412.1|k59_0|+|0', '>NP_011412.1|k59_1|-|191'] },
-                // Sequence lines must pass through untouched.
                 { assert path(process.out.format_faa[0][1]).linesGzip.findAll { l -> !l.startsWith('>') }.size() == 3 },
                 { assert snapshot(process.out.format_faa).match() }
             )
@@ -61,8 +57,7 @@ nextflow_process {
         }
 
         then {
-            // A silently passed-through header would produce ids that stop matching the gff, which
-            // is exactly the failure mode this module exists to prevent -- so it must error instead.
+            // Passing a short header through would break the gff id match, so it must error.
             assert process.failed
         }
     }

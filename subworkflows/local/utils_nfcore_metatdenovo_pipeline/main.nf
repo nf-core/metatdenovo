@@ -226,12 +226,7 @@ def validateInputSamplesheet(input) {
 }
 
 //
-// Nextflow's classic CLI parser hands boolean/integer params through as raw
-// strings (`--skip_dbcan false` -> the *string* 'false', which is truthy in
-// Groovy). nf-schema's validateParameters() does not fix this -- it only
-// type-casts a throwaway copy of params used for its own validation, never
-// the real `params` binding. Coerce explicitly at the read site instead.
-// See https://github.com/nf-core/metatdenovo/issues/478.
+// CLI params arrive as strings ('false' is truthy) and nf-schema does not coerce `params` itself.
 //
 def typecastBooleanParam(String name) {
     def value = params.get(name)

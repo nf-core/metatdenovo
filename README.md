@@ -25,7 +25,7 @@
 
 On release, automated continuous integration tests run the pipeline on a full-sized dataset on the AWS cloud infrastructure. This ensures that the pipeline runs on AWS, has sensible resource allocation defaults set to run on real-world datasets, and permits the persistent storage of results to benchmark between pipeline releases and other analysis sources. The results obtained from the full-sized test can be viewed on the [nf-core website](https://nf-co.re/metatdenovo/results).
 
-## Usage
+## Pipeline summary
 
 ![nf-core/metatdenovo metro map](docs/images/metat-metromap.png)
 
@@ -36,26 +36,29 @@ On release, automated continuous integration tests run the pipeline on a full-si
 5. Optional: Normalize the sequencing depth with [`BBnorm`](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbnorm-guide/)
 6. Merge trimmed, pair-end reads ([`Seqtk`](https://github.com/lh3/seqtk))
 7. Choice of de novo assembly programs:
-   1. [`RNAspades`](https://cab.spbu.ru/software/rnaspades/) suggested for both prokaryote and eukaryote assembly
+   1. [`SPAdes`](https://github.com/ablab/spades), by default rnaSPAdes (`--spades_flavor`), suggested for both prokaryote and eukaryote assembly
    2. [`Megahit`](https://github.com/voutcn/megahit) suggested for both prokaryote and eukaryote assembly; requires less resources
-8. Choice of orf caller:
+8. Assembly statistics ([`QUAST`](https://github.com/ablab/quast))
+9. Choice of one or more ORF callers, and/or user-supplied ORFs:
    1. [`TransDecoder`](https://github.com/TransDecoder/TransDecoder) suggested for eukaryotes; only ORFs
-   2. [`MetaEuk`](https://github.com/soedinglab/metaeuk) suggested for eukaryotes; splice-aware, requires a reference protein database
+   2. [`MetaEuk`](https://github.com/soedinglab/metaeuk) suggested for eukaryotes; splice-aware, uses a reference protein database (downloaded automatically if not given)
    3. [`Prokka`](https://github.com/tseemann/prokka) suggested for prokaryotes; ORFs and other features plus functional annotation
-   4. [`Prodigal`](https://github.com/hyattpd/Prodigal) suggested for Prokaryotes; only ORFs
-9. Quantification of genes identified in assemblies:
-   1. Generate index of assembly ([`BBmap index`](https://sourceforge.net/projects/bbmap/))
-   2. Mapping cleaned reads to the assembly for quantification ([`BBmap`](https://sourceforge.net/projects/bbmap/))
-   3. Get raw counts per each gene present in the assembly ([`Featurecounts`](http://subread.sourceforge.net)) -> TSV table with collected featurecounts output
-10. Functional annotation:
+   4. [`Prodigal`](https://github.com/hyattpd/Prodigal) suggested for prokaryotes; only ORFs
+10. Consolidation of ORF calls: calls from different callers on the same contig are merged into loci, and proteins are clustered across contigs ([`MMseqs2`](https://github.com/soedinglab/MMseqs2))
+11. Quantification of genes identified in assemblies:
+    1. Generate index of assembly ([`BBmap index`](https://sourceforge.net/projects/bbmap/))
+    2. Mapping cleaned reads to the assembly for quantification ([`BBmap`](https://sourceforge.net/projects/bbmap/))
+    3. Get raw counts per each gene present in the assembly ([`Featurecounts`](http://subread.sourceforge.net)) -> TSV table with collected featurecounts output
+12. Functional annotation:
     1. [`Prokka`](https://github.com/tseemann/prokka) feature identification and annotation for prokaryotes
     2. [`eggNOG-mapper`](https://github.com/eggnogdb/eggnog-mapper)
     3. [`KofamScan`](https://github.com/takaram/kofam_scan)
-    4. [`HMMER`](https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch) search ORFs with a set of HMM profiles, and rank results
-11. Taxonomic annotation:
+    4. [`dbCAN`](https://github.com/bcb-unl/run_dbcan) CAZyme annotation
+    5. [`HMMER`](https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch) search ORFs with a set of HMM profiles, and rank results
+13. Taxonomic annotation:
     1. [`EUKulele`](https://github.com/AlexanderLabWHOI/EUKulele)
     2. [`Diamond`](https://github.com/bbuchfink/diamond)
-12. Summary statistics.
+14. Summary statistics.
 
 ## Usage
 

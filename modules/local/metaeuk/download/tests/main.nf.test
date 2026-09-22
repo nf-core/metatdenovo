@@ -9,8 +9,7 @@ nextflow_process {
     tag "metaeuk"
     tag "metaeuk/download"
 
-    // A real (non-stub) run downloads and builds a full MetaEuk reference database
-    // (the smallest of which is still far too large for CI), so only the stub is tested here.
+    // Real databases are far too large for CI, so stub only.
     test("UniRef50 - stub") {
 
         options "-stub"
@@ -30,8 +29,7 @@ nextflow_process {
 
     }
 
-    // A db_name with a `/` (e.g. UniProtKB/Swiss-Prot, from `metaeuk databases -h`) can't be
-    // used directly as a directory/prefix name -- this is the case that exercises db_dir.
+    // A db_name containing "/" exercises db_dir.
     test("UniProtKB/Swiss-Prot - stub") {
 
         options "-stub"

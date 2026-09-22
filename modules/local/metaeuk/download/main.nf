@@ -10,9 +10,7 @@ process METAEUK_DOWNLOAD {
     input:
     val db_name
 
-    // storeDir (below, in conf/modules.config) only allows val/path outputs, so this process
-    // reports no version itself -- METAEUK_EASYPREDICT already reports the same tool's version
-    // on every run that reaches it.
+    // storeDir allows only val/path outputs, so no version here; METAEUK_EASYPREDICT reports it.
     output:
     path "${db_dir}", emit: database
 
@@ -20,11 +18,8 @@ process METAEUK_DOWNLOAD {
     task.ext.when == null || task.ext.when
 
     script:
-    // Some names `metaeuk databases -h` lists contain a `/` (e.g. UniProtKB/Swiss-Prot), which
-    // can't be a directory/prefix name -- db_dir is a filesystem-safe stand-in used only for
-    // that, kept distinct per db_name so storeDir doesn't reuse one database's cache for
-    // another. The prefix inside db_dir doesn't need to match db_name: METAEUK_EASYPREDICT finds
-    // it later from whichever *.version file is actually there.
+    // Some db names contain "/" (UniProtKB/Swiss-Prot), so db_dir is a filesystem-safe name,
+    // distinct per db_name so storeDir caches never collide.
     db_dir = db_name.replaceAll('[^A-Za-z0-9_.-]', '_')
     def args = task.ext.args ?: ''
     """

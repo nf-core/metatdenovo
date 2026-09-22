@@ -8,9 +8,6 @@ nextflow_workflow {
     tag "subworkflows_local"
     tag "transdecoder"
 
-    // Inputs are built inline rather than read from a fixture: the pipeline repo carries no
-    // test data of its own.
-
     test("a much bigger batch must not be paired with a smaller batch's LongOrfs output") {
 
         config "./nextflow.config"
@@ -18,13 +15,7 @@ nextflow_workflow {
         when {
             workflow {
                 """
-                // 'big' is ~500x the length of 'small', so TransDecoder.LongOrfs takes
-                // measurably longer on it -- forcing it to finish AFTER 'small' even though
-                // it's submitted first. TRANSDECODER_LONGORF.out.folder carries no meta, so if
-                // TRANSDECODER_PREDICT pairs it with ch_batches positionally (submission order)
-                // rather than a real join by id, 'big's fasta gets 'small's LongOrfs directory
-                // and vice versa -- exactly what happened on the real 82M-contig run, where
-                // contigs.1's fasta was paired with contigs.78's LongOrfs directory.
+                // 'big' is ~500x 'small', so its LongOrfs finishes last; catches positional pairing with Predict.
                 def rng   = new Random(42)
                 def bases = ['A', 'C', 'G', 'T']
                 def big   = (1..150000).collect { bases[rng.nextInt(4)] }.join()

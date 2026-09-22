@@ -9,8 +9,6 @@ nextflow_process {
     tag "format"
     tag "format/gff2bed"
 
-    // Inputs are built inline rather than read from a fixture: the pipeline repo carries no
-    // test data of its own, and a couple of CDS lines are small enough to state literally.
 
     test("cds with ID= attribute - bed line produced") {
 
@@ -31,8 +29,7 @@ nextflow_process {
         then {
             assertAll(
                 { assert process.success },
-                // The "(^|;)ID=" anchor must grab the real ID= attribute, not something inside the
-                // Target_ID=/TCS_ID= attributes that also contain the substring "ID=".
+                // Must match the real ID=, not the substring inside Target_ID=/TCS_ID=.
                 { assert path(process.out.bed[0][1]).csv(sep: "\t", header: false).rows[0] ==
                     ["C0": "k1", "C1": 0, "C2": 100, "C3": "prokka:gene1", "C4": 0, "C5": "+"] }
             )
@@ -56,9 +53,7 @@ nextflow_process {
         }
 
         then {
-            // A silently empty id would make this locus indistinguishable from every other CDS
-            // this caller ever fails to identify, merging unrelated loci downstream -- so it must
-            // error instead of writing a bed line with an empty name.
+            // An empty id would merge unrelated loci downstream, so it must error.
             assert process.failed
             assert process.errorReport.contains("ERROR: CDS record has no ID= attribute")
         }

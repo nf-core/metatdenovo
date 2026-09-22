@@ -22,7 +22,6 @@ process SEQTK_HMMHITFAAS {
     """
     mkdir hits/
 
-    # Loop over all unique profiles found in hmmrank, and call seqtk subseq for all orfs matching that profile
     for profile in \$(gunzip -c $hmmrank | grep -v '^profile' | cut -f 1 | sort -u); do
         seqtk subseq $faa <(gunzip -c $hmmrank | grep "^\${profile}" | cut -f 2) | gzip -c > hits/${prefix}.\${profile}.faa.gz
     done

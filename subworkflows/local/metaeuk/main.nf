@@ -20,10 +20,6 @@ workflow METAEUK {
 
     main:
 
-    // A pre-built database is used as-is; otherwise METAEUK_DOWNLOAD builds one under
-    // params.metaeuk_db_dir. db_name is a plain value rather than a channel, so METAEUK_DOWNLOAD
-    // runs exactly once and Nextflow reuses its single output for every fasta this subworkflow
-    // receives, same as any process whose inputs are plain values rather than queue channels.
     if ( db_path ) {
         ch_database = file(db_path, checkIfExists: true)
     } else {
@@ -31,11 +27,7 @@ workflow METAEUK {
         ch_database = METAEUK_DOWNLOAD.out.database
     }
 
-    // MetaEuk's splice-aware ORF calling is per-contig, so splitting the assembly into
-    // batches (same rationale/mechanism as PROKKA_SUBSETS) is safe, and directly bounds
-    // extractorfs's peak memory, which scales with however many contigs it's handed at
-    // once -- unlike Prokka, a killed/aborted batch here only costs re-running that batch,
-    // not the whole multi-hour, whole-assembly task.
+    // Calling is per-contig, so batching is safe and bounds extractorfs's peak memory.
     METAEUK_EASYPREDICT (
         fasta
             .map { _meta, contigs -> contigs }
@@ -54,8 +46,7 @@ workflow METAEUK {
 
     METAEUK_GFF_CAT(ch_gff)
 
-    // Both outputs get reformatted so the protein fasta's sequence ids and the gff's ID= attributes
-    // are the same string -- MetaEuk's own two outputs disagree, see FORMAT_METAEUKFAA.
+    // MetaEuk's fasta ids and gff ID= attributes disagree; both are reformatted to match.
     FORMAT_METAEUKFAA ( METAEUK_FAA_CAT.out.file_out )
     FORMAT_METAEUK_GFF ( METAEUK_GFF_CAT.out.file_out )
 

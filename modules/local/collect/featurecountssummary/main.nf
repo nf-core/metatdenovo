@@ -1,5 +1,4 @@
-// Safely quote a Groovy value as a single-quoted R string literal -- without this, a value
-// containing a quote or backslash could break the generated R syntax.
+// Quote a Groovy value as a single-quoted R string literal.
 def rq(v) {
     return "'" + v.toString().replace('\\', '\\\\').replace("'", "\\'") + "'"
 }
@@ -31,13 +30,10 @@ process COLLECT_FEATURECOUNTSSUMMARY {
     library(dplyr)
     library(stringr)
 
-    # CUSTOM_COLLECTSTATS names a table column from the text between a file's first and
-    # second dot, so name each output "<caller>.<Status>.featureCounts.tsv". Skip
-    # "Assigned": CUSTOM_COLLECTFEATURECOUNTS's own output already reports it, as the
-    # caller-named column.
+    # CUSTOM_COLLECTSTATS names columns from the text between the first two dots of a file name.
+    # Assigned is skipped: CUSTOM_COLLECTFEATURECOUNTS already reports it.
     summaries <- bind_rows(lapply(Sys.glob('*.featureCounts.tsv.summary'), function(f) {
-        # A caller name can contain regex metacharacters (only '.' is rejected upstream), so
-        # strip the suffix by literal length rather than matching it as a regex.
+        # Strip the suffix by length: caller names can contain regex metacharacters.
         suffix <- paste0('.', ${rq(meta.caller)}, '.featureCounts.tsv.summary')
         name <- basename(f)
         read_tsv(f, col_types = cols(Status = col_character(), .default = col_integer())) %>%
@@ -45,16 +41,13 @@ process COLLECT_FEATURECOUNTSSUMMARY {
             mutate(sample = if (str_ends(name, fixed(suffix))) str_sub(name, 1, -nchar(suffix) - 1) else name) %>%
             select(status = Status, sample, count)
     }))
-    # The `else name` branch above leaves the full filename as "sample" on a mismatched
-    # suffix, so this guard is what turns that into a failure instead of silently wrong stats.
+    # A mismatched suffix leaves the full filename as sample; fail rather than write wrong stats.
     stopifnot(
         "a *.featureCounts.tsv.summary filename didn't match the expected <sample>.<caller> pattern" =
             ! any(str_detect(summaries\$sample, '\\\\.featureCounts\\\\.tsv\\\\.summary\$'))
     )
 
-    # CUSTOM_COLLECTSTATS reads all fcs files together in one call, so every file must share
-    # the same columns as CUSTOM_COLLECTFEATURECOUNTS's own counts table, even though only
-    # sample/count are populated here.
+    # CUSTOM_COLLECTSTATS reads all files in one call, so columns must match CUSTOM_COLLECTFEATURECOUNTS.
     for ( s in unique(summaries\$status[str_starts(summaries\$status, 'Unassigned_')]) ) {
         summaries %>%
             filter(status == s) %>%
@@ -78,8 +71,6 @@ process COLLECT_FEATURECOUNTSSUMMARY {
     """
 
     stub:
-    // Single-quoted and quote-escaped, matching the same caller-name-safety concern as the
-    // script: block above, but for bash rather than R.
     def safeCaller = meta.caller.replace("'", "'\\''")
     """
     touch '${safeCaller}.Unassigned_NoFeatures.featureCounts.tsv'

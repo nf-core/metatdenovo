@@ -9,19 +9,14 @@ nextflow_process {
     tag "format"
     tag "format/locusconsolidate"
 
-    // Inputs are built inline rather than read from a fixture: the pipeline repo carries no test data
-    // of its own. Coordinates below are real -- the overlapping Prodigal pair is from the default test
-    // profile's own assembly, and the two-caller and multi-exon cases from test_metaeuk_transdecoder.
+    // Real coordinates from the default and test_metaeuk_transdecoder profiles.
 
     test("single caller - overlapping adjacent genes must NOT merge") {
 
         when {
             process {
                 """
-                // k141_102_5 and k141_102_6 are two distinct Prodigal genes that overlap on the same
-                // strand, the ordinary prokaryotic operon pattern. Merging on overlap alone fused
-                // them into one locus and summed their counts; only the caller condition keeps them
-                // apart. Input is BED, sorted by (chrom, start) as BEDTOOLS_SORT leaves it.
+                // Two distinct same-strand overlapping Prodigal genes: the caller rule keeps them apart.
                 def bed = file("\${workDir}/single.bed")
                 bed.text = [
                     ['k141_102', '4199', '5300', 'prodigal:k141_102_5', '0', '-'],
@@ -84,10 +79,7 @@ nextflow_process {
         when {
             process {
                 """
-                // Two exons of one spliced MetaEuk call. Both inherit the same locus id, so the GFF
-                // keeps a row each (featureCounts sums them as one meta-feature via -g ID) while
-                // provenance must collapse to one row -- a second row would fan out the join in
-                // COLLECT_LOCUSCONSOLIDATE and duplicate this locus's counts.
+                // Two exons of one spliced call: a GFF row each, but one provenance row.
                 def bed = file("\${workDir}/exons.bed")
                 bed.text = [
                     ['k59_1', '191',  '590',  'metaeuk:NP_011412.1|k59_1|-|191', '0', '-'],
@@ -116,10 +108,7 @@ nextflow_process {
         when {
             process {
                 """
-                // Real coordinates from a three-caller run. One spliced MetaEuk gene, with calls from
-                // the other two callers in the gap between its exons. Exon 1 closes a group on its
-                // own, exon 2 falls into the group the other callers build, and both must still end
-                // up in one locus.
+                // Spliced gene with other callers in its intron: both exons must share one locus.
                 def bed = file("\${workDir}/spliced.bed")
                 bed.text = [
                     ['k127_1000001', '3',   '450',  'metaeuk:UniRef50_D8LSF2|k127_1000001|-|3', '0', '-'],
@@ -161,8 +150,7 @@ nextflow_process {
         when {
             process {
                 """
-                // The case above with the exons swapped round: exon 1 is the one that merges, so the
-                // locus is already named from coordinates when exon 2 turns up alone.
+                // As above with exons swapped: exon 1 merges, exon 2 arrives alone.
                 def bed = file("\${workDir}/spliced_merge_first.bed")
                 bed.text = [
                     ['k141_7', '0',   '400',  'metaeuk:NP_012345.1|k141_7|+|0', '0', '+'],
@@ -217,15 +205,8 @@ nextflow_process {
         when {
             process {
                 """
-                // Three calls sharing a start on one contig and strand: two from one caller, one from
-                // the other. A greedy sweep absorbs whichever equal-start call it meets first, so the
-                // result used to depend on which caller's BED was concatenated first -- and that
-                // changes whenever a caller's task re-runs into a different work directory. Measured
-                // on the full-size test data, the same 91863 calls gave 68829, 68826 or 68828 loci
-                // depending only on that order.
-                //
-                // The rows below are fed in the reverse of the module's own total order, so a module
-                // that trusted its input order would group them differently from a sorted feed.
+                // Equal-start calls from two callers, fed in reverse of the module sort order,
+                // so trusting input order would group them differently.
                 def bed = file("\${workDir}/ties.bed")
                 bed.text = [
                     ['k141_500', '1000', '1900', 'transdecoder:k141_500.p1', '0', '+'],
@@ -243,10 +224,8 @@ nextflow_process {
             def prov = path(process.out.provenance[0][1]).linesGzip.findAll { l -> !l.startsWith('ID\t') }
             assertAll(
                 { assert process.success },
-                // In the module's own order the two prokka calls come first, shortest end first.
-                // GENE_00001 opens a locus; GENE_00002 shares its caller so it cannot join and starts
-                // a new one; the transdecoder call then merges into that second locus. So GENE_00001
-                // stays alone and the merged locus spans to 1900.
+                // Sorted: GENE_00001 opens a locus, GENE_00002 (same caller) starts another, and
+                // the transdecoder call joins the second.
                 { assert gff.size() == 2 },
                 { assert gff.any { l -> l.contains('ID=locus_k141_500_1001_1900_+') } },
                 { assert gff.any { l -> l.endsWith('ID=GENE_00001') } },

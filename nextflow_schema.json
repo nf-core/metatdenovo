@@ -472,6 +472,27 @@
                     "fa_icon": "far fa-file-code",
                     "help_text": "This parameter specifies the location of the EGGNOG database or where it will be created using the --create_eggnog_db parameter. The directory must exist."
                 },
+                "eggnog_db_url": {
+                    "type": "string",
+                    "default": "http://eggnog5.embl.de/download/emapperdb-5.0.2/eggnog.db.gz",
+                    "description": "URL to download the eggNOG annotation database from.",
+                    "fa_icon": "fas fa-link",
+                    "hidden": true
+                },
+                "eggnog_dmnd_url": {
+                    "type": "string",
+                    "default": "http://eggnog5.embl.de/download/emapperdb-5.0.2/eggnog_proteins.dmnd.gz",
+                    "description": "URL to download the eggNOG Diamond database from.",
+                    "fa_icon": "fas fa-link",
+                    "hidden": true
+                },
+                "eggnog_taxa_url": {
+                    "type": "string",
+                    "default": "http://eggnog5.embl.de/download/emapperdb-5.0.2/eggnog.taxa.tar.gz",
+                    "description": "URL to download the eggNOG taxonomy database from.",
+                    "fa_icon": "fas fa-link",
+                    "hidden": true
+                },
                 "skip_kofamscan": {
                     "type": "boolean",
                     "description": "If enabled, skips the run of KofamScan.",

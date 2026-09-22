@@ -46,11 +46,6 @@ CONTROL_REP1,AEG588A1_S1_L004_R1_001.fastq.gz,AEG588A1_S1_L004_R2_001.fastq.gz
 
 #### Full samplesheet
 
-<!-- I commented out text about single-end samples as we don't know whether this works yet. -->
-<!-- The pipeline will auto-detect whether a sample is single- or paired-end using the information provided in the samplesheet. The samplesheet can have as many columns as you desire, however, there is a strict requirement for the first 3 columns to match those defined in the table below. -->
-
-<!-- A final samplesheet file consisting of both single- and paired-end data may look something like the one below. This is for 6 samples, where `TREATMENT_REP3` has been sequenced twice. -->
-
 A final samplesheet file consisting of samples taken at time 0 and 24 in triplicate may look like the one below.
 
 ```csv title="samplesheet.csv"
@@ -63,11 +58,11 @@ T24b,AEG588A5_S2_L002_R1_001.fastq.gz,AEG588A5_S2_L002_R2_001.fastq.gz
 T24c,AEG588A6_S3_L002_R1_001.fastq.gz,AEG588A6_S3_L002_R2_001.fastq.gz
 ```
 
-| Column    | Description                                                                                                                                                                            |
-| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `sample`  | Custom sample name. This entry will be identical for multiple sequencing libraries/runs from the same sample. Spaces in sample names are automatically converted to underscores (`_`). |
-| `fastq_1` | Full path to FastQ file for Illumina short reads 1. The file has to have the extension ".fastq" or ".fq", followed by ".gz" if gzipped.                                                |
-| `fastq_2` | Full path to FastQ file for Illumina short reads 2. The file has to have the extension ".fastq" or ".fq", followed by ".gz" if gzipped.                                                |
+| Column    | Description                                                                                                                                       |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `sample`  | Custom sample name. This entry will be identical for multiple sequencing libraries/runs from the same sample. Sample names cannot contain spaces. |
+| `fastq_1` | Full path to FastQ file for Illumina short reads 1. The file has to have the extension ".fastq" or ".fq", followed by ".gz" if gzipped.           |
+| `fastq_2` | Full path to FastQ file for Illumina short reads 2. The file has to have the extension ".fastq" or ".fq", followed by ".gz" if gzipped.           |
 
 An [example samplesheet](../assets/samplesheet.csv) has been provided with the pipeline.
 
@@ -124,7 +119,7 @@ None of these parameters have a pipeline default; when left unset, Megahit uses 
 See the [Megahit documentation](https://github.com/voutcn/megahit) for the full meaning of these options, and [Coping with large datasets](usage/large_datasets.md) for concrete starting values and where these fit relative to [digital normalization](#digital-normalization) above.
 
 The workflow also supports Spades (`--assembler spades` ) as an alternative.
-The default "flavour" of Spades is set to RNA, but this can be changed using the `--spades_flavor` parameter (see [parameter documentation](/metatdenovo/parameters/#spades_flavor))
+The default "flavour" of Spades is set to RNA, but this can be changed using the `--spades_flavor` parameter (see [parameter documentation](https://nf-co.re/metatdenovo/parameters#spades_flavor)).
 
 You can also choose to input contigs from an assembly that you made outside the pipeline using the `--user_assembly file.fna.gz` (where `file.fna.gz` is the name of a fasta file with contigs) parameter.
 When you use your own assembly, the name of this -- used in output file names -- can be set using the `--user_assembly_name` parameter.
@@ -146,8 +141,8 @@ It requires a reference protein database.
 By default the pipeline downloads and builds one automatically the first time it's needed, using MetaEuk's own `metaeuk databases` command, and caches it under `--metaeuk_db_dir` (default `./metaeuk_db/`) so later runs reuse it instead of re-downloading.
 `--metaeuk_db_name` (default `UniRef50`) picks which database to build.
 
-The database itself, and the URL it's fetched from, are entirely MetaEuk's own -- the pipeline doesn't maintain a separate mapping of names to URLs, only the list of names it allows `--metaeuk_db_name` to be.
-That list is restricted to the amino-acid databases `metaeuk databases -h` offers (its nucleotide and profile entries aren't valid MetaEuk homology references), but since the actual download depends on MetaEuk's own logic and a third-party host we don't control, we can only vouch for the ones we've actually confirmed downloadable ourselves:
+Allowed names are the amino-acid databases `metaeuk databases -h` offers.
+MetaEuk itself fetches them from third-party hosts, so only the ones below are confirmed to download:
 
 | Name                   | Confirmed downloadable | Notes                                                                                                                                                         |
 | ---------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -161,12 +156,11 @@ That list is restricted to the amino-acid databases `metaeuk databases -h` offer
 | `GTDB`                 | –                      | bacterial/archaeal genomes -- a strange choice as a homology reference for MetaEuk's eukaryote-targeted gene calling, but included since the tool supports it |
 | `PDB`                  | –                      | download failed 2026-09-01: `ftp.wwpdb.org` didn't resolve                                                                                                    |
 
-A dash means we simply haven't tried it, not that it's known broken -- update this table (with today's date) whenever you confirm one works, and add a short note if one fails.
+A dash means untested, not known broken.
 
-`UniRef50` is tens of gigabytes and can take a long time to download and format -- pick a smaller database with `--metaeuk_db_name` if that's a concern, or build one ahead of time and skip the download entirely with `--metaeuk_db` (below).
-
-If a suitable database already exists -- built outside the pipeline, shared from another run, or anything else you'd rather point at directly -- pass it with `--metaeuk_db`, either a protein fasta file or a directory containing an mmseqs2-formatted database.
-This takes priority over `--metaeuk_db_name`/`--metaeuk_db_dir`, which are then ignored:
+To use an existing database, pass it with `--metaeuk_db`, either a protein fasta file or a directory containing an MMseqs2-formatted database.
+This takes priority over `--metaeuk_db_name`/`--metaeuk_db_dir`, which are then ignored.
+To build one ahead of time:
 
 ```bash
 metaeuk databases UniRef50 metaeuk_uniref50/UniRef50 tmp
@@ -206,15 +200,12 @@ The short Prodigal calls are not necessarily wrong -- small proteins are real, a
 
 #### Provide your own ORFs
 
-You can add one or more sets of pre-called ORFs to the pipeline with `--user_orfs orfs.csv`, a comma-separated
-file with a header row and three columns: `name`, `gff`, `faa`. Each row supplies one named set of ORFs (a gff
-file and its matching amino acid fasta), and is treated exactly like another `--orf_caller` value from that
-point on -- it takes part in locus consolidation, protein consolidation and feature counting alongside
-whichever built-in callers are also active.
+You can add one or more sets of pre-called ORFs with `--user_orfs orfs.csv`, a comma-separated file with a header row and three columns: `name`, `gff`, `faa`.
+Each row supplies one named set of ORFs (a gff file and its matching amino acid fasta), and is treated exactly like another `--orf_caller` value: it takes part in locus consolidation, protein consolidation and feature counting alongside any built-in callers.
+For a single set, `--user_orfs_gff` and `--user_orfs_faa` (optionally with `--user_orfs_name`) are a shorter alternative.
 
-`--user_orfs` is additive with `--orf_caller`, not mutually exclusive with it: provide `--orf_caller`,
-`--user_orfs`, or both, but at least one of them is required. Every row's `name` must be unique, and cannot
-collide with an active `--orf_caller` value.
+User ORFs are additive with `--orf_caller`: provide `--orf_caller`, user ORFs, or both, but at least one is required.
+Every `name` must be unique, and cannot collide with an active `--orf_caller` value.
 
 ```csv title="orfs.csv"
 name,gff,faa
@@ -223,7 +214,7 @@ my_caller,orfs.gff.gz,orfs.faa.gz
 
 ### Read mapping and quantification options
 
-After assembly and ORF calling, reads are mapped back to the assembly with BBMap and quantified per ORF/CDS with featureCounts, producing the `summary_tables/<assembly>.<orfcaller>.counts.tsv.gz` tables (and, when multiple ORF callers are active, the locus-consolidated table described above).
+After assembly and ORF calling, reads are mapped back to the assembly with BBMap and quantified per ORF/CDS with featureCounts, producing the `summary_tables/<assembly>.<orfcaller>.counts.tsv.gz` tables and the consolidated tables described [below](#consolidating-calls-for-the-same-gene).
 
 A read can align equally well to more than one site in the assembly.
 `--bbmap_ambiguous` controls how BBMap handles that:
@@ -235,7 +226,7 @@ A read can align equally well to more than one site in the assembly.
 | toss            | Treat the read as unmapped          |
 | all             | Retain every top-scoring site       |
 
-`best`, `random` and `toss` all guarantee at most one reported alignment per read, which is exactly what the counts tables above -- and the locus consolidation described above ([issue #463](https://github.com/nf-core/metatdenovo/issues/463)), and any future cross-contig consolidation -- assume when summing counts per ORF or locus: a read is never counted more than once.
+`best`, `random` and `toss` all guarantee at most one reported alignment per read, which the counts tables and the consolidated tables assume when summing counts per ORF, locus or cluster: a read is never counted more than once.
 `all` deliberately breaks that guarantee: a read can legitimately count toward more than one ORF.
 
 `--featurecounts_fraction` controls how featureCounts treats reads with more than one reported alignment.
@@ -292,7 +283,9 @@ So the effect is modest in absolute terms, a few percent of loci at most, but tw
 If you run a single caller and are watching runtime, `--skip_protein_consolidation` costs you little.
 Lowering `--cluster_min_seq_id` is what makes the step start merging paralogs and strain variants, so change it deliberately rather than to "make something happen".
 
-By default, every active ORF source (each `--orf_caller`/`--user_orfs` entry) is annotated on its own, in addition to the cluster representatives above -- with N sources active, that means the same annotation search runs on essentially the same gene up to N+1 times, regardless of how few loci consolidation actually merged. `--annotate_only_consolidated` (default `true`) restricts EGGNOG, KOFAMSCAN, DBCAN, EUKULELE, DIAMOND_TAXONOMY and HMMCLASSIFY to just the consolidated representatives instead, so the two-caller example above would be annotated once (68300 proteins) rather than three times. It silently has no effect with a single ORF source active, or with `--skip_protein_consolidation`, since there is nothing consolidated to restrict to in either case.
+With more than one ORF source active, only the cluster representatives are annotated by eggNOG-mapper, KofamScan, dbCAN, EUKulele, Diamond taxonomy and HMMER, so the two-caller example above is annotated once (68300 proteins) rather than three times.
+Set `--annotate_only_consolidated false` to also annotate every source's own proteins.
+With a single ORF source, or with `--skip_protein_consolidation`, every source is annotated on its own.
 
 ```bash
 nextflow run nf-core/metatdenovo -profile docker --outdir results/ --input samplesheet.csv --assembler megahit --orf_caller metaeuk,transdecoder --metaeuk_db /path/to/db --cluster_min_seq_id 0.95
@@ -306,16 +299,8 @@ Metatdenovo uses two different programs for taxonomy annotation: EUKulele and Di
 
 EUKulele can be run with different reference datasets.
 The default dataset is PhyloDB (`--eukulele_db phylodb` ) which works for mixed communities of prokaryotes and eukaryotes.
-Other database options for running the pipeline are MMETSP (`--eukulele_db mmetsp`; for marine protists) and GTDB (`--eukulele_db gtdb`; for prokarytes
-[under development]).
-
-Options:
-
-- PhyloDB: default, covers both prokaryotes and eukaryotes
-- MMETSP: marine protists
-- GTDB: prokaryotes, both bacteria and archaea
-
-You can also provide your own database, see the [EUKulele documentation](https://eukulele.readthedocs.io/en/latest/#) documentation.
+Other database options for running the pipeline are MMETSP (`--eukulele_db mmetsp`; for marine protists) and GTDB (`--eukulele_db gtdb`; for prokaryotes, both bacteria and archaea).
+You can also provide your own database, see the [EUKulele documentation](https://eukulele.readthedocs.io/en/latest/#).
 
 Databases are automatically downloaded by the workflow, but if you already have them available you can use the `--eukulele_dbpath path/to/db` pointing
 to the root directory of the EUKulele databases.
@@ -326,9 +311,8 @@ to the root directory of the EUKulele databases.
 #### Taxonomic annotation with Diamond
 
 The Diamond taxonomy-annotation process uses Diamond database files (`.dmnd` files) that have been prepared with taxonomy information.
-Currently we are only supplying a single standard databases, for GTDB release R09-RS220.
+We supply a single standard database, for GTDB release R09-RS220.
 This is provided in collaboration with SciLifeLab Data Center and can be downloaded from here: [GTDB (R09RS220) taxonomy database](https://figshare.scilifelab.se/articles/dataset/nf-core_metatdenovo_taxonomy/28211678), DOI: https://doi.org/10.17044/scilifelab.28211678.
-We hope to add more later.
 
 To make your own database, you will need to collect four files: a protein fasta file, the `names.dmp` and `nodes.dmp` files from an
 NCBI-style taxon dump plus a mapping file in which protein accessions are translated into taxon ids.
@@ -336,7 +320,7 @@ NCBI-style taxon dump plus a mapping file in which protein accessions are transl
 ##### Building a database with nf-core/createtaxdb
 
 The recommended way to build your own taxonomy-aware Diamond database is with [nf-core/createtaxdb](https://nf-co.re/createtaxdb), which wraps `diamond makedb` and its taxonomy inputs into a reproducible pipeline of its own.
-Below is a worked example that builds and validates a database from [MarFERReT](https://zenodo.org/records/10170983) v1.1, a curated marine microbial eukaryote protein reference -- useful if your community has a substantial eukaryotic fraction not well represented in NCBI RefSeq/GTDB (see also [Coping with large datasets](usage/large_datasets.md) and [issue #459](https://github.com/nf-core/metatdenovo/issues/459) for related eukaryote-focused work).
+Below is a worked example that builds and validates a database from [MarFERReT](https://zenodo.org/records/10170983) v1.1, a curated marine microbial eukaryote protein reference -- useful if your community has a substantial eukaryotic fraction not well represented in NCBI RefSeq/GTDB.
 
 A minimal `samplesheet.csv`:
 
@@ -382,10 +366,10 @@ Once you have a `.dmnd` plus the `names.dmp`/`nodes.dmp` you used to build it, w
 ##### Building an NCBI NR/RefSeq database with nf-core/createtaxdb
 
 > [!WARNING]
-> Unlike the MarFERReT example above, this one has **not** been run end-to-end -- it's the createtaxdb equivalent of the manual NCBI NR procedure in the next section below, built by direct analogy, not validated in practice.
-> NR is a much larger database than MarFERReT (the manual procedure's own comment says the FASTA download alone "takes a loooong time"), so expect a correspondingly long build and high memory use if you try this.
-> One thing this example can't confirm without actually running it: the manual procedure below pipes the FASTA through `sed '/^>/s/ .*//'` to strip descriptive text after each accession before `diamond makedb` sees it, because the taxonmap lookup needs to match on the bare accession.
-> It's not verified here whether createtaxdb's own `DIAMOND_MAKEDB` wrapping does that same stripping internally or expects pre-cleaned input -- if the taxonmap join comes out empty or wrong, that header-cleaning step is the first thing to check.
+> Unlike the MarFERReT example above, this one has **not** been run end-to-end.
+> NR is much larger than MarFERReT, so expect a long build and high memory use.
+> The manual procedure below strips everything after the accession in each FASTA header (`sed '/^>/s/ .*//'`), because the taxonmap lookup matches on the bare accession.
+> If the taxonomy comes out empty or wrong, check whether createtaxdb needs pre-cleaned headers too.
 
 Using the same NCBI sources as the manual procedure below, a `samplesheet.csv`:
 
@@ -413,7 +397,7 @@ nextflow run nf-core/createtaxdb -r dev -profile docker -params-file params.yml
 ```
 
 `nodesdmp`/`namesdmp` still need pre-extracting from the [taxonomy dump](ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz) first, same as gotcha 2 above.
-`dbname: refseq` matches the naming already used for this database in the `diamond_dbs.csv` example below, though note that NCBI NR and NCBI RefSeq are not literally the same underlying data -- this follows the manual procedure's own choice of source, not a claim that NR is a perfect stand-in for RefSeq specifically.
+`dbname: refseq` matches the `diamond_dbs.csv` example below, although NCBI NR and NCBI RefSeq are not the same data.
 
 ##### Building a database manually
 
@@ -441,9 +425,7 @@ wget ftp://ftp.ncbi.nih.gov/pub/taxonomy/accession2taxid/prot.accession2taxid.FU
 gunzip -c nr.gz | sed '/^>/s/ .*//' | diamond makedb --taxonmap prot.accession2taxid.FULL.gz --taxonnames names.dmp --taxonnodes nodes.dmp --db ncbi-nr.taxonomy.dmnd
 ```
 
-We are also, in collaboration with SciLifeLab Data Center, providing a [GTDB (R09RS220) taxonomy database](https://figshare.scilifelab.se/articles/dataset/nf-core*metatdenovo_taxonomy/28211678), DOI: https://doi.org/10.17044/scilifelab.28211678.
-
-_Note_: If you can't download the files from FigShare from the command line with `wget` or `curl`, try URLs looking like
+_Note_: If you can't download the GTDB files from FigShare from the command line with `wget` or `curl`, try URLs looking like
 `https://ndownloader.figshare.com/files/52095806` instead of the ones you get from the web page.
 Also note, that the files do not get the correct file names when you download from the command line.
 Use a command like `wget -O gtdb-r220.names.dmp https://ndownloader.figshare.com/files/52095806`.
@@ -482,14 +464,14 @@ Besides the functional annotation that the gene caller Prokka gives (see above) 
 programs available in the workflow: the [eggNOG-mapper](http://eggnog-mapper.embl.de/) and
 [KofamScan](https://github.com/takaram/kofam_scan).
 Both are suitable for both prokaryotic and eukaryotic genes and both are run by default, but can be skipped using the `--skip_eggnog` and
-`--skip_kofamscan` options respectivelly.
+`--skip_kofamscan` options respectively.
 The tools use large databases which are downloaded automatically but paths can be provided by the user through the `--eggnog_dbpath directory`
 and `--kofam_dir dir` parameters respectively.
 It is practical to let the pipeline download the files on the first run, and then reuse the data by setting the parameters.
 
 :::note
 Currently, the standard download procedure for the eggNOG database using the `download_eggnog_data.py` tool (v.2.1.9) doesn't work because the domain it tries to download from doesn't exist.
-Since release 1.4.0, this pipeline therefore fetches files directly from [the current download site](http://eggnog5.embl.de/download/emapperdb-5.0.2) instead, using Nextflow's own file staging so it works even on compute nodes without network access.
+The pipeline instead fetches the files directly from [the current download site](http://eggnog5.embl.de/download/emapperdb-5.0.2), using Nextflow's own file staging so it works even on compute nodes without network access.
 :::
 
 :::note
@@ -506,7 +488,7 @@ Since the pipeline only runs dbCAN's protein-mode CAZyme annotation (not its gen
 database assets to save space and time.
 
 A more targeted annotation option offered by the workflow is the possibility for the user to provide a set of
-[HMMER HMM profiles](http://eddylab.org/software/hmmer/Userguide.pdf) through the `--hmmdir dir` or `hmmfiles file0.hmm,file1.hmm,...,filen.hmm`
+[HMMER HMM profiles](http://eddylab.org/software/hmmer/Userguide.pdf) through the `--hmmdir dir` or `--hmmfiles file0.hmm,file1.hmm,...,filen.hmm`
 parameters.
 Each HMM file will be used to search the amino acid sequences of the ORF set and the results will be summarized in a tab separated file in
 which each ORF-HMM combination will be ranked according to score and E-value.
@@ -560,7 +542,7 @@ run_dbcan database --db_dir dbcan --aws_s3 --no-cgc
 ## Example pipeline command with some common features
 
 ```bash
-nextflow run nf-core/metatdenovo -profile docker --input samplesheet.csv --assembler spades --orf_caller prokka --eukulele_db gtdb
+nextflow run nf-core/metatdenovo -profile docker --input samplesheet.csv --outdir results --assembler spades --orf_caller prokka --eukulele_db gtdb
 ```
 
 In this example, we are running metatdenovo with `spades` as assembler, `prokka` as ORF caller and EUKulele with the GTDB database for taxonomic annotation. eggNOG-mapper runs by default, as do the other annotation tools; each can be turned off with its own `--skip_*` parameter.
@@ -570,7 +552,7 @@ Note that the pipeline will create the following files in your working directory
 ```bash
 work                # Directory containing the nextflow working files
 <OUTDIR>            # Finished results in specified location (defined with --outdir)
-.nextflow_log       # Log file from Nextflow
+.nextflow.log       # Log file from Nextflow
 # Other nextflow hidden files, eg. history of pipeline runs and old logs.
 ```
 
@@ -590,9 +572,9 @@ with:
 
 ```yaml title="params.yaml"
 input: 'samplesheet.csv'
+outdir: 'results'
 assembler: 'spades'
 orf_caller: 'prokka'
-eggnog: true
 eukulele_db: 'gtdb'
 <...>
 ```
@@ -615,7 +597,7 @@ First, go to the [nf-core/metatdenovo releases page](https://github.com/nf-core/
 
 This version number will be logged in reports when you run the pipeline, so that you'll know what you used when you look back in the future. For example, at the bottom of the MultiQC reports.
 
-To further assist in reproducibility, you can use share and reuse [parameter files](#running-the-pipeline) to repeat pipeline runs with the same settings without having to write out a command with every single parameter.
+To further assist in reproducibility, you can use share and reuse [parameter files](#example-pipeline-command-with-some-common-features) to repeat pipeline runs with the same settings without having to write out a command with every single parameter.
 
 > [!TIP]
 > If you wish to share such profile (such as upload as supplementary material for academic publications), make sure to NOT include cluster specific paths to files, nor institutional specific profiles.

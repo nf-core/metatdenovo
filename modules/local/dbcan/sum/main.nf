@@ -28,7 +28,6 @@ process DBCAN_SUM {
     library(stringr)
     library(tidyverse)
 
-    # call the tables into variables
     dbcan <- read_tsv("${dbcan}", show_col_types = FALSE )
 
     counts <- list.files(pattern = "*.counts.tsv.gz") %>%

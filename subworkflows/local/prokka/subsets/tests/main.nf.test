@@ -15,19 +15,14 @@ nextflow_workflow {
         when {
             workflow {
                 """
-                // The default prokka_batchsize is 10 MB, so every pipeline profile produces a
-                // single batch and nothing downstream of the split has ever seen more. Two
-                // contigs plus the 1.KB batch size below give one batch each.
-                // Real sequence, not synthetic: PROKKA runs on synthetic sequence but Prodigal
-                // calls no genes, and PROKKAGFF2TSV then fails on the empty table.
+                // Two contigs with a 1.KB batch size give two batches.
+                // Real sequence: Prodigal calls no genes on synthetic sequence, and PROKKAGFF2TSV fails on the empty table.
                 def seq = file(params.modules_testdata_base_path + 'genomics/sarscov2/genome/genome.fasta')
                     .readLines()
                     .findAll { l -> ! l.startsWith('>') }
                     .join()
 
-                // Both contigs carry the same genome under different names. A shorter slice
-                // would do, except PROKKA calls no genes on a few kb of it, and a contig with
-                // no features cannot show that both batches reach the concatenated gff.
+                // Same genome under two names; PROKKA calls no genes on a shorter slice.
                 def fasta = file("\${workDir}/contigs.fasta")
                 fasta.text = [ '>contig_a', seq, '>contig_b', seq, '' ].join('\\n')
 
@@ -47,8 +42,7 @@ nextflow_workflow {
                 { assert summary.contains('contigs: 2') },
                 { assert summary.readLines().find { l -> l.startsWith('CDS:') }?.split(':')[1]?.trim()?.toInteger() > 0 },
 
-                // A per-assembly sample name. PROKKA's per-batch files all carry the same
-                // literal "Genus species strain", which would collide in MultiQC.
+                // Per-assembly name; per-batch files all say "Genus species strain".
                 { assert summary.contains('organism: Genus species test_prokka') },
 
                 // Both batches reach the concatenated outputs, not just one.

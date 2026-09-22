@@ -1,7 +1,6 @@
 process FORMAT_LOCUSCONSOLIDATE {
     tag "$meta.id"
-    // Buffers provenance and members for every locus until END, so memory scales with the number
-    // of called ORFs rather than being streamed; process_medium rather than process_low for that.
+    // Buffers every locus until END, so memory scales with ORF count.
     label 'process_medium'
 
     conda "${moduleDir}/environment.yml"
@@ -24,50 +23,14 @@ process FORMAT_LOCUSCONSOLIDATE {
     script:
     prefix = task.ext.prefix ?: "${meta.id}"
 
-    // Groups overlapping CDS calls into loci, from a BED sorted by (chrom, start) whose name column
-    // is "<caller>:<original ID>" (see FORMAT_GFF2BED).
-    //
-    // The grouping rule is the point of this module: two calls join the same locus only if they
-    // overlap on the same strand AND come from callers not already in that group. Plain interval
-    // merging cannot express that second condition, and getting it wrong is not a corner case --
-    // prokaryotic genes overlap each other routinely (the classic 4 bp ATGA operon overlap), so
-    // merging on overlap alone fuses adjacent genes from ONE caller into a single locus. Measured on
-    // this pipeline's own default test data, that fused 515 of 3470 Prodigal ORFs (14.8%) into 238
-    // shared loci, silently summing the counts of genes that are not the same gene.
-    //
-    // With the caller condition, a single-caller run can never merge anything, so every locus has one
-    // contributor, inherits that ORF's own ID, and the consolidated counts table is identical in
-    // content to that caller's own -- the graceful-degradation property this level is supposed to
-    // have. A locus with several contributors gets a fresh coordinate-derived ID instead.
-    //
-    // Grouping is a single greedy sweep in sorted order, so it is deterministic but not "optimal":
-    // in a chain A(caller1) - B(caller2) - C(caller1), B binds to A and C starts a new locus.
-    //
-    // Because the sweep is greedy, WHICH call a locus absorbs depends on the order equal-start calls
-    // arrive in, so the input is re-sorted here on a total order over the fields that matter --
-    // chrom, start, end, strand, name -- rather than trusting the upstream sort. Ordering by
-    // (chrom, start) alone leaves ties to be broken by whatever order the per-caller BEDs happened to
-    // be concatenated in, which changes when a caller's task re-runs into a different work directory.
-    // Measured on the full-size test data (91863 calls, 16335 coordinate groups holding more than one
-    // call): 68829 loci with one caller's BED first, 68826 with the other's, 68828 shuffled. With the
-    // sort below, all three give 68829. LC_ALL=C so the name comparison is byte order everywhere
-    // rather than whatever collation the host locale supplies.
-    //
-    // Provenance and members are accumulated by locus ID and written at END rather than per group,
-    // because a multi-exon gene contributes several non-overlapping groups that all inherit the same
-    // ID. Emitting per group would repeat that ID with per-segment counts, and any consumer joining
-    // on it would fan out and duplicate the locus's counts.
-    //
-    // An ORF belongs to exactly one locus. A spliced gene's exons fall into several groups, so
-    // flush() looks its members up in a per-contig ORF-to-locus map and reuses the locus found there
-    // instead of naming a new one. A locus keeps the ID its first group gave it, so one with several
-    // contributors can be named after a contributing ORF rather than its coordinates; the provenance
-    // table is what records how many callers agreed.
+    // Groups overlapping CDS calls (BED name "<caller>:<ID>") into loci. Calls join a locus only if
+    // they overlap on the same strand and come from a caller not yet in it: same-caller genes overlap
+    // routinely and must stay separate. Single-contributor loci keep the ORF ID.
+    // The sweep is greedy, so the input is re-sorted on a total order to make ties deterministic.
     """
     LC_ALL=C sort -k1,1 -k2,2n -k3,3n -k6,6 -k4,4 ${sorted_bed} \\
         | awk 'BEGIN { FS = OFS = "\\t"; SEP = SUBSEP }
 
-        # Close the open group for one contig/strand: assign the locus its ID and record provenance.
         function flush(key,   i, n, parts, cnt, id, sep, seen_member, n_found) {
             if (!(key in g_end)) return
             n = split(g_members[key], parts, SEP)
@@ -76,9 +39,7 @@ process FORMAT_LOCUSCONSOLIDATE {
             for (i = 1; i <= n; i++) {
                 if (!(parts[i] in seen_member)) { seen_member[parts[i]] = 1; cnt++ }
             }
-            # Reuse the locus a member ORF is already in. Its other exons formed earlier groups, and
-            # a new ID here would split one gene over two loci -- the members table maps an ORF to one
-            # locus, so the other would end up with no protein and no counts.
+            # Reuse the locus a member ORF (an earlier exon) is already in, so a gene has one locus.
             id = ""
             n_found = 0
             for (i = 1; i <= n; i++) {
@@ -107,15 +68,12 @@ process FORMAT_LOCUSCONSOLIDATE {
             for (i = 1; i <= n; i++) {
                 if (!((id SEP parts[i]) in member_seen)) {
                     member_seen[id SEP parts[i]] = 1
-                    # if/else, not a ternary on the right of the assignment: some awks create the
-                    # target array element before evaluating the right-hand side, which would make
-                    # "id in prov_members" true on the first append and prepend an empty member.
+                    # if/else, not ternary: mawk creates the element before evaluating the RHS.
                     if (id in prov_members) prov_members[id] = prov_members[id] SEP parts[i]
                     else                    prov_members[id] = parts[i]
                 }
             }
-            # Drop all of the group state, not just g_end. There is one key per contig and strand, so
-            # anything left here is a row per contig for the rest of the run.
+            # Drop all group state; leftovers accumulate one row per contig.
             delete g_chrom[key]
             delete g_start[key]
             delete g_end[key]
@@ -124,16 +82,13 @@ process FORMAT_LOCUSCONSOLIDATE {
             delete g_members[key]
         }
 
-        # Groups never span contigs, so close them all when the contig changes. This keeps the
-        # ORF-to-locus map small and gives the last group on each contig a defined emission order,
-        # which an END sweep over an unordered array does not.
+        # Groups never span contigs; flushing per contig bounds memory and fixes emission order.
         function flush_contig(   i, n, keys) {
             n = 0
             for (i in open_keys) keys[++n] = i
             for (i = 1; i <= n; i++) flush(keys[i])
             delete open_keys
             delete orf_locus
-            # Locus ids are contig-scoped, so the member-dedup set can go with the contig too.
             delete member_seen
         }
 
@@ -173,10 +128,7 @@ process FORMAT_LOCUSCONSOLIDATE {
             for (p = 1; p <= n_prov; p++) {
                 id = prov_order[p]
                 n  = split(prov_members[id], parts, SEP)
-                # Members and callers are insertion-sorted, and the GFF is piped through sort above,
-                # so every output is a function of the locus content alone. Nothing here depends on
-                # the order intervals happened to arrive in, which keeps the files reproducible even
-                # if the upstream sort is not stable for ties.
+                # Sort members and callers so output depends only on locus content.
                 delete sorted_m
                 for (i = 1; i <= n; i++) {
                     for (j = i - 1; j >= 1 && sorted_m[j] > parts[i]; j--) sorted_m[j + 1] = sorted_m[j]
@@ -198,8 +150,7 @@ process FORMAT_LOCUSCONSOLIDATE {
                 }
                 callers = ""
                 for (j = 1; j <= n_callers; j++) callers = (j == 1 ? sorted[j] : callers "," sorted[j])
-                # n_calls counts the independent calls merged into this locus, i.e. distinct
-                # contributing ORFs -- not exon segments, and not intervals.
+                # n_calls: distinct contributing ORFs, not exon segments.
                 print id, callers, n | "gzip -c > ${prefix}.provenance.tsv.gz"
             }
         }'

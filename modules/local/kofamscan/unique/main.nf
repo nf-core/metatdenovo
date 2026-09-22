@@ -27,11 +27,8 @@ process KOFAMSCAN_UNIQUE {
     library(stringr)
 
     read_tsv("$kofamtsv", col_types = 'ccdddc') %>%
-        # Select first the best scoring hit
         group_by(orf) %>% filter(score == max(score)) %>% ungroup() %>%
-        # then the hit with the smallest evalue
         group_by(orf) %>% filter(evalue == min(evalue)) %>% ungroup() %>%
-        # and last the first row
         group_by(orf) %>% filter(row_number() == 1) %>% ungroup() %>%
         write_tsv("${prefix}.kofamscan-uniq.tsv.gz")
 

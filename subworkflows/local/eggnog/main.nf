@@ -11,29 +11,21 @@ workflow EGGNOG {
     take:
     faa           // channel: [ val(meta), path(faa) ]
     feature_counts // channel: [ val(meta), path(fcs) ] -- meta.caller must match faa's
+    db_url         // string: URL of eggnog.db.gz
+    dmnd_url       // string: URL of eggnog_proteins.dmnd.gz
+    taxa_url       // string: URL of eggnog.taxa.tar.gz
 
     main:
 
-    EGGNOG_DOWNLOAD(
-        file('http://eggnog5.embl.de/download/emapperdb-5.0.2/eggnog.db.gz'),
-        file('http://eggnog5.embl.de/download/emapperdb-5.0.2/eggnog_proteins.dmnd.gz'),
-        file('http://eggnog5.embl.de/download/emapperdb-5.0.2/eggnog.taxa.tar.gz')
-    )
+    EGGNOG_DOWNLOAD( file(db_url), file(dmnd_url), file(taxa_url) )
 
     ch_search_mode_db = EGGNOG_DOWNLOAD.out.dmnd.map { dmnd -> [ 'diamond', dmnd ] }
 
-    // The official module wants a single "eggnog_data" directory (--data_dir); stage the
-    // db/taxa/pkl files into one at task-staging time only, via the module's own stageAs,
-    // rather than restructuring EGGNOG_DOWNLOAD's own (storeDir-cached, so expensive to
-    // invalidate) flat output layout.
+    // EGGNOGMAPPER wants one data dir; stageAs builds it, leaving EGGNOG_DOWNLOAD's storeDir layout alone.
     ch_eggnog_data_dir = EGGNOG_DOWNLOAD.out.eggnog_db
         .combine(EGGNOG_DOWNLOAD.out.taxa_db)
         .combine(EGGNOG_DOWNLOAD.out.pkl)
-        // .first() makes this a value channel again. EGGNOG_DOWNLOAD takes no input, so its outputs
-        // are value channels and can be reused by every faa item, but .combine() demotes the result
-        // to a queue channel holding a single item -- which the first faa then consumes, leaving
-        // EGGNOGMAPPER to run exactly once no matter how many ORF callers are in faa. With several
-        // callers that silently annotated only the first of them. (.map() above does not demote.)
+        // .combine() demotes to a one-item queue channel, which would cap EGGNOGMAPPER at one task.
         .first()
 
     EGGNOGMAPPER(faa, ch_search_mode_db, ch_eggnog_data_dir)

@@ -19,6 +19,15 @@ input:
       type: file
       description: Feature count files
       pattern: "*.counts.tsv.gz"
+  - db_url:
+      type: string
+      description: URL of eggnog.db.gz
+  - dmnd_url:
+      type: string
+      description: URL of eggnog_proteins.dmnd.gz
+  - taxa_url:
+      type: string
+      description: URL of eggnog.taxa.tar.gz
 output:
   - hits:
       type: file
