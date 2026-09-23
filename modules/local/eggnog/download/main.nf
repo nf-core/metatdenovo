@@ -5,8 +5,8 @@ process EGGNOG_DOWNLOAD {
     conda "${moduleDir}/environment.yml"
     // An s3:// storeDir is staged by aws inside this container, which the eggnog-mapper image lacks.
     container "${ workflow.containerEngine in ['singularity', 'apptainer'] && !task.ext.singularity_pull_docker_container ?
-        'oras://community.wave.seqera.io/library/eggnog-mapper_awscli:34a6ca5baa89f396':
-        'community.wave.seqera.io/library/eggnog-mapper_awscli:635add8f85922662' }"
+        'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/c8/c8774aa73495d82609d5cc6b53f337a63336291727269e618b8569d5bd6bee71/data' :
+        'community.wave.seqera.io/library/eggnog-mapper_awscli_gzip_tar:318162c59a7e1aa7' }"
 
     input:
     path eggnog_db_gz
