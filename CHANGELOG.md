@@ -44,6 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Fixed`
 
+- [#545](https://github.com/nf-core/metatdenovo/pull/545) - Fix the eggNOG-mapper version reported by conda runs, which was the pipeline's own release tag instead of the tool's version (@erikrikarddaniel)
 - [#527](https://github.com/nf-core/metatdenovo/pull/527) - Fix the eggNOG database download URL (@erikrikarddaniel)
 - [#525](https://github.com/nf-core/metatdenovo/pull/525) - Fix eggNOG, KofamScan and dbCAN database downloads to an `s3://` directory on AWS Batch, and `--eukulele_dbpath` on `s3://`, addresses [#471](https://github.com/nf-core/metatdenovo/issues/471) (@danilodileo)
 - [#524](https://github.com/nf-core/metatdenovo/pull/524) - Fix BBNorm under Singularity/Apptainer when the host's `$TMPDIR` is not mounted in the container, addresses [#516](https://github.com/nf-core/metatdenovo/issues/516) (@erikrikarddaniel)
