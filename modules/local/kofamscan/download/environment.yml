@@ -6,3 +6,5 @@ channels:
 dependencies:
   - conda-forge::wget=1.21.4
   - conda-forge::awscli=2.36.42
+  - conda-forge::gzip=1.14
+  - conda-forge::tar=1.35

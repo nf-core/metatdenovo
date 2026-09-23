@@ -5,8 +5,8 @@ process KOFAMSCAN_DOWNLOAD {
     conda "${moduleDir}/environment.yml"
     // An s3:// storeDir is staged by aws inside this container, which the wget image lacks.
     container "${ workflow.containerEngine in ['singularity', 'apptainer'] && !task.ext.singularity_pull_docker_container ?
-        'oras://community.wave.seqera.io/library/wget_awscli:340260e7e9dd32f7':
-        'community.wave.seqera.io/library/wget_awscli:9510e6a6af2abe94' }"
+        'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/bc/bceb5c307eb199ae3eca0eecfd71a0a4a918ce90e6fd96ecc749603426337823/data' :
+        'community.wave.seqera.io/library/wget_awscli_gzip_tar:1fad694ee6322b7d' }"
 
     input:
     path ko_list_gz
