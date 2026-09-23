@@ -3,7 +3,7 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v1.5.0dev - [YYYY-mm-dd]
+## v2.0.0 - [YYYY-mm-dd]
 
 ### `Added`
 
@@ -71,6 +71,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 | trim-galore | 2.1.0            | 2.3.0       |
 | prokka      | 1.14.6           | 1.15.6      |
 | nft-utils   | 0.0.3            | 1.2.0       |
+
+## v1.4.1 - [2026-09-15]
+
+### `Fixed`
+
+- [#517](https://github.com/nf-core/metatdenovo/pull/517) - Fix BBNorm failing under Singularity/Apptainer when the host's `$TMPDIR` isn't bind-mounted into the container, closes issue [#513](https://github.com/nf-core/metatdenovo/issues/513) (@erikrikarddaniel)
 
 ## v1.4.0 - [2026-06-26]
 
