@@ -16,6 +16,7 @@ include { FORMAT_LOCUSCONSOLIDATE            } from '../modules/local/format/loc
 include { FORMAT_LOCUSFAA                    } from '../modules/local/format/locusfaa/'
 include { FORMATSPADES                       } from '../modules/local/format/spades/'
 include { MERGE_TABLES                       } from '../modules/local/merge/summary/'
+include { SAMTOOLS_TRIMHEADER                } from '../modules/local/samtools/trimheader/'
 include { FORMAT_DIAMOND_TAX_RANKLIST        } from '../modules/local/diamond/format_tax/ranklist/'
 include { FORMAT_DIAMOND_TAX_TAXDUMP         } from '../modules/local/diamond/format_tax/taxdump/'
 include { SUMTAXONOMY as SUM_DIAMONDTAX      } from '../modules/local/sumtaxonomy/'
@@ -664,7 +665,10 @@ workflow METATDENOVO {
         ch_assembly_contigs.map { meta, fasta -> [meta, fasta, []] }
     )
 
-    ch_featurecounts = BAM_SORT_STATS_SAMTOOLS.out.bam
+    // featureCounts crashes on a BAM header over 2 GiB, i.e. about 75M contigs
+    SAMTOOLS_TRIMHEADER ( BAM_SORT_STATS_SAMTOOLS.out.bam.join(BAM_SORT_STATS_SAMTOOLS.out.idxstats) )
+
+    ch_featurecounts = SAMTOOLS_TRIMHEADER.out.bam
         .combine(ch_gff)   // every sample x every caller
         .map { sampleMeta, bam, callerMeta, gff ->
             // Keep sample meta: FEATURECOUNTS_CDS reads single_end from it

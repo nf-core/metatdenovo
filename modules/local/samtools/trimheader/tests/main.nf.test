@@ -1,0 +1,101 @@
+nextflow_process {
+
+    name "Test Process SAMTOOLS_TRIMHEADER"
+    script "../main.nf"
+    process "SAMTOOLS_TRIMHEADER"
+
+    tag "modules"
+    tag "modules_local"
+    tag "samtools"
+    tag "samtools/trimheader"
+
+    // c2 has no reads, and the pair spans c1 and c3, so the mate reference must be renumbered too.
+    test("three contigs, one without reads") {
+
+        when {
+            process {
+                """
+                def sam = file("\${workDir}/test.sorted.sam")
+                sam.text = [
+                    ['@HD', 'VN:1.6', 'SO:coordinate'],
+                    ['@SQ', 'SN:c1', 'LN:100'],
+                    ['@SQ', 'SN:c2', 'LN:100'],
+                    ['@SQ', 'SN:c3', 'LN:100'],
+                    ['r1', '97',  'c1', '1', '60', '4M', 'c3', '1', '0', 'ACGT', 'IIII'],
+                    ['r1', '145', 'c3', '1', '60', '4M', 'c1', '1', '0', 'ACGT', 'IIII']
+                ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+
+                def idxstats = file("\${workDir}/test.idxstats")
+                idxstats.text = [
+                    ['c1', '100', '1', '0'],
+                    ['c2', '100', '0', '0'],
+                    ['c3', '100', '1', '0'],
+                    ['*', '0', '0', '0']
+                ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+
+                input[0] = [ [ id:'test' ], sam, idxstats ]
+                """
+            }
+        }
+
+        then {
+            // BGZF is multi-member gzip, which GZIPInputStream reads through.
+            def bytes = new java.util.zip.GZIPInputStream(new FileInputStream(process.out.bam[0][1])).bytes
+            def buf = java.nio.ByteBuffer.wrap(bytes).order(java.nio.ByteOrder.LITTLE_ENDIAN)
+            buf.position(4)
+            def text = new byte[buf.getInt()]
+            buf.get(text)
+            def refs = (1..buf.getInt()).collect {
+                def name = new byte[buf.getInt()]
+                buf.get(name)
+                buf.getInt()
+                new String(name, 0, name.length - 1)
+            }
+            def records = []
+            while (buf.hasRemaining()) {
+                def start = buf.position()
+                def size = buf.getInt()
+                def ref = buf.getInt()
+                buf.position(start + 24)
+                records << [ ref, buf.getInt() ]
+                buf.position(start + 4 + size)
+            }
+
+            assertAll(
+                { assert process.success },
+                { assert refs == [ 'c1', 'c3' ] },
+                { assert new String(text).findAll(/SN:\S+/) == [ 'SN:c1', 'SN:c3' ] },
+                { assert records == [ [ 0, 1 ], [ 1, 0 ] ] },
+                { assert process.out.bam[0][1].toString().endsWith('/test.sorted.bam') },
+                { assert snapshot(process.out.findAll { key, _val -> key.startsWith('versions') }).match() }
+            )
+        }
+
+    }
+
+    test("three contigs, one without reads - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                def bam = file("\${workDir}/test.sorted.bam")
+                bam.text = ''
+                def idxstats = file("\${workDir}/test.idxstats")
+                idxstats.text = ''
+                input[0] = [ [ id:'test' ], bam, idxstats ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+
+    }
+
+}
