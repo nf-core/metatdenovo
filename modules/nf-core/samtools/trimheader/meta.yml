@@ -1,9 +1,9 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
 name: "samtools_trimheader"
-description: Drop @SQ header lines for references without any reads, so a BAM against a very fragmented assembly stays below the 2 GiB header size that featureCounts can read
+description: Remove @SQ header lines for references without any reads, keeping every read. Some tools, such as featureCounts, cannot read a BAM header over 2 GiB, which a very fragmented assembly produces.
 keywords:
   - bam
   - header
+  - reference
   - samtools
 tools:
   - "samtools":
@@ -14,6 +14,13 @@ tools:
       doi: "10.1093/bioinformatics/btp352"
       licence: ["MIT"]
       identifier: biotools:samtools
+  - "gawk":
+      description: "GNU awk"
+      homepage: "https://www.gnu.org/software/gawk/"
+      documentation: "https://www.gnu.org/software/gawk/manual/"
+      tool_dev_url: "https://www.gnu.org/prep/ftp.html"
+      licence: ["GPL v3"]
+      identifier: ""
 input:
   - - meta:
         type: map
@@ -24,11 +31,12 @@ input:
         pattern: "*.bam"
         ontologies:
           - edam: "http://edamontology.org/format_2572"
-    - idxstats:
+    - bai:
         type: file
-        description: samtools idxstats output for the same BAM file
-        pattern: "*.idxstats"
-        ontologies: []
+        description: Index of the BAM file
+        pattern: "*.bai"
+        ontologies:
+          - edam: "http://edamontology.org/format_3327"
 output:
   bam:
     - - meta:
@@ -67,14 +75,14 @@ maintainers:
   - "@erikrikarddaniel"
 containers:
   docker:
-    linux/amd64:
-      name: community.wave.seqera.io/library/gawk_htslib_samtools:908360748e8474ae
-      build_id: bd-908360748e8474ae_1
-      scan_id: sc-ce0c86e6aa44a470_1
     linux/arm64:
       name: community.wave.seqera.io/library/gawk_htslib_samtools:b51955e87a26cfe5
       build_id: bd-b51955e87a26cfe5_1
       scan_id: sc-ab868510acd1f1e1_1
+    linux/amd64:
+      name: community.wave.seqera.io/library/gawk_htslib_samtools:908360748e8474ae
+      build_id: bd-908360748e8474ae_1
+      scan_id: sc-ce0c86e6aa44a470_1
   singularity:
     linux/amd64:
       name: oras://community.wave.seqera.io/library/gawk_htslib_samtools:4213d948f3b62e99
@@ -86,6 +94,6 @@ containers:
       https: https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/3b/3bb445ced9ac40e4d726fd8bcdb86925f0bc813c51a1f8936323735a12e5c85d/data
   conda:
     linux/amd64:
-      lock_file: modules/local/samtools/trimheader/.conda-lock/linux_amd64-bd-908360748e8474ae_1.txt
+      lock_file: modules/nf-core/samtools/trimheader/.conda-lock/linux_amd64-bd-908360748e8474ae_1.txt
     linux/arm64:
-      lock_file: modules/local/samtools/trimheader/.conda-lock/linux_arm64-bd-b51955e87a26cfe5_1.txt
+      lock_file: modules/nf-core/samtools/trimheader/.conda-lock/linux_arm64-bd-b51955e87a26cfe5_1.txt
