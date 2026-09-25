@@ -1,7 +1,7 @@
 {
     "-profile test_megahit_transdecoder": {
         "content": [
-            59,
+            62,
             {
                 "BBMAP_ALIGN": {
                     "bbmap": 39.18
@@ -94,6 +94,9 @@
                     "samtools": 1.24
                 },
                 "SAMTOOLS_STATS": {
+                    "samtools": 1.24
+                },
+                "SAMTOOLS_TRIMHEADER": {
                     "samtools": 1.24
                 },
                 "SEQTK_MERGEPE": {
@@ -260,10 +263,10 @@
                 "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tUnassigned_Ambiguity\tUnassigned_Chimera\tUnassigned_Duplicate\tUnassigned_FragmentLength\tUnassigned_MappingQuality\tUnassigned_MultiMapping\tUnassigned_NoFeatures\tUnassigned_NonSplit\tUnassigned_Overlapping_Length\tUnassigned_Read_Type\tUnassigned_Secondary\tUnassigned_Singleton\tUnassigned_Unmapped\ttransdecoder"
             ]
         ],
+        "timestamp": "2026-09-25T18:22:09.400522661",
         "meta": {
-            "nf-test": "0.9.3",
-            "nextflow": "25.10.4"
-        },
-        "timestamp": "2026-09-15T16:59:17.409409"
+            "nf-test": "0.9.4",
+            "nextflow": "26.04.6"
+        }
     }
 }

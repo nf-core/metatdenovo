@@ -1,7 +1,7 @@
 {
     "-profile test_annotate_only_consolidated": {
         "content": [
-            81,
+            84,
             {
                 "BBMAP_ALIGN": {
                     "bbmap": 39.18
@@ -145,6 +145,9 @@
                     "samtools": 1.24
                 },
                 "SAMTOOLS_STATS": {
+                    "samtools": 1.24
+                },
+                "SAMTOOLS_TRIMHEADER": {
                     "samtools": 1.24
                 },
                 "SEQKIT_GREP": {
@@ -315,10 +318,10 @@
                 "multiqc_citations.txt:md5,9af6aefe57f066cc7e3c782a93f48cf3"
             ]
         ],
+        "timestamp": "2026-09-25T17:13:32.70249126",
         "meta": {
-            "nf-test": "0.9.3",
-            "nextflow": "25.10.4"
-        },
-        "timestamp": "2026-09-15T12:43:00.341771"
+            "nf-test": "0.9.4",
+            "nextflow": "26.04.6"
+        }
     }
 }
