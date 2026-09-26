@@ -44,7 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Fixed`
 
-- [#NN](https://github.com/nf-core/metatdenovo/pull/NN) - Fix `--prokka_batchsize`, `--metaeuk_batchsize` and `--transdecoder_batchsize` rejecting sizes with units, such as `100.MB` (@erikrikarddaniel)
+- [#551](https://github.com/nf-core/metatdenovo/pull/551) - Fix `--prokka_batchsize`, `--metaeuk_batchsize` and `--transdecoder_batchsize` rejecting sizes with units, such as `100.MB` (@erikrikarddaniel)
 - [#548](https://github.com/nf-core/metatdenovo/pull/548) - Fix featureCounts failing on assemblies with more than about 75 million contigs, fixes [#547](https://github.com/nf-core/metatdenovo/issues/547) (@erikrikarddaniel)
 - [#545](https://github.com/nf-core/metatdenovo/pull/545) - Fix the eggNOG-mapper version reported by conda runs, which was the pipeline's own release tag instead of the tool's version (@erikrikarddaniel)
 - [#527](https://github.com/nf-core/metatdenovo/pull/527) - Fix the eggNOG database download URL (@erikrikarddaniel)
