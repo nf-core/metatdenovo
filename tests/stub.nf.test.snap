@@ -199,9 +199,6 @@
                 "SAMTOOLS_STATS": {
                     "samtools": 1.24
                 },
-                "SAMTOOLS_TRIMHEADER": {
-                    "samtools": 1.24
-                },
                 "SEQKIT_GREP": {
                     "seqkit": "2.13.0"
                 },
@@ -258,7 +255,7 @@
                 }
             }
         ],
-        "timestamp": "2026-09-25T18:41:12.299715745",
+        "timestamp": "2026-09-17T14:52:35.245420423",
         "meta": {
             "nf-test": "0.9.4",
             "nextflow": "26.04.6"
