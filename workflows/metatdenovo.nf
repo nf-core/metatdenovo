@@ -81,6 +81,7 @@ include { PIGZ_COMPRESS as PIGZ_TRANSDECODER_GFF     } from '../modules/nf-core/
 include { PIGZ_COMPRESS as PIGZ_TRANSDECODER_PEP     } from '../modules/nf-core/pigz/compress/'
 include { PIGZ_UNCOMPRESS as UNPIGZ_GFF              } from '../modules/nf-core/pigz/uncompress/'
 include { QUAST                                      } from '../modules/nf-core/quast/'
+include { SAMTOOLS_TRIMHEADER                        } from '../modules/nf-core/samtools/trimheader/'
 include { SEQTK_MERGEPE                              } from '../modules/nf-core/seqtk/mergepe/'
 include { SEQTK_SEQ as SEQTK_SEQ_CONTIG_FILTER       } from '../modules/nf-core/seqtk/seq/'
 include { SPADES                                     } from '../modules/nf-core/spades/'
@@ -130,6 +131,7 @@ workflow METATDENOVO {
     def skip_qc                    = typecastBooleanParam('skip_qc')
     def skip_trimming              = typecastBooleanParam('skip_trimming')
     def min_contig_length          = typecastIntegerParam('min_contig_length')
+    def trim_bam_header_above      = typecastIntegerParam('trim_bam_header_above')
 
     if ( ( params.assembler && params.user_assembly ) || ( ! params.assembler && ! params.user_assembly ) ) {
         error "Provide either `--assembler` or `--user_assembly`!"
@@ -664,7 +666,19 @@ workflow METATDENOVO {
         ch_assembly_contigs.map { meta, fasta -> [meta, fasta, []] }
     )
 
-    ch_featurecounts = BAM_SORT_STATS_SAMTOOLS.out.bam
+    // featureCounts crashes on a BAM header over 2 GiB, i.e. about 75M contigs; idxstats is about as large as the header
+    ch_sorted_bam = BAM_SORT_STATS_SAMTOOLS.out.bam
+        .join(BAM_SORT_STATS_SAMTOOLS.out.index)
+        .join(BAM_SORT_STATS_SAMTOOLS.out.idxstats)
+        .branch { _meta, _bam, _bai, idxstats ->
+            trim: idxstats.size() > trim_bam_header_above
+            keep: true
+        }
+
+    SAMTOOLS_TRIMHEADER ( ch_sorted_bam.trim.map { meta, bam, bai, _idxstats -> [ meta, bam, bai ] } )
+
+    ch_featurecounts = SAMTOOLS_TRIMHEADER.out.bam
+        .mix( ch_sorted_bam.keep.map { meta, bam, _bai, _idxstats -> [ meta, bam ] } )
         .combine(ch_gff)   // every sample x every caller
         .map { sampleMeta, bam, callerMeta, gff ->
             // Keep sample meta: FEATURECOUNTS_CDS reads single_end from it

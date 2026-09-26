@@ -299,6 +299,15 @@
                     "fa_icon": "fas fa-divide",
                     "description": "Count multi-mapped reads fractionally in featureCounts instead of at full weight per site",
                     "help_text": "Only has an effect on reads with more than one reported alignment, i.e. in practice when `--bbmap_ambiguous all` is used. With the default `false`, a read that maps to N sites contributes a full count to each of the N ORFs it hits; with `true`, it contributes 1/N to each instead, keeping per-sample totals from inflating."
+                },
+                "trim_bam_header_above": {
+                    "type": "integer",
+                    "default": 1073741824,
+                    "minimum": 0,
+                    "fa_icon": "fas fa-cut",
+                    "description": "Header size in bytes above which contigs without reads are removed from a BAM file before featureCounts",
+                    "help_text": "featureCounts cannot read a BAM header larger than 2 GiB, which an assembly of about 75 million contigs produces. Samples whose header, estimated from the size of their idxstats file, exceeds this size get a copy of their BAM file with only the contigs that have reads.",
+                    "hidden": true
                 }
             },
             "fa_icon": "fas fa-percentage"

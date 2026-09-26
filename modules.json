@@ -189,6 +189,11 @@
                         "git_sha": "9339809fcb90af8a8b7051e6cd914894d5c52002",
                         "installed_by": ["bam_stats_samtools"]
                     },
+                    "samtools/trimheader": {
+                        "branch": "master",
+                        "git_sha": "6ea7380463eee30a9792c0199aed8fd976abbdc0",
+                        "installed_by": ["modules"]
+                    },
                     "seqkit/grep": {
                         "branch": "master",
                         "git_sha": "504cddfc189c20124336b8f2c88cc97dbd543928",
