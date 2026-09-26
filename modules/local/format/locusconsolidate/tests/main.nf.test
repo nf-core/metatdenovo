@@ -1,0 +1,238 @@
+nextflow_process {
+
+    name "Test Process FORMAT_LOCUSCONSOLIDATE"
+    script "../main.nf"
+    process "FORMAT_LOCUSCONSOLIDATE"
+
+    tag "modules"
+    tag "modules_local"
+    tag "format"
+    tag "format/locusconsolidate"
+
+    // Real coordinates from the default and test_metaeuk_transdecoder profiles.
+
+    test("single caller - overlapping adjacent genes must NOT merge") {
+
+        when {
+            process {
+                """
+                // Two distinct same-strand overlapping Prodigal genes: the caller rule keeps them apart.
+                def bed = file("\${workDir}/single.bed")
+                bed.text = [
+                    ['k141_102', '4199', '5300', 'prodigal:k141_102_5', '0', '-'],
+                    ['k141_102', '5296', '6355', 'prodigal:k141_102_6', '0', '-']
+                ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+
+                input[0] = [ [ id:'test' ], bed ]
+                """
+            }
+        }
+
+        then {
+            def gff  = path(process.out.gff[0][1]).linesGzip
+            def prov = path(process.out.provenance[0][1]).linesGzip
+            assertAll(
+                { assert process.success },
+                // Two genes in, two loci out, each keeping its own Prodigal id.
+                { assert gff.size() == 2 },
+                { assert gff.every { l -> l.contains('ID=k141_102_') } },
+                { assert gff.any { l -> l.endsWith('ID=k141_102_5') } },
+                { assert gff.any { l -> l.endsWith('ID=k141_102_6') } },
+                // Nothing merged, so no synthesized id and every locus has one call.
+                { assert gff.every { l -> !l.contains('ID=locus_') } },
+                { assert prov.findAll { l -> !l.startsWith('ID\t') }.every { l -> l.endsWith('\tprodigal\t1') } },
+                { assert snapshot(process.out.gff, process.out.provenance, process.out.members).match() }
+            )
+        }
+    }
+
+    test("two callers overlapping - merge into one locus with a synthesized id") {
+
+        when {
+            process {
+                """
+                def bed = file("\${workDir}/two.bed")
+                bed.text = [
+                    ['k59_0', '0', '447', 'metaeuk:NP_011412.1|k59_0|+|0', '0', '+'],
+                    ['k59_0', '0', '447', 'transdecoder:k59_0.p1',         '0', '+']
+                ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+
+                input[0] = [ [ id:'test' ], bed ]
+                """
+            }
+        }
+
+        then {
+            def prov = path(process.out.provenance[0][1]).linesGzip.findAll { l -> !l.startsWith('ID\t') }
+            assertAll(
+                { assert process.success },
+                { assert path(process.out.gff[0][1]).linesGzip == ['k59_0\tlocus_consolidate\tCDS\t1\t447\t.\t+\t.\tID=locus_k59_0_1_447_+'] },
+                // Callers are sorted, and n_calls counts contributing ORFs.
+                { assert prov == ['locus_k59_0_1_447_+\tmetaeuk,transdecoder\t2'] },
+                { assert path(process.out.members[0][1]).linesGzip.findAll { l -> !l.startsWith('ID\t') }.size() == 2 }
+            )
+        }
+    }
+
+    test("multi-exon gene - one GFF row per exon but a single provenance row") {
+
+        when {
+            process {
+                """
+                // Two exons of one spliced call: a GFF row each, but one provenance row.
+                def bed = file("\${workDir}/exons.bed")
+                bed.text = [
+                    ['k59_1', '191',  '590',  'metaeuk:NP_011412.1|k59_1|-|191', '0', '-'],
+                    ['k59_1', '1101', '1149', 'metaeuk:NP_011412.1|k59_1|-|191', '0', '-']
+                ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+
+                input[0] = [ [ id:'test' ], bed ]
+                """
+            }
+        }
+
+        then {
+            def prov    = path(process.out.provenance[0][1]).linesGzip.findAll { l -> !l.startsWith('ID\t') }
+            def members = path(process.out.members[0][1]).linesGzip.findAll { l -> !l.startsWith('ID\t') }
+            assertAll(
+                { assert process.success },
+                { assert path(process.out.gff[0][1]).linesGzip.size() == 2 },
+                { assert prov == ['NP_011412.1|k59_1|-|191\tmetaeuk\t1'] },
+                { assert members.size() == 1 }
+            )
+        }
+    }
+
+    test("spliced gene whose exons straddle another locus stays one locus") {
+
+        when {
+            process {
+                """
+                // Spliced gene with other callers in its intron: both exons must share one locus.
+                def bed = file("\${workDir}/spliced.bed")
+                bed.text = [
+                    ['k127_1000001', '3',   '450',  'metaeuk:UniRef50_D8LSF2|k127_1000001|-|3', '0', '-'],
+                    ['k127_1000001', '560', '926',  'prokka:PAJFOBNA_01986',                    '0', '-'],
+                    ['k127_1000001', '560', '1115', 'transdecoder:k127_1000001.p2',             '0', '-'],
+                    ['k127_1000001', '656', '1115', 'metaeuk:UniRef50_D8LSF2|k127_1000001|-|3', '0', '-'],
+                    ['k127_1000001', '928', '1111', 'prokka:PAJFOBNA_01987',                    '0', '-']
+                ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+
+                input[0] = [ [ id:'test' ], bed ]
+                """
+            }
+        }
+
+        then {
+            def gff     = path(process.out.gff[0][1]).linesGzip
+            def prov    = path(process.out.provenance[0][1]).linesGzip.findAll { l -> !l.startsWith('ID\t') }
+            def members = path(process.out.members[0][1]).linesGzip.findAll { l -> !l.startsWith('ID\t') }
+            def loci_per_orf = members.groupBy { l -> l.split('\t')[1] + ':' + l.split('\t')[2] }
+                                      .collectEntries { orf, rows -> [orf, rows.collect { r -> r.split('\t')[0] }.unique().size()] }
+            assertAll(
+                { assert process.success },
+                // No ORF may be in more than one locus.
+                { assert loci_per_orf.every { orf, n -> n == 1 } },
+                // One GFF row per group, the gene's two groups under one id, summed by -g ID.
+                { assert gff.size() == 3 },
+                { assert gff.findAll { l -> l.endsWith('ID=UniRef50_D8LSF2|k127_1000001|-|3') }.size() == 2 },
+                { assert gff.any { l -> l.endsWith('ID=PAJFOBNA_01987') } },
+                { assert prov.size() == 2 },
+                { assert prov.any { l -> l == 'UniRef50_D8LSF2|k127_1000001|-|3\tmetaeuk,prokka,transdecoder\t3' } },
+                { assert prov.any { l -> l == 'PAJFOBNA_01987\tprokka\t1' } },
+                { assert snapshot(process.out.gff, process.out.provenance, process.out.members).match() }
+            )
+        }
+    }
+
+    test("spliced gene whose first exon is the one that merges stays one locus") {
+
+        when {
+            process {
+                """
+                // As above with exons swapped: exon 1 merges, exon 2 arrives alone.
+                def bed = file("\${workDir}/spliced_merge_first.bed")
+                bed.text = [
+                    ['k141_7', '0',   '400',  'metaeuk:NP_012345.1|k141_7|+|0', '0', '+'],
+                    ['k141_7', '0',   '400',  'prokka:GENE_00007',             '0', '+'],
+                    ['k141_7', '900', '1200', 'metaeuk:NP_012345.1|k141_7|+|0', '0', '+']
+                ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+
+                input[0] = [ [ id:'test' ], bed ]
+                """
+            }
+        }
+
+        then {
+            def gff     = path(process.out.gff[0][1]).linesGzip
+            def prov    = path(process.out.provenance[0][1]).linesGzip.findAll { l -> !l.startsWith('ID\t') }
+            def members = path(process.out.members[0][1]).linesGzip.findAll { l -> !l.startsWith('ID\t') }
+            assertAll(
+                { assert process.success },
+                { assert members.collect { l -> l.split('\t')[0] }.unique().size() == 1 },
+                { assert gff.size() == 2 },
+                { assert gff.every { l -> l.endsWith('ID=locus_k141_7_1_400_+') } },
+                { assert prov == ['locus_k141_7_1_400_+\tmetaeuk,prokka\t2'] }
+            )
+        }
+    }
+
+    test("bed - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                def bed = file("\${workDir}/stub.bed")
+                bed.text = ''
+
+                input[0] = [ [ id:'test' ], bed ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+
+    test("tie order must not change the grouping") {
+
+        when {
+            process {
+                """
+                // Equal-start calls from two callers, fed in reverse of the module sort order,
+                // so trusting input order would group them differently.
+                def bed = file("\${workDir}/ties.bed")
+                bed.text = [
+                    ['k141_500', '1000', '1900', 'transdecoder:k141_500.p1', '0', '+'],
+                    ['k141_500', '1000', '1500', 'prokka:GENE_00002',        '0', '+'],
+                    ['k141_500', '1000', '1400', 'prokka:GENE_00001',        '0', '+']
+                ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+
+                input[0] = [ [ id:'test' ], bed ]
+                """
+            }
+        }
+
+        then {
+            def gff  = path(process.out.gff[0][1]).linesGzip
+            def prov = path(process.out.provenance[0][1]).linesGzip.findAll { l -> !l.startsWith('ID\t') }
+            assertAll(
+                { assert process.success },
+                // Sorted: GENE_00001 opens a locus, GENE_00002 (same caller) starts another, and
+                // the transdecoder call joins the second.
+                { assert gff.size() == 2 },
+                { assert gff.any { l -> l.contains('ID=locus_k141_500_1001_1900_+') } },
+                { assert gff.any { l -> l.endsWith('ID=GENE_00001') } },
+                { assert prov.any { l -> l == 'locus_k141_500_1001_1900_+\tprokka,transdecoder\t2' } },
+                { assert prov.any { l -> l == 'GENE_00001\tprokka\t1' } },
+                { assert snapshot(process.out.gff, process.out.provenance, process.out.members).match() }
+            )
+        }
+    }
+}

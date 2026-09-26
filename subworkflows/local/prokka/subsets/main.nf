@@ -24,7 +24,32 @@ workflow PROKKA_SUBSETS {
         []
     )
 
-    ch_log  = PROKKA.out.txt.map { _meta, log -> log }.collect()
+    // MultiQC names Prokka samples from the "organism:" line, identical in every batch, so batches are summed into one.
+    ch_log = contigs
+        .map { meta, _contigs -> meta.id }
+        .combine(PROKKA.out.txt.map { _meta, txt -> txt }.collect().map { txts -> [ txts ] })
+        .map { assembly_id, txts ->
+            def totals = [:]
+            def order  = []
+            txts.each { txt ->
+                txt.readLines().each { line ->
+                    def parts = line.split(':', 2)
+                    if (parts.size() == 2) {
+                        def key   = parts[0].trim()
+                        def value = parts[1].trim()
+                        if (key != 'organism' && value.isInteger()) {
+                            if (!totals.containsKey(key)) { order << key }
+                            totals[key] = (totals[key] ?: 0) + value.toInteger()
+                        }
+                    }
+                }
+            }
+            def content = "organism: Genus species ${assembly_id}_prokka\n" +
+                order.collect { key -> "${key}: ${totals[key]}" }.join('\n') + '\n'
+            // No "_mqc" suffix: it would bypass MultiQC's native prokka module.
+            [ "${assembly_id}.prokka_summary.txt", content ]
+        }
+        .collectFile()
 
     ch_gff = contigs.map{ meta, _contigs -> [ id:"${meta.id}.prokka" ] }
         .combine(PROKKA.out.gff.collect { _meta, gff -> gff }.map { gff -> [ gff ] })

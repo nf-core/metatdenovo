@@ -29,6 +29,11 @@
                     "description": "The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.",
                     "fa_icon": "fas fa-folder-open"
                 },
+                "save_parquet": {
+                    "type": "boolean",
+                    "description": "Also write the summary tables in Parquet format, alongside the default gzipped TSV.",
+                    "fa_icon": "fas fa-table"
+                },
                 "email": {
                     "type": "string",
                     "description": "Email address for completion summary.",
@@ -124,6 +129,11 @@
                     "type": "boolean",
                     "description": "Save the resulting fastq files from filtering",
                     "fa_icon": "fas fa-align-center"
+                },
+                "save_bbduk_removed_fastq": {
+                    "type": "boolean",
+                    "description": "Save the reads that were removed (matched the sequence_filter reference) during BBDuk filtering",
+                    "fa_icon": "fas fa-align-center"
                 }
             },
             "fa_icon": "fas fa-filter"
@@ -205,6 +215,41 @@
                     "type": "boolean",
                     "description": "Save the formatted spades fasta file",
                     "fa_icon": "fas fa-download"
+                },
+                "megahit_k_min": {
+                    "type": "integer",
+                    "description": "Minimum k-mer size for MEGAHIT, must be odd and <=255.",
+                    "help_text": "Coarser (larger) minimum k-mer sizes reduce the memory needed for the earliest, most memory-hungry MEGAHIT iterations, at the cost of sensitivity to low-coverage or short reads. Useful as a last resort when MEGAHIT runs out of memory on very large datasets. Cannot be combined with `--megahit_k_list`. See [Usage: Assembler options](https://nf-co.re/metatdenovo/usage#assembler-options) and [Coping with large datasets](https://nf-co.re/metatdenovo/docs/large_datasets) for suggested starting values.",
+                    "fa_icon": "fas fa-ruler-horizontal",
+                    "hidden": true
+                },
+                "megahit_k_max": {
+                    "type": "integer",
+                    "description": "Maximum k-mer size for MEGAHIT, must be odd and <=255.",
+                    "help_text": "Cannot be combined with `--megahit_k_list`. See [Usage: Assembler options](https://nf-co.re/metatdenovo/usage#assembler-options) and [Coping with large datasets](https://nf-co.re/metatdenovo/docs/large_datasets) for suggested starting values.",
+                    "fa_icon": "fas fa-ruler-horizontal",
+                    "hidden": true
+                },
+                "megahit_k_step": {
+                    "type": "integer",
+                    "description": "Increment of k-mer size of each iteration for MEGAHIT, must be even and <=28.",
+                    "help_text": "Cannot be combined with `--megahit_k_list`. See [Usage: Assembler options](https://nf-co.re/metatdenovo/usage#assembler-options) and [Coping with large datasets](https://nf-co.re/metatdenovo/docs/large_datasets) for suggested starting values.",
+                    "fa_icon": "fas fa-ruler-horizontal",
+                    "hidden": true
+                },
+                "megahit_k_list": {
+                    "type": "string",
+                    "description": "Comma-separated list of k-mer sizes for MEGAHIT, all must be odd, in the range 15-255, increment <=28.",
+                    "help_text": "Overrides the default automatic k-mer stepping. Cannot be combined with `--megahit_k_min`, `--megahit_k_max` or `--megahit_k_step`. See [Usage: Assembler options](https://nf-co.re/metatdenovo/usage#assembler-options) and [Coping with large datasets](https://nf-co.re/metatdenovo/docs/large_datasets) for suggested starting values.",
+                    "fa_icon": "fas fa-ruler-horizontal",
+                    "hidden": true
+                },
+                "megahit_min_count": {
+                    "type": "integer",
+                    "description": "Minimum multiplicity for filtering k-mers in MEGAHIT.",
+                    "help_text": "Raising this prunes low-frequency (often erroneous) k-mers before graph construction, reducing memory use. Usually a safer first lever than raising `--megahit_k_min` on very large datasets. See [Usage: Assembler options](https://nf-co.re/metatdenovo/usage#assembler-options) and [Coping with large datasets](https://nf-co.re/metatdenovo/docs/large_datasets) for suggested starting values.",
+                    "fa_icon": "fas fa-filter",
+                    "hidden": true
                 }
             },
             "fa_icon": "fas fa-bezier-curve"
@@ -231,9 +276,81 @@
                     "default": 0.9,
                     "fa_icon": "fas fa-address-card",
                     "description": "Minimum identity needed to assign read to a contig"
+                },
+                "bbmap_ambiguous": {
+                    "type": "string",
+                    "default": "best",
+                    "enum": ["best", "all", "random", "toss"],
+                    "fa_icon": "fas fa-random",
+                    "description": "How BBMap should handle reads that align equally well to more than one site",
+                    "help_text": "- `best`: use the first best-scoring site (default).\n- `random`: pick one top-scoring site at random.\n- `toss`: treat the read as unmapped.\n- `all`: keep every top-scoring site, i.e. true multi-mapping.\n\nEach of `best`/`random`/`toss` produces at most one alignment per read, which is what the pipeline's counts tables (including the locus-consolidated table, see `--featurecounts_fraction` below) assume when summing counts per ORF/locus. `all` deliberately breaks that assumption and should normally be paired with `--featurecounts_fraction`."
                 }
             },
             "fa_icon": "fas fa-filter"
+        },
+        "quantification_options": {
+            "title": "Quantification options",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "featurecounts_fraction": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-divide",
+                    "description": "Count multi-mapped reads fractionally in featureCounts instead of at full weight per site",
+                    "help_text": "Only has an effect on reads with more than one reported alignment, i.e. in practice when `--bbmap_ambiguous all` is used. With the default `false`, a read that maps to N sites contributes a full count to each of the N ORFs it hits; with `true`, it contributes 1/N to each instead, keeping per-sample totals from inflating."
+                },
+                "trim_bam_header_above": {
+                    "type": "integer",
+                    "default": 1073741824,
+                    "minimum": 0,
+                    "fa_icon": "fas fa-cut",
+                    "description": "Header size in bytes above which contigs without reads are removed from a BAM file before featureCounts",
+                    "help_text": "featureCounts cannot read a BAM header larger than 2 GiB, which an assembly of about 75 million contigs produces. Samples whose header, estimated from the size of their idxstats file, exceeds this size get a copy of their BAM file with only the contigs that have reads.",
+                    "hidden": true
+                }
+            },
+            "fa_icon": "fas fa-percentage"
+        },
+        "consolidation_options": {
+            "title": "Consolidation options",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "skip_protein_consolidation": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-forward",
+                    "description": "Skip cross-contig consolidation of ORFs whose proteins cluster together",
+                    "help_text": "Cross-contig consolidation clusters the called proteins and sums the per-locus counts of everything that lands in one cluster, producing `summary_tables/<assembly>.protein_consolidate_<identity>.counts.tsv.gz`. Unlike the locus consolidation it builds on, this is not a no-op when only one ORF caller is active: near-identical proteins on different contigs are merged whichever caller found them."
+                },
+                "cluster_min_seq_id": {
+                    "type": "number",
+                    "default": 0.99,
+                    "minimum": 0,
+                    "maximum": 1,
+                    "fa_icon": "fas fa-equals",
+                    "description": "Minimum sequence identity for two proteins to be considered the same gene",
+                    "help_text": "Passed to MMseqs2 as `--min-seq-id`. Rounded to whole percent for the output table name, so 0.99 gives `protein_consolidate_99`. This is less strict than it looks even at 1.0, since coverage is controlled separately by `--cluster_coverage`: calls that are identical where they align but trimmed differently at the ends still cluster. Conversely a splice-aware caller whose exon boundary is off by a few residues in the middle of a gene will fall below 1.0, which is why the default is 0.99 rather than exact identity."
+                },
+                "cluster_coverage": {
+                    "type": "number",
+                    "default": 0.8,
+                    "minimum": 0,
+                    "maximum": 1,
+                    "fa_icon": "fas fa-arrows-alt-h",
+                    "description": "Minimum fraction of both proteins that must be covered by the alignment",
+                    "help_text": "Passed to MMseqs2 as `-c`, with its default bidirectional coverage mode, so the threshold applies to both the longer and the shorter sequence."
+                },
+                "annotate_only_consolidated": {
+                    "type": "boolean",
+                    "default": true,
+                    "fa_icon": "fas fa-object-ungroup",
+                    "description": "Only annotate the consolidated cluster representatives, not every individual ORF source as well",
+                    "help_text": "Every active `--orf_caller`/`--user_orfs` source is annotated as its own caller by default -- with N sources active alongside consolidation, that repeats the same annotation search up to N+1 times for whatever fraction of the genes every source agrees on. With this on (the default), EGGNOG, KOFAMSCAN, DBCAN, EUKULELE, DIAMOND_TAXONOMY and HMMCLASSIFY only see the cluster representatives, not each individual source's full protein set. Silently has no effect (falls back to annotating every source, same as before this option existed) whenever there is nothing consolidated to restrict to: only one ORF source active, or `--skip_protein_consolidation` given."
+                }
+            },
+            "fa_icon": "fas fa-object-group"
         },
         "orf_caller_options": {
             "title": "Orf Caller options",
@@ -243,9 +360,20 @@
             "properties": {
                 "orf_caller": {
                     "type": "string",
-                    "enum": ["prodigal", "prokka", "transdecoder"],
-                    "description": "Specify which ORF caller to run. Possible alternatives: prodigal, prokka, transdecoder. This needs to be set unless the `--user_orfs_*` params are set.",
+                    "pattern": "^(prodigal|prokka|transdecoder|metaeuk)(,(prodigal|prokka|transdecoder|metaeuk))*$",
+                    "description": "Comma-separated list of ORF callers to run. Possible alternatives: prodigal, prokka, transdecoder, metaeuk. At least one of this, `--user_orfs`, or `--user_orfs_gff`/`--user_orfs_faa` must be set; any combination may be set together.",
                     "fa_icon": "fas fa-phone-volume"
+                },
+                "user_orfs": {
+                    "type": "string",
+                    "default": null,
+                    "format": "file-path",
+                    "exists": true,
+                    "schema": "assets/schema_user_orfs.json",
+                    "pattern": "^\\S+\\.(csv|tsv|json|yaml|yml)$",
+                    "description": "Path to comma-separated file listing user-provided ORF calls to add alongside (or instead of) `--orf_caller`.",
+                    "help_text": "This has to be a comma-separated file with a header row and three mandatory columns: name, gff, faa. Each row adds one named set of ORF calls to the run, treated exactly like another `--orf_caller` value downstream. `name` cannot collide with an active `--orf_caller` value, `--user_orfs_name`, or with another row's `name`. Use this for more than one user-supplied set; for a single set, `--user_orfs_gff`/`--user_orfs_faa` below is a lighter-weight alternative -- both may be combined.",
+                    "fa_icon": "fas fa-file-csv"
                 },
                 "user_orfs_faa": {
                     "type": "string",
@@ -253,7 +381,7 @@
                     "format": "file-path",
                     "exists": true,
                     "mimetype": "text/plain",
-                    "description": "Path to a protein fasta file for user-provided ORFs.",
+                    "description": "Path to a protein fasta file for a single set of user-provided ORFs. Additive with `--orf_caller` and `--user_orfs`; requires `--user_orfs_gff` too.",
                     "fa_icon": "far fa-file-code"
                 },
                 "user_orfs_gff": {
@@ -262,13 +390,13 @@
                     "format": "file-path",
                     "exists": true,
                     "mimetype": "text/plain",
-                    "description": "Path to a gff file for user-provided ORFs.",
+                    "description": "Path to a gff file for a single set of user-provided ORFs. Additive with `--orf_caller` and `--user_orfs`; requires `--user_orfs_faa` too.",
                     "fa_icon": "far fa-file-code"
                 },
                 "user_orfs_name": {
                     "type": "string",
                     "default": "user_orfs",
-                    "description": "Name to give to user-provided ORFs.",
+                    "description": "Name to give the ORFs supplied via `--user_orfs_gff`/`--user_orfs_faa`. Cannot collide with an active `--orf_caller` value, a `--user_orfs` row name, or the pipeline's own reserved names.",
                     "fa_icon": "fas fa-bezier-curve"
                 },
                 "prodigal_trainingfile": {
@@ -283,6 +411,53 @@
                     "pattern": "^\\d+(\\.\\d+)?\\.?\\s*(K|M|G|T)?B$",
                     "hidden": true,
                     "help_text": "Prokka usually fails on very large input files. This parameter controls the size of smaller batches for which Prokka will be called. Should be a string in the format integer-unit e.g. `--prokka_batchsize '8.MB'`",
+                    "fa_icon": "fas fa-expand-alt"
+                },
+                "metaeuk_db": {
+                    "type": "string",
+                    "default": null,
+                    "description": "Path to a pre-built reference protein database for MetaEuk, either a protein fasta file or a directory containing an mmseqs2-formatted database. Optional -- when unset, `--metaeuk_db_name` is downloaded and built automatically.",
+                    "fa_icon": "far fa-file-code"
+                },
+                "metaeuk_db_name": {
+                    "type": "string",
+                    "default": "UniRef50",
+                    "enum": [
+                        "UniRef100",
+                        "UniRef90",
+                        "UniRef50",
+                        "UniProtKB",
+                        "UniProtKB/TrEMBL",
+                        "UniProtKB/Swiss-Prot",
+                        "NR",
+                        "GTDB",
+                        "PDB"
+                    ],
+                    "description": "Name of the amino-acid reference database to download and build for MetaEuk when `--metaeuk_db` isn't set. Restricted to the amino-acid databases `metaeuk databases -h` lists (its nucleotide/profile entries aren't valid MetaEuk homology references); see the table in usage.md for which of these we've actually confirmed downloadable.",
+                    "fa_icon": "fas fa-download"
+                },
+                "metaeuk_db_dir": {
+                    "type": "string",
+                    "default": "./metaeuk_db/",
+                    "description": "Path to a directory to store the downloaded MetaEuk database in. Will be created if it doesn't exist. Ignored when `--metaeuk_db` is set.",
+                    "fa_icon": "fas fa-folder-open"
+                },
+                "metaeuk_batchsize": {
+                    "type": "integer",
+                    "description": "Size of individual files annotated by MetaEuk in one batch.",
+                    "default": "104857600",
+                    "pattern": "^\\d+(\\.\\d+)?\\.?\\s*(K|M|G|T)?B$",
+                    "hidden": true,
+                    "help_text": "MetaEuk reloads and searches its full reference database on every batch, so very small batches multiply that fixed cost -- unlike Prokka's batching, where each batch is self-contained. This parameter controls the size of the smaller assembly batches MetaEuk is called on, primarily to bound its peak memory use and to limit how much work is lost if a single batch fails. Should be a string in the format integer-unit e.g. `--metaeuk_batchsize '100.MB'`",
+                    "fa_icon": "fas fa-expand-alt"
+                },
+                "transdecoder_batchsize": {
+                    "type": "integer",
+                    "description": "Size of individual files annotated by TransDecoder in one batch.",
+                    "default": "104857600",
+                    "pattern": "^\\d+(\\.\\d+)?\\.?\\s*(K|M|G|T)?B$",
+                    "hidden": true,
+                    "help_text": "TransDecoder.Predict self-trains its coding/noncoding model from the longest ORFs in whatever input it's given, with no way to share one model across batches, so very small batches can train on too few candidates -- unlike Prokka's batching, where each batch is fully independent. This parameter controls the size of the smaller assembly batches TransDecoder is called on, primarily to bound peak memory use and to limit how much work is lost if a single batch fails; set it larger than the whole assembly to recover the exact unbatched, single-model behaviour. Should be a string in the format integer-unit e.g. `--transdecoder_batchsize '100.MB'`",
                     "fa_icon": "fas fa-expand-alt"
                 }
             },
@@ -306,6 +481,27 @@
                     "fa_icon": "far fa-file-code",
                     "help_text": "This parameter specifies the location of the EGGNOG database or where it will be created using the --create_eggnog_db parameter. The directory must exist."
                 },
+                "eggnog_db_url": {
+                    "type": "string",
+                    "default": "http://eggnog5.embl.de/download/emapperdb-5.0.2/eggnog.db.gz",
+                    "description": "URL to download the eggNOG annotation database from.",
+                    "fa_icon": "fas fa-link",
+                    "hidden": true
+                },
+                "eggnog_dmnd_url": {
+                    "type": "string",
+                    "default": "http://eggnog5.embl.de/download/emapperdb-5.0.2/eggnog_proteins.dmnd.gz",
+                    "description": "URL to download the eggNOG Diamond database from.",
+                    "fa_icon": "fas fa-link",
+                    "hidden": true
+                },
+                "eggnog_taxa_url": {
+                    "type": "string",
+                    "default": "http://eggnog5.embl.de/download/emapperdb-5.0.2/eggnog.taxa.tar.gz",
+                    "description": "URL to download the eggNOG taxonomy database from.",
+                    "fa_icon": "fas fa-link",
+                    "hidden": true
+                },
                 "skip_kofamscan": {
                     "type": "boolean",
                     "description": "If enabled, skips the run of KofamScan.",
@@ -317,6 +513,32 @@
                     "description": "Path to a directory with KOfam files. Will be created if it doesn't exist.",
                     "help_text": "If a `ko_list` file and/or `profiles` does not exist, they will be downloaded.",
                     "fa_icon": "fas fa-folder-open"
+                },
+                "kofam_ko_list_url": {
+                    "type": "string",
+                    "default": "https://www.genome.jp/ftp/db/kofam/ko_list.gz",
+                    "description": "URL to download the KOfam ko_list file from.",
+                    "fa_icon": "fas fa-link",
+                    "hidden": true
+                },
+                "kofam_profiles_url": {
+                    "type": "string",
+                    "default": "https://www.genome.jp/ftp/db/kofam/profiles.tar.gz",
+                    "description": "URL to download the KOfam HMM profiles archive from.",
+                    "fa_icon": "fas fa-link",
+                    "hidden": true
+                },
+                "skip_dbcan": {
+                    "type": "boolean",
+                    "description": "If enabled, skips dbCAN CAZyme annotation.",
+                    "fa_icon": "fas fa-forward"
+                },
+                "dbcan_dbpath": {
+                    "type": "string",
+                    "default": "dbcan",
+                    "description": "Specify the dbCAN database path.",
+                    "fa_icon": "far fa-file-code",
+                    "help_text": "The dbCAN CAZyme database will be downloaded to this directory if it doesn't already exist there."
                 },
                 "hmmdir": {
                     "type": "string",
@@ -392,6 +614,11 @@
                     "description": "EUKulele database folder.",
                     "help_text": "If this parameter is set, EUKulele will look for a database to use in this folder. If --eukulele_db also is set, the specified database will be searched for in this directory and if it is not present it will be downloaded. If a custom database (see EUKulele documentation) should be used, EUKulele will assume that it is present in this folder - N.B. only works with one custom database (if using a custom database, point to a directory that only contains that database).",
                     "fa_icon": "far fa-file-code"
+                },
+                "save_eukulele_alignments": {
+                    "type": "boolean",
+                    "description": "Also publish EUKulele's raw Diamond alignment file, on top of the taxonomy estimation and counts.",
+                    "fa_icon": "fas fa-download"
                 }
             },
             "fa_icon": "fas fa-address-card"
@@ -569,6 +796,12 @@
         },
         {
             "$ref": "#/$defs/mapping_options"
+        },
+        {
+            "$ref": "#/$defs/quantification_options"
+        },
+        {
+            "$ref": "#/$defs/consolidation_options"
         },
         {
             "$ref": "#/$defs/orf_caller_options"

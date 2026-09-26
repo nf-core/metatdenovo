@@ -1,0 +1,70 @@
+nextflow_pipeline {
+
+    name "Test pipeline"
+    script "../main.nf"
+    tag "pipeline"
+    profile "test_bbmap_ambiguous"
+
+    test("-profile test_bbmap_ambiguous") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+        }
+
+        then {
+            // stable_name: All files + folders in ${params.outdir}/ with a stable name
+            def stable_name = getAllFilesFromDir(params.outdir, relative: true, includeDir: true, ignore: ['pipeline_info/*.{html,json,txt}', 'multiqc/multiqc_plots', 'multiqc/multiqc_plots/**' ])
+            // stable_path: All files in ${params.outdir}/ with stable content
+            def stable_path = getAllFilesFromDir(params.outdir, ignoreFile: 'tests/.nftignore')
+            assertAll(
+                { assert workflow.success },
+                { assert snapshot(
+                    // Number of successful tasks
+                    workflow.trace.succeeded().size(),
+                    // pipeline versions.yml file for multiqc from which Nextflow version is removed because we test pipelines on multiple Nextflow versions
+                    removeNextflowVersion("$outputDir/pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml"),
+                    // All stable path name, with a relative path
+                    stable_name,
+                    // All files with stable contents
+                    stable_path,
+                    path("${params.outdir}/summary_tables/megahit.prodigal.counts.tsv.gz").linesGzip.findAll { l -> l.contains('orf') },
+                ).match() },
+                { assert path("${params.outdir}/megahit/megahit_assembly.log").readLines().any { l -> l.contains('ALL DONE') } },
+
+                // ambig=all reaches BBMap: the default `best` never writes secondary alignments.
+                { assert (
+                    ['SAMPLE1_PE', 'SAMPLE2_PE', 'SAMPLE3_PE_1'].every { sample ->
+                        path("${params.outdir}/samtools/megahit.${sample}.flagstat")
+                            .readLines()
+                            .find { l -> l.contains('secondary') }
+                            .tokenize(' ')[0] as int > 0
+                    }
+                ) },
+
+                // --fraction reaches featureCounts: only it produces fractional counts.
+                { assert (
+                    path("${params.outdir}/summary_tables/megahit.prodigal.counts.tsv.gz")
+                        .csv(sep: '\t', decompress: true, header: true).rows
+                        .any { r -> (r["count"] as double) != Math.floor(r["count"] as double) }
+                ) },
+
+                // Fractional weighting cannot push a sample's total above its mapped reads.
+                { assert (
+                    ['SAMPLE1_PE', 'SAMPLE2_PE', 'SAMPLE3_PE_1'].every { sample ->
+                        def primary_reads = path("${params.outdir}/samtools/megahit.${sample}.flagstat")
+                            .readLines()
+                            .find { l -> l.contains('primary') && !l.contains('duplicates') }
+                            .tokenize(' ')[0] as int
+                        def count_sum = path("${params.outdir}/summary_tables/megahit.prodigal.counts.tsv.gz")
+                            .csv(sep: '\t', decompress: true, header: true).rows
+                            .findAll { r -> r["sample"] == sample }
+                            .sum { r -> r["count"] as double } ?: 0.0
+                        count_sum <= primary_reads
+                    }
+                ) },
+            )
+        }
+    }
+}

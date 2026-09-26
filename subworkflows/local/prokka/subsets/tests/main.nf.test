@@ -1,0 +1,54 @@
+nextflow_workflow {
+
+    name "Test Subworkflow PROKKA_SUBSETS"
+    script "../main.nf"
+    workflow "PROKKA_SUBSETS"
+
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "prokka_subsets"
+
+    test("per-batch summaries are summed across batches, not taken from one of them") {
+
+        config "./nextflow.config"
+
+        when {
+            workflow {
+                """
+                // Two contigs with a 1.KB batch size give two batches.
+                // Real sequence: Prodigal calls no genes on synthetic sequence, and PROKKAGFF2TSV fails on the empty table.
+                def seq = file(params.modules_testdata_base_path + 'genomics/sarscov2/genome/genome.fasta')
+                    .readLines()
+                    .findAll { l -> ! l.startsWith('>') }
+                    .join()
+
+                // Same genome under two names; PROKKA calls no genes on a shorter slice.
+                def fasta = file("\${workDir}/contigs.fasta")
+                fasta.text = [ '>contig_a', seq, '>contig_b', seq, '' ].join('\\n')
+
+                input[0] = channel.of([ [ id: 'test' ], fasta ])
+                input[1] = '1.KB'
+                """
+            }
+        }
+
+        then {
+            def summary = path(workflow.out.prokka_log[0]).text
+
+            assertAll(
+                { assert workflow.success },
+
+                // The cross-batch sum: one batch's file alone would say 'contigs: 1'.
+                { assert summary.contains('contigs: 2') },
+                { assert summary.readLines().find { l -> l.startsWith('CDS:') }?.split(':')[1]?.trim()?.toInteger() > 0 },
+
+                // Per-assembly name; per-batch files all say "Genus species strain".
+                { assert summary.contains('organism: Genus species test_prokka') },
+
+                // Both batches reach the concatenated outputs, not just one.
+                { assert path(workflow.out.gff[0][1]).linesGzip.any { l -> l.startsWith('contig_a\t') } },
+                { assert path(workflow.out.gff[0][1]).linesGzip.any { l -> l.startsWith('contig_b\t') } }
+            )
+        }
+    }
+}

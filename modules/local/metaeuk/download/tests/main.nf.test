@@ -1,0 +1,52 @@
+nextflow_process {
+
+    name "Test Process METAEUK_DOWNLOAD"
+    script "../main.nf"
+    process "METAEUK_DOWNLOAD"
+
+    tag "modules"
+    tag "modules_local"
+    tag "metaeuk"
+    tag "metaeuk/download"
+
+    // Real databases are far too large for CI, so stub only.
+    test("UniRef50 - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                input[0] = 'UniRef50'
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            assert snapshot(process.out).match()
+        }
+
+    }
+
+    // A db_name containing "/" exercises db_dir.
+    test("UniProtKB/Swiss-Prot - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                input[0] = 'UniProtKB/Swiss-Prot'
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            assert snapshot(process.out).match()
+        }
+
+    }
+
+}

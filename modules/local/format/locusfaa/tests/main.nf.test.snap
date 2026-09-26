@@ -1,0 +1,60 @@
+{
+    "three loci, one of them multi-caller": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test.locus.faa.gz:md5,9ec959ef65fe8fc037d5d840a539eff8"
+                ]
+            ]
+        ],
+        "timestamp": "2026-08-25T10:28:10.175428606",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
+    },
+    "three loci, one of them multi-caller - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.locus.faa.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "1": [
+                    [
+                        "FORMAT_LOCUSFAA",
+                        "gzip",
+                        "1.11"
+                    ]
+                ],
+                "faa": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.locus.faa.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "versions_gzip": [
+                    [
+                        "FORMAT_LOCUSFAA",
+                        "gzip",
+                        "1.11"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-08-25T10:28:55.604164954",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
+    }
+}

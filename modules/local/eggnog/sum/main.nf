@@ -3,14 +3,13 @@ process EGGNOG_SUM {
     label 'process_low'
 
     conda "conda-forge::r-tidyverse=2.0.0 conda-forge::r-dtplyr=1.3.1 conda-forge::r-data.table=1.14.8"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+    container "${ workflow.containerEngine in ['singularity', 'apptainer'] && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/mulled-v2-b2ec1fea5791d428eebb8c8ea7409c350d31dada:a447f6b7a6afde38352b24c30ae9cd6e39df95c4-1' :
         'biocontainers/mulled-v2-b2ec1fea5791d428eebb8c8ea7409c350d31dada:a447f6b7a6afde38352b24c30ae9cd6e39df95c4-1' }"
 
     input:
 
-    tuple val(meta), path(eggnog)
-    path(fcs)
+    tuple val(meta), path(eggnog), path(fcs)
 
     output:
 
@@ -31,7 +30,6 @@ process EGGNOG_SUM {
     library(stringr)
     library(tidyverse)
 
-    # call the tables into variables
     eggnog <- read_tsv("${eggnog}", show_col_types = FALSE )
 
     counts <- list.files(pattern = "*.counts.tsv.gz") %>%

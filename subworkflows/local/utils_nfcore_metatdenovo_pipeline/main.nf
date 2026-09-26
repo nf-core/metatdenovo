@@ -11,7 +11,6 @@
 include { UTILS_NFSCHEMA_PLUGIN     } from '../../nf-core/utils_nfschema_plugin'
 include { paramsSummaryMap          } from 'plugin/nf-schema'
 include { samplesheetToList         } from 'plugin/nf-schema'
-include { paramsHelp                } from 'plugin/nf-schema'
 include { completionEmail           } from '../../nf-core/utils_nfcore_pipeline'
 include { completionSummary         } from '../../nf-core/utils_nfcore_pipeline'
 include { UTILS_NFCORE_PIPELINE     } from '../../nf-core/utils_nfcore_pipeline'
@@ -33,6 +32,7 @@ workflow PIPELINE_INITIALISATION {
     outdir            //  string: The output directory where the results will be saved
     input             //  string: Path to input samplesheet
     diamond_dbs       //  string: Path to csv file with Diamond taxonomy dbs
+    user_orfs         //  string: Path to csv file with user-provided ORF calls
     help              // boolean: Display help message and exit
     help_full         // boolean: Show the full help message
     show_hidden       // boolean: Show hidden parameters in the help message
@@ -138,9 +138,19 @@ workflow PIPELINE_INITIALISATION {
             .fromList(samplesheetToList(diamond_dbs, "${projectDir}/assets/schema_diamond_dbs.json"))
     }
 
+    //
+    // Create channel from user-provided ORFs file provided through user_orfs
+    //
+    ch_user_orfs = channel.empty()
+    if ( user_orfs ) {
+        ch_user_orfs = channel
+            .fromList(samplesheetToList(user_orfs, "${projectDir}/assets/schema_user_orfs.json"))
+    }
+
     emit:
     samplesheet   = ch_samplesheet
     diamond_paths = ch_diamond_paths
+    user_orfs     = ch_user_orfs
     versions      = ch_versions
 }
 
@@ -213,6 +223,32 @@ def validateInputSamplesheet(input) {
     }
 
     return [ metas[0], fastqs ]
+}
+
+//
+// CLI params arrive as strings ('false' is truthy) and nf-schema does not coerce `params` itself.
+//
+def typecastBooleanParam(String name) {
+    def value = params.get(name)
+    if (value instanceof Boolean) {
+        return value
+    }
+    def s = value.toString()
+    if (s == 'true')  { return true }
+    if (s == 'false') { return false }
+    error("--${name} must be true or false, got '${value}'")
+}
+
+def typecastIntegerParam(String name) {
+    def value = params.get(name)
+    if (value instanceof Integer) {
+        return value
+    }
+    try {
+        return value.toString().toInteger()
+    } catch (NumberFormatException _e) {
+        error("--${name} must be an integer, got '${value}'")
+    }
 }
 //
 // Generate methods description for MultiQC

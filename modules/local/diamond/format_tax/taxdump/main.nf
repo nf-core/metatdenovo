@@ -3,7 +3,7 @@ process FORMAT_DIAMOND_TAX_TAXDUMP {
     label 'process_medium'
 
     conda "${moduleDir}/environment.yml"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+    container "${ workflow.containerEngine in ['singularity', 'apptainer'] && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/mulled-v2-b2ec1fea5791d428eebb8c8ea7409c350d31dada:a447f6b7a6afde38352b24c30ae9cd6e39df95c4-1' :
         'biocontainers/mulled-v2-b2ec1fea5791d428eebb8c8ea7409c350d31dada:a447f6b7a6afde38352b24c30ae9cd6e39df95c4-1' }"
 
@@ -51,21 +51,19 @@ process FORMAT_DIAMOND_TAX_TAXDUMP {
 
     taxassign <- read_tsv("${taxfile}", col_names = c("orf", "taxid", "evalue", "taxonomy"), col_types = 'cidc')
 
-    # Make a translation table from taxonomy string to the well-known ranks above
     tr <- taxassign %>%
         filter(!is.na(taxonomy)) %>%
         distinct(taxonomy) %>%
         transmute(taxonomy, name = taxonomy) %>%
         separate_rows(name, sep = ';') %>%
         distinct(taxonomy, name) %>%
-        # Some duplicates might occur for combinations of taxonomy and rank. Allow many-to-many and concatenate the names.
+        # A taxonomy can hold several names per rank: allow many-to-many and concatenate.
         inner_join(taxa, by = join_by(name), relationship = 'many-to-many') %>%
         group_by(taxonomy, rank) %>%
         arrange(name) %>%
         summarise(name = str_c(name, collapse = '/'), .groups = 'drop') %>%
         pivot_wider(names_from = rank, values_from = name)
 
-    # And left-join with the original table
     taxassign %>%
         left_join(tr, by = join_by(taxonomy)) %>%
         write_tsv("${prefix}.taxonomy-taxdump.tsv.gz")

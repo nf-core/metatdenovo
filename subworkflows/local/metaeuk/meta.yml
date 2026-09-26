@@ -1,0 +1,65 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "metaeuk"
+description: Calls ORFs on assembled contigs with MetaEuk (splice-aware, eukaryote-targeted)
+  and reformats its GFF output for featureCounts
+keywords:
+  - metaeuk
+  - orf
+  - eukaryotes
+  - gene prediction
+components:
+  - metaeuk/download
+  - metaeuk/easypredict
+  - find/concatenate
+  - format/metaeuk/gff
+  - format/metaeukfaa
+input:
+  - fasta:
+      type: file
+      description: |
+        Channel containing metadata and an assembly fasta file
+        Structure: [ val(meta), path(fasta) ]
+      pattern: "*.{fa,fasta,fa.gz,fasta.gz}"
+  - db_path:
+      type: string
+      description: |
+        Path to a pre-built MetaEuk homology reference -- either a protein
+        fasta file, or a directory containing an mmseqs2-formatted protein
+        database. Falsy (e.g. null) to have METAEUK_DOWNLOAD build db_name
+        instead.
+        Structure: value
+  - db_name:
+      type: string
+      description: |
+        Name of a reference database that `metaeuk databases` can download
+        and build, used only when db_path is falsy
+        Structure: value
+  - batchsize:
+      type: string
+      description: |
+        Size of the assembly batches MetaEuk is called on, e.g. '100.MB'.
+        Usually from params.metaeuk_batchsize
+output:
+  - faa:
+      type: file
+      description: |
+        Protein FASTA file containing the predicted ORFs
+        Structure: [ val(meta), path(faa) ]
+      pattern: "*.fas"
+  - gff:
+      type: file
+      description: |
+        CDS-only GFF file with one shared ID per (possibly multi-exon) gene,
+        suitable for featureCounts
+        Structure: [ val(meta), path(gff) ]
+      pattern: "*_format.gff.gz"
+  - versions:
+      type: file
+      description: |
+        File containing software versions
+        Structure: [ path(versions.yml) ]
+      pattern: "versions.yml"
+authors:
+  - "@erikrikarddaniel"
+maintainers:
+  - "@erikrikarddaniel"

@@ -1,19 +1,24 @@
 .DS_Store
 bbmap/bbduk/*.fastq.gz
+bbmap/bbduk/*.matched.fq.gz
 bbmap/bbduk/*.bbduk.log
 bbmap/bbnorm/all_samples.bbnorm.log
 bbmap/bbmap/*.log
 bbmap/logs/*.log
 fastqc/*_fastqc.{html,zip}
+diamond_taxonomy/*.tsv.gz
 featurecounts/*.{tsv,tsv.summary}
 featurecounts/*.featureCounts.tsv
 featurecounts/*.featureCounts.tsv.summary
 hmmer/*.tbl.gz
 hmmer/hits/*.faa.gz
-megahit/megahit_out/megahit_assembly.{contigs.fa.gz,log}
+kofamscan/*.tsv.gz
+megahit/megahit_assembly.{contigs.fa.gz,log}
 multiqc/multiqc_data/fastqc*.txt
 multiqc/multiqc_data/BETA-multiqc.parquet
 multiqc/multiqc_data/llms-full.txt
+multiqc/multiqc_data/fastqc_top_overrepresented_sequences_table.txt
+multiqc/multiqc_data/multiqc.parquet
 multiqc/multiqc_data/multiqc.log
 multiqc/multiqc_data/multiqc_data.json
 multiqc/multiqc_data/BETA-multiqc.parquet
@@ -25,6 +30,8 @@ multiqc/multiqc_data/multiqc_prokka.txt
 multiqc/multiqc_data/multiqc_software_versions.txt
 multiqc/multiqc_data/multiqc_sources.txt
 multiqc/multiqc_data/prokka_plot.txt
+multiqc/multiqc_data/multiqc_prodigal_stats.txt
+multiqc/multiqc_data/multiqc_transdecoder_stats.txt
 multiqc/multiqc_plots/{svg,pdf,png}/*.{svg,pdf,png}
 multiqc/multiqc_report.html
 multiqc/multiqc_plots
@@ -40,9 +47,22 @@ spades/spades.spades.log
 spades/spades.yaml
 spades/*.gz
 summary_tables/*.tsv.gz
+summary_tables/*.parquet
+protein_consolidate/*
 transdecoder/*.gz
-transrate/megahit_assemblies_mqc.csv
-transrate/spades_assemblies_mqc.csv
+# MetaEuk (MMseqs2-based) orders output by work distribution, so md5s differ across machines.
+# The FASTA/GFF id contract is asserted in tests/metaeuk.nf.test.
+metaeuk/*.fas
+metaeuk/*.gff
+metaeuk/*.headersMap.tsv
+metaeuk/*_format.faa.gz
+metaeuk/*_format.gff.gz
+# QUAST logs and reports embed timestamps and absolute paths.
+# MultiQC's quast tables vary with MEGAHIT's non-determinism.
+quast/**
+multiqc/multiqc_data/multiqc_quast.txt
+multiqc/multiqc_data/quast_table.txt
+multiqc/multiqc_data/quast_num_contigs.txt
 trimgalore/fastqc/*.{html,zip}
 trimgalore/*trimming_report.txt
 pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml

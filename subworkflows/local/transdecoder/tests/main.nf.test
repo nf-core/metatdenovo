@@ -1,0 +1,37 @@
+nextflow_workflow {
+
+    name "Test Subworkflow TRANSDECODER"
+    script "../main.nf"
+    workflow "TRANSDECODER"
+
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "transdecoder"
+
+    test("a much bigger batch must not be paired with a smaller batch's LongOrfs output") {
+
+        config "./nextflow.config"
+
+        when {
+            workflow {
+                """
+                // 'big' is ~500x 'small', so its LongOrfs finishes last; catches positional pairing with Predict.
+                def rng   = new Random(42)
+                def bases = ['A', 'C', 'G', 'T']
+                def big   = (1..150000).collect { bases[rng.nextInt(4)] }.join()
+                def small = (1..2000).collect { bases[rng.nextInt(4)] }.join()
+
+                def fasta = file("\${workDir}/batches.fasta")
+                fasta.text = [ '>big', big, '>small', small, '' ].join('\\n')
+
+                input[0] = channel.of([ [ id: 'test' ], fasta ])
+                input[1] = '1.KB' // forces splitFasta to give each contig its own batch
+                """
+            }
+        }
+
+        then {
+            assert workflow.success
+        }
+    }
+}

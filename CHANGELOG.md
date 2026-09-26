@@ -3,6 +3,77 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.0.0 - [YYYY-mm-dd]
+
+### `Added`
+
+- [#534](https://github.com/nf-core/metatdenovo/pull/534) - Add a pipeline test for the `test_bbnorm` profile, checking that normalised reads are used only for the assembly (@erikrikarddaniel)
+- [#532](https://github.com/nf-core/metatdenovo/pull/532) - Add a test that runs Prokka on more than one batch (@erikrikarddaniel)
+- [#526](https://github.com/nf-core/metatdenovo/pull/526) - Add `--save_parquet` to also write every `summary_tables/` table as Parquet, closes [#473](https://github.com/nf-core/metatdenovo/issues/473) (@erikrikarddaniel)
+- [#506](https://github.com/nf-core/metatdenovo/pull/506) - Add a `-stub` pipeline test that runs several ORF callers with every annotation tool, addresses [#476](https://github.com/nf-core/metatdenovo/issues/476) (@erikrikarddaniel)
+- [#505](https://github.com/nf-core/metatdenovo/pull/505) - Document how to resume a Megahit assembly that stopped partway through, in the new [large datasets](docs/usage/large_datasets.md) page (@erikrikarddaniel)
+- [#504](https://github.com/nf-core/metatdenovo/pull/504) - Add featureCounts' `Unassigned_*` read categories as columns in `<assembly>.<caller>.overall_stats.tsv.gz`. The column order changes, so read columns by name, addresses [#451](https://github.com/nf-core/metatdenovo/issues/451) (@erikrikarddaniel)
+- [#502](https://github.com/nf-core/metatdenovo/pull/502) - Download and build a MetaEuk reference database (`--metaeuk_db_name`, default `UniRef50`) when `--metaeuk_db` is not set, addresses [#485](https://github.com/nf-core/metatdenovo/issues/485) (@erikrikarddaniel)
+- [#501](https://github.com/nf-core/metatdenovo/pull/501) - Add `--annotate_only_consolidated` (default `true`): with more than one ORF source, annotate only the protein-cluster representatives instead of every source's full protein set (@erikrikarddaniel)
+- [#494](https://github.com/nf-core/metatdenovo/pull/494) - User-supplied ORFs (`--user_orfs_gff`/`--user_orfs_faa`, or several named sets in a `--user_orfs` CSV) can be combined with `--orf_caller` and take part in consolidation (@erikrikarddaniel)
+- [#492](https://github.com/nf-core/metatdenovo/pull/492) - Run MetaEuk and TransDecoder on batches of contigs (`--metaeuk_batchsize`, `--transdecoder_batchsize`) to limit memory use. TransDecoder trains its coding model per batch, addresses [#486](https://github.com/nf-core/metatdenovo/issues/486) (@erikrikarddaniel)
+- [#481](https://github.com/nf-core/metatdenovo/pull/481) - Add `--save_eukulele_alignments`. EUKulele's large Diamond alignment file is no longer published by default, addresses [#475](https://github.com/nf-core/metatdenovo/issues/475) (@erikrikarddaniel)
+- [#479](https://github.com/nf-core/metatdenovo/pull/479) - Add protein consolidation: cluster the proteins from all ORF sources into `<assembly>.protein_consolidate_<identity>.counts.tsv.gz` (`--cluster_min_seq_id`, `--cluster_coverage`, `--skip_protein_consolidation`), addresses [#460](https://github.com/nf-core/metatdenovo/issues/460) (@erikrikarddaniel)
+- [#469](https://github.com/nf-core/metatdenovo/pull/469) - Add `--save_bbduk_removed_fastq` to keep the reads that BBDuk removes, addresses [#17](https://github.com/nf-core/metatdenovo/issues/17) (@danilodileo)
+- [#468](https://github.com/nf-core/metatdenovo/pull/468) - Add `--bbmap_ambiguous` and `--featurecounts_fraction` to control how reads that map to more than one place are counted, addresses [#464](https://github.com/nf-core/metatdenovo/issues/464) (@erikrikarddaniel)
+- [#467](https://github.com/nf-core/metatdenovo/pull/467) - Add locus consolidation: with more than one ORF source, merge overlapping calls from different sources into loci in `<assembly>.locus_consolidate.counts.tsv.gz`, addresses [#463](https://github.com/nf-core/metatdenovo/issues/463) (@erikrikarddaniel)
+- [#466](https://github.com/nf-core/metatdenovo/pull/466) - Run more than one ORF caller in the same run, e.g. `--orf_caller prokka,transdecoder`, addresses [#462](https://github.com/nf-core/metatdenovo/issues/462) (@erikrikarddaniel)
+- [#465](https://github.com/nf-core/metatdenovo/pull/465) - Add MetaEuk as a splice-aware ORF caller for eukaryotes, addresses [#459](https://github.com/nf-core/metatdenovo/issues/459) (@erikrikarddaniel)
+- [#461](https://github.com/nf-core/metatdenovo/pull/461) - Document how to build a taxonomy-aware Diamond database with nf-core/createtaxdb, addresses [#412](https://github.com/nf-core/metatdenovo/issues/412) (@erikrikarddaniel)
+- [#458](https://github.com/nf-core/metatdenovo/pull/458) - Add Prodigal and TransDecoder ORF statistics to the MultiQC report, addresses [#456](https://github.com/nf-core/metatdenovo/issues/456) (@erikrikarddaniel)
+- [#457](https://github.com/nf-core/metatdenovo/pull/457) - Add dbCAN CAZyme annotation (`--skip_dbcan`, `--dbcan_dbpath`), addresses [#60](https://github.com/nf-core/metatdenovo/issues/60) and [#430](https://github.com/nf-core/metatdenovo/issues/430) (@erikrikarddaniel)
+- [#455](https://github.com/nf-core/metatdenovo/pull/455) - Add hidden Megahit k-mer and `--megahit_min_count` params for large datasets, addresses [#453](https://github.com/nf-core/metatdenovo/issues/453) (@erikrikarddaniel)
+- [#452](https://github.com/nf-core/metatdenovo/pull/452) - Add tests for `--diamond_dbs` and KofamScan (@erikrikarddaniel)
+
+### `Changed`
+
+- [#527](https://github.com/nf-core/metatdenovo/pull/527) - KofamScan and eggNOG database downloads no longer need network access on the compute node, addresses [#365](https://github.com/nf-core/metatdenovo/issues/365) (@erikrikarddaniel)
+- [#491](https://github.com/nf-core/metatdenovo/pull/491) - Replace TransRate with QUAST for assembly statistics, addresses [#487](https://github.com/nf-core/metatdenovo/issues/487) (@erikrikarddaniel)
+- [#489](https://github.com/nf-core/metatdenovo/pull/489) - Use the shared nf-core module `custom/collectfeaturecounts` for count tables, with unchanged output (@erikrikarddaniel)
+- [#488](https://github.com/nf-core/metatdenovo/pull/488) - Use the shared nf-core module `custom/collectstats`. The count column in `<assembly>.<caller>.overall_stats.tsv.gz` is named after the ORF caller (e.g. `prodigal`) instead of `n_feature_count` (@erikrikarddaniel)
+- [#483](https://github.com/nf-core/metatdenovo/pull/483) - Move TransDecoder ORF-name cleanup into its own module, with unchanged output (@erikrikarddaniel)
+- [#466](https://github.com/nf-core/metatdenovo/pull/466) - `featurecounts/` file names include the ORF caller, e.g. `SAMPLE1.prokka.featureCounts.tsv` (@erikrikarddaniel)
+- [#454](https://github.com/nf-core/metatdenovo/pull/454) - Template update to nf-core/tools 4.1.0 and software updates (@erikrikarddaniel)
+- [#452](https://github.com/nf-core/metatdenovo/pull/452) - Replace several local modules with nf-core/modules equivalents, addresses [#445](https://github.com/nf-core/metatdenovo/issues/445) (@erikrikarddaniel)
+- [#450](https://github.com/nf-core/metatdenovo/pull/450) - Template update to nf-core/tools 4.0.3 and software updates (@erikrikarddaniel)
+
+### `Fixed`
+
+- [#548](https://github.com/nf-core/metatdenovo/pull/548) - Fix featureCounts failing on assemblies with more than about 75 million contigs, fixes [#547](https://github.com/nf-core/metatdenovo/issues/547) (@erikrikarddaniel)
+- [#545](https://github.com/nf-core/metatdenovo/pull/545) - Fix the eggNOG-mapper version reported by conda runs, which was the pipeline's own release tag instead of the tool's version (@erikrikarddaniel)
+- [#527](https://github.com/nf-core/metatdenovo/pull/527) - Fix the eggNOG database download URL (@erikrikarddaniel)
+- [#525](https://github.com/nf-core/metatdenovo/pull/525) - Fix eggNOG, KofamScan and dbCAN database downloads to an `s3://` directory on AWS Batch, and `--eukulele_dbpath` on `s3://`, addresses [#471](https://github.com/nf-core/metatdenovo/issues/471) (@danilodileo)
+- [#524](https://github.com/nf-core/metatdenovo/pull/524) - Fix BBNorm under Singularity/Apptainer when the host's `$TMPDIR` is not mounted in the container, addresses [#516](https://github.com/nf-core/metatdenovo/issues/516) (@erikrikarddaniel)
+- [#523](https://github.com/nf-core/metatdenovo/pull/523) - Fix an out-of-date test snapshot, addresses [#522](https://github.com/nf-core/metatdenovo/issues/522) (@erikrikarddaniel)
+- [#521](https://github.com/nf-core/metatdenovo/pull/521) - Leave memory headroom for the JVM in BBMap align, BBDuk and index, as BBNorm already did, addresses [#520](https://github.com/nf-core/metatdenovo/issues/520) (@danilodileo)
+- [#519](https://github.com/nf-core/metatdenovo/pull/519) - Without `--save_bam`, no BAM files are published; samtools' sorted BAMs were published regardless, addresses [#474](https://github.com/nf-core/metatdenovo/issues/474) (@danilodileo)
+- [#509](https://github.com/nf-core/metatdenovo/pull/509) - Fix MetaEuk output supplied via `--user_orfs_gff`/`--user_orfs_faa` merging separate loci into one, closes [#508](https://github.com/nf-core/metatdenovo/issues/508) (@erikrikarddaniel)
+- [#506](https://github.com/nf-core/metatdenovo/pull/506) - Fix five `-stub` failures in the annotation modules, addresses [#476](https://github.com/nf-core/metatdenovo/issues/476) (@erikrikarddaniel)
+- [#503](https://github.com/nf-core/metatdenovo/pull/503) - Boolean and integer params such as `--skip_eggnog false` or `--min_contig_length` now work from the command line, addresses [#478](https://github.com/nf-core/metatdenovo/issues/478) (@erikrikarddaniel)
+- [#483](https://github.com/nf-core/metatdenovo/pull/483) - Round `tpm` to 6 decimals so count tables computed separately agree, closes [#484](https://github.com/nf-core/metatdenovo/issues/484) (@erikrikarddaniel)
+- [#481](https://github.com/nf-core/metatdenovo/pull/481) - Fix the EUKulele `-stub` run (@erikrikarddaniel)
+- [#480](https://github.com/nf-core/metatdenovo/pull/480) - Fix TransDecoder.Predict failing on `-resume`, addresses [#477](https://github.com/nf-core/metatdenovo/issues/477) (@erikrikarddaniel)
+- [#479](https://github.com/nf-core/metatdenovo/pull/479) - Run eggNOG-mapper for every ORF caller, not only the first (@erikrikarddaniel)
+- [#479](https://github.com/nf-core/metatdenovo/pull/479) - Fix the MultiQC ORF statistics crashing when an ORF caller finds no proteins (@erikrikarddaniel)
+- [#466](https://github.com/nf-core/metatdenovo/pull/466) - Fix a crash when an HMM search finds no hits (@erikrikarddaniel)
+- [#458](https://github.com/nf-core/metatdenovo/pull/458) - Fix Prokka statistics in the MultiQC report merging into one sample when an assembly has more than one Prokka batch, addresses [#456](https://github.com/nf-core/metatdenovo/issues/456) (@erikrikarddaniel)
+- [#452](https://github.com/nf-core/metatdenovo/pull/452) - Fix `EGGNOG_FORMAT` naming the ORF column `Lorf` instead of `orf` (@erikrikarddaniel)
+
+### `Dependencies`
+
+| Tool        | Previous version | New version |
+| ----------- | ---------------- | ----------- |
+| samtools    | 1.23.1           | 1.24        |
+| multiqc     | 1.34             | 1.35        |
+| trim-galore | 2.1.0            | 2.3.0       |
+| prokka      | 1.14.6           | 1.15.6      |
+| nft-utils   | 0.0.3            | 1.2.0       |
+
 ## v1.4.1 - [2026-09-15]
 
 ### `Fixed`

@@ -1,0 +1,53 @@
+Changes in component 'nf-core/megahit'
+Changes in 'megahit/meta.yml':
+--- modules/nf-core/megahit/meta.yml
++++ modules/nf-core/megahit/meta.yml
+@@ -41,6 +41,13 @@
+         description: |
+           A single or list of input FastQ files for R2 of paired-end library(s),
+           respectively in gzipped or uncompressed FASTQ or FASTA format.
++        ontologies: []
++  - - interleaved_reads:
++        type: file
++        description: |
++          A single or list of interleaved paired-end FASTQ files (alternating R1/R2 reads
++          in a single file per sample), respectively in gzipped or uncompressed format.
++          Can be combined with reads1/reads2 in the same invocation.
+         ontologies: []
+ output:
+   contigs:
+
+Changes in 'megahit/main.nf':
+--- modules/nf-core/megahit/main.nf
++++ modules/nf-core/megahit/main.nf
+@@ -8,6 +8,7 @@
+ 
+     input:
+     tuple val(meta), path(reads1), path(reads2)
++    path(interleaved_reads)
+ 
+     output:
+     tuple val(meta), path("*.contigs.fa.gz")                            , emit: contigs
+@@ -25,12 +26,16 @@
+     def args = task.ext.args ?: ''
+     def args2 = task.ext.args2 ?: ''
+     def prefix = task.ext.prefix ?: "${meta.id}"
+-    def reads_command = meta.single_end || !reads2 ? "-r ${reads1.join(',')}" : "-1 ${reads1.join(',')} -2 ${reads2.join(',')}"
++    def reads_command       = reads1 ? (meta.single_end || !reads2 ? "-r ${reads1.join(',')}" : "-1 ${reads1.join(',')} -2 ${reads2.join(',')}") : ''
++    // Interleaved paired-end reads (single file per sample, alternating mates), e.g. from
++    // seqtk mergepe -- can be combined with reads_command above in the same megahit run.
++    def interleaved_command = interleaved_reads ? "--12 ${interleaved_reads instanceof List ? interleaved_reads.join(',') : interleaved_reads}" : ''
+     """
+     megahit \\
+         ${args} \\
+         -t ${task.cpus} \\
+         ${reads_command} \\
++        ${interleaved_command} \\
+         --out-prefix ${prefix}
+ 
+     pigz \\
+
+'modules/nf-core/megahit/environment.yml' is unchanged
+'modules/nf-core/megahit/tests/main.nf.test.snap' is unchanged
+'modules/nf-core/megahit/tests/main.nf.test' is unchanged
+************************************************************

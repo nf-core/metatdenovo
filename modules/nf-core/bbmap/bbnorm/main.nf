@@ -35,13 +35,17 @@ process BBMAP_BBNORM {
     // Nextflow forwards the host's \$TMPDIR into Singularity/Apptainer containers without
     // bind-mounting it, so multipass temp files must stay under the task's own (bound) work dir.
     """
+    mkdir -p tmp
+
     bbnorm.sh \\
         $input \\
         $output \\
         $args \\
         threads=$task.cpus \\
         $memory \\
-        tmpdir=. \\
+        tmpdir=tmp \\
         &> ${prefix}.bbnorm.log
+
+    rm -rf tmp
     """
 }

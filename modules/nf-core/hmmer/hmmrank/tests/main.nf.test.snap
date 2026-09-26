@@ -1,0 +1,58 @@
+{
+    "hmmrank - 16S -- stub": {
+        "content": [
+            {
+                "hmmrank": [
+                    [
+                        {
+                            "id": "16S-test"
+                        },
+                        "16S-test.hmmrank.tsv.gz:md5,d07a8a166c4795c2c375435bc30336cd"
+                    ]
+                ],
+                "versions": [
+                    "versions.yml:md5,fb0420306768e2aedcaa534a3ff2c829"
+                ]
+            },
+            {
+                "HMMER_HMMRANK": {
+                    "r-base": "4.2.3",
+                    "r-tidyverse": "2.0.0"
+                }
+            }
+        ],
+        "timestamp": "2026-05-12T19:16:49.769860989",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.0"
+        }
+    },
+    "hmmrank - 16S": {
+        "content": [
+            {
+                "hmmrank": [
+                    [
+                        {
+                            "id": "16S-test"
+                        },
+                        "16S-test.hmmrank.tsv.gz:md5,ee4e777c815c37727358ab4ebda276b3"
+                    ]
+                ],
+                "versions": [
+                    "versions.yml:md5,fb0420306768e2aedcaa534a3ff2c829"
+                ]
+            },
+            {
+                "HMMER_HMMRANK": {
+                    "r-base": "4.2.3",
+                    "r-tidyverse": "2.0.0"
+                }
+            }
+        ],
+        "timestamp": "2026-05-12T19:05:39.80170586",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.0"
+        }
+    }
+}

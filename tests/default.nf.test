@@ -9,26 +9,28 @@ nextflow_pipeline {
 
         when {
             params {
-                outdir = "$outputDir"
+                outdir         = "$outputDir"
+                // Non-default, to prove these params reach Megahit. k_min == k_max would skip a required output.
+                megahit_k_min  = 25
+                megahit_k_max  = 49
+                megahit_k_step = 12
             }
         }
 
         then {
-            // stable_name: All files + folders in ${params.outdir}/ with a stable name
-            def stable_name = getAllFilesFromDir(params.outdir, relative: true, includeDir: true, ignore: ['pipeline_info/*.{html,json,txt}', 'multiqc/multiqc_plots', 'multiqc/multiqc_plots/**' ])
-            // stable_path: All files in ${params.outdir}/ with stable content
-            def stable_path = getAllFilesFromDir(params.outdir, ignoreFile: 'tests/.nftignore')
+            // stable_path: All files + folders in ${params.outdir}/ with a stable path (including file name)
+            def stable_path = getAllFilesFromDir(params.outdir, relative: true, includeDir: true, ignore: ['pipeline_info/*.{html,json,txt}', 'multiqc/multiqc_plots', 'multiqc/multiqc_plots/**' ])
+            // stable_content: All files in ${params.outdir}/ with stable content
+            def stable_content = getAllFilesFromDir(params.outdir, ignoreFile: 'tests/.nftignore')
+            assert workflow.success
             assertAll(
-                { assert workflow.success },
                 { assert snapshot(
-                    // Number of successful tasks
-                    workflow.trace.succeeded().size(),
                     // pipeline versions.yml file for multiqc from which Nextflow version is removed because we test pipelines on multiple Nextflow versions
                     removeNextflowVersion("$outputDir/pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml"),
                     // All stable path name, with a relative path
-                    stable_name,
-                    // All files with stable contents
                     stable_path,
+                    // All files with stable contents
+                    stable_content,
                     // Important files with unstable content
                     path("${params.outdir}/samtools/megahit.SAMPLE1_PE.flagstat").readLines().size(),
                     path("${params.outdir}/summary_tables/megahit.prodigal.counts.tsv.gz").linesGzip.findAll { l -> l.contains('orf') },
@@ -37,10 +39,61 @@ nextflow_pipeline {
                     path("${params.outdir}/summary_tables/megahit.prodigal.hmmrank.tsv.gz").linesGzip.findAll { l -> l.contains('PF00848') }.size(),
                     path("${params.outdir}/summary_tables/megahit.prodigal.overall_stats.tsv.gz").linesGzip.size(),
                     path("${params.outdir}/summary_tables/megahit.prodigal.overall_stats.tsv.gz").csv(sep: '\t', decompress: true, header: true).columns["n_post_trimming"].sum(),
-                    path("${params.outdir}/summary_tables/megahit.prodigal.overall_stats.tsv.gz").linesGzip.findAll { l -> l.contains('n_feature_count') },
+                    path("${params.outdir}/summary_tables/megahit.prodigal.overall_stats.tsv.gz").linesGzip.findAll { l -> l.contains('prodigal') },
                 ).match() },
-                { assert path("${params.outdir}/megahit/megahit_out/megahit_assembly.log").readLines().any { l -> l.contains('ALL DONE') } },
-                { assert path("${params.outdir}/megahit/megahit_out/megahit_assembly.contigs.fa.gz").linesGzip.size() > 3000 },
+                { assert path("${params.outdir}/megahit/megahit_assembly.log").readLines().any { l -> l.contains('ALL DONE') } },
+
+                // With one caller nothing can merge, so the locus table must equal Prodigal's own (minus provenance).
+                { assert (
+                    ['orf', 'chr', 'start', 'end', 'strand', 'length', 'sample', 'count', 'tpm'].collect { c ->
+                        path("${params.outdir}/summary_tables/megahit.prodigal.counts.tsv.gz").csv(sep: '\t', decompress: true, header: true).columns[c]
+                    }.transpose().toSet()
+                ) == (
+                    ['orf', 'chr', 'start', 'end', 'strand', 'length', 'sample', 'count', 'tpm'].collect { c ->
+                        path("${params.outdir}/summary_tables/megahit.locus_consolidate.counts.tsv.gz").csv(sep: '\t', decompress: true, header: true).columns[c]
+                    }.transpose().toSet()
+                ) },
+                { assert (
+                    path("${params.outdir}/summary_tables/megahit.locus_consolidate.counts.tsv.gz")
+                        .csv(sep: '\t', decompress: true, header: true).rows
+                        .every { r -> r["callers"] == 'prodigal' && (r["n_calls"] as int) == 1 }
+                ) },
+
+                // Protein-consolidation outputs are in .nftignore (MEGAHIT is not deterministic), so assert their shape.
+                // Every counted cluster needs a representative, or its annotation join is empty.
+                // Containment, not equality: clusters with no reads have no counts row.
+                { assert (
+                    path("${params.outdir}/summary_tables/megahit.protein_consolidate_99.counts.tsv.gz")
+                        .csv(sep: '\t', decompress: true, header: true).columns["orf"].toSet()
+                ).every { orf -> orf in (
+                    path("${params.outdir}/protein_consolidate/megahit.protein_consolidate_99.representatives.fa.gz").linesGzip
+                        .findAll { l -> l.startsWith('>') }
+                        .collect { l -> l.substring(1).tokenize(' ')[0] }
+                        .toSet()
+                ) } },
+                // Every representative is a member of its own cluster; COLLECT_PROTEINCONSOLIDATE takes its length from it.
+                { assert (
+                    path("${params.outdir}/protein_consolidate/megahit.protein_consolidate_99.clusters.tsv").readLines()
+                        .every { l -> l.tokenize('\t').size() == 2 }
+                ) },
+                { assert (
+                    path("${params.outdir}/protein_consolidate/megahit.protein_consolidate_99.clusters.tsv").readLines()
+                        .collect { l -> l.tokenize('\t') }
+                        .with { rows -> rows.collect { r -> r[0] }.toSet().every { rep -> rows.any { r -> r[0] == rep && r[1] == rep } } }
+                ) },
+                // Clustering regroups rows and must not drop reads; tpm renormalisation would hide a loss.
+                { assert (
+                    ['SAMPLE1_PE', 'SAMPLE2_PE', 'SAMPLE3_PE_1'].every { sample ->
+                        def total = { table ->
+                            path("${params.outdir}/summary_tables/${table}").csv(sep: '\t', decompress: true, header: true).rows
+                                .findAll { r -> r["sample"] == sample }
+                                .sum { r -> r["count"] as double } ?: 0.0
+                        }
+                        total('megahit.protein_consolidate_99.counts.tsv.gz') == total('megahit.locus_consolidate.counts.tsv.gz')
+                    }
+                ) },
+                { assert path("${params.outdir}/megahit/megahit_assembly.log").readLines().any { l -> l.contains('k list: 25,37,49') } },
+                { assert path("${params.outdir}/megahit/megahit_assembly.contigs.fa.gz").linesGzip.size() > 3000 },
                 { assert path("${params.outdir}/samtools/megahit.SAMPLE1_PE.idxstats").readLines().size() > 1600 },
                 { assert path("${params.outdir}/prodigal/megahit.prodigal.gff.gz").linesGzip.findAll { l -> l.contains('CDS') }.size() > 3000 },
                 { assert path("${params.outdir}/summary_tables/megahit.prodigal.counts.tsv.gz").linesGzip.size() > 3000 },
