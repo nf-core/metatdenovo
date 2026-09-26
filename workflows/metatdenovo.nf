@@ -184,7 +184,7 @@ workflow METATDENOVO {
             error "--user_orfs/--user_orfs_name '${name}' collides with an active --orf_caller value or a name the pipeline reserves for itself. Pick a different name."
         }
     }
-    def duplicate_user_orf_names = user_orf_names.countBy { it }.findAll { _name, count -> count > 1 }.keySet()
+    def duplicate_user_orf_names = user_orf_names.countBy { name -> name }.findAll { _name, count -> count > 1 }.keySet()
     if ( duplicate_user_orf_names ) {
         error "Duplicate user-supplied-ORFs name(s): ${duplicate_user_orf_names.join(', ')}. Every name (--user_orfs rows and --user_orfs_name) must be unique."
     }
