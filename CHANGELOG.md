@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Added`
 
+- [#NN](https://github.com/nf-core/metatdenovo/pull/NN) - Document how to mount `$TMPDIR` into Singularity and Apptainer containers, which some tools, such as Prokka, fail without (@erikrikarddaniel)
 - [#534](https://github.com/nf-core/metatdenovo/pull/534) - Add a pipeline test for the `test_bbnorm` profile, checking that normalised reads are used only for the assembly (@erikrikarddaniel)
 - [#532](https://github.com/nf-core/metatdenovo/pull/532) - Add a test that runs Prokka on more than one batch (@erikrikarddaniel)
 - [#526](https://github.com/nf-core/metatdenovo/pull/526) - Add `--save_parquet` to also write every `summary_tables/` table as Parquet, closes [#473](https://github.com/nf-core/metatdenovo/issues/473) (@erikrikarddaniel)
