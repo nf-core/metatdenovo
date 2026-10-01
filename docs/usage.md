@@ -683,6 +683,18 @@ See the main [Nextflow documentation](https://www.nextflow.io/docs/latest/config
 
 If you have any questions or issues please send us a message on [Slack](https://nf-co.re/join/slack) on the [`#configs` channel](https://nfcore.slack.com/channels/configs).
 
+### Singularity or Apptainer and `$TMPDIR`
+
+If Prokka fails under Singularity or Apptainer with `Could not run command: ... parallel ... blastp ...`, the cause is usually a `$TMPDIR` that does not exist inside the container.
+Other tools can fail the same way.
+Mounting it fixes this:
+
+```groovy
+singularity.runOptions = '-B "$TMPDIR"'
+```
+
+See [Temporary directory missing inside Singularity containers](https://nf-co.re/docs/running/configuration/troubleshooting#temporary-directory-missing-inside-singularity-containers) for details.
+
 ## Running in the background
 
 Nextflow handles job submissions and supervises the running jobs. The Nextflow process must run until the pipeline is finished.
