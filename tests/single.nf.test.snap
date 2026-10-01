@@ -1,7 +1,7 @@
 {
     "-profile test_single": {
         "content": [
-            69,
+            79,
             {
                 "BBMAP_ALIGN": {
                     "bbmap": 39.18
@@ -12,24 +12,41 @@
                 "BBMAP_INDEX": {
                     "bbmap": 39.18
                 },
+                "BEDTOOLS_SORT": {
+                    "bedtools": "2.31.1"
+                },
                 "CAT_FASTQ": {
                     "cat": 9.5
                 },
-                "COLLECT_FEATURECOUNTS": {
+                "COLLECT_FEATURECOUNTSSUMMARY": {
                     "R": "4.5.3",
                     "dplyr": "1.2.1",
                     "readr": "2.2.0",
-                    "stringr": "1.6.0",
-                    "dtplyr": "1.3.3",
-                    "data.table": "1.17.8"
-                },
-                "COLLECT_STATS": {
-                    "R": "4.5.3",
-                    "dplyr": "1.2.1",
-                    "readr": "2.2.0",
-                    "purrr": "1.2.2",
-                    "tidyr": "1.3.2",
                     "stringr": "1.6.0"
+                },
+                "COLLECT_LOCUSCONSOLIDATE": {
+                    "R": "4.5.3",
+                    "data.table": "1.17.8",
+                    "dplyr": "1.2.1",
+                    "dtplyr": "1.3.3",
+                    "readr": "2.2.0",
+                    "stringr": "1.6.0"
+                },
+                "CUSTOM_COLLECTFEATURECOUNTS": {
+                    "R": "4.5.3",
+                    "data.table": "1.17.8",
+                    "dplyr": "1.2.1",
+                    "dtplyr": "1.3.3",
+                    "readr": "2.2.0",
+                    "stringr": "1.6.0"
+                },
+                "CUSTOM_COLLECTSTATS": {
+                    "R": "4.3.1",
+                    "dplyr": "1.1.4",
+                    "purrr": "1.1.0",
+                    "readr": "2.1.5",
+                    "stringr": "1.5.2",
+                    "tidyr": "1.3.1"
                 },
                 "FASTQC": {
                     "fastqc": "0.12.1"
@@ -37,11 +54,17 @@
                 "FEATURECOUNTS_CDS": {
                     "subread": "2.1.1"
                 },
+                "FORMAT_GFF2BED": {
+                    "gzip": 1.11
+                },
+                "FORMAT_LOCUSCONSOLIDATE": {
+                    "gzip": 1.11
+                },
                 "FORMAT_PRODIGAL_GFF": {
                     "gzip": 1.11
                 },
-                "MEGAHIT_INTERLEAVED": {
-                    "megahit_interleaved": "1.2.9"
+                "MEGAHIT": {
+                    "megahit": "1.2.9"
                 },
                 "PIGZ_PE_READS_REV": {
                     "pigz": 2.8
@@ -52,38 +75,41 @@
                 "PRODIGAL_MODULE": {
                     "prodigal": "2.6.3"
                 },
+                "QUAST": {
+                    "quast": "5.3.0"
+                },
                 "SAMTOOLS_FLAGSTAT": {
-                    "samtools": "1.23.1"
+                    "samtools": 1.24
                 },
                 "SAMTOOLS_IDXSTATS": {
-                    "samtools": "1.23.1"
+                    "samtools": 1.24
                 },
                 "SAMTOOLS_INDEX": {
-                    "samtools": "1.23.1"
+                    "samtools": 1.24
                 },
                 "SAMTOOLS_SORT": {
-                    "samtools": "1.23.1"
+                    "samtools": 1.24
                 },
                 "SAMTOOLS_STATS": {
-                    "samtools": "1.23.1"
+                    "samtools": 1.24
                 },
                 "SEQTK_MERGEPE": {
                     "seqtk": "1.4-r122"
                 },
-                "TRANSRATE": {
-                    "transrate": "1.0.3"
+                "TIDYVERSE_STRIPCDSPREFIX": {
+                    "R": "4.5.3",
+                    "dplyr": "1.2.1",
+                    "readr": "2.2.0",
+                    "stringr": "1.6.0"
                 },
                 "TRIMGALORE": {
-                    "trimgalore": "2.1.0"
-                },
-                "UNPIGZ_CONTIGS": {
-                    "pigz": "2.3.4"
+                    "trimgalore": "2.3.0"
                 },
                 "UNPIGZ_GFF": {
-                    "pigz": "2.3.4"
+                    "pigz": 2.8
                 },
                 "Workflow": {
-                    "nf-core/metatdenovo": "v1.4.1"
+                    "nf-core/metatdenovo": "v2.0.0"
                 }
             },
             [
@@ -101,20 +127,29 @@
                 "bbmap/bbmap/SAMPLE4_PE_1.bbmap.log",
                 "bbmap/bbmap/SAMPLE5_PE.bbmap.log",
                 "featurecounts",
-                "featurecounts/SAMPLE1_SE.featureCounts.tsv",
-                "featurecounts/SAMPLE1_SE.featureCounts.tsv.summary",
-                "featurecounts/SAMPLE2_SE.featureCounts.tsv",
-                "featurecounts/SAMPLE2_SE.featureCounts.tsv.summary",
-                "featurecounts/SAMPLE3_SE.featureCounts.tsv",
-                "featurecounts/SAMPLE3_SE.featureCounts.tsv.summary",
-                "featurecounts/SAMPLE4_PE_1.featureCounts.tsv",
-                "featurecounts/SAMPLE4_PE_1.featureCounts.tsv.summary",
-                "featurecounts/SAMPLE5_PE.featureCounts.tsv",
-                "featurecounts/SAMPLE5_PE.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE1_SE.locus_consolidate.featureCounts.tsv",
+                "featurecounts/SAMPLE1_SE.locus_consolidate.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE1_SE.prodigal.featureCounts.tsv",
+                "featurecounts/SAMPLE1_SE.prodigal.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE2_SE.locus_consolidate.featureCounts.tsv",
+                "featurecounts/SAMPLE2_SE.locus_consolidate.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE2_SE.prodigal.featureCounts.tsv",
+                "featurecounts/SAMPLE2_SE.prodigal.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE3_SE.locus_consolidate.featureCounts.tsv",
+                "featurecounts/SAMPLE3_SE.locus_consolidate.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE3_SE.prodigal.featureCounts.tsv",
+                "featurecounts/SAMPLE3_SE.prodigal.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE4_PE_1.locus_consolidate.featureCounts.tsv",
+                "featurecounts/SAMPLE4_PE_1.locus_consolidate.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE4_PE_1.prodigal.featureCounts.tsv",
+                "featurecounts/SAMPLE4_PE_1.prodigal.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE5_PE.locus_consolidate.featureCounts.tsv",
+                "featurecounts/SAMPLE5_PE.locus_consolidate.featureCounts.tsv.summary",
+                "featurecounts/SAMPLE5_PE.prodigal.featureCounts.tsv",
+                "featurecounts/SAMPLE5_PE.prodigal.featureCounts.tsv.summary",
                 "megahit",
-                "megahit/megahit_out",
-                "megahit/megahit_out/megahit_assembly.contigs.fa.gz",
-                "megahit/megahit_out/megahit_assembly.log",
+                "megahit/megahit_assembly.contigs.fa.gz",
+                "megahit/megahit_assembly.log",
                 "multiqc",
                 "multiqc/multiqc_data",
                 "multiqc/multiqc_data/bbduk-filtered-barplot_Bases.txt",
@@ -139,8 +174,12 @@
                 "multiqc/multiqc_data/multiqc_data.json",
                 "multiqc/multiqc_data/multiqc_fastqc.txt",
                 "multiqc/multiqc_data/multiqc_general_stats.txt",
+                "multiqc/multiqc_data/multiqc_prodigal_stats.txt",
+                "multiqc/multiqc_data/multiqc_quast.txt",
                 "multiqc/multiqc_data/multiqc_software_versions.txt",
                 "multiqc/multiqc_data/multiqc_sources.txt",
+                "multiqc/multiqc_data/quast_num_contigs.txt",
+                "multiqc/multiqc_data/quast_table.txt",
                 "multiqc/multiqc_report.html",
                 "pipeline_info",
                 "pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml",
@@ -150,17 +189,27 @@
                 "prodigal/megahit.prodigal.gff.gz",
                 "prodigal/megahit.prodigal_all.txt.gz",
                 "prodigal/megahit.prodigal_format.gff.gz",
+                "quast",
+                "quast/megahit",
+                "quast/megahit.tsv",
+                "quast/megahit/basic_stats",
+                "quast/megahit/basic_stats/GC_content_plot.pdf",
+                "quast/megahit/basic_stats/Nx_plot.pdf",
+                "quast/megahit/basic_stats/cumulative_plot.pdf",
+                "quast/megahit/basic_stats/megahit_assembly.contigs_GC_content_plot.pdf",
+                "quast/megahit/icarus.html",
+                "quast/megahit/icarus_viewers",
+                "quast/megahit/icarus_viewers/contig_size_viewer.html",
+                "quast/megahit/quast.log",
+                "quast/megahit/report.html",
+                "quast/megahit/report.pdf",
+                "quast/megahit/report.tex",
+                "quast/megahit/report.tsv",
+                "quast/megahit/report.txt",
+                "quast/megahit/transposed_report.tex",
+                "quast/megahit/transposed_report.tsv",
+                "quast/megahit/transposed_report.txt",
                 "samtools",
-                "samtools/SAMPLE1_SE.sorted.bam",
-                "samtools/SAMPLE1_SE.sorted.bam.bai",
-                "samtools/SAMPLE2_SE.sorted.bam",
-                "samtools/SAMPLE2_SE.sorted.bam.bai",
-                "samtools/SAMPLE3_SE.sorted.bam",
-                "samtools/SAMPLE3_SE.sorted.bam.bai",
-                "samtools/SAMPLE4_PE_1.sorted.bam",
-                "samtools/SAMPLE4_PE_1.sorted.bam.bai",
-                "samtools/SAMPLE5_PE.sorted.bam",
-                "samtools/SAMPLE5_PE.sorted.bam.bai",
                 "samtools/megahit.SAMPLE1_SE.flagstat",
                 "samtools/megahit.SAMPLE1_SE.idxstats",
                 "samtools/megahit.SAMPLE2_SE.flagstat",
@@ -172,10 +221,9 @@
                 "samtools/megahit.SAMPLE5_PE.flagstat",
                 "samtools/megahit.SAMPLE5_PE.idxstats",
                 "summary_tables",
+                "summary_tables/megahit.locus_consolidate.counts.tsv.gz",
                 "summary_tables/megahit.prodigal.counts.tsv.gz",
                 "summary_tables/megahit.prodigal.overall_stats.tsv.gz",
-                "transrate",
-                "transrate/megahit_assemblies_mqc.csv",
                 "trimgalore",
                 "trimgalore/SAMPLE1_SE.fastq.gz_trimming_report.txt",
                 "trimgalore/SAMPLE2_SE.fastq.gz_trimming_report.txt",
@@ -201,7 +249,7 @@
                 "trimgalore/fastqc/SAMPLE5_PE_2_val_2_fastqc.zip"
             ],
             [
-                "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f"
+                "multiqc_citations.txt:md5,2d1a8ef8ba06c7eada06ab3e96552ea4"
             ],
             16,
             [
@@ -210,13 +258,13 @@
             5000000,
             6,
             [
-                "sample\tn_post_trimming\tn_non_contaminated\tidxs_n_mapped\tidxs_n_unmapped\tn_feature_count"
+                "sample\tn_post_trimming\tn_non_contaminated\tidxs_n_mapped\tidxs_n_unmapped\tUnassigned_Ambiguity\tUnassigned_Chimera\tUnassigned_Duplicate\tUnassigned_FragmentLength\tUnassigned_MappingQuality\tUnassigned_MultiMapping\tUnassigned_NoFeatures\tUnassigned_NonSplit\tUnassigned_Overlapping_Length\tUnassigned_Read_Type\tUnassigned_Secondary\tUnassigned_Singleton\tUnassigned_Unmapped\tprodigal"
             ]
         ],
-        "timestamp": "2026-06-24T16:46:12.429088386",
         "meta": {
-            "nf-test": "0.9.5",
-            "nextflow": "26.04.4"
-        }
+            "nf-test": "0.9.3",
+            "nextflow": "25.10.4"
+        },
+        "timestamp": "2026-09-15T17:52:47.331518"
     }
 }

@@ -1,0 +1,63 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "eggnog_format"
+description: Reformat EggNOG-mapper's raw annotations output into a cleaned-up summary-table-ready TSV
+keywords:
+  - eggnog
+  - eggnog-mapper
+  - format
+tools:
+  - "gzip":
+      description: Compression utility
+      homepage: https://www.gnu.org/software/gzip/
+      documentation: https://www.gnu.org/software/gzip/manual/gzip.html
+      licence: ["GPL-3.0-or-later"]
+      identifier: null
+
+input:
+  - - meta:
+        type: map
+        description: |
+          Groovy Map containing sample information
+          e.g. `[ id:'sample1' ]`
+    - annotations:
+        type: file
+        description: Gzipped raw EggNOG-mapper annotations output
+        pattern: "*.emapper.annotations.gz"
+
+output:
+  emappertsv:
+    - - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. `[ id:'sample1' ]`
+      - "*.emapper.tsv.gz":
+          type: file
+          description: Reformatted EggNOG-mapper output for summary tables
+          pattern: "*.emapper.tsv.gz"
+  versions_gzip:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - "gzip":
+          type: string
+          description: The name of the tool
+      - "gzip --version":
+          type: eval
+          description: The expression to obtain the version of the tool
+
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - gzip:
+          type: string
+          description: The name of the tool
+      - gzip --version:
+          type: eval
+          description: The expression to obtain the version of the tool
+authors:
+  - "@danilodileo"
+maintainers:
+  - "@danilodileo"

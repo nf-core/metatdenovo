@@ -1,0 +1,135 @@
+nextflow_workflow {
+
+    name "Test Subworkflow USER_ORFS"
+    script "../main.nf"
+    workflow "USER_ORFS"
+
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "user_orfs"
+
+    test("raw metaeuk gff/faa - gets normalised") {
+
+        when {
+            workflow {
+                """
+                def gff = file("\${workDir}/metaeuk.gff")
+                gff.text = 'k1\\tMetaEuk\\tCDS\\t1\\t100\\t.\\t+\\t.\\tTarget_ID=P1;TCS_ID=P1|k1|+|0_CDS_0;Parent=P1|k1|+|0_exon_0\\n'
+
+                def faa = file("\${workDir}/metaeuk.faa")
+                faa.text = '>P1|k1|+|282|1e-75|1|0|100|0[0]:100[100]:100[100]\\nMPSRFTK\\n'
+
+                input[0] = channel.of([ [ id: 'test' ], gff, faa ])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                // Raw MetaEuk gff: no ID=, so gff and fasta header must both be rewritten.
+                { assert path(workflow.out.gff[0][1]).linesGzip[0].contains('ID=P1|k1|+|0;') },
+                { assert path(workflow.out.faa[0][1]).linesGzip[0] == '>P1|k1|+|0' }
+            )
+        }
+    }
+
+    test("already-normalised gff/faa - passed through unchanged") {
+
+        when {
+            workflow {
+                """
+                def gff = file("\${workDir}/generic.gff")
+                gff.text = 'k1\\tprodigal\\tCDS\\t1\\t100\\t.\\t+\\t0\\tID=gene1\\n'
+
+                def faa = file("\${workDir}/generic.faa")
+                faa.text = '>gene1\\nMPSRFTK\\n'
+
+                input[0] = channel.of([ [ id: 'test' ], gff, faa ])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert snapshot(sanitizeOutput(workflow.out)).match() }
+            )
+        }
+    }
+
+    test("already-normalised metaeuk gff/faa - not reprocessed") {
+
+        when {
+            workflow {
+                """
+                // Already normalised: ID= plus the original TCS_ID=, 4-field header. Must not be reformatted.
+                def gff = file("\${workDir}/already_formatted.gff")
+                gff.text = 'k1\\tMetaEuk\\tCDS\\t1\\t100\\t.\\t+\\t.\\tID=P1|k1|+|0;Target_ID=P1;TCS_ID=P1|k1|+|0_CDS_0\\n'
+
+                def faa = file("\${workDir}/already_formatted.faa")
+                faa.text = '>P1|k1|+|0\\nMPSRFTK\\n'
+
+                input[0] = channel.of([ [ id: 'test' ], gff, faa ])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert snapshot(sanitizeOutput(workflow.out)).match() }
+            )
+        }
+    }
+
+    test("normalised gff behind a long GFF3 header - passed through unchanged") {
+
+        when {
+            workflow {
+                """
+                // One ##sequence-region per contig pushes the first feature past the read limit if comments count.
+                def header = '##gff-version 3\\n' + ('##sequence-region k1 1 5000\\n' * 25)
+
+                def gff = file("\${workDir}/long_header.gff")
+                gff.text = header + 'k1\\tprodigal\\tCDS\\t1\\t100\\t.\\t+\\t0\\tID=gene1\\n'
+
+                def faa = file("\${workDir}/long_header.faa")
+                faa.text = '>gene1\\nMPSRFTK\\n'
+
+                input[0] = channel.of([ [ id: 'test' ], gff, faa ])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert snapshot(sanitizeOutput(workflow.out)).match() }
+            )
+        }
+    }
+
+    test("gff and faa disagree on raw/normalised state - fails loudly") {
+
+        when {
+            workflow {
+                """
+                def gff = file("\${workDir}/raw.gff")
+                gff.text = 'k1\\tMetaEuk\\tCDS\\t1\\t100\\t.\\t+\\t.\\tTarget_ID=P1;TCS_ID=P1|k1|+|0_CDS_0\\n'
+
+                def faa = file("\${workDir}/already_short.faa")
+                faa.text = '>P1|k1|+|0\\nMPSRFTK\\n'
+
+                input[0] = channel.of([ [ id: 'test' ], gff, faa ])
+                """
+            }
+        }
+
+        then {
+            // A mismatched pair would silently break every downstream join on ORF id.
+            assert workflow.failed
+            assert workflow.errorReport.contains("gff and faa disagree on whether they're raw MetaEuk output or already normalised ")
+        }
+    }
+}

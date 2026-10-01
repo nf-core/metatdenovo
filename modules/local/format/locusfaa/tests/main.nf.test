@@ -1,0 +1,100 @@
+nextflow_process {
+
+    name "Test Process FORMAT_LOCUSFAA"
+    script "../main.nf"
+    process "FORMAT_LOCUSFAA"
+
+    tag "modules"
+    tag "modules_local"
+    tag "format"
+    tag "format/locusfaa"
+
+    // Real ids from test_metaeuk_transdecoder: two identical proteins on different contigs,
+    // one unrelated locus, and one locus called by two callers.
+
+    test("three loci, one of them multi-caller") {
+
+        when {
+            process {
+                """
+                def members = file("\${workDir}/test.members.tsv")
+                members.text = [
+                    ['ID', 'caller', 'orf'],
+                    ['locus_k59_0_1_447_+', 'metaeuk', 'NP_011412.1|k59_0|+|0'],
+                    ['locus_k59_0_1_447_+', 'transdecoder', 'k59_0.p1'],
+                    ['k59_1.p1', 'transdecoder', 'k59_1.p1'],
+                    ['NP_011412.1|k59_1|-|191', 'metaeuk', 'NP_011412.1|k59_1|-|191']
+                ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+                def gzipped = file("\${workDir}/test.members.tsv.gz")
+                ['gzip', '-c', members.toString()].execute().getInputStream().withStream { s ->
+                    gzipped.withOutputStream { o -> o << s }
+                }
+
+                // MetaEuk fasta: uncompressed, id is the whole header.
+                def metaeuk = file("\${workDir}/metaeuk.faa")
+                metaeuk.text = [
+                    '>NP_011412.1|k59_0|+|0',
+                    'MPSRFTKTRKHRGHVSAGKGRIGKHRKHPGGRGMAGG',
+                    '>NP_011412.1|k59_1|-|191',
+                    'MPSRFTKTRKHRGHVSAGKGRIGKHRKHPGGRGMAGG',
+                    ''
+                ].join('\\n')
+
+                // Header has a description to drop; k59_0.p1 is shorter so longest-wins is tested.
+                def transdecoder = file("\${workDir}/transdecoder.faa")
+                transdecoder.text = [
+                    '>k59_0.p1 GENE.k59_0~~k59_0.p1  ORF type:3prime_partial (+)',
+                    'MPSRFTKTRKHRGHVSAGK',
+                    '>k59_1.p1 GENE.k59_1~~k59_1.p1  ORF type:complete (+)',
+                    'MRLSDQFNNTTSSSDFFFSQLGDESSFDDNWNIWNST*',
+                    ''
+                ].join('\\n')
+
+                input[0] = [ [ id:'test' ], gzipped, ['metaeuk', 'transdecoder'], [ metaeuk, transdecoder ] ]
+                """
+            }
+        }
+
+        then {
+            def lines = path(process.out.faa[0][1]).linesGzip
+            def ids   = lines.findAll { l -> l.startsWith('>') }
+            def seqs  = [ids, lines.findAll { l -> !l.startsWith('>') }].transpose().collectEntries()
+            assertAll(
+                { assert process.success },
+                // One sequence per locus, in members-table order.
+                { assert ids == ['>locus_k59_0_1_447_+', '>k59_1.p1', '>NP_011412.1|k59_1|-|191'] },
+                // Multi-caller locus takes the longest contributor (MetaEuk, 37 residues).
+                { assert seqs['>locus_k59_0_1_447_+'] == 'MPSRFTKTRKHRGHVSAGKGRIGKHRKHPGGRGMAGG' },
+                { assert seqs['>k59_1.p1'] == 'MRLSDQFNNTTSSSDFFFSQLGDESSFDDNWNIWNST*' },
+                // Identical sequences, so these cluster downstream.
+                { assert seqs['>NP_011412.1|k59_1|-|191'] == seqs['>locus_k59_0_1_447_+'] },
+                { assert snapshot(process.out.faa).match() }
+            )
+        }
+    }
+
+    test("three loci, one of them multi-caller - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                def members = file("\${workDir}/empty.members.tsv.gz")
+                members.text = ''
+                def faa = file("\${workDir}/empty.faa")
+                faa.text = ''
+
+                input[0] = [ [ id:'test' ], members, ['metaeuk'], [ faa ] ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+}

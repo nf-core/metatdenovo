@@ -32,6 +32,7 @@ workflow NFCORE_METATDENOVO {
     take:
     samplesheet // channel: samplesheet read in from --input
     diamond_dbs // channel: paths to Diamond taxonomy databases, read from --diamond_dbs
+    user_orfs   // channel: user-provided ORF calls, read from --user_orfs
 
     main:
 
@@ -41,10 +42,11 @@ workflow NFCORE_METATDENOVO {
     METATDENOVO (
         samplesheet,
         diamond_dbs,
+        user_orfs,
         params.multiqc_config,
         params.multiqc_logo,
         params.multiqc_methods_description,
-        params.outdir
+        params.outdir,
     )
     emit:
     multiqc_report = METATDENOVO.out.multiqc_report // channel: /path/to/multiqc_report.html
@@ -69,6 +71,7 @@ workflow {
         params.outdir,
         params.input,
         params.diamond_dbs,
+        params.user_orfs,
         params.help,
         params.help_full,
         params.show_hidden
@@ -79,7 +82,8 @@ workflow {
     //
     NFCORE_METATDENOVO (
         PIPELINE_INITIALISATION.out.samplesheet,
-        PIPELINE_INITIALISATION.out.diamond_paths
+        PIPELINE_INITIALISATION.out.diamond_paths,
+        PIPELINE_INITIALISATION.out.user_orfs
     )
 
     //

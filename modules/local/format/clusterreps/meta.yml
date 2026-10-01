@@ -1,0 +1,31 @@
+name: "format_clusterreps"
+description: Extracts the distinct cluster representatives from an MMseqs2 cluster
+  membership table, as a plain id list suitable for subsetting the clustered FASTA
+keywords:
+  - clustering
+  - mmseqs2
+  - format
+input:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - clusters:
+      type: file
+      description: MMseqs2 cluster membership, headerless representative/member pairs
+      pattern: "*.tsv"
+output:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - representatives:
+      type: file
+      description: One cluster representative id per line, in the order the clusters appear
+      pattern: "*.representatives.txt"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+authors:
+  - "@erikrikarddaniel"
+maintainers:
+  - "@erikrikarddaniel"

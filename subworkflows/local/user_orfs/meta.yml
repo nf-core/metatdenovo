@@ -1,0 +1,35 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "user_orfs"
+description: Normalises user-supplied ORFs (--user_orfs_gff/--user_orfs_faa), detecting and
+  reformatting a raw MetaEuk gff/fasta pair the same way a pipeline-internal MetaEuk run
+  already is, and passing anything else through unchanged
+keywords:
+  - user_orfs
+  - metaeuk
+  - orf
+components:
+  - format/metaeuk/gff
+  - format/metaeukfaa
+input:
+  - user_orfs:
+      type: file
+      description: |
+        Channel containing metadata, a user-supplied gff and its matching protein fasta
+        Structure: [ val(meta), path(gff), path(faa) ]
+output:
+  - gff:
+      type: file
+      description: |
+        The gff, reformatted to a plain ID= attribute if it was raw MetaEuk output, unchanged
+        otherwise
+        Structure: [ val(meta), path(gff) ]
+  - faa:
+      type: file
+      description: |
+        The protein fasta, with headers rewritten to match gff's id if it was raw MetaEuk
+        output, unchanged otherwise
+        Structure: [ val(meta), path(faa) ]
+authors:
+  - "@erikrikarddaniel"
+maintainers:
+  - "@erikrikarddaniel"

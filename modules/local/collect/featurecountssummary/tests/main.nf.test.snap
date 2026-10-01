@@ -1,0 +1,60 @@
+{
+    "one file per Unassigned_* category is emitted - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test.prodigal",
+                            "caller": "prodigal"
+                        },
+                        "prodigal.Unassigned_NoFeatures.featureCounts.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "1": [
+                    "versions.yml:md5,6a97780a9ba689715f0c0894b0e4b82b"
+                ],
+                "unassigned": [
+                    [
+                        {
+                            "id": "test.prodigal",
+                            "caller": "prodigal"
+                        },
+                        "prodigal.Unassigned_NoFeatures.featureCounts.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "versions": [
+                    "versions.yml:md5,6a97780a9ba689715f0c0894b0e4b82b"
+                ]
+            }
+        ],
+        "timestamp": "2026-09-11T11:11:02.350354887",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
+    },
+    "one file per Unassigned_* category is emitted, Assigned is skipped": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test.prodigal",
+                        "caller": "prodigal"
+                    },
+                    [
+                        "prodigal.Unassigned_Ambiguity.featureCounts.tsv:md5,6cd347fb7ded1a83a349d8ee50658b05",
+                        "prodigal.Unassigned_MultiMapping.featureCounts.tsv:md5,0b23a81c09bab69f21abf9e46680732b",
+                        "prodigal.Unassigned_NoFeatures.featureCounts.tsv:md5,d7a81ae8bd2a0a4f8345b3522c33f24d",
+                        "prodigal.Unassigned_Unmapped.featureCounts.tsv:md5,cb624bb5a0c0c61deefec28095a2e84a"
+                    ]
+                ]
+            ]
+        ],
+        "timestamp": "2026-09-11T11:10:28.550477718",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
+    }
+}

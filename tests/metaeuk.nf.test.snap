@@ -1,0 +1,240 @@
+{
+    "-profile test_metaeuk": {
+        "content": [
+            51,
+            {
+                "BBMAP_ALIGN": {
+                    "bbmap": 39.18
+                },
+                "BBMAP_INDEX": {
+                    "bbmap": 39.18
+                },
+                "BEDTOOLS_SORT": {
+                    "bedtools": "2.31.1"
+                },
+                "COLLECT_FEATURECOUNTSSUMMARY": {
+                    "R": "4.5.3",
+                    "dplyr": "1.2.1",
+                    "readr": "2.2.0",
+                    "stringr": "1.6.0"
+                },
+                "COLLECT_LOCUSCONSOLIDATE": {
+                    "R": "4.5.3",
+                    "data.table": "1.17.8",
+                    "dplyr": "1.2.1",
+                    "dtplyr": "1.3.3",
+                    "readr": "2.2.0",
+                    "stringr": "1.6.0"
+                },
+                "CUSTOM_COLLECTFEATURECOUNTS": {
+                    "R": "4.5.3",
+                    "data.table": "1.17.8",
+                    "dplyr": "1.2.1",
+                    "dtplyr": "1.3.3",
+                    "readr": "2.2.0",
+                    "stringr": "1.6.0"
+                },
+                "CUSTOM_COLLECTSTATS": {
+                    "R": "4.3.1",
+                    "dplyr": "1.1.4",
+                    "purrr": "1.1.0",
+                    "readr": "2.1.5",
+                    "stringr": "1.5.2",
+                    "tidyr": "1.3.1"
+                },
+                "FASTQC": {
+                    "fastqc": "0.12.1"
+                },
+                "FEATURECOUNTS_CDS": {
+                    "subread": "2.1.1"
+                },
+                "FORMAT_GFF2BED": {
+                    "gzip": 1.11
+                },
+                "FORMAT_LOCUSCONSOLIDATE": {
+                    "gzip": 1.11
+                },
+                "FORMAT_METAEUKFAA": {
+                    "gzip": 1.11
+                },
+                "FORMAT_METAEUK_GFF": {
+                    "gzip": 1.11
+                },
+                "MEGAHIT": {
+                    "megahit": "1.2.9"
+                },
+                "METAEUK_EASYPREDICT": {
+                    "metaeuk": "6.a5d39d9"
+                },
+                "METAEUK_FAA_CAT": {
+                    "coreutils": 9.4,
+                    "find": "4.6.0",
+                    "pigz": 2.8
+                },
+                "METAEUK_GFF_CAT": {
+                    "coreutils": 9.4,
+                    "find": "4.6.0",
+                    "pigz": 2.8
+                },
+                "QUAST": {
+                    "quast": "5.3.0"
+                },
+                "SAMTOOLS_FLAGSTAT": {
+                    "samtools": 1.24
+                },
+                "SAMTOOLS_IDXSTATS": {
+                    "samtools": 1.24
+                },
+                "SAMTOOLS_INDEX": {
+                    "samtools": 1.24
+                },
+                "SAMTOOLS_SORT": {
+                    "samtools": 1.24
+                },
+                "SAMTOOLS_STATS": {
+                    "samtools": 1.24
+                },
+                "SEQTK_MERGEPE": {
+                    "seqtk": "1.4-r122"
+                },
+                "TIDYVERSE_STRIPCDSPREFIX": {
+                    "R": "4.5.3",
+                    "dplyr": "1.2.1",
+                    "readr": "2.2.0",
+                    "stringr": "1.6.0"
+                },
+                "TRIMGALORE": {
+                    "trimgalore": "2.3.0"
+                },
+                "UNPIGZ_GFF": {
+                    "pigz": 2.8
+                },
+                "Workflow": {
+                    "nf-core/metatdenovo": "v2.0.0"
+                }
+            },
+            [
+                "bbmap",
+                "bbmap/bbmap",
+                "bbmap/bbmap/RPL28_GENOMIC.bbmap.log",
+                "bbmap/bbmap/RPL28_MRNA.bbmap.log",
+                "bbmap/bbmap/RPL28_MRNA_RECODED.bbmap.log",
+                "featurecounts",
+                "featurecounts/RPL28_GENOMIC.locus_consolidate.featureCounts.tsv",
+                "featurecounts/RPL28_GENOMIC.locus_consolidate.featureCounts.tsv.summary",
+                "featurecounts/RPL28_GENOMIC.metaeuk.featureCounts.tsv",
+                "featurecounts/RPL28_GENOMIC.metaeuk.featureCounts.tsv.summary",
+                "featurecounts/RPL28_MRNA.locus_consolidate.featureCounts.tsv",
+                "featurecounts/RPL28_MRNA.locus_consolidate.featureCounts.tsv.summary",
+                "featurecounts/RPL28_MRNA.metaeuk.featureCounts.tsv",
+                "featurecounts/RPL28_MRNA.metaeuk.featureCounts.tsv.summary",
+                "featurecounts/RPL28_MRNA_RECODED.locus_consolidate.featureCounts.tsv",
+                "featurecounts/RPL28_MRNA_RECODED.locus_consolidate.featureCounts.tsv.summary",
+                "featurecounts/RPL28_MRNA_RECODED.metaeuk.featureCounts.tsv",
+                "featurecounts/RPL28_MRNA_RECODED.metaeuk.featureCounts.tsv.summary",
+                "megahit",
+                "megahit/megahit_assembly.contigs.fa.gz",
+                "megahit/megahit_assembly.log",
+                "metaeuk",
+                "metaeuk/megahit.metaeuk_format.faa.gz",
+                "metaeuk/megahit.metaeuk_format.gff.gz",
+                "multiqc",
+                "multiqc/multiqc_data",
+                "multiqc/multiqc_data/fastqc-status-check-heatmap.txt",
+                "multiqc/multiqc_data/fastqc_overrepresented_sequences_plot.txt",
+                "multiqc/multiqc_data/fastqc_per_base_n_content_plot.txt",
+                "multiqc/multiqc_data/fastqc_per_base_sequence_quality_plot.txt",
+                "multiqc/multiqc_data/fastqc_per_sequence_gc_content_plot_Counts.txt",
+                "multiqc/multiqc_data/fastqc_per_sequence_gc_content_plot_Percentages.txt",
+                "multiqc/multiqc_data/fastqc_per_sequence_quality_scores_plot.txt",
+                "multiqc/multiqc_data/fastqc_sequence_counts_plot.txt",
+                "multiqc/multiqc_data/fastqc_sequence_duplication_levels_plot.txt",
+                "multiqc/multiqc_data/fastqc_sequence_length_distribution_plot.txt",
+                "multiqc/multiqc_data/fastqc_top_overrepresented_sequences_table.txt",
+                "multiqc/multiqc_data/llms-full.txt",
+                "multiqc/multiqc_data/multiqc.log",
+                "multiqc/multiqc_data/multiqc.parquet",
+                "multiqc/multiqc_data/multiqc_citations.txt",
+                "multiqc/multiqc_data/multiqc_data.json",
+                "multiqc/multiqc_data/multiqc_fastqc.txt",
+                "multiqc/multiqc_data/multiqc_general_stats.txt",
+                "multiqc/multiqc_data/multiqc_metaeuk_stats.txt",
+                "multiqc/multiqc_data/multiqc_quast.txt",
+                "multiqc/multiqc_data/multiqc_software_versions.txt",
+                "multiqc/multiqc_data/multiqc_sources.txt",
+                "multiqc/multiqc_data/quast_num_contigs.txt",
+                "multiqc/multiqc_data/quast_table.txt",
+                "multiqc/multiqc_report.html",
+                "pipeline_info",
+                "pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml",
+                "quast",
+                "quast/megahit",
+                "quast/megahit.tsv",
+                "quast/megahit/basic_stats",
+                "quast/megahit/basic_stats/GC_content_plot.pdf",
+                "quast/megahit/basic_stats/Nx_plot.pdf",
+                "quast/megahit/basic_stats/cumulative_plot.pdf",
+                "quast/megahit/basic_stats/megahit_assembly.contigs_GC_content_plot.pdf",
+                "quast/megahit/icarus.html",
+                "quast/megahit/icarus_viewers",
+                "quast/megahit/icarus_viewers/contig_size_viewer.html",
+                "quast/megahit/quast.log",
+                "quast/megahit/report.html",
+                "quast/megahit/report.pdf",
+                "quast/megahit/report.tex",
+                "quast/megahit/report.tsv",
+                "quast/megahit/report.txt",
+                "quast/megahit/transposed_report.tex",
+                "quast/megahit/transposed_report.tsv",
+                "quast/megahit/transposed_report.txt",
+                "samtools",
+                "samtools/megahit.RPL28_GENOMIC.flagstat",
+                "samtools/megahit.RPL28_GENOMIC.idxstats",
+                "samtools/megahit.RPL28_MRNA.flagstat",
+                "samtools/megahit.RPL28_MRNA.idxstats",
+                "samtools/megahit.RPL28_MRNA_RECODED.flagstat",
+                "samtools/megahit.RPL28_MRNA_RECODED.idxstats",
+                "summary_tables",
+                "summary_tables/megahit.locus_consolidate.counts.tsv.gz",
+                "summary_tables/megahit.metaeuk.counts.tsv.gz",
+                "summary_tables/megahit.metaeuk.overall_stats.tsv.gz",
+                "trimgalore",
+                "trimgalore/RPL28_GENOMIC_1.fastq.gz_trimming_report.txt",
+                "trimgalore/RPL28_GENOMIC_2.fastq.gz_trimming_report.txt",
+                "trimgalore/RPL28_MRNA_1.fastq.gz_trimming_report.txt",
+                "trimgalore/RPL28_MRNA_2.fastq.gz_trimming_report.txt",
+                "trimgalore/RPL28_MRNA_RECODED_1.fastq.gz_trimming_report.txt",
+                "trimgalore/RPL28_MRNA_RECODED_2.fastq.gz_trimming_report.txt",
+                "trimgalore/fastqc",
+                "trimgalore/fastqc/RPL28_GENOMIC_1_val_1_fastqc.html",
+                "trimgalore/fastqc/RPL28_GENOMIC_1_val_1_fastqc.zip",
+                "trimgalore/fastqc/RPL28_GENOMIC_2_val_2_fastqc.html",
+                "trimgalore/fastqc/RPL28_GENOMIC_2_val_2_fastqc.zip",
+                "trimgalore/fastqc/RPL28_MRNA_1_val_1_fastqc.html",
+                "trimgalore/fastqc/RPL28_MRNA_1_val_1_fastqc.zip",
+                "trimgalore/fastqc/RPL28_MRNA_2_val_2_fastqc.html",
+                "trimgalore/fastqc/RPL28_MRNA_2_val_2_fastqc.zip",
+                "trimgalore/fastqc/RPL28_MRNA_RECODED_1_val_1_fastqc.html",
+                "trimgalore/fastqc/RPL28_MRNA_RECODED_1_val_1_fastqc.zip",
+                "trimgalore/fastqc/RPL28_MRNA_RECODED_2_val_2_fastqc.html",
+                "trimgalore/fastqc/RPL28_MRNA_RECODED_2_val_2_fastqc.zip"
+            ],
+            [
+                "multiqc_citations.txt:md5,2d1a8ef8ba06c7eada06ab3e96552ea4",
+                "multiqc_metaeuk_stats.txt:md5,be6038955478f96fdcaaa12d04c6d4a9"
+            ],
+            16,
+            [
+                "orf\tchr\tstart\tend\tstrand\tlength\tsample\tcount\ttpm"
+            ],
+            [
+                "sample\tn_post_trimming\tidxs_n_mapped\tidxs_n_unmapped\tUnassigned_Ambiguity\tUnassigned_Chimera\tUnassigned_Duplicate\tUnassigned_FragmentLength\tUnassigned_MappingQuality\tUnassigned_MultiMapping\tUnassigned_NoFeatures\tUnassigned_NonSplit\tUnassigned_Overlapping_Length\tUnassigned_Read_Type\tUnassigned_Secondary\tUnassigned_Singleton\tUnassigned_Unmapped\tmetaeuk"
+            ]
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.10.4"
+        },
+        "timestamp": "2026-09-15T17:15:03.472729"
+    }
+}

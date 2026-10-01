@@ -3,9 +3,14 @@ process KOFAMSCAN_DOWNLOAD {
     label 'process_long'
 
     conda "${moduleDir}/environment.yml"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/3b/3b54fa9135194c72a18d00db6b399c03248103f87e43ca75e4b50d61179994b3/data':
-        'community.wave.seqera.io/library/wget:1.21.4--8b0fcde81c17be5e' }"
+    // An s3:// storeDir is staged by aws inside this container, which the wget image lacks.
+    container "${ workflow.containerEngine in ['singularity', 'apptainer'] && !task.ext.singularity_pull_docker_container ?
+        'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/bc/bceb5c307eb199ae3eca0eecfd71a0a4a918ce90e6fd96ecc749603426337823/data' :
+        'community.wave.seqera.io/library/wget_awscli_gzip_tar:1fad694ee6322b7d' }"
+
+    input:
+    path ko_list_gz
+    path profiles_targz
 
     output:
     path "ko_list"     , emit: ko_list
@@ -17,11 +22,9 @@ process KOFAMSCAN_DOWNLOAD {
     script:
 
     """
-    wget https://www.genome.jp/ftp/db/kofam/ko_list.gz
-    gunzip ko_list.gz
+    gunzip -c ${ko_list_gz} > ko_list
 
-    wget https://www.genome.jp/ftp/db/kofam/profiles.tar.gz
-    tar -zxf profiles.tar.gz
+    tar -zxf ${profiles_targz}
     """
 
     stub:

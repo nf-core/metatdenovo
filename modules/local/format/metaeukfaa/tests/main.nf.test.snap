@@ -1,0 +1,60 @@
+{
+    "metaeuk fasta - headers rewritten to the gff id form": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test_format.faa.gz:md5,d105c939745ff91b6cc4003896f9fc8d"
+                ]
+            ]
+        ],
+        "timestamp": "2026-08-25T10:27:35.510035689",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
+    },
+    "metaeuk fasta - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test_format.faa.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "1": [
+                    [
+                        "FORMAT_METAEUKFAA",
+                        "gzip",
+                        "1.11"
+                    ]
+                ],
+                "format_faa": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test_format.faa.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "versions_gzip": [
+                    [
+                        "FORMAT_METAEUKFAA",
+                        "gzip",
+                        "1.11"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-08-25T10:27:53.028896213",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
+    }
+}

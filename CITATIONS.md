@@ -24,15 +24,9 @@
 
 - [Trim Galore!](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/)
 
-- [khmer](https://github.com/dib-lab/khmer)
-
-  > Brown C, Howe A, Zhang Q, Pyrkosz , and Brom T. 2012. “A Reference-Free Algorithm for Computational Normalization of Shotgun Sequencing Data.” ArXiv:1203.4802 [q-Bio], May. arxiv.org/abs/1203.4802.
-  > Crusoe M, Alameldin H, Awad S, Boucher E, Caldwell A, Cartwright R, Charbonneau A, et al. 2015. “The Khmer Software Package: Enabling Efficient Nucleotide Sequence Analysis.” F1000Research 4 (September): 900. doi.org/10.12688/f1000research.6924.1.
-  > Qingpeng Z, Pell J, Canino-Koning R, Howe A, and Brown C. 2014. “These Are Not the K-Mers You Are Looking For: Efficient Online K-Mer Counting Using a Probabilistic Data Structure.” PLOS ONE 9 (7): e101271. doi.org/10.1371/journal.pone.0101271.
-
 - [Seqtk](https://github.com/lh3/seqtk)
 
-- [RNAspade](https://cab.spbu.ru/software/rnaspades/)
+- [SPAdes](https://github.com/ablab/spades)
 
   > Bankevich A, Nurk S, Antipov D, Gurevich AA, Dvorkin M, Kulikov AS, Lesin VM, Nikolenko SI, Pham S, Prjibelski AD, Pyshkin AV, Sirotkin AV, Vyahhi N, Tesler G, Alekseyev MA, Pevzner PA. SPAdes: a new genome assembly algorithm and its applications to single-cell sequencing. J Comput Biol. 2012 May;19(5):455-77. doi: 10.1089/cmb.2012.0021.
   > Nurk S, Meleshko D, Korobeynikov A, Pevzner PA. metaSPAdes: a new versatile metagenomic assembler. Genome Res. 2017 May;27(5):824-834. doi: 10.1101/gr.213959.116. Epub 2017 Mar 15.
@@ -47,11 +41,17 @@
 
 - [TransDecoder](https://github.com/TransDecoder/TransDecoder)
 
+- [MetaEuk](https://github.com/soedinglab/metaeuk)
+
+  > Levy Karin E, Mirdita M, Söding J. MetaEuk—sensitive, high-throughput gene discovery, and annotation for large-scale eukaryotic metagenomics. Microbiome 8, 48 (2020). doi: 10.1186/s40168-020-00808-x [PMID: 32245390].
+
 - [Prokka](https://github.com/tseemann/prokka)
 
   > Seemann T Prokka: rapid prokaryotic genome annotation Bioinformatics 2014 Jul 15;30(14):2068-9. PMID:24642063
 
 - [Prodigal](https://github.com/hyattpd/Prodigal)
+
+  > Hyatt D, Chen GL, LoCascio PF, Land ML, Larimer FW, Hauser LJ. Prodigal: prokaryotic gene recognition and translation initiation site identification. BMC Bioinformatics. 2010;11:119. doi: 10.1186/1471-2105-11-119.
 
 - [BBmap](https://sourceforge.net/projects/bbmap/)
 
@@ -60,6 +60,24 @@
   > Liao Y, Smyth GK and Shi W. The R package Rsubread is easier, faster, cheaper and better for alignment and quantification of RNA sequencing reads. Nucleic Acids Research, 47(8):e47, 2019
   > Liao Y, Smyth GK and Shi W. featureCounts: an efficient general-purpose program for assigning sequence reads to genomic features. Bioinformatics, 30(7):923-30, 2014
   > Liao Y, Smyth GK and Shi W. The Subread aligner: fast, accurate and scalable read mapping by seed-and-vote. Nucleic Acids Research, 41(10):e108, 2013
+
+- [BEDTools](https://github.com/arq5x/bedtools2)
+
+  > Quinlan AR, Hall IM. BEDTools: a flexible suite of utilities for comparing genomic features. Bioinformatics. 2010 Mar 15;26(6):841-2. doi: 10.1093/bioinformatics/btq033. Epub 2010 Jan 28. PubMed PMID: 20110278; PubMed Central PMCID: PMC2832824.
+
+- [MMseqs2](https://github.com/soedinglab/MMseqs2)
+
+  > Steinegger M, Soding J. MMseqs2 enables sensitive protein sequence searching for the analysis of massive data sets. Nat Biotechnol. 2017 Nov;35(11):1026-1028. doi: 10.1038/nbt.3988. Epub 2017 Oct 16. PubMed PMID: 29035372.
+
+  > Steinegger M, Soding J. Clustering huge protein sequence sets in linear time. Nat Commun. 2018 Jun 29;9(1):2542. doi: 10.1038/s41467-018-04964-5. PubMed PMID: 29959318; PubMed Central PMCID: PMC6026198.
+
+- [SAMtools](https://github.com/samtools/samtools)
+
+  > Danecek P, Bonfield JK, Liddle J, Marshall J, Ohan V, Pollard MO, Whitwham A, Keane T, McCarthy SA, Davies RM, Li H. Twelve years of SAMtools and BCFtools. GigaScience. 2021;10(2):giab008. doi: 10.1093/gigascience/giab008.
+
+- [SeqKit](https://github.com/shenwei356/seqkit)
+
+  > Shen W, Le S, Li Y, Hu F. SeqKit: A Cross-Platform and Ultrafast Toolkit for FASTA/Q File Manipulation. PLoS One. 2016 Oct 5;11(10):e0163962. doi: 10.1371/journal.pone.0163962. PubMed PMID: 27706213; PubMed Central PMCID: PMC5051824.
 
 - [Eggnog](https://github.com/eggnogdb/eggnog-mapper)
 
@@ -76,9 +94,21 @@
 
 - [Kofamscan](https://github.com/takaram/kofam_scan)
 
+  > Aramaki T, Blanc-Mathieu R, Endo H, Ohkubo K, Kanehisa M, Goto S, Ogata H. KofamKOALA: KEGG Ortholog assignment based on profile HMM and adaptive score threshold. Bioinformatics. 2020;36(7):2251-2252. doi: 10.1093/bioinformatics/btz859.
+
+- [dbCAN](https://bcb.unl.edu/dbCAN2/)
+
+  > Zheng J, Ge Q, Yan Y, Zhang X, Huang L, Yin Y. dbCAN3: automated
+  > carbohydrate-active enzyme and substrate annotation. Nucleic Acids
+  > Research, 51(W1):W115-W121, 2023. doi: 10.1093/nar/gkad328
+
 - [HMMsearch](https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch)
 
+  > Eddy SR. Accelerated Profile HMM Searches. PLoS Comput Biol. 2011;7(10):e1002195. doi: 10.1371/journal.pcbi.1002195.
+
 - [EUKulele](https://github.com/AlexanderLabWHOI/EUKulele)
+
+  > Krinos A, Hu S, Cohen N, Alexander H. EUKulele: Taxonomic annotation of the unsung eukaryotic microbes. Journal of Open Source Software. 2021;6(57):2817. doi: 10.21105/joss.02817.
 
 - [Diamond](https://github.com/bbuchfink/diamond)
 
@@ -88,13 +118,13 @@
 
   > Wei S, Ren H. 2021. “TaxonKit: A Practical and Efficient NCBI Taxonomy Toolkit.” Journal of Genetics and Genomics, Special issue on Microbiome, 48 (9): 844–50. https://doi.org/10.1016/j.jgg.2021.03.006.
 
-- [CAT](https://github.com/dutilh/CAT)
+- [QUAST](https://github.com/ablab/quast)
 
-  > von Meijenfeldt FAB, Arkhipova K, Cambuy DD, Coutinho FH, Dutilh BE. Robust taxonomic classification of uncharted microbial sequences and bins with CAT and BAT. Genome Biology. 2019;20:217.
+  > Gurevich A, Saveliev V, Vyahhi N, Tesler G. QUAST: quality assessment tool for genome assemblies. Bioinformatics. 2013;29(8):1072-1075. doi: 10.1093/bioinformatics/btt086.
 
-- [transrate](https://hibberdlab.com/transrate/)
+- [DuckDB](https://duckdb.org)
 
-  > Smith-Unna R, Boursnell C, Patro R, Hibberd J, Kelly S. TransRate: reference free quality assessment of de-novo transcriptome assemblies (2016). Genome Research doi: [http://dx.doi.org/10.1101/gr.196469.115](http://dx.doi.org/10.1101/gr.196469.115)
+  > Raasveldt M, Mühleisen H. DuckDB: an Embeddable Analytical Database. In: Proceedings of the 2019 International Conference on Management of Data (SIGMOD '19). 2019 Jun 25:1981-1984. doi: 10.1145/3299869.3320212.
 
 ## Software packaging/containerisation tools
 

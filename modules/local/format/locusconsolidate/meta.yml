@@ -1,0 +1,49 @@
+name: "format_locusconsolidate"
+description: Turns bedtools-merge output (strand-aware merged CDS intervals from multiple
+  ORF callers) into a consolidated GFF, applying the ID-inheritance rule -- a locus with a
+  single distinct contributor keeps that contributor's own original ID, a locus with
+  several distinct contributors gets a fresh coordinate-derived ID -- plus a separate
+  provenance table recording which caller(s) contributed to each locus and how many
+  independent calls it received
+keywords:
+  - gff
+  - bed
+  - format
+  - locus consolidation
+input:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - merged_bed:
+      type: file
+      description: >
+        bedtools merge output over all active callers' CDS intervals, 6 columns:
+        chr, start (0-based), end, strand, distinct "<caller>:<original ID>" names, count
+      pattern: "*.bed"
+output:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - gff:
+      type: file
+      description: Consolidated CDS GFF, one row per merged locus
+      pattern: "*.gff.gz"
+  - provenance:
+      type: file
+      description: Per-locus provenance table (ID, callers, n_calls)
+      pattern: "*.provenance.tsv.gz"
+  - members:
+      type: file
+      description: >
+        Per-locus membership table (ID, caller, orf), one row per original per-caller ORF
+        the locus was merged from, deduplicated across the exon segments of a multi-exon
+        gene. Lets a locus with a synthesized ID be traced back to a protein sequence.
+      pattern: "*.members.tsv.gz"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+authors:
+  - "@erikrikarddaniel"
+maintainers:
+  - "@erikrikarddaniel"

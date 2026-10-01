@@ -3,7 +3,7 @@ process PROKKAGFF2TSV {
     label 'process_medium'
 
     conda "${moduleDir}/environment.yml"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+    container "${ workflow.containerEngine in ['singularity', 'apptainer'] && !task.ext.singularity_pull_docker_container ?
         'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/4b/4b997e8d619c30e5ea23a08d9fb7e4b0c9b441f3187b64d65ff1c0df5e12bba0/data' :
         'community.wave.seqera.io/library/r-base_r-r.utils_r-dplyr_r-readr_pruned:b59bb1a4cfb1196e' }"
 
@@ -58,5 +58,22 @@ process PROKKAGFF2TSV {
         ),
         "versions.yml"
     )
+    """
+
+    stub:
+    def prefix = task.ext.prefix ?: "${meta.id}"
+    """
+    echo "" | gzip > ${prefix}.prokka-annotations.tsv.gz
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        R: 4.5.3
+        data.table: 1.17.8
+        dtplyr: 1.3.3
+        dplyr: 1.2.1
+        tidyr: 1.3.2
+        readr: 2.2.0
+        stringr: 1.6.0
+    END_VERSIONS
     """
 }
