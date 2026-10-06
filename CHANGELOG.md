@@ -45,6 +45,7 @@ Their calls are merged into loci and clustered into proteins, giving one count t
 
 ### `Changed`
 
+- [#NN](https://github.com/nf-core/metatdenovo/pull/NN) - Update the metro map in the README to show the 2.0 workflow (@erikrikarddaniel)
 - [#527](https://github.com/nf-core/metatdenovo/pull/527) - KofamScan and eggNOG database downloads no longer need network access on the compute node, addresses [#365](https://github.com/nf-core/metatdenovo/issues/365) (@erikrikarddaniel)
 - [#491](https://github.com/nf-core/metatdenovo/pull/491) - Replace TransRate with QUAST for assembly statistics, addresses [#487](https://github.com/nf-core/metatdenovo/issues/487) (@erikrikarddaniel)
 - [#489](https://github.com/nf-core/metatdenovo/pull/489) - Use the shared nf-core module `custom/collectfeaturecounts` for count tables, with unchanged output (@erikrikarddaniel)

@@ -27,7 +27,10 @@ On release, automated continuous integration tests run the pipeline on a full-si
 
 ## Pipeline summary
 
-![nf-core/metatdenovo metro map](docs/images/metat-metromap.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/nf-core-metatdenovo_metro_map_dark.svg">
+  <img alt="nf-core/metatdenovo metro map" src="docs/images/nf-core-metatdenovo_metro_map_light.svg">
+</picture>
 
 1. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
 2. Present QC for raw reads ([`MultiQC`](http://multiqc.info/))

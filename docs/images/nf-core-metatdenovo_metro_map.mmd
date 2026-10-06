@@ -1,0 +1,127 @@
+%%
+%% Source for docs/images/nf-core-metatdenovo_metro_map_{light,dark}.svg, rendered with nf-metro
+%% (https://github.com/pinin4fjords/nf-metro, also on bioconda):
+%%   nf-metro render nf-core-metatdenovo_metro_map.mmd --theme nfcore --mode light --embed-font \
+%%     --logo nf-core-metatdenovo_logo_light.png -o nf-core-metatdenovo_metro_map_light.svg
+%%   nf-metro render nf-core-metatdenovo_metro_map.mmd --theme nfcore --mode dark --embed-font \
+%%     --logo nf-core-metatdenovo_logo_dark.png -o nf-core-metatdenovo_metro_map_dark.svg
+%%
+
+%%metro title: nf-core/metatdenovo
+%%metro style: nfcore
+
+%%metro line: reads | Reads | #24B064
+%%metro line: contigs | Contigs | #3D5A80
+%%metro line: orfs | ORFs per caller | #E67E22
+%%metro line: user | Your own ORFs | #8E44AD | dashed
+%%metro line: consolidated | Consolidated loci and proteins | #C0392B
+
+%%metro files: reads_in | FASTQ | Reads
+%%metro file: assembly_in | FASTA | Your assembly
+%%metro files: orfs_in | GFF+FAA | Your ORFs
+%%metro file: counts_out | TSV | Count tables
+%%metro file: annot_out | TSV | Annotation tables
+%%metro file: report_out | HTML | MultiQC report
+
+%%metro grid: preprocessing | 0,0
+%%metro grid: assembly | 1,0
+%%metro grid: orfcalling | 2,0
+%%metro grid: consolidation | 3,0
+%%metro grid: annotation | 4,0
+%%metro grid: mapping | 2,1
+%%metro grid: counting | 3,1
+%%metro grid: summary | 4,1
+
+graph LR
+    subgraph preprocessing [Preprocessing]
+        reads_in[ ]
+        fastqc[FastQC]
+        trimgalore[Trim Galore!]
+        bbduk[BBDuk]
+        seqtk[Seqtk]
+        bbnorm[BBNorm]
+        reads_in -->|reads| fastqc
+        fastqc -->|reads| trimgalore
+        trimgalore -->|reads| bbduk
+        bbduk -->|reads| seqtk
+        seqtk -->|reads| bbnorm
+    end
+
+    subgraph assembly [Assembly]
+        megahit[MEGAHIT]
+        spades[SPAdes]
+        assembly_in[ ]
+        quast[QUAST]
+        megahit -->|contigs| quast
+        spades -->|contigs| quast
+        assembly_in -->|contigs| quast
+    end
+
+    subgraph orfcalling [ORF calling]
+        prokka[Prokka]
+        prodigal[Prodigal]
+        transdecoder[TransDecoder]
+        metaeuk[MetaEuk]
+    end
+
+    subgraph consolidation [Consolidation]
+        orfs_in[ ]
+        locus[Locus consolidation]
+            mmseqs[MMseqs2 clustering]
+        locus -->|consolidated| mmseqs
+    end
+
+    subgraph mapping [Mapping]
+        bbmap[BBMap]
+        samtools[Samtools]
+        bbmap -->|reads| samtools
+    end
+
+    subgraph counting [Quantification]
+        featurecounts[featureCounts]
+        counts_out[ ]
+        featurecounts -->|orfs,user,consolidated| counts_out
+    end
+
+    subgraph annotation [Functional and taxonomic annotation]
+        eggnog[eggNOG-mapper]
+        kofamscan[KofamScan]
+        dbcan[dbCAN]
+        hmmer[HMMER]
+        eukulele[EUKulele]
+        diamond[Diamond]
+        annot_out[ ]
+        eggnog -->|orfs,user,consolidated| kofamscan
+        kofamscan -->|orfs,user,consolidated| dbcan
+        dbcan -->|orfs,user,consolidated| hmmer
+        hmmer -->|orfs,user,consolidated| eukulele
+        eukulele -->|orfs,user,consolidated| diamond
+        diamond -->|orfs,user,consolidated| annot_out
+    end
+
+    subgraph summary [Summary]
+        stats[Summary statistics]
+        multiqc[MultiQC]
+        report_out[ ]
+        stats -->|orfs,user,consolidated| multiqc
+        multiqc -->|orfs,user,consolidated| report_out
+    end
+
+    bbnorm -->|reads| megahit
+    bbnorm -->|reads| spades
+    seqtk -->|reads| bbmap
+    quast -->|contigs| prokka
+    quast -->|contigs| prodigal
+    quast -->|contigs| transdecoder
+    quast -->|contigs| metaeuk
+    quast -->|contigs| bbmap
+    prokka -->|orfs| locus
+    prodigal -->|orfs| locus
+    transdecoder -->|orfs| locus
+    metaeuk -->|orfs| locus
+    orfs_in -->|user| locus
+    locus -->|orfs,user,consolidated| featurecounts
+    samtools -->|reads| featurecounts
+    mmseqs -->|consolidated| featurecounts
+    mmseqs -->|orfs,user,consolidated| eggnog
+    featurecounts -->|orfs,user,consolidated| stats
