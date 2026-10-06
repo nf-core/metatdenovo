@@ -55,11 +55,6 @@
             "default": "",
             "fa_icon": "fas fa-check",
             "properties": {
-                "skip_qc": {
-                    "type": "boolean",
-                    "description": "Skip all QC steps except for MultiQC.",
-                    "fa_icon": "fas fa-forward"
-                },
                 "skip_fastqc": {
                     "type": "boolean",
                     "description": "Skip FastQC.",
@@ -271,6 +266,12 @@
                     "fa_icon": "fas fa-download",
                     "default": true
                 },
+                "save_idxstats": {
+                    "type": "boolean",
+                    "description": "Save the per-contig read counts from `samtools idxstats`",
+                    "help_text": "These files have one line per contig, so they get large for fragmented assemblies: 1.8 GB per sample on an assembly of 82 million contigs.",
+                    "fa_icon": "fas fa-download"
+                },
                 "bbmap_minid": {
                     "type": "number",
                     "default": 0.9,
@@ -436,7 +437,7 @@
                     "description": "Name of the amino-acid reference database to download and build for MetaEuk when `--metaeuk_db` isn't set. Restricted to the amino-acid databases `metaeuk databases -h` lists (its nucleotide/profile entries aren't valid MetaEuk homology references); see the table in usage.md for which of these we've actually confirmed downloadable.",
                     "fa_icon": "fas fa-download"
                 },
-                "metaeuk_db_dir": {
+                "metaeuk_dbpath": {
                     "type": "string",
                     "default": "./metaeuk_db/",
                     "description": "Path to a directory to store the downloaded MetaEuk database in. Will be created if it doesn't exist. Ignored when `--metaeuk_db` is set.",
@@ -507,11 +508,17 @@
                     "description": "If enabled, skips the run of KofamScan.",
                     "fa_icon": "fas fa-forward"
                 },
-                "kofam_dir": {
+                "kofam_dbpath": {
                     "type": "string",
                     "default": "./kofam/",
                     "description": "Path to a directory with KOfam files. Will be created if it doesn't exist.",
                     "help_text": "If a `ko_list` file and/or `profiles` does not exist, they will be downloaded.",
+                    "fa_icon": "fas fa-folder-open"
+                },
+                "kofam_dir": {
+                    "type": "string",
+                    "description": "Deprecated: use `--kofam_dbpath`. If set, its value is used instead of `--kofam_dbpath`.",
+                    "hidden": true,
                     "fa_icon": "fas fa-folder-open"
                 },
                 "kofam_ko_list_url": {

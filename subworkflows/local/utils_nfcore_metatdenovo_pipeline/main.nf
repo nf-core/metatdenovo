@@ -208,6 +208,9 @@ workflow PIPELINE_COMPLETION {
 // Check and validate pipeline parameters
 //
 def validateInputParameters() {
+    if ( params.kofam_dir ) {
+        log.warn("`--kofam_dir` is deprecated, use `--kofam_dbpath` instead. Using `--kofam_dir ${params.kofam_dir}`.")
+    }
 }
 
 //

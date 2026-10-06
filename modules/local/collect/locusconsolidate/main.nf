@@ -43,7 +43,7 @@ process COLLECT_LOCUSCONSOLIDATE {
                         lazy_dt() %>%
                         filter(count > 0) %>%
                         mutate(
-                            sample = str_remove(sample, '.sorted.bam'),
+                            sample = str_remove(sample, '[.]sorted[.]bam\$'),
                             r = count/Length
                         ) %>%
                         rename(orf = Geneid, chr = Chr, start = Start, end = End, strand = Strand, length = Length) %>%

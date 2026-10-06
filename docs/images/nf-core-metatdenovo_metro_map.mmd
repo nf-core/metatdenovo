@@ -1,0 +1,170 @@
+%%
+%% The workflow's structure, as drawn by hand in nf-core-metatdenovo_metro_map_{light,dark}.svg.
+%% Update it when the workflow changes, as a checklist for what the drawing must show.
+%% nf-metro 2.1.0 (https://github.com/pinin4fjords/nf-metro, also on bioconda) renders it as an automatic
+%% layout to compare against. Write the output elsewhere; it would overwrite the drawing:
+%%   nf-metro render nf-core-metatdenovo_metro_map.mmd --theme nfcore --mode light --embed-font \
+%%     --logo nf-core-metatdenovo_logo_light.png --no-chrome-css --no-dark-mode-css -o /tmp/metro_map.svg
+%% y_spacing is set below nf-metro's computed minimum on purpose, to keep the map compact.
+%%
+
+%%metro title: nf-core/metatdenovo
+%%metro style: nfcore
+%%metro font_scale: 1.4
+%%metro stroke_scale: 1.3
+%%metro compact_offsets: true
+%%metro y_spacing: 68
+
+%%metro line: reads | Reads | #24B064
+%%metro line: contigs | Contigs | #3D5A80
+%%metro line: orfs | ORFs per caller | #E67E22
+%%metro line: user | Your own ORFs | #8E44AD | dashed
+%%metro line: consolidated | Consolidated loci and proteins | #C0392B
+%%metro line: qc | QC reports | #7F8C8D | dotted
+
+%%metro files: reads_in | FASTQ | Reads
+%%metro file: assembly_in | FASTA | Your assembly
+%%metro files: orfs_in | GFF+FAA | Your ORFs
+%%metro file: counts_out | TSV | Count tables
+%%metro file: eggnog_out | TSV
+%%metro file: kofamscan_out | TSV
+%%metro file: dbcan_out | TSV
+%%metro file: hmmer_out | TSV
+%%metro file: eukulele_out | TSV
+%%metro file: diamond_out | TSV
+%%metro file: stats_out | TSV | Statistics
+%%metro files: qc_in | LOG | Tool reports
+%%metro file: report_out | HTML | MultiQC report
+
+%%metro off_track: quast, qc_in
+
+%%metro marker: fastqc | circle, #bdbdbd
+%%metro marker: trimgalore | circle, #bdbdbd
+%%metro marker: bbduk | circle, #bdbdbd
+%%metro marker: bbnorm | circle, #bdbdbd
+%%metro marker: mmseqs | circle, #bdbdbd
+%%metro marker: eggnog | circle, #bdbdbd
+%%metro marker: kofamscan | circle, #bdbdbd
+%%metro marker: dbcan | circle, #bdbdbd
+%%metro marker: hmmer | circle, #bdbdbd
+%%metro marker: eukulele | circle, #bdbdbd
+%%metro marker: diamond | circle, #bdbdbd
+%%metro marker_legend: circle, #bdbdbd | Optional step
+
+%%metro grid: preprocessing | 0,0
+%%metro grid: assembly | 1,0
+%%metro grid: orfcalling | 2,0
+%%metro grid: consolidation | 3,0
+%%metro grid: annotation | 4,0
+%%metro grid: quantification | 3,1
+%%metro grid: summary | 4,1
+
+graph LR
+    subgraph preprocessing [Preprocessing]
+        reads_in[ ]
+        fastqc[FastQC]
+        trimgalore[Trim Galore!]
+        bbduk[BBDuk]
+        seqtk[Seqtk]
+        bbnorm[BBNorm]
+        reads_in -->|reads| fastqc
+        fastqc -->|reads| trimgalore
+        trimgalore -->|reads| bbduk
+        bbduk -->|reads| seqtk
+        seqtk -->|reads| bbnorm
+    end
+
+    subgraph assembly [Assembly]
+        megahit[MEGAHIT]
+        spades[SPAdes]
+        assembly_in[ ]
+        _contigs
+        quast[QUAST]
+        megahit -->|contigs| _contigs
+        spades -->|contigs| _contigs
+        assembly_in -->|contigs| _contigs
+        _contigs -->|contigs| quast
+    end
+
+    subgraph orfcalling [ORF calling]
+        prokka[Prokka]
+        prodigal[Prodigal]
+        transdecoder[TransDecoder]
+        metaeuk[MetaEuk]
+    end
+
+    subgraph consolidation [Consolidation]
+        orfs_in[ ]
+        locus[Locus consolidation]
+        mmseqs[MMseqs2 clustering]
+        locus -->|consolidated| mmseqs
+    end
+
+    subgraph quantification [Mapping and counting]
+        bbmap[BBMap]
+        samtools[Samtools]
+        featurecounts[featureCounts]
+        bbmap -->|reads| samtools
+    end
+
+    subgraph annotation [Annotation]
+        eggnog[eggNOG-mapper]
+        kofamscan[KofamScan]
+        dbcan[dbCAN]
+        hmmer[HMMER]
+        eukulele[EUKulele]
+        diamond[Diamond]
+        _annot
+        eggnog_out[ ]
+        kofamscan_out[ ]
+        dbcan_out[ ]
+        hmmer_out[ ]
+        eukulele_out[ ]
+        diamond_out[ ]
+        _annot -->|consolidated| eggnog
+        _annot -->|consolidated| kofamscan
+        _annot -->|consolidated| dbcan
+        _annot -->|consolidated| hmmer
+        _annot -->|consolidated| eukulele
+        _annot -->|consolidated| diamond
+        eggnog -->|consolidated| eggnog_out
+        kofamscan -->|consolidated| kofamscan_out
+        dbcan -->|consolidated| dbcan_out
+        hmmer -->|consolidated| hmmer_out
+        eukulele -->|consolidated| eukulele_out
+        diamond -->|consolidated| diamond_out
+    end
+
+    subgraph summary [Summary outputs]
+        counts[Count tables]
+        counts_out[ ]
+        stats[Summary statistics]
+        stats_out[ ]
+        qc_in[ ]
+        multiqc[MultiQC]
+        report_out[ ]
+        counts -->|consolidated| counts_out
+        counts -->|consolidated| stats
+        stats -->|consolidated| stats_out
+        qc_in -->|qc| multiqc
+        multiqc -->|qc| report_out
+    end
+
+    bbnorm -->|reads| megahit
+    bbnorm -->|reads| spades
+    bbduk -->|reads| bbmap
+    _contigs -->|contigs| prokka
+    _contigs -->|contigs| prodigal
+    _contigs -->|contigs| transdecoder
+    _contigs -->|contigs| metaeuk
+    _contigs -->|contigs| bbmap
+    prokka -->|orfs| locus
+    prodigal -->|orfs| locus
+    transdecoder -->|orfs| locus
+    metaeuk -->|orfs| locus
+    orfs_in -->|user| locus
+    locus -->|consolidated| featurecounts
+    samtools -->|reads| featurecounts
+    mmseqs -->|consolidated| counts
+    mmseqs -->|consolidated| _annot
+    featurecounts -->|consolidated| counts
