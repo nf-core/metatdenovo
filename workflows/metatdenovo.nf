@@ -128,7 +128,6 @@ workflow METATDENOVO {
     def skip_fastqc                = typecastBooleanParam('skip_fastqc')
     def skip_kofamscan             = typecastBooleanParam('skip_kofamscan')
     def skip_protein_consolidation = typecastBooleanParam('skip_protein_consolidation')
-    def skip_qc                    = typecastBooleanParam('skip_qc')
     def skip_trimming              = typecastBooleanParam('skip_trimming')
     def min_contig_length          = typecastIntegerParam('min_contig_length')
     def trim_bam_header_above      = typecastIntegerParam('trim_bam_header_above')
@@ -302,7 +301,7 @@ workflow METATDENOVO {
     //
     FASTQC_TRIMGALORE (
         ch_fastq,
-        skip_fastqc || skip_qc,
+        skip_fastqc,
         skip_trimming
     )
 
