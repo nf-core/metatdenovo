@@ -42,9 +42,8 @@
                     },
                     "custom/collectfeaturecounts": {
                         "branch": "master",
-                        "git_sha": "94b413835288b0e80bd29256d0a95e4fce020a8b",
-                        "installed_by": ["modules"],
-                        "patch": "modules/nf-core/custom/collectfeaturecounts/custom-collectfeaturecounts.diff"
+                        "git_sha": "7574f3f0316ceab3da2a6c87af1f41f692884636",
+                        "installed_by": ["modules"]
                     },
                     "custom/collectstats": {
                         "branch": "master",
