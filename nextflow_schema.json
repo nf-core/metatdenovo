@@ -436,7 +436,7 @@
                     "description": "Name of the amino-acid reference database to download and build for MetaEuk when `--metaeuk_db` isn't set. Restricted to the amino-acid databases `metaeuk databases -h` lists (its nucleotide/profile entries aren't valid MetaEuk homology references); see the table in usage.md for which of these we've actually confirmed downloadable.",
                     "fa_icon": "fas fa-download"
                 },
-                "metaeuk_db_dir": {
+                "metaeuk_dbpath": {
                     "type": "string",
                     "default": "./metaeuk_db/",
                     "description": "Path to a directory to store the downloaded MetaEuk database in. Will be created if it doesn't exist. Ignored when `--metaeuk_db` is set.",
@@ -507,7 +507,7 @@
                     "description": "If enabled, skips the run of KofamScan.",
                     "fa_icon": "fas fa-forward"
                 },
-                "kofam_dir": {
+                "kofam_dbpath": {
                     "type": "string",
                     "default": "./kofam/",
                     "description": "Path to a directory with KOfam files. Will be created if it doesn't exist.",

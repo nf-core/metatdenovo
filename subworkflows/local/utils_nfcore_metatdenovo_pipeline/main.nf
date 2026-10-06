@@ -208,6 +208,10 @@ workflow PIPELINE_COMPLETION {
 // Check and validate pipeline parameters
 //
 def validateInputParameters() {
+    // Unknown params only warn, so the old name would silently re-download KOfam to the default path
+    if ( params.containsKey('kofam_dir') ) {
+        error("`--kofam_dir` was renamed to `--kofam_dbpath` in 2.0.0.")
+    }
 }
 
 //

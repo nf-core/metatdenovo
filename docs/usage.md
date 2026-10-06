@@ -138,7 +138,7 @@ MetaEuk (`--orf_caller metaeuk`) is a second eukaryote-targeted alternative.
 Unlike Transdecoder, which calls ORFs directly on the assembled contigs/transcripts, MetaEuk is splice-aware: it aligns contigs against a reference protein database and can call a single gene model spanning an intron, which matters for assemblies that include intron-containing genomic sequence alongside spliced transcripts.
 
 It requires a reference protein database.
-By default the pipeline downloads and builds one automatically the first time it's needed, using MetaEuk's own `metaeuk databases` command, and caches it under `--metaeuk_db_dir` (default `./metaeuk_db/`) so later runs reuse it instead of re-downloading.
+By default the pipeline downloads and builds one automatically the first time it's needed, using MetaEuk's own `metaeuk databases` command, and caches it under `--metaeuk_dbpath` (default `./metaeuk_db/`) so later runs reuse it instead of re-downloading.
 `--metaeuk_db_name` (default `UniRef50`) picks which database to build.
 
 Allowed names are the amino-acid databases `metaeuk databases -h` offers.
@@ -159,7 +159,7 @@ MetaEuk itself fetches them from third-party hosts, so only the ones below are c
 A dash means untested, not known broken.
 
 To use an existing database, pass it with `--metaeuk_db`, either a protein fasta file or a directory containing an MMseqs2-formatted database.
-This takes priority over `--metaeuk_db_name`/`--metaeuk_db_dir`, which are then ignored.
+This takes priority over `--metaeuk_db_name`/`--metaeuk_dbpath`, which are then ignored.
 To build one ahead of time:
 
 ```bash
@@ -466,7 +466,7 @@ programs available in the workflow: the [eggNOG-mapper](http://eggnog-mapper.emb
 Both are suitable for both prokaryotic and eukaryotic genes and both are run by default, but can be skipped using the `--skip_eggnog` and
 `--skip_kofamscan` options respectively.
 The tools use large databases which are downloaded automatically but paths can be provided by the user through the `--eggnog_dbpath directory`
-and `--kofam_dir dir` parameters respectively.
+and `--kofam_dbpath dir` parameters respectively.
 It is practical to let the pipeline download the files on the first run, and then reuse the data by setting the parameters.
 
 :::note
@@ -477,7 +477,7 @@ The pipeline instead fetches the files directly from [the current download site]
 :::note
 Both the eggNOG and KofamScan databases are large (eggNOG's files total over 10 GB; KofamScan's `profiles.tar.gz` is around 1.5 GB), and Nextflow's own file staging has no resume support: an interrupted transfer restarts from scratch, up to a few retries, rather than continuing where it left off.
 Over an unreliable connection this can fail repeatedly on the largest files.
-If that happens, download the files yourself with a tool that supports resuming (e.g. `wget -c` or `aria2c`), unpack them, and point `--eggnog_dbpath`/`--kofam_dir` at the result so the pipeline reuses them instead of downloading.
+If that happens, download the files yourself with a tool that supports resuming (e.g. `wget -c` or `aria2c`), unpack them, and point `--eggnog_dbpath`/`--kofam_dbpath` at the result so the pipeline reuses them instead of downloading.
 :::
 
 A third functional annotation option is CAZyme annotation using [dbCAN](https://bcb.unl.edu/dbCAN2/) (`run_dbcan`), which is also run by
@@ -519,7 +519,7 @@ will be called with the option `--eggnog_dbpath`
 
 ##### Kofamscan databases
 
-You can use `wget` to download the file in a new directory that will be used with `--kofam_dir`
+You can use `wget` to download the file in a new directory that will be used with `--kofam_dbpath`
 
 ```bash
 wget https://www.genome.jp/ftp/db/kofam/ko_list.gz

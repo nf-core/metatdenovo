@@ -11,6 +11,7 @@ Their calls are merged into loci and clustered into proteins, giving one count t
 
 ### `Breaking changes`
 
+- [#558](https://github.com/nf-core/metatdenovo/pull/558) - `--kofam_dir` is renamed `--kofam_dbpath`, matching the other database location parameters (@erikrikarddaniel)
 - [#501](https://github.com/nf-core/metatdenovo/pull/501) - With more than one ORF source, only the protein-cluster representatives are annotated by default; set `--annotate_only_consolidated false` to annotate every source's full protein set (@erikrikarddaniel)
 - [#491](https://github.com/nf-core/metatdenovo/pull/491) - TransRate is removed; assembly statistics now come from QUAST, in `quast/` and its own MultiQC section (@erikrikarddaniel)
 - [#488](https://github.com/nf-core/metatdenovo/pull/488), [#504](https://github.com/nf-core/metatdenovo/pull/504) - Columns in `<assembly>.<caller>.overall_stats.tsv.gz` are renamed and reordered, so read them by name (@erikrikarddaniel)
