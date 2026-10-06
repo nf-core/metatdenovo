@@ -205,23 +205,21 @@ workflow METATDENOVO {
     // Display label only, not tied to which callers run
     def orfs_name  = params.orf_caller ?: params.user_orfs_name
 
-    ch_hmmrs = channel.empty()
+    def ch_hmmrs = channel.empty()
     if ( params.hmmdir ) {
-        channel
+        ch_hmmrs = channel
             .fromPath(params.hmmdir + params.hmmpattern, checkIfExists: true)
-            .set { ch_hmmrs }
     } else if ( params.hmmfiles ) {
-        channel
+        ch_hmmrs = channel
             .fromList( params.hmmfiles.tokenize(',') )
             .map { hmmfile -> [ file(hmmfile) ] }
-            .set { ch_hmmrs }
     }
 
     def ch_versions = channel.empty()
     def ch_multiqc_files = channel.empty()
 
     // DL: I'm not sure which parts are still required after nf-schema. The branch { } certainly is needed.
-    ch_fastq = ch_samplesheet
+    def ch_fastq = ch_samplesheet
         .flatMap { meta, fastq_files ->
             if (fastq_files.size() <= 2) {
                 return [[ meta.id, [meta], fastq_files ]]
@@ -250,7 +248,7 @@ workflow METATDENOVO {
     ch_multiqc_files = channel.empty()
     // Only single-row samples: CAT_FASTQ already gzips the rest
 
-    fwd = ch_fastq.single
+    def fwd = ch_fastq.single
         .filter { meta, _f -> ! meta.single_end }
         .map { meta, fastqs -> [ meta, fastqs[0] ] }
         .branch {
@@ -262,7 +260,7 @@ workflow METATDENOVO {
         }
     PIGZ_PE_READS_FWD(fwd.unzipped)
 
-    rev = ch_fastq.single
+    def rev = ch_fastq.single
         .filter { meta, _f -> ! meta.single_end }
         .map { meta, fastqs -> [ meta, fastqs[1] ] }
         .branch {
@@ -274,7 +272,7 @@ workflow METATDENOVO {
         }
     PIGZ_PE_READS_REV(rev.unzipped)
 
-    se = ch_fastq.single
+    def se = ch_fastq.single
         .filter { meta, _f -> meta.single_end }
         .map { meta, fastqs -> [ meta, fastqs[0] ] }
         .branch {
@@ -305,7 +303,7 @@ workflow METATDENOVO {
         skip_trimming
     )
 
-    ch_collect_stats = ch_fastq
+    def ch_collect_stats = ch_fastq
         .collect { meta, _fasta -> meta }
         .map { metas -> [ [ id:"${assembly_name}.${orfs_name}" ], metas ] }
 
@@ -335,15 +333,15 @@ workflow METATDENOVO {
     ch_multiqc_files = ch_multiqc_files.mix(FASTQC_TRIMGALORE.out.trim_log.collect { _meta, log -> log })
     ch_multiqc_files = ch_multiqc_files.mix(FASTQC_TRIMGALORE.out.trim_zip.collect { _meta, zip -> zip })
 
+    def ch_clean_reads = channel.empty()
     if ( params.sequence_filter ) {
         BBMAP_BBDUK ( FASTQC_TRIMGALORE.out.reads, channel.fromPath(params.sequence_filter).first() )
         ch_clean_reads  = BBMAP_BBDUK.out.reads
-        ch_bbduk_logs = BBMAP_BBDUK.out.log.collect { _meta, log ->  log }.map { log -> [ log ] }
+        def ch_bbduk_logs = BBMAP_BBDUK.out.log.collect { _meta, log ->  log }.map { log -> [ log ] }
         ch_collect_stats = ch_collect_stats.combine(ch_bbduk_logs)
         ch_multiqc_files = ch_multiqc_files.mix(BBMAP_BBDUK.out.log.collect{ _meta, log -> log })
     } else {
         ch_clean_reads  = FASTQC_TRIMGALORE.out.reads
-        ch_bbduk_logs = channel.empty()
         ch_collect_stats = ch_collect_stats
             .map { meta, samples, report -> [ meta, samples, report, [] ] }
     }
@@ -351,7 +349,7 @@ workflow METATDENOVO {
     //
     // MODULE: Interleave sequences for assembly
     //
-    ch_interleaved = channel.empty()
+    def ch_interleaved = channel.empty()
     if ( ! params.user_assembly ) {
         SEQTK_MERGEPE(ch_clean_reads)
         ch_interleaved = SEQTK_MERGEPE.out.reads
@@ -360,6 +358,8 @@ workflow METATDENOVO {
     //
     // SUBWORKFLOW: Perform digital normalization.
     //
+    def ch_pe_reads_to_assembly = channel.empty()
+    def ch_se_reads_to_assembly = channel.empty()
     if ( ! params.user_assembly ) {
         if ( params.bbnorm ) {
             BBMAP_BBNORM(
@@ -382,6 +382,7 @@ workflow METATDENOVO {
     //
     // MODULE: Run Megahit or Spades on all interleaved fastq files
     //
+    def ch_assembly_contigs = channel.empty()
     if ( params.user_assembly ) {
         // Downstream assumes a gzipped assembly
         if ( ! params.user_assembly.endsWith('.gz') ) {
@@ -401,7 +402,7 @@ workflow METATDENOVO {
             ch_se_reads_to_assembly.toList()
         )
 
-        ch_spades = ch_pe_reads_to_assembly
+        def ch_spades = ch_pe_reads_to_assembly
             .mix(ch_se_reads_to_assembly)
             .collect()
             .map { it -> [ [ id: assembly_name ], it, [], [] ] }
@@ -411,14 +412,14 @@ workflow METATDENOVO {
             []
         )
 
-        ch_spades_assembly = SPADES.out.transcripts
+        def ch_spades_assembly = SPADES.out.transcripts
             .ifEmpty { [] }
             .combine(SPADES.out.contigs.ifEmpty { [] } )
 
         FORMATSPADES( ch_spades_assembly.first() )
         ch_assembly_contigs = FORMATSPADES.out.assembly
     } else if ( assembler == 'megahit' ) {
-        ch_megahit_reads = ch_se_reads_to_assembly.toList()
+        def ch_megahit_reads = ch_se_reads_to_assembly.toList()
             .map { se_reads -> [ [ id: 'megahit_assembly', single_end: true ], se_reads, [] ] }
 
         MEGAHIT(
@@ -440,12 +441,12 @@ workflow METATDENOVO {
     //
     // Call ORFs
     //
-    ch_gff      = channel.empty()
-    ch_protein  = channel.empty()
+    def ch_gff      = channel.empty()
+    def ch_protein  = channel.empty()
     // Gathered for a single UNPIGZ_GFF call: an unaliased process can only be invoked once per workflow
-    ch_gff_gz   = channel.empty()
+    def ch_gff_gz   = channel.empty()
 
-    ch_parquet_tables = channel.empty()
+    def ch_parquet_tables = channel.empty()
 
     //
     // SUBWORKFLOW: Run Prokka on batches of the assembly
@@ -565,10 +566,10 @@ workflow METATDENOVO {
     }
 
     // User ORF sets act as further callers from here on. ch_gff must stay uncompressed.
-    ch_user_orfs_single = params.user_orfs_gff && params.user_orfs_faa ?
+    def ch_user_orfs_single = params.user_orfs_gff && params.user_orfs_faa ?
         channel.value( [ [ id: params.user_orfs_name ], file(params.user_orfs_gff), file(params.user_orfs_faa) ] ) :
         channel.empty()
-    ch_user_orfs_named = ch_user_orfs.mix(ch_user_orfs_single)
+    def ch_user_orfs_named = ch_user_orfs.mix(ch_user_orfs_single)
         .map { meta, gff, faa -> [ meta + [caller: meta.id, id: "${assembly_name}.${meta.id}"], gff, faa ] }
 
     USER_ORFS ( ch_user_orfs_named )
@@ -584,7 +585,7 @@ workflow METATDENOVO {
     // overlap alone fuses adjacent genes of one caller.
     FORMAT_GFF2BED ( ch_gff )
 
-    ch_locus_bed = FORMAT_GFF2BED.out.bed
+    def ch_locus_bed = FORMAT_GFF2BED.out.bed
         .map { _meta, bed -> bed }
         .collectFile(name: "${assembly_name}.combined.bed", sort: true)
         .map { bed -> [ [ id: "${assembly_name}.locus_consolidate", caller: 'locus_consolidate' ], bed ] }
@@ -596,7 +597,7 @@ workflow METATDENOVO {
 
     // Cluster locus proteins to join one gene called on different contigs. Members must be loci,
     // since the counts table sums per-locus counts. params.user_orfs is null for a gff/faa pair.
-    ch_protein_clusters = channel.empty()
+    def ch_protein_clusters = channel.empty()
     if ( ! skip_protein_consolidation && ( orf_callers || user_orf_names ) ) {
         // Joined on meta.id to stay 1:1 with several assemblies; sorted for a stable task hash
         FORMAT_LOCUSFAA (
@@ -652,7 +653,7 @@ workflow METATDENOVO {
     //
     // SUBWORKFLOW: classify ORFs with a set of hmm files
     //
-    ch_hmmclassify = ch_hmmrs
+    def ch_hmmclassify = ch_hmmrs
         .combine(ch_protein)
         .map { hmm, meta, protein -> [ meta, hmm, protein ] }
     HMMCLASSIFY ( ch_hmmclassify )
@@ -666,7 +667,7 @@ workflow METATDENOVO {
     )
 
     // featureCounts crashes on a BAM header over 2 GiB, i.e. about 75M contigs; idxstats is about as large as the header
-    ch_sorted_bam = BAM_SORT_STATS_SAMTOOLS.out.bam
+    def ch_sorted_bam = BAM_SORT_STATS_SAMTOOLS.out.bam
         .join(BAM_SORT_STATS_SAMTOOLS.out.index)
         .join(BAM_SORT_STATS_SAMTOOLS.out.idxstats)
         .branch { _meta, _bam, _bai, idxstats ->
@@ -676,7 +677,7 @@ workflow METATDENOVO {
 
     SAMTOOLS_TRIMHEADER ( ch_sorted_bam.trim.map { meta, bam, bai, _idxstats -> [ meta, bam, bai ] } )
 
-    ch_featurecounts = SAMTOOLS_TRIMHEADER.out.bam
+    def ch_featurecounts = SAMTOOLS_TRIMHEADER.out.bam
         .mix( ch_sorted_bam.keep.map { meta, bam, _bai, _idxstats -> [ meta, bam ] } )
         .combine(ch_gff)   // every sample x every caller
         .map { sampleMeta, bam, callerMeta, gff ->
@@ -721,7 +722,7 @@ workflow METATDENOVO {
     //
     // MODULE: Collect featurecounts output counts in one table
     //
-    ch_collect_feature = FEATURECOUNTS_CDS.out.counts
+    def ch_collect_feature = FEATURECOUNTS_CDS.out.counts
         .map { meta, fc -> [ meta.caller, fc ] }
         .groupTuple()
         .map { caller, fcs -> [ [ id: "${assembly_name}.${caller}", caller: caller ], fcs ] }
@@ -741,7 +742,7 @@ workflow METATDENOVO {
 
     // Keyed on assembly, as the inputs differ in caller. End-anchored strip: string minus removes the
     // first match, which breaks when the assembly name contains the caller name.
-    ch_protein_consolidate_counts = channel.empty()
+    def ch_protein_consolidate_counts = channel.empty()
     if ( ! skip_protein_consolidation && ( orf_callers || user_orf_names ) ) {
         COLLECT_PROTEINCONSOLIDATE (
             ch_collect_feature.locus_consolidate
@@ -758,7 +759,7 @@ workflow METATDENOVO {
     //
     // MODULE: Unassigned_* counts from featureCounts summaries
     //
-    ch_collect_summary = FEATURECOUNTS_CDS.out.summary
+    def ch_collect_summary = FEATURECOUNTS_CDS.out.summary
         .map { meta, summary -> [ meta.caller, summary ] }
         .groupTuple()
         .map { caller, summaries -> [ [ id: "${assembly_name}.${caller}", caller: caller ], summaries ] }
@@ -771,12 +772,12 @@ workflow METATDENOVO {
     ch_versions = ch_versions.mix(COLLECT_FEATURECOUNTSSUMMARY.out.versions)
 
     // Protein consolidation re-aggregates locus counts, so reuse the locus Unassigned_* counts for it
-    ch_unassigned_per_caller = COLLECT_FEATURECOUNTSSUMMARY.out.unassigned
+    def ch_unassigned_per_caller = COLLECT_FEATURECOUNTSSUMMARY.out.unassigned
         .branch { meta, _unassigned ->
             locus_consolidate: meta.caller == 'locus_consolidate'
             other: true
         }
-    ch_unassigned_protein_consolidate = channel.empty()
+    def ch_unassigned_protein_consolidate = channel.empty()
     if ( ! skip_protein_consolidation && ( orf_callers || user_orf_names ) ) {
         // Pad to the 4 provenance columns: CUSTOM_COLLECTSTATS needs all fcs files in a call to share columns
         ch_unassigned_protein_consolidate = ch_unassigned_per_caller.locus_consolidate
@@ -802,10 +803,10 @@ workflow METATDENOVO {
     ch_versions           = ch_versions.mix(TIDYVERSE_STRIPCDSPREFIX.out.versions)
 
     // Must hold every annotated caller: CUSTOM_COLLECTSTATS left-joins onto it
-    ch_counts_per_caller  = TIDYVERSE_STRIPCDSPREFIX.out.counts.mix(ch_protein_consolidate_counts)
-    ch_fcs_for_summary    = ch_counts_per_caller
+    def ch_counts_per_caller  = TIDYVERSE_STRIPCDSPREFIX.out.counts.mix(ch_protein_consolidate_counts)
+    def ch_fcs_for_summary    = ch_counts_per_caller
 
-    ch_merge_tables = channel.empty()
+    def ch_merge_tables = channel.empty()
 
     //
     // SUBWORKFLOW: run eggnog_mapper on the ORF-called amino acid sequences
@@ -820,7 +821,7 @@ workflow METATDENOVO {
     // SUBWORKFLOW: run kofamscan on the ORF-called amino acid sequences
     //
     if( !skip_kofamscan ) {
-        ch_kofamscan = ch_protein.map { meta, protein -> [ meta, protein ] }
+        def ch_kofamscan = ch_protein.map { meta, protein -> [ meta, protein ] }
         KOFAMSCAN( ch_kofamscan, ch_fcs_for_summary, params.kofam_ko_list_url, params.kofam_profiles_url )
         ch_merge_tables   = ch_merge_tables.mix ( KOFAMSCAN.out.kofamscan_summary )
         ch_parquet_tables = ch_parquet_tables
@@ -858,7 +859,7 @@ workflow METATDENOVO {
         }
 
         // No --eukulele_db means a user-provided database directory
-        ch_eukulele_db = channel.empty()
+        def ch_eukulele_db = channel.empty()
         if ( params.eukulele_db ) {
             ch_eukulele_db = channel
                 .of ( params.eukulele_db )
@@ -867,7 +868,7 @@ workflow METATDENOVO {
             ch_eukulele_db = channel.fromPath(params.eukulele_dbpath, checkIfExists: true)
                 .map { path -> [ [], path ] }
         }
-        ch_eukulele = ch_protein
+        def ch_eukulele = ch_protein
             .map { meta, protein -> [ [ id: meta.id, caller: meta.caller ], protein ] }
             .combine( ch_eukulele_db )
             .map { meta, fasta, database, directory -> [ [ id: "${meta.id}.${database}", caller: meta.caller ], fasta, database, directory ] }
@@ -880,7 +881,7 @@ workflow METATDENOVO {
     //
     // MODULE: Diamond taxonomy, every caller x every db
     //
-    ch_diamond_input = ch_protein.combine( ch_diamond_dbs.map { db -> [ db[0], db[1] ] } )
+    def ch_diamond_input = ch_protein.combine( ch_diamond_dbs.map { db -> [ db[0], db[1] ] } )
 
     DIAMOND_TAXONOMY(
         ch_diamond_input.map { pm, protein, _dm, _db -> [ pm, protein ] },
@@ -890,7 +891,7 @@ workflow METATDENOVO {
     )
 
     // Not .join(): callers share db names, and join mishandles duplicate keys
-    ch_taxonkit_lineage = DIAMOND_TAXONOMY.out.tsv
+    def ch_taxonkit_lineage = DIAMOND_TAXONOMY.out.tsv
         .map { it -> [ [ id: "${it[0].id}.${it[0].db}.lineage", db: it[0].db, caller: it[0].caller ], it[1] ] }
         .combine(ch_diamond_dbs)
         .filter { meta, _tsv, dbMeta, _dmnd, _names, _nodes, _ranks, _parse -> meta.db == dbMeta.id }
@@ -920,7 +921,7 @@ workflow METATDENOVO {
     )
 
     // Not .join(): dbs share caller names
-    ch_diamondtax_sum_input = FORMAT_DIAMOND_TAX_RANKLIST.out.taxonomy
+    def ch_diamondtax_sum_input = FORMAT_DIAMOND_TAX_RANKLIST.out.taxonomy
         .combine( ch_fcs_for_summary )
         .filter { meta, _taxonomy, fcsMeta, _fcs -> meta.caller == fcsMeta.caller }
         .map { meta, taxonomy, _fcsMeta, fcs -> [ meta, meta.db, taxonomy, fcs ] }
@@ -941,7 +942,7 @@ workflow METATDENOVO {
     )
 
     // Left join, so callers without annotation tables still get stats
-    ch_fcs_mergetab_per_caller = ch_counts_per_caller
+    def ch_fcs_mergetab_per_caller = ch_counts_per_caller
         .map { meta, fcs -> [ meta.caller, meta, fcs ] }
         .join(
             MERGE_TABLES.out.merged_table.map { meta, mergetab -> [ meta.caller, mergetab ] },
