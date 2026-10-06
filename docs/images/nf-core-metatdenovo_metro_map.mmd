@@ -1,14 +1,24 @@
 %%
-%% Source for docs/images/nf-core-metatdenovo_metro_map_{light,dark}.svg, rendered with nf-metro
+%% Source for docs/images/nf-core-metatdenovo_metro_map_{light,dark}.svg, rendered with nf-metro 2.1.0
 %% (https://github.com/pinin4fjords/nf-metro, also on bioconda):
 %%   nf-metro render nf-core-metatdenovo_metro_map.mmd --theme nfcore --mode light --embed-font \
-%%     --logo nf-core-metatdenovo_logo_light.png -o nf-core-metatdenovo_metro_map_light.svg
+%%     --logo nf-core-metatdenovo_logo_light.png --no-chrome-css --no-dark-mode-css \
+%%     -o nf-core-metatdenovo_metro_map_light.svg
 %%   nf-metro render nf-core-metatdenovo_metro_map.mmd --theme nfcore --mode dark --embed-font \
-%%     --logo nf-core-metatdenovo_logo_dark.png -o nf-core-metatdenovo_metro_map_dark.svg
+%%     --logo nf-core-metatdenovo_logo_dark.png --no-chrome-css --no-dark-mode-css \
+%%     -o nf-core-metatdenovo_metro_map_dark.svg
+%% Then give the legend box a solid fill; many SVG viewers, Inkscape among them, draw its rgba() fill black:
+%%   sed -i -E 's/fill="rgba\([^)]*\)"([^>]*class="nf-metro-legend-bg")/fill="#ededed"\1/' nf-core-metatdenovo_metro_map_light.svg
+%%   sed -i -E 's/fill="rgba\([^)]*\)"([^>]*class="nf-metro-legend-bg")/fill="#373737"\1/' nf-core-metatdenovo_metro_map_dark.svg
+%% y_spacing is set below nf-metro's computed minimum on purpose, to keep the map compact.
 %%
 
 %%metro title: nf-core/metatdenovo
 %%metro style: nfcore
+%%metro font_scale: 1.4
+%%metro stroke_scale: 1.3
+%%metro compact_offsets: true
+%%metro y_spacing: 60
 
 %%metro line: reads | Reads | #24B064
 %%metro line: contigs | Contigs | #3D5A80
@@ -20,16 +30,35 @@
 %%metro file: assembly_in | FASTA | Your assembly
 %%metro files: orfs_in | GFF+FAA | Your ORFs
 %%metro file: counts_out | TSV | Count tables
-%%metro file: annot_out | TSV | Annotation tables
+%%metro file: eggnog_out | TSV
+%%metro file: kofamscan_out | TSV
+%%metro file: dbcan_out | TSV
+%%metro file: hmmer_out | TSV
+%%metro file: eukulele_out | TSV
+%%metro file: diamond_out | TSV
 %%metro file: report_out | HTML | MultiQC report
+
+%%metro off_track: quast
+
+%%metro marker: fastqc | circle, #bdbdbd
+%%metro marker: trimgalore | circle, #bdbdbd
+%%metro marker: bbduk | circle, #bdbdbd
+%%metro marker: bbnorm | circle, #bdbdbd
+%%metro marker: mmseqs | circle, #bdbdbd
+%%metro marker: eggnog | circle, #bdbdbd
+%%metro marker: kofamscan | circle, #bdbdbd
+%%metro marker: dbcan | circle, #bdbdbd
+%%metro marker: hmmer | circle, #bdbdbd
+%%metro marker: eukulele | circle, #bdbdbd
+%%metro marker: diamond | circle, #bdbdbd
+%%metro marker_legend: circle, #bdbdbd | Optional step
 
 %%metro grid: preprocessing | 0,0
 %%metro grid: assembly | 1,0
 %%metro grid: orfcalling | 2,0
 %%metro grid: consolidation | 3,0
 %%metro grid: annotation | 4,0
-%%metro grid: mapping | 2,1
-%%metro grid: counting | 3,1
+%%metro grid: quantification | 3,1
 %%metro grid: summary | 4,1
 
 graph LR
@@ -73,19 +102,16 @@ graph LR
         locus -->|consolidated| mmseqs
     end
 
-    subgraph mapping [Mapping]
+    subgraph quantification [Mapping and quantification]
         bbmap[BBMap]
         samtools[Samtools]
-        bbmap -->|reads| samtools
-    end
-
-    subgraph counting [Quantification]
         featurecounts[featureCounts]
         counts_out[ ]
-        featurecounts -->|orfs,user,consolidated| counts_out
+        bbmap -->|reads| samtools
+            featurecounts -->|consolidated| counts_out
     end
 
-    subgraph annotation [Functional and taxonomic annotation]
+    subgraph annotation [Annotation]
         eggnog[eggNOG-mapper]
         kofamscan[KofamScan]
         dbcan[dbCAN]
@@ -93,27 +119,32 @@ graph LR
         eukulele[EUKulele]
         diamond[Diamond]
         _annot
-        annot_out[ ]
-        _annot -->|orfs,user,consolidated| eggnog
-        _annot -->|orfs,user,consolidated| kofamscan
-        _annot -->|orfs,user,consolidated| dbcan
-        _annot -->|orfs,user,consolidated| hmmer
-        _annot -->|orfs,user,consolidated| eukulele
-        _annot -->|orfs,user,consolidated| diamond
-        eggnog -->|orfs,user,consolidated| annot_out
-        kofamscan -->|orfs,user,consolidated| annot_out
-        dbcan -->|orfs,user,consolidated| annot_out
-        hmmer -->|orfs,user,consolidated| annot_out
-        eukulele -->|orfs,user,consolidated| annot_out
-        diamond -->|orfs,user,consolidated| annot_out
+        eggnog_out[ ]
+        kofamscan_out[ ]
+        dbcan_out[ ]
+        hmmer_out[ ]
+        eukulele_out[ ]
+        diamond_out[ ]
+        _annot -->|consolidated| eggnog
+        _annot -->|consolidated| kofamscan
+        _annot -->|consolidated| dbcan
+        _annot -->|consolidated| hmmer
+        _annot -->|consolidated| eukulele
+        _annot -->|consolidated| diamond
+        eggnog -->|consolidated| eggnog_out
+        kofamscan -->|consolidated| kofamscan_out
+        dbcan -->|consolidated| dbcan_out
+        hmmer -->|consolidated| hmmer_out
+        eukulele -->|consolidated| eukulele_out
+        diamond -->|consolidated| diamond_out
     end
 
     subgraph summary [Summary]
         stats[Summary statistics]
         multiqc[MultiQC]
         report_out[ ]
-        stats -->|orfs,user,consolidated| multiqc
-        multiqc -->|orfs,user,consolidated| report_out
+        stats -->|consolidated| multiqc
+        multiqc -->|consolidated| report_out
     end
 
     bbnorm -->|reads| megahit
@@ -129,8 +160,8 @@ graph LR
     transdecoder -->|orfs| locus
     metaeuk -->|orfs| locus
     orfs_in -->|user| locus
-    locus -->|orfs,user,consolidated| featurecounts
+    locus -->|consolidated| featurecounts
     samtools -->|reads| featurecounts
     mmseqs -->|consolidated| featurecounts
-    mmseqs -->|orfs,user,consolidated| _annot
-    featurecounts -->|orfs,user,consolidated| stats
+    mmseqs -->|consolidated| _annot
+    featurecounts -->|consolidated| stats
