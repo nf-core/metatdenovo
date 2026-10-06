@@ -1,0 +1,22 @@
+Changes in component 'nf-core/custom/collectfeaturecounts'
+'modules/nf-core/custom/collectfeaturecounts/meta.yml' is unchanged
+'modules/nf-core/custom/collectfeaturecounts/main.nf' is unchanged
+'modules/nf-core/custom/collectfeaturecounts/environment.yml' is unchanged
+'modules/nf-core/custom/collectfeaturecounts/.conda-lock/linux_arm64-bd-e98a95795cdd7b8d_1.txt' is unchanged
+'modules/nf-core/custom/collectfeaturecounts/.conda-lock/linux_amd64-bd-e289d008f8e006c5_1.txt' is unchanged
+'modules/nf-core/custom/collectfeaturecounts/tests/main.nf.test.snap' is unchanged
+'modules/nf-core/custom/collectfeaturecounts/tests/main.nf.test' is unchanged
+Changes in 'custom/collectfeaturecounts/templates/collectfeaturecounts.R':
+--- modules/nf-core/custom/collectfeaturecounts/templates/collectfeaturecounts.R
++++ modules/nf-core/custom/collectfeaturecounts/templates/collectfeaturecounts.R
+@@ -17,7 +17,7 @@
+     lazy_dt() %>%
+     filter(count > 0) %>%
+     mutate(
+-        sample = str_remove(sample, '.sorted.bam'),
++        sample = str_remove(sample, '[.]sorted[.]bam\$'),
+         r = count/Length
+     ) %>%
+     rename(orf = Geneid, chr = Chr, start = Start, end = End, strand = Strand, length = Length) %>%
+
+************************************************************

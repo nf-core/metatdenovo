@@ -44,7 +44,7 @@ process COLLECT_PROTEINCONSOLIDATE {
                     fread(file, sep = '\\t', skip = 1) %>%
                         melt(measure.vars = c(ncol(.)), variable.name = 'sample', value.name = 'count') %>%
                         lazy_dt() %>%
-                        mutate(sample = str_remove(sample, fixed('.sorted.bam'))) %>%
+                        mutate(sample = str_remove(sample, '[.]sorted[.]bam\$')) %>%
                         rename(orf = Geneid, chr = Chr, start = Start, end = End, strand = Strand, length = Length) %>%
                         as_tibble()
                 }

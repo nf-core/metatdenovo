@@ -43,7 +43,8 @@
                     "custom/collectfeaturecounts": {
                         "branch": "master",
                         "git_sha": "94b413835288b0e80bd29256d0a95e4fce020a8b",
-                        "installed_by": ["modules"]
+                        "installed_by": ["modules"],
+                        "patch": "modules/nf-core/custom/collectfeaturecounts/custom-collectfeaturecounts.diff"
                     },
                     "custom/collectstats": {
                         "branch": "master",
