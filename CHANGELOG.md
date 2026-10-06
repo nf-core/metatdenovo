@@ -11,6 +11,7 @@ Their calls are merged into loci and clustered into proteins, giving one count t
 
 ### `Breaking changes`
 
+- [#558](https://github.com/nf-core/metatdenovo/pull/558) - `samtools idxstats` files are no longer published by default, since they get very large for fragmented assemblies; use `--save_idxstats` to keep them, closes [#550](https://github.com/nf-core/metatdenovo/issues/550) (@erikrikarddaniel)
 - [#558](https://github.com/nf-core/metatdenovo/pull/558) - `--skip_qc` is removed; it only skipped FastQC, which `--skip_fastqc` also does (@erikrikarddaniel)
 - [#558](https://github.com/nf-core/metatdenovo/pull/558) - `--kofam_dir` is renamed `--kofam_dbpath`, matching the other database location parameters (@erikrikarddaniel)
 - [#501](https://github.com/nf-core/metatdenovo/pull/501) - With more than one ORF source, only the protein-cluster representatives are annotated by default; set `--annotate_only_consolidated false` to annotate every source's full protein set (@erikrikarddaniel)

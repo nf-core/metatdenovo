@@ -266,6 +266,12 @@
                     "fa_icon": "fas fa-download",
                     "default": true
                 },
+                "save_idxstats": {
+                    "type": "boolean",
+                    "description": "Save the per-contig read counts from `samtools idxstats`",
+                    "help_text": "These files have one line per contig, so they get large for fragmented assemblies: 1.8 GB per sample on an assembly of 82 million contigs.",
+                    "fa_icon": "fas fa-download"
+                },
                 "bbmap_minid": {
                     "type": "number",
                     "default": 0.9,

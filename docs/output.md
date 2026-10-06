@@ -280,7 +280,8 @@ Sort and index the BBMap alignments with [Samtools](https://www.htslib.org), and
 - `samtools/`
   - `*.sorted.bam`: coordinate-sorted alignments, if enabled with `--save_bam`.
   - `*.sorted.bam.bai`: BAM index, if enabled with `--save_bam`.
-  - `*.flagstat`, `*.idxstats`: mapping statistics from `samtools flagstat`/`samtools idxstats`, if enabled with `--save_samtools` (on by default).
+  - `*.flagstat`: mapping statistics from `samtools flagstat`, if enabled with `--save_samtools` (on by default).
+  - `*.idxstats`: per-contig read counts from `samtools idxstats`, if enabled with `--save_idxstats`.
 
 </details>
 
