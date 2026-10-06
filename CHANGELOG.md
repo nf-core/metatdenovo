@@ -13,7 +13,6 @@ Their calls are merged into loci and clustered into proteins, giving one count t
 
 - [#558](https://github.com/nf-core/metatdenovo/pull/558) - `samtools idxstats` files are no longer published by default, since they get very large for fragmented assemblies; use `--save_idxstats` to keep them, closes [#550](https://github.com/nf-core/metatdenovo/issues/550) (@erikrikarddaniel)
 - [#558](https://github.com/nf-core/metatdenovo/pull/558) - `--skip_qc` is removed; it only skipped FastQC, which `--skip_fastqc` also does (@erikrikarddaniel)
-- [#558](https://github.com/nf-core/metatdenovo/pull/558) - `--kofam_dir` is renamed `--kofam_dbpath`, matching the other database location parameters (@erikrikarddaniel)
 - [#501](https://github.com/nf-core/metatdenovo/pull/501) - With more than one ORF source, only the protein-cluster representatives are annotated by default; set `--annotate_only_consolidated false` to annotate every source's full protein set (@erikrikarddaniel)
 - [#491](https://github.com/nf-core/metatdenovo/pull/491) - TransRate is removed; assembly statistics now come from QUAST, in `quast/` and its own MultiQC section (@erikrikarddaniel)
 - [#488](https://github.com/nf-core/metatdenovo/pull/488), [#504](https://github.com/nf-core/metatdenovo/pull/504) - Columns in `<assembly>.<caller>.overall_stats.tsv.gz` are renamed and reordered, so read them by name (@erikrikarddaniel)
@@ -48,6 +47,7 @@ Their calls are merged into loci and clustered into proteins, giving one count t
 
 ### `Changed`
 
+- [#558](https://github.com/nf-core/metatdenovo/pull/558) - `--kofam_dir` is renamed `--kofam_dbpath`, matching the other database location parameters. `--kofam_dir` still works, with a deprecation warning (@erikrikarddaniel)
 - [#558](https://github.com/nf-core/metatdenovo/pull/558) - Update the metro map in the README to show the 2.0 workflow (@erikrikarddaniel)
 - [#527](https://github.com/nf-core/metatdenovo/pull/527) - KofamScan and eggNOG database downloads no longer need network access on the compute node, addresses [#365](https://github.com/nf-core/metatdenovo/issues/365) (@erikrikarddaniel)
 - [#491](https://github.com/nf-core/metatdenovo/pull/491) - Replace TransRate with QUAST for assembly statistics, addresses [#487](https://github.com/nf-core/metatdenovo/issues/487) (@erikrikarddaniel)

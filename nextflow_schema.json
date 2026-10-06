@@ -515,6 +515,12 @@
                     "help_text": "If a `ko_list` file and/or `profiles` does not exist, they will be downloaded.",
                     "fa_icon": "fas fa-folder-open"
                 },
+                "kofam_dir": {
+                    "type": "string",
+                    "description": "Deprecated: use `--kofam_dbpath`. If set, its value is used instead of `--kofam_dbpath`.",
+                    "hidden": true,
+                    "fa_icon": "fas fa-folder-open"
+                },
                 "kofam_ko_list_url": {
                     "type": "string",
                     "default": "https://www.genome.jp/ftp/db/kofam/ko_list.gz",
