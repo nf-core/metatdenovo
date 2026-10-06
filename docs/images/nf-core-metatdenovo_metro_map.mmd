@@ -1,15 +1,10 @@
 %%
-%% Source for docs/images/nf-core-metatdenovo_metro_map_{light,dark}.svg, rendered with nf-metro 2.1.0
-%% (https://github.com/pinin4fjords/nf-metro, also on bioconda):
+%% The workflow's structure, as drawn by hand in nf-core-metatdenovo_metro_map_{light,dark}.svg.
+%% Update it when the workflow changes, as a checklist for what the drawing must show.
+%% nf-metro 2.1.0 (https://github.com/pinin4fjords/nf-metro, also on bioconda) renders it as an automatic
+%% layout to compare against. Write the output elsewhere; it would overwrite the drawing:
 %%   nf-metro render nf-core-metatdenovo_metro_map.mmd --theme nfcore --mode light --embed-font \
-%%     --logo nf-core-metatdenovo_logo_light.png --no-chrome-css --no-dark-mode-css \
-%%     -o nf-core-metatdenovo_metro_map_light.svg
-%%   nf-metro render nf-core-metatdenovo_metro_map.mmd --theme nfcore --mode dark --embed-font \
-%%     --logo nf-core-metatdenovo_logo_dark.png --no-chrome-css --no-dark-mode-css \
-%%     -o nf-core-metatdenovo_metro_map_dark.svg
-%% Then give the legend box a solid fill; many SVG viewers, Inkscape among them, draw its rgba() fill black:
-%%   sed -i -E 's/fill="rgba\([^)]*\)"([^>]*class="nf-metro-legend-bg")/fill="#ededed"\1/' nf-core-metatdenovo_metro_map_light.svg
-%%   sed -i -E 's/fill="rgba\([^)]*\)"([^>]*class="nf-metro-legend-bg")/fill="#373737"\1/' nf-core-metatdenovo_metro_map_dark.svg
+%%     --logo nf-core-metatdenovo_logo_light.png --no-chrome-css --no-dark-mode-css -o /tmp/metro_map.svg
 %% y_spacing is set below nf-metro's computed minimum on purpose, to keep the map compact.
 %%
 
