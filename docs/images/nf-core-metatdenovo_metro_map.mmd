@@ -51,10 +51,12 @@ graph LR
         megahit[MEGAHIT]
         spades[SPAdes]
         assembly_in[ ]
+        _contigs
         quast[QUAST]
-        megahit -->|contigs| quast
-        spades -->|contigs| quast
-        assembly_in -->|contigs| quast
+        megahit -->|contigs| _contigs
+        spades -->|contigs| _contigs
+        assembly_in -->|contigs| _contigs
+        _contigs -->|contigs| quast
     end
 
     subgraph orfcalling [ORF calling]
@@ -67,7 +69,7 @@ graph LR
     subgraph consolidation [Consolidation]
         orfs_in[ ]
         locus[Locus consolidation]
-            mmseqs[MMseqs2 clustering]
+        mmseqs[MMseqs2 clustering]
         locus -->|consolidated| mmseqs
     end
 
@@ -90,12 +92,19 @@ graph LR
         hmmer[HMMER]
         eukulele[EUKulele]
         diamond[Diamond]
+        _annot
         annot_out[ ]
-        eggnog -->|orfs,user,consolidated| kofamscan
-        kofamscan -->|orfs,user,consolidated| dbcan
-        dbcan -->|orfs,user,consolidated| hmmer
-        hmmer -->|orfs,user,consolidated| eukulele
-        eukulele -->|orfs,user,consolidated| diamond
+        _annot -->|orfs,user,consolidated| eggnog
+        _annot -->|orfs,user,consolidated| kofamscan
+        _annot -->|orfs,user,consolidated| dbcan
+        _annot -->|orfs,user,consolidated| hmmer
+        _annot -->|orfs,user,consolidated| eukulele
+        _annot -->|orfs,user,consolidated| diamond
+        eggnog -->|orfs,user,consolidated| annot_out
+        kofamscan -->|orfs,user,consolidated| annot_out
+        dbcan -->|orfs,user,consolidated| annot_out
+        hmmer -->|orfs,user,consolidated| annot_out
+        eukulele -->|orfs,user,consolidated| annot_out
         diamond -->|orfs,user,consolidated| annot_out
     end
 
@@ -109,12 +118,12 @@ graph LR
 
     bbnorm -->|reads| megahit
     bbnorm -->|reads| spades
-    seqtk -->|reads| bbmap
-    quast -->|contigs| prokka
-    quast -->|contigs| prodigal
-    quast -->|contigs| transdecoder
-    quast -->|contigs| metaeuk
-    quast -->|contigs| bbmap
+    bbduk -->|reads| bbmap
+    _contigs -->|contigs| prokka
+    _contigs -->|contigs| prodigal
+    _contigs -->|contigs| transdecoder
+    _contigs -->|contigs| metaeuk
+    _contigs -->|contigs| bbmap
     prokka -->|orfs| locus
     prodigal -->|orfs| locus
     transdecoder -->|orfs| locus
@@ -123,5 +132,5 @@ graph LR
     locus -->|orfs,user,consolidated| featurecounts
     samtools -->|reads| featurecounts
     mmseqs -->|consolidated| featurecounts
-    mmseqs -->|orfs,user,consolidated| eggnog
+    mmseqs -->|orfs,user,consolidated| _annot
     featurecounts -->|orfs,user,consolidated| stats
