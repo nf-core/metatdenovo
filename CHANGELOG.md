@@ -5,6 +5,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v2.0.0 - [YYYY-mm-dd]
 
+Better support for mixed communities and mixed data types.
+Several ORF callers, including MetaEuk for eukaryotes, can run in one go, together with your own ORFs.
+Their calls are merged into loci and clustered into proteins, giving one count table across all sources.
+
+### `Breaking changes`
+
+- [#501](https://github.com/nf-core/metatdenovo/pull/501) - With more than one ORF source, only the protein-cluster representatives are annotated by default; set `--annotate_only_consolidated false` to annotate every source's full protein set (@erikrikarddaniel)
+- [#491](https://github.com/nf-core/metatdenovo/pull/491) - TransRate is removed; assembly statistics now come from QUAST, in `quast/` and its own MultiQC section (@erikrikarddaniel)
+- [#488](https://github.com/nf-core/metatdenovo/pull/488), [#504](https://github.com/nf-core/metatdenovo/pull/504) - Columns in `<assembly>.<caller>.overall_stats.tsv.gz` are renamed and reordered, so read them by name (@erikrikarddaniel)
+- [#479](https://github.com/nf-core/metatdenovo/pull/479) - `--bbmap_ambiguous all` now requires `--featurecounts_fraction` or `--skip_protein_consolidation`, since it would otherwise count a multi-mapping read more than once in the consolidated table (@erikrikarddaniel)
+- [#466](https://github.com/nf-core/metatdenovo/pull/466) - `featurecounts/` file names include the ORF caller, e.g. `SAMPLE1.prokka.featureCounts.tsv` (@erikrikarddaniel)
+
 ### `Added`
 
 - [#555](https://github.com/nf-core/metatdenovo/pull/555) - Document how to mount `$TMPDIR` into Singularity and Apptainer containers, which some tools, such as Prokka, fail without (@erikrikarddaniel)

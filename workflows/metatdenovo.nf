@@ -153,7 +153,7 @@ workflow METATDENOVO {
         error "You can't input your own ORFs (`--user_orfs`/`--user_orfs_gff`+`--user_orfs_faa`) if you call for assembly with `--assembler`."
     }
 
-    orf_callers = params.orf_caller ? params.orf_caller.tokenize(',').collect { caller -> caller.trim() } : []
+    def orf_callers = params.orf_caller ? params.orf_caller.tokenize(',').collect { caller -> caller.trim() } : []
     def valid_orf_callers = ['prodigal', 'prokka', 'transdecoder', 'metaeuk']
     orf_callers.each { caller ->
         if ( ! (caller in valid_orf_callers) ) {
@@ -175,8 +175,8 @@ workflow METATDENOVO {
         ( params.user_orfs_gff && params.user_orfs_faa ? [ params.user_orfs_name ] : [] )
     // Identity in the name keeps runs at different --cluster_min_seq_id apart. BigDecimal, not
     // Math.round, so 0.995 and 1.0 differ: 0.99 -> 99, 1.0 -> 100, 0.995 -> 99_5.
-    cluster_pct              = new java.math.BigDecimal(params.cluster_min_seq_id.toString()).multiply(new java.math.BigDecimal("100"))
-    protein_consolidate_name = "protein_consolidate_" + cluster_pct.stripTrailingZeros().toPlainString().replace('.', '_')
+    def cluster_pct              = new java.math.BigDecimal(params.cluster_min_seq_id.toString()).multiply(new java.math.BigDecimal("100"))
+    def protein_consolidate_name = "protein_consolidate_" + cluster_pct.stripTrailingZeros().toPlainString().replace('.', '_')
 
     def reserved_caller_names = orf_callers + ['locus_consolidate', protein_consolidate_name]
     user_orf_names.each { name ->
@@ -200,11 +200,11 @@ workflow METATDENOVO {
         error "`--bbmap_ambiguous all` counts a multi-mapping read at full weight at every site it aligns to, which double-counts it when protein consolidation sums counts across a cluster. Add `--featurecounts_fraction` so each alignment is weighted 1/N, or `--skip_protein_consolidation` if you do not need the consolidated table."
     }
 
-    assembler     = params.assembler
-    assembly_name = params.assembler ?: params.user_assembly_name
+    def assembler     = params.assembler
+    def assembly_name = params.assembler ?: params.user_assembly_name
 
     // Display label only, not tied to which callers run
-    orfs_name  = params.orf_caller ?: params.user_orfs_name
+    def orfs_name  = params.orf_caller ?: params.user_orfs_name
 
     ch_hmmrs = channel.empty()
     if ( params.hmmdir ) {
@@ -635,7 +635,7 @@ workflow METATDENOVO {
         ch_protein = ch_protein.mix(SEQKIT_GREP.out.filter)
     }
 
-    total_orf_sources = orf_callers.size() + user_orf_names.size()
+    def total_orf_sources = orf_callers.size() + user_orf_names.size()
     if ( annotate_only_consolidated && ! skip_protein_consolidation && total_orf_sources > 1 ) {
         ch_protein = ch_protein.filter { meta, _protein -> meta.caller == protein_consolidate_name }
     }
@@ -853,7 +853,7 @@ workflow METATDENOVO {
     //
     if ( ! skip_eukulele ) {
         // file(), not java.io.File, so s3:// paths work
-        d = file(params.eukulele_dbpath)
+        def d = file(params.eukulele_dbpath)
         if ( ! d.exists() ) {
             d.mkdirs()
         }

@@ -347,7 +347,7 @@ namesdmp: /path/to/names.dmp
 Then run:
 
 ```bash
-nextflow run nf-core/createtaxdb -r dev -profile docker -params-file params.yml
+nextflow run nf-core/createtaxdb -r 3.1.0 -profile docker -params-file params.yml
 ```
 
 A few gotchas worth knowing before you try this:
@@ -393,7 +393,7 @@ namesdmp: /path/to/names.dmp
 then, same as above:
 
 ```bash
-nextflow run nf-core/createtaxdb -r dev -profile docker -params-file params.yml
+nextflow run nf-core/createtaxdb -r 3.1.0 -profile docker -params-file params.yml
 ```
 
 `nodesdmp`/`namesdmp` still need pre-extracting from the [taxonomy dump](ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz) first, same as gotcha 2 above.
