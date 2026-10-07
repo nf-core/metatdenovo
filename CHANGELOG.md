@@ -3,7 +3,7 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v2.0.0 - [YYYY-mm-dd]
+## v2.0.0 - [2026-10-07]
 
 Better support for mixed communities and mixed data types.
 Several ORF callers, including MetaEuk for eukaryotes, can run in one go, together with your own ORFs.
