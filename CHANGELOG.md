@@ -47,6 +47,7 @@ Their calls are merged into loci and clustered into proteins, giving one count t
 
 ### `Changed`
 
+- [#565](https://github.com/nf-core/metatdenovo/pull/565) - Resource guidance for protein consolidation on very large assemblies, in the large datasets documentation (@erikrikarddaniel, reviewed by @vagkaratzas)
 - [#558](https://github.com/nf-core/metatdenovo/pull/558) - `--kofam_dir` is renamed `--kofam_dbpath`, matching the other database location parameters. `--kofam_dir` still works, with a deprecation warning (@erikrikarddaniel, reviewed by @piplus2, @vagkaratzas)
 - [#558](https://github.com/nf-core/metatdenovo/pull/558) - Update the metro map in the README to show the 2.0 workflow (@erikrikarddaniel, reviewed by @piplus2, @vagkaratzas)
 - [#527](https://github.com/nf-core/metatdenovo/pull/527) - KofamScan and eggNOG database downloads no longer need network access on the compute node, addresses [#365](https://github.com/nf-core/metatdenovo/issues/365) (@erikrikarddaniel)
@@ -62,7 +63,7 @@ Their calls are merged into loci and clustered into proteins, giving one count t
 ### `Fixed`
 
 - [#551](https://github.com/nf-core/metatdenovo/pull/551) - Fix `--prokka_batchsize`, `--metaeuk_batchsize` and `--transdecoder_batchsize` rejecting sizes with units, such as `100.MB` (@erikrikarddaniel, reviewed by @LuisHeinzlmeier)
-- [#548](https://github.com/nf-core/metatdenovo/pull/548) - Fix featureCounts failing on assemblies with more than about 75 million contigs, fixes [#547](https://github.com/nf-core/metatdenovo/issues/547) (@erikrikarddaniel, reviewed by @vagkaratzas)
+- [#548](https://github.com/nf-core/metatdenovo/pull/548) - Fix featureCounts failing on assemblies with more than about 75 million contigs, with `--trim_bam_header_above` setting the BAM header size above which the header is trimmed, fixes [#547](https://github.com/nf-core/metatdenovo/issues/547) (@erikrikarddaniel, reviewed by @vagkaratzas)
 - [#545](https://github.com/nf-core/metatdenovo/pull/545) - Fix the eggNOG-mapper version reported by conda runs, which was the pipeline's own release tag instead of the tool's version (@erikrikarddaniel)
 - [#527](https://github.com/nf-core/metatdenovo/pull/527) - Fix the eggNOG database download URL (@erikrikarddaniel)
 - [#525](https://github.com/nf-core/metatdenovo/pull/525) - Fix eggNOG, KofamScan and dbCAN database downloads to an `s3://` directory on AWS Batch, and `--eukulele_dbpath` on `s3://`, addresses [#471](https://github.com/nf-core/metatdenovo/issues/471) (@danilodileo, reviewed by @erikrikarddaniel)
@@ -84,13 +85,21 @@ Their calls are merged into loci and clustered into proteins, giving one count t
 
 ### `Dependencies`
 
-| Tool        | Previous version | New version |
-| ----------- | ---------------- | ----------- |
-| samtools    | 1.23.1           | 1.24        |
-| multiqc     | 1.34             | 1.35        |
-| trim-galore | 2.1.0            | 2.3.0       |
-| prokka      | 1.14.6           | 1.15.6      |
-| nft-utils   | 0.0.3            | 1.2.0       |
+| Tool          | Previous version | New version |
+| ------------- | ---------------- | ----------- |
+| bedtools      |                  | 2.31.1      |
+| dbcan         |                  | 5.2.9       |
+| duckdb-cli    |                  | 1.5.5       |
+| eggnog-mapper | 2.1.9            | 2.1.13      |
+| metaeuk       |                  | 6.a5d39d9   |
+| mmseqs2       |                  | 18.8cc5c    |
+| prokka        | 1.14.6           | 1.15.6      |
+| quast         |                  | 5.3.0       |
+| samtools      | 1.23.1           | 1.24        |
+| seqkit        |                  | 2.13.0      |
+| transrate     | 1.0.3            |             |
+| trim-galore   | 2.1.0            | 2.3.0       |
+| nft-utils     | 0.0.3            | 1.2.0       |
 
 ## v1.4.1 - [2026-09-15]
 

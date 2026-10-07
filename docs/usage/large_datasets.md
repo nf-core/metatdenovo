@@ -120,3 +120,25 @@ nextflow run nf-core/metatdenovo -profile docker --outdir results/ --input sampl
 
 This is a fresh run, not a `-resume` of the original session.
 `--user_assembly` skips the reads-to-assembly steps (read merging, digital normalization, the assembler itself), so nothing upstream of the assembly is redone.
+
+## Protein consolidation on very large assemblies
+
+Protein consolidation runs by default, and its first step, `FORMAT_LOCUSFAA`, holds every called protein sequence in memory on a single CPU.
+On an assembly of 82 million contigs with three ORF sources it needed 126 GB and close to four days.
+The default allowance is 36 GB and 8 hours, doubled on one retry, so a run of that size fails at this step.
+
+Give it, and `MMSEQS_CREATETSV` later in the clustering, more resources in a config file passed with `-c`:
+
+```groovy
+process {
+    withName: 'FORMAT_LOCUSFAA' {
+        memory = 160.GB
+        time   = 5.d
+    }
+    withName: '.*:MMSEQS_FASTA_CLUSTER:MMSEQS_CREATETSV' {
+        memory = 24.GB
+    }
+}
+```
+
+Or turn the step off with `--skip_protein_consolidation`; see [Protein consolidation](../usage.md#consolidating-calls-for-the-same-gene) for what that costs.
