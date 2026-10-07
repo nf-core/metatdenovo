@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Fixed`
 
+- [#NN](https://github.com/nf-core/metatdenovo/pull/NN) - Fix BBMap failing with "Mismatch between length of bases and qualities" on AWS Batch with Fusion, by decompressing its input without a `bgzip` subprocess (@erikrikarddaniel)
+
 ### `Dependencies`
 
 | Tool | Previous version | New version |
