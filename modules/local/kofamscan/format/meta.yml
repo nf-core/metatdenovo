@@ -1,0 +1,64 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "kofamscan_format"
+description: Reformat KofamScan's raw detail-tsv output into a cleaned-up summary-table-ready TSV
+keywords:
+  - kofamscan
+  - kegg
+  - orthology
+  - format
+tools:
+  - "gzip":
+      description: Compression utility
+      homepage: https://www.gnu.org/software/gzip/
+      documentation: https://www.gnu.org/software/gzip/manual/gzip.html
+      licence: ["GPL-3.0-or-later"]
+      identifier: null
+
+input:
+  - - meta:
+        type: map
+        description: |
+          Groovy Map containing sample information
+          e.g. `[ id:'sample1' ]`
+    - kofamscan_tsv:
+        type: file
+        description: Raw, gzipped KofamScan detail-tsv output
+        pattern: "*.tsv.gz"
+
+output:
+  kofamtsv:
+    - - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. `[ id:'sample1' ]`
+      - "*.kofamscan.tsv.gz":
+          type: file
+          description: Cleaned KofamScan output for summary tables
+          pattern: "*.kofamscan.tsv.gz"
+  versions_gzip:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - "gzip":
+          type: string
+          description: The name of the tool
+      - "gzip --version":
+          type: eval
+          description: The expression to obtain the version of the tool
+
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - gzip:
+          type: string
+          description: The name of the tool
+      - gzip --version:
+          type: eval
+          description: The expression to obtain the version of the tool
+authors:
+  - "@danilodileo"
+maintainers:
+  - "@danilodileo"

@@ -1,0 +1,28 @@
+{
+    "metaeuk gff - stub": {
+        "content": [
+            {
+                "format_gff": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test_format.gff.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "versions_gzip": [
+                    [
+                        "FORMAT_METAEUK_GFF",
+                        "gzip",
+                        "1.11"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-09-13T19:14:18.682973653",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
+    }
+}

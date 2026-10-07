@@ -8,7 +8,7 @@ keywords:
   - ranking
 components:
   - hmmer/hmmsearch
-  - hmmrank
+  - hmmer/hmmrank
   - seqtk/hmmhitfaas
 input:
   - ch_hmmclassify:

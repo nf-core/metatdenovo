@@ -5,7 +5,13 @@ keywords:
   - kegg
   - orthology
   - download
-input: none
+input:
+  - ko_list_gz:
+      type: file
+      description: Gzipped KOfam ko_list file, staged from a URL via Nextflow's own file() so it works on network-isolated compute nodes
+  - profiles_targz:
+      type: file
+      description: Gzipped tar archive of KOfam HMM profiles, staged from a URL via Nextflow's own file()
 output:
   ko_list:
     type: file
@@ -19,10 +25,10 @@ output:
     - - "${task.process}":
           type: string
           description: The name of the process
-      - wget:
+      - gzip:
           type: string
           description: The name of the tool
-      - wget --version 2>&1 | head -n 1 | awk "{print \$3}":
+      - gzip --version | head -n 1 | awk "{print \$2}":
           type: eval
           description: The expression to obtain the version of the tool
 topics:
@@ -30,11 +36,35 @@ topics:
     - - "${task.process}":
           type: string
           description: The name of the process
-      - wget:
+      - gzip:
           type: string
           description: The name of the tool
-      - wget --version 2>&1 | head -n 1 | awk "{print \$3}":
+      - gzip --version | head -n 1 | awk "{print \$2}":
           type: eval
           description: The expression to obtain the version of the tool
 authors:
   - "@danilodileo"
+containers:
+  docker:
+    linux/amd64:
+      name: community.wave.seqera.io/library/wget_awscli_gzip_tar:1fad694ee6322b7d
+      build_id: bd-1fad694ee6322b7d_1
+      scan_id: sc-57b5b2710feed391_1
+    linux/arm64:
+      name: community.wave.seqera.io/library/wget_awscli_gzip_tar:58866b9aaf7e5e39
+      build_id: bd-58866b9aaf7e5e39_1
+      scan_id: sc-3492f9ed04c9a991_1
+  singularity:
+    linux/arm64:
+      name: oras://community.wave.seqera.io/library/wget_awscli_gzip_tar:4a6da226684802b2
+      build_id: bd-4a6da226684802b2_1
+      https: https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/48/487a65589a19ab678fb71de5cb2e4fb0c6c494f018179e6edbf0be7afacd3756/data
+    linux/amd64:
+      name: oras://community.wave.seqera.io/library/wget_awscli_gzip_tar:43374a670afd10cc
+      build_id: bd-43374a670afd10cc_1
+      https: https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/bc/bceb5c307eb199ae3eca0eecfd71a0a4a918ce90e6fd96ecc749603426337823/data
+  conda:
+    linux/amd64:
+      lock_file: modules/local/kofamscan/download/.conda-lock/linux_amd64-bd-1fad694ee6322b7d_1.txt
+    linux/arm64:
+      lock_file: modules/local/kofamscan/download/.conda-lock/linux_arm64-bd-58866b9aaf7e5e39_1.txt
