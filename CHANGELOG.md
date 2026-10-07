@@ -47,7 +47,7 @@ Their calls are merged into loci and clustered into proteins, giving one count t
 
 ### `Changed`
 
-- [#NN](https://github.com/nf-core/metatdenovo/pull/NN) - Resource guidance for protein consolidation on very large assemblies, in the large datasets documentation (@erikrikarddaniel, reviewed by @vagkaratzas)
+- [#565](https://github.com/nf-core/metatdenovo/pull/565) - Resource guidance for protein consolidation on very large assemblies, in the large datasets documentation (@erikrikarddaniel, reviewed by @vagkaratzas)
 - [#558](https://github.com/nf-core/metatdenovo/pull/558) - `--kofam_dir` is renamed `--kofam_dbpath`, matching the other database location parameters. `--kofam_dir` still works, with a deprecation warning (@erikrikarddaniel, reviewed by @piplus2, @vagkaratzas)
 - [#558](https://github.com/nf-core/metatdenovo/pull/558) - Update the metro map in the README to show the 2.0 workflow (@erikrikarddaniel, reviewed by @piplus2, @vagkaratzas)
 - [#527](https://github.com/nf-core/metatdenovo/pull/527) - KofamScan and eggNOG database downloads no longer need network access on the compute node, addresses [#365](https://github.com/nf-core/metatdenovo/issues/365) (@erikrikarddaniel)
