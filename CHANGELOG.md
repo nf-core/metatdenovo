@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Fixed`
 
-- [#NN](https://github.com/nf-core/metatdenovo/pull/NN) - Protein-cluster count summary uses far less memory on large assemblies (@erikrikarddaniel)
+- [#587](https://github.com/nf-core/metatdenovo/pull/587) - Protein-cluster count summary uses far less memory on large assemblies (@erikrikarddaniel)
 
 ### `Dependencies`
 
