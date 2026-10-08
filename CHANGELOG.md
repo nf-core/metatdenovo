@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Fixed`
 
-- [#NN](https://github.com/nf-core/metatdenovo/pull/NN) - A task that fails again after its last retry no longer kills other running tasks; they now finish first (@erikrikarddaniel)
+- [#588](https://github.com/nf-core/metatdenovo/pull/588) - A task that fails again after its last retry no longer kills other running tasks; they now finish first (@erikrikarddaniel)
 
 ### `Dependencies`
 
