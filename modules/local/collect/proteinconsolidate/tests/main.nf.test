@@ -23,7 +23,9 @@ nextflow_process {
                     ['Geneid', 'Chr', 'Start', 'End', 'Strand', 'Length', 'RPL28_GENOMIC.sorted.bam'],
                     ['NP_011412.1|k59_1|-|191', 'k59_1;k59_1', '192;1102', '590;1149', '-;-', '447', '69'],
                     ['locus_k59_0_1_447_+',     'k59_0',       '1',        '447',      '+',   '447', '0'],
-                    ['k59_1.p1',                'k59_1',       '183',      '611',      '+',   '429', '12']
+                    ['k59_1.p1',                'k59_1',       '183',      '611',      '+',   '429', '12'],
+                    ['k59_3.p1',                'k59_3',       '10',       '300',      '+',   '291', '5'],
+                    ['k59_4.p1',                'k59_4',       '20',       '310',      '-',   '291', '0']
                 ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
 
                 def mrna = file("\${workDir}/mrna.featureCounts.tsv")
@@ -32,7 +34,9 @@ nextflow_process {
                     ['Geneid', 'Chr', 'Start', 'End', 'Strand', 'Length', 'RPL28_MRNA_RECODED.sorted.bam'],
                     ['NP_011412.1|k59_1|-|191', 'k59_1;k59_1', '192;1102', '590;1149', '-;-', '447', '0'],
                     ['locus_k59_0_1_447_+',     'k59_0',       '1',        '447',      '+',   '447', '400'],
-                    ['k59_1.p1',                'k59_1',       '183',      '611',      '+',   '429', '0']
+                    ['k59_1.p1',                'k59_1',       '183',      '611',      '+',   '429', '0'],
+                    ['k59_3.p1',                'k59_3',       '10',       '300',      '+',   '291', '0'],
+                    ['k59_4.p1',                'k59_4',       '20',       '310',      '-',   '291', '0']
                 ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
 
                 // Gzipped like the real input, so the module's zcat path is exercised.
@@ -40,7 +44,9 @@ nextflow_process {
                     ['ID', 'callers', 'n_calls'],
                     ['locus_k59_0_1_447_+',     'metaeuk,transdecoder', '2'],
                     ['k59_1.p1',                'transdecoder',         '1'],
-                    ['NP_011412.1|k59_1|-|191', 'metaeuk',              '1']
+                    ['NP_011412.1|k59_1|-|191', 'metaeuk',              '1'],
+                    ['k59_3.p1',                'transdecoder',         '1'],
+                    ['k59_4.p1',                'transdecoder',         '1']
                 ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
 
                 def provenanceBaos = new java.io.ByteArrayOutputStream()
@@ -54,7 +60,9 @@ nextflow_process {
                 clusters.text = [
                     ['NP_011412.1|k59_1|-|191', 'NP_011412.1|k59_1|-|191'],
                     ['NP_011412.1|k59_1|-|191', 'locus_k59_0_1_447_+'],
-                    ['k59_1.p1',                'k59_1.p1']
+                    ['k59_1.p1',                'k59_1.p1'],
+                    ['k59_3.p1',                'k59_3.p1'],
+                    ['k59_3.p1',                'k59_4.p1']
                 ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
 
                 input[0] = [ [ id:'test' ], [ genomic, mrna ], provenance, clusters ]
@@ -66,6 +74,7 @@ nextflow_process {
             def rows = path(process.out.counts[0][1]).csv(sep: '\t', decompress: true, header: true).rows
             def merged = rows.findAll { r -> r["orf"] == 'NP_011412.1|k59_1|-|191' }
             def solo   = rows.findAll { r -> r["orf"] == 'k59_1.p1' }
+            def silent = rows.findAll { r -> r["orf"] == 'k59_3.p1' }
             assertAll(
                 { assert process.success },
 
@@ -90,6 +99,13 @@ nextflow_process {
                 { assert (solo[0]["count"] as int) == 12 },
                 { assert (solo[0]["n_loci"] as int) == 1 },
                 { assert solo[0]["callers"] == 'transdecoder' },
+
+                // A member without counts in any sample still contributes its coordinates.
+                { assert silent.size() == 1 },
+                { assert silent[0]["chr"] == 'k59_3;k59_4' },
+                { assert silent[0]["start"] == '10;20' },
+                { assert silent[0]["strand"] == '+;-' },
+                { assert silent[0]["loci"] == 'k59_3.p1,k59_4.p1' },
 
                 // tpm is recomputed per sample over the clusters, so it sums to 1e6 within a sample.
                 { assert rows.findAll { r -> r["sample"] == 'RPL28_GENOMIC' }.sum { r -> r["tpm"] as double } == 1e6 },

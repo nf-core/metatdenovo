@@ -39,13 +39,13 @@
                     {
                         "id": "test"
                     },
-                    "test.counts.tsv.gz:md5,8c5fc41389edfa719663fe05fa246d84"
+                    "test.counts.tsv.gz:md5,ce6281da57320db6b12e3e5b12a42895"
                 ]
             ]
         ],
-        "timestamp": "2026-08-28T12:49:45.145802541",
+        "timestamp": "2026-10-08T14:53:40.241558263",
         "meta": {
-            "nf-test": "0.9.5",
+            "nf-test": "0.9.4",
             "nextflow": "26.04.6"
         }
     }
