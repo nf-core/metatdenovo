@@ -19,7 +19,8 @@ nextflow_process {
                 def rows = [
                     ['orf', 'chr', 'start', 'end', 'strand', 'length', 'sample', 'count', 'tpm'],
                     ['cds.NP_011412.1', 'k59_1', '183', '611', '+', '429', 'SAMPLE1', '12', '500000'],
-                    ['locus_k59_0_1_447_+', 'k59_0', '1', '447', '+', '447', 'SAMPLE1', '12', '500000']
+                    ['locus_k59_0_1_447_+', 'k59_0', '1', '447', '+', '447', 'SAMPLE1', '12', '500000'],
+                    ['NP_cds.2', 'cds.k59_2', '1', '300', '-', '300', 'SAMPLE1', '3', '0.5']
                 ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
 
                 def baos = new java.io.ByteArrayOutputStream()
@@ -34,11 +35,14 @@ nextflow_process {
         }
 
         then {
-            def orfs = path(process.out.counts[0][1]).csv(sep: '\t', decompress: true, header: true).columns["orf"]
+            def table = path(process.out.counts[0][1]).csv(sep: '\t', decompress: true, header: true)
+            def orfs  = table.columns["orf"]
             assertAll(
                 { assert process.success },
                 { assert orfs.contains('NP_011412.1') },
                 { assert orfs.contains('locus_k59_0_1_447_+') },
+                { assert orfs.contains('NP_cds.2') },
+                { assert table.columns["chr"].contains('cds.k59_2') },
                 { assert orfs.every { orf -> !orf.startsWith('cds.') } },
                 { assert snapshot(process.out.counts).match() }
             )

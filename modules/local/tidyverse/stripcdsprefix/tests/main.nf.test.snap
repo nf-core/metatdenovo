@@ -6,13 +6,13 @@
                     {
                         "id": "test"
                     },
-                    "test.counts.tsv.gz:md5,95a629ecd96d06df5829d517c7a4a5ca"
+                    "test.counts.tsv.gz:md5,c1fbf93fc3605a4c3c66abe78cb194b8"
                 ]
             ]
         ],
-        "timestamp": "2026-08-28T10:55:48.069287947",
+        "timestamp": "2026-10-08T08:27:07.709457498",
         "meta": {
-            "nf-test": "0.9.5",
+            "nf-test": "0.9.4",
             "nextflow": "26.04.6"
         }
     },
@@ -28,7 +28,11 @@
                     ]
                 ],
                 "1": [
-                    "versions.yml:md5,729dd70f75e4afd91bdab4689ab92b68"
+                    [
+                        "TIDYVERSE_STRIPCDSPREFIX",
+                        "gzip",
+                        "1.11"
+                    ]
                 ],
                 "counts": [
                     [
@@ -38,14 +42,18 @@
                         "test.counts.tsv.gz:md5,68b329da9893e34099c7d8ad5cb9c940"
                     ]
                 ],
-                "versions": [
-                    "versions.yml:md5,729dd70f75e4afd91bdab4689ab92b68"
+                "versions_gzip": [
+                    [
+                        "TIDYVERSE_STRIPCDSPREFIX",
+                        "gzip",
+                        "1.11"
+                    ]
                 ]
             }
         ],
-        "timestamp": "2026-09-11T15:04:56.78904802",
+        "timestamp": "2026-10-08T08:27:14.689938218",
         "meta": {
-            "nf-test": "0.9.5",
+            "nf-test": "0.9.4",
             "nextflow": "26.04.6"
         }
     }

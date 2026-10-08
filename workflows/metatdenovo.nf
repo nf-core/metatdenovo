@@ -800,7 +800,6 @@ workflow METATDENOVO {
 
     // Strips TransDecoder's cds. prefix; a no-op for other callers
     TIDYVERSE_STRIPCDSPREFIX ( CUSTOM_COLLECTFEATURECOUNTS.out.counts )
-    ch_versions           = ch_versions.mix(TIDYVERSE_STRIPCDSPREFIX.out.versions)
 
     // Must hold every annotated caller: CUSTOM_COLLECTSTATS left-joins onto it
     def ch_counts_per_caller  = TIDYVERSE_STRIPCDSPREFIX.out.counts.mix(ch_protein_consolidate_counts)

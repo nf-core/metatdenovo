@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Fixed`
 
+- [#NN](https://github.com/nf-core/metatdenovo/pull/NN) - Fix the step that tidies TransDecoder ORF names in count tables running out of memory on large runs (@erikrikarddaniel)
+
 ### `Dependencies`
 
 | Tool | Previous version | New version |

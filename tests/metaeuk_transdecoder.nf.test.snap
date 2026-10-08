@@ -136,10 +136,7 @@
                     "seqtk": "1.4-r122"
                 },
                 "TIDYVERSE_STRIPCDSPREFIX": {
-                    "R": "4.5.3",
-                    "dplyr": "1.2.1",
-                    "readr": "2.2.0",
-                    "stringr": "1.6.0"
+                    "gzip": 1.11
                 },
                 "TRANSDECODER_BED_CAT": {
                     "coreutils": 9.4,
