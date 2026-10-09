@@ -19,7 +19,7 @@ include { MERGE_TABLES                       } from '../modules/local/merge/summ
 include { FORMAT_DIAMOND_TAX_RANKLIST        } from '../modules/local/diamond/format_tax/ranklist/'
 include { FORMAT_DIAMOND_TAX_TAXDUMP         } from '../modules/local/diamond/format_tax/taxdump/'
 include { SUMTAXONOMY as SUM_DIAMONDTAX      } from '../modules/local/sumtaxonomy/'
-include { TIDYVERSE_STRIPCDSPREFIX           } from '../modules/local/tidyverse/stripcdsprefix/'
+include { FORMAT_STRIPCDSPREFIX              } from '../modules/local/format/stripcdsprefix/'
 include { WRITESPADESYAML                    } from '../modules/local/spades/writeyaml/'
 
 
@@ -799,11 +799,10 @@ workflow METATDENOVO {
     CUSTOM_COLLECTFEATURECOUNTS ( ch_collect_feature.other )
 
     // Strips TransDecoder's cds. prefix; a no-op for other callers
-    TIDYVERSE_STRIPCDSPREFIX ( CUSTOM_COLLECTFEATURECOUNTS.out.counts )
-    ch_versions           = ch_versions.mix(TIDYVERSE_STRIPCDSPREFIX.out.versions)
+    FORMAT_STRIPCDSPREFIX ( CUSTOM_COLLECTFEATURECOUNTS.out.counts )
 
     // Must hold every annotated caller: CUSTOM_COLLECTSTATS left-joins onto it
-    def ch_counts_per_caller  = TIDYVERSE_STRIPCDSPREFIX.out.counts.mix(ch_protein_consolidate_counts)
+    def ch_counts_per_caller  = FORMAT_STRIPCDSPREFIX.out.counts.mix(ch_protein_consolidate_counts)
     def ch_fcs_for_summary    = ch_counts_per_caller
 
     def ch_merge_tables = channel.empty()

@@ -36,7 +36,14 @@ process COLLECT_PROTEINCONSOLIDATE {
     # Dedupe on ID: a duplicate row would fan the join out and inflate counts.
     provenance <- fread(cmd = "zcat '${provenance}'", sep = '\\t') %>% distinct(ID, .keep_all = TRUE)
 
-    counts <- tibble(f = Sys.glob('*.featureCounts.tsv')) %>%
+    files <- Sys.glob('*.featureCounts.tsv')
+
+    # All tables list the same loci, so coordinates come from one, including loci without counts.
+    coords <- fread(files[1], sep = '\\t', skip = 1, select = 1:6, col.names = c('orf', 'chr', 'start', 'end', 'strand', 'length')) %>%
+        mutate(orf = str_remove(orf, '^cds\\\\.'))
+
+    # Zero counts dropped per table: kept, they dominate memory on large assemblies.
+    counts <- tibble(f = files) %>%
         mutate(
             d = purrr::map(
                 f,
@@ -44,8 +51,9 @@ process COLLECT_PROTEINCONSOLIDATE {
                     fread(file, sep = '\\t', skip = 1) %>%
                         melt(measure.vars = c(ncol(.)), variable.name = 'sample', value.name = 'count') %>%
                         lazy_dt() %>%
+                        filter(count > 0) %>%
                         mutate(sample = str_remove(sample, '[.]sorted[.]bam\$')) %>%
-                        rename(orf = Geneid, chr = Chr, start = Start, end = End, strand = Strand, length = Length) %>%
+                        select(orf = Geneid, sample, count) %>%
                         as_tibble()
                 }
             )
@@ -56,7 +64,7 @@ process COLLECT_PROTEINCONSOLIDATE {
 
     # Coordinates are per locus, so summarised apart from counts; order by locus id for reproducibility.
     cluster_attrs <- clusters %>%
-        left_join(counts %>% distinct(orf, chr, start, end, strand, length), by = 'orf') %>%
+        left_join(coords, by = 'orf') %>%
         left_join(provenance, by = c('orf' = 'ID')) %>%
         arrange(cluster, orf) %>%
         group_by(cluster) %>%
@@ -77,7 +85,7 @@ process COLLECT_PROTEINCONSOLIDATE {
     # Summing member counts is safe only while each read is assigned to one feature
     # (--bbmap_ambiguous/--featurecounts_fraction). tpm is recomputed from the sums.
     # Fail on loci missing from the cluster table: dropping them would silently lose reads.
-    orphans <- counts %>% filter(count > 0) %>% distinct(orf) %>% anti_join(clusters, by = 'orf')
+    orphans <- counts %>% distinct(orf) %>% anti_join(clusters, by = 'orf')
     if (nrow(orphans) > 0) {
         stop(sprintf(
             '%d locus/loci with counts are absent from the cluster table, e.g. %s',
@@ -86,7 +94,6 @@ process COLLECT_PROTEINCONSOLIDATE {
     }
 
     counts %>%
-        filter(count > 0) %>%
         inner_join(clusters, by = 'orf') %>%
         group_by(cluster, sample) %>%
         summarise(count = sum(count), .groups = 'drop') %>%
