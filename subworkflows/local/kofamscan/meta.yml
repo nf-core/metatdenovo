@@ -26,10 +26,13 @@ input:
   - profiles_url:
       type: string
       description: URL to download the KOfam HMM profiles archive from
+  - batchsize:
+      type: integer
+      description: Number of amino acid residues per KofamScan batch
 output:
   - kofam_table_out:
       type: file
-      description: KOFAMSCAN output table
+      description: KOFAMSCAN output tables, one per batch
       pattern: "kofamscan_output.tsv.gz"
   - kofamscan_summary:
       type: file

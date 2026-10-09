@@ -10,7 +10,7 @@ input:
       description: Groovy Map containing sample information
   - kofmascan:
       type: file
-      description: KofamScan output file
+      description: KofamScan output files, one per batch
       pattern: "kofamscan_output.tsv.gz"
   - fcs:
       type: file
