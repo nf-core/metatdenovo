@@ -1,11 +1,11 @@
-name: interproscan
+name: interproscan_annotation
 description: Runs InterProScan functional annotation on called ORFs and summarizes the results
 keywords:
   - interproscan
   - functional annotation
   - protein sequences
 components:
-  - interproscan/download
+  - interproscan/database
   - interproscan/stripasterisk
   - interproscan
   - interproscan/format

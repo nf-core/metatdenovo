@@ -2,7 +2,7 @@
 // Run InterProScan on called ORFs, first downloading the required database
 //
 
-include { INTERPROSCAN_DATABASE      } from '../../../modules/local/interproscan/download/main'
+include { INTERPROSCAN_DATABASE      } from '../../../modules/local/interproscan/database/main'
 include { INTERPROSCAN_STRIPASTERISK } from '../../../modules/local/interproscan/stripasterisk/main'
 include { INTERPROSCAN               } from '../../../modules/nf-core/interproscan/main'
 include { INTERPROSCAN_FORMAT        } from '../../../modules/local/interproscan/format/main'
