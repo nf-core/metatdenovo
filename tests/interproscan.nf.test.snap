@@ -60,6 +60,9 @@
                 "FORMAT_PRODIGAL_GFF": {
                     "gzip": 1.11
                 },
+                "FORMAT_STRIPCDSPREFIX": {
+                    "gzip": 1.11
+                },
                 "INTERPROSCAN": {
                     "interproscan": "5.59-91.0"
                 },
@@ -119,12 +122,6 @@
                 "SEQTK_MERGEPE": {
                     "seqtk": "1.4-r122"
                 },
-                "TIDYVERSE_STRIPCDSPREFIX": {
-                    "R": "4.5.3",
-                    "dplyr": "1.2.1",
-                    "readr": "2.2.0",
-                    "stringr": "1.6.0"
-                },
                 "TRIMGALORE": {
                     "trimgalore": "2.3.0"
                 },
@@ -132,7 +129,7 @@
                     "pigz": 2.8
                 },
                 "Workflow": {
-                    "nf-core/metatdenovo": "v1.5.0dev"
+                    "nf-core/metatdenovo": "v2.1.0dev"
                 }
             },
             [
@@ -224,11 +221,8 @@
                 "quast/megahit/transposed_report.txt",
                 "samtools",
                 "samtools/megahit.SAMPLE1_PE.flagstat",
-                "samtools/megahit.SAMPLE1_PE.idxstats",
                 "samtools/megahit.SAMPLE2_PE.flagstat",
-                "samtools/megahit.SAMPLE2_PE.idxstats",
                 "samtools/megahit.SAMPLE3_PE_1.flagstat",
-                "samtools/megahit.SAMPLE3_PE_1.idxstats",
                 "summary_tables",
                 "summary_tables/megahit.locus_consolidate.counts.tsv.gz",
                 "summary_tables/megahit.prodigal.counts.tsv.gz",
@@ -259,10 +253,10 @@
                 "multiqc_citations.txt:md5,2d1a8ef8ba06c7eada06ab3e96552ea4"
             ]
         ],
+        "timestamp": "2026-10-09T17:15:32.026155",
         "meta": {
-            "nf-test": "0.9.2",
-            "nextflow": "26.04.1"
-        },
-        "timestamp": "2026-09-18T19:59:03.925224"
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
     }
 }
