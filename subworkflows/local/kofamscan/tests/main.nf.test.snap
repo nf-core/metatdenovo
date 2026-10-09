@@ -1,0 +1,54 @@
+{
+    "proteins in several batches - same annotation as one KofamScan run": {
+        "content": [
+            {
+                "kofam_table_out": [
+                    [
+                        {
+                            "caller": "prodigal",
+                            "id": "test"
+                        },
+                        [
+                            "test.001.kofamscan_output.tsv.gz:md5,7babbc11fdffbdd02d989ec506323e26",
+                            "test.002.kofamscan_output.tsv.gz:md5,0609eba8977a8cd44a811e8455d211d5",
+                            "test.003.kofamscan_output.tsv.gz:md5,37cd8e6845fbda8f922fc76b647a7bec",
+                            "test.004.kofamscan_output.tsv.gz:md5,4069effdb629790236e4679333be694e"
+                        ]
+                    ]
+                ],
+                "kofam_table_tsv": [
+                    [
+                        {
+                            "caller": "prodigal",
+                            "id": "test"
+                        },
+                        "test.kofamscan.tsv.gz:md5,b1a11887a5bb4e7a3abaf4b434870e13"
+                    ]
+                ],
+                "kofam_table_uniq": [
+                    [
+                        {
+                            "caller": "prodigal",
+                            "id": "test"
+                        },
+                        "test.kofamscan-uniq.tsv.gz:md5,2c6b3f134c48ee630de0816e75c1eaba"
+                    ]
+                ],
+                "kofamscan_summary": [
+                    [
+                        {
+                            "caller": "prodigal",
+                            "id": "test"
+                        },
+                        "test.kofamscan_summary.tsv.gz:md5,e03a33bc7515c6b7a1f8f9e8704aec97"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-10-09T15:11:31.836948268",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "26.04.6"
+        }
+    }
+}

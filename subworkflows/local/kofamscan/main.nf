@@ -39,10 +39,10 @@ workflow KOFAMSCAN {
         KOFAMSCAN_DOWNLOAD.out.ko_list
     )
 
-    // sort: input order is part of the downstream task hashes
+    // Sorted by batch number: input order is part of the downstream task hashes and the merged row order
     ch_kofamscan_tsv = KOFAMSCAN_SCAN.out.tsv
         .map { meta, tsv -> [ meta.parent, tsv ] }
-        .groupTuple(sort: true)
+        .groupTuple(sort: { a, b -> a.name <=> b.name })
 
     KOFAMSCAN_FORMAT( ch_kofamscan_tsv )
 

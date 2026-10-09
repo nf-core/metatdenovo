@@ -539,6 +539,7 @@
                     "type": "integer",
                     "description": "Number of amino acid residues per batch KofamScan is run on.",
                     "default": 1000000000,
+                    "minimum": 1,
                     "hidden": true,
                     "help_text": "KofamScan runs on batches of the protein fasta so that large sets run in parallel tasks and an interrupted run loses at most the unfinished batches. The size counts sequence residues only, not header lines. KO assignment is unaffected by batching, but reported E-values depend on the number of sequences in the batch, so they differ between batch sizes.",
                     "fa_icon": "fas fa-expand-alt"

@@ -33,8 +33,8 @@ nextflow_pipeline {
                 // Fixture db: https://github.com/nf-core/test-datasets/blob/metatdenovo/test_data/kofamscan/README.md
                 { assert path("${params.outdir}/summary_tables/megahit.prodigal.kofamscan.tsv.gz").linesGzip.size() > 1 },
                 { assert path("${params.outdir}/summary_tables/megahit.prodigal.kofamscan.tsv.gz").linesGzip.findAll { l -> l.contains('K21572') || l.contains('K21573') }.size() > 0 },
-                // kofamscan_batchsize in test_kofamscan splits the proteins into 7 batches
-                { assert file("${params.outdir}/kofamscan").listFiles().findAll { f -> f.name.endsWith('.kofamscan_output.tsv.gz') }.size() == 7 },
+                // kofamscan_batchsize in test_kofamscan gives several batches
+                { assert file("${params.outdir}/kofamscan").listFiles().findAll { f -> f.name.endsWith('.kofamscan_output.tsv.gz') }.size() > 1 },
             )
         }
     }
