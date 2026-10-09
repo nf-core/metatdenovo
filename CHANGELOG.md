@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Added`
 
-- [#NN](https://github.com/nf-core/metatdenovo/pull/NN) - KofamScan runs on batches of proteins, in parallel and resumable per batch (`--kofamscan_batchsize`) (@erikrikarddaniel)
+- [#589](https://github.com/nf-core/metatdenovo/pull/589) - KofamScan runs on batches of proteins, in parallel and resumable per batch (`--kofamscan_batchsize`) (@erikrikarddaniel)
 
 ### `Changed`
 
