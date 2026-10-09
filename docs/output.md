@@ -327,7 +327,7 @@ Quantification of CDS features with `featureCounts` from the [subread](https://s
 <summary>Output files</summary>
 
 - `kofamscan/`
-  - `<assembly_name>.<orfcaller_name>.<n>.kofamscan_output.tsv.gz`: kofamscan output, one file per batch of proteins (see `--kofamscan_batchsize`).
+  - `<assembly_name>.<orfcaller_name>.<nnn>.kofamscan_output.tsv.gz`: kofamscan output, one file per batch of proteins, numbered `001`, `002`, ... (see `--kofamscan_batchsize`).
 - `summary_tables/`
   - `<assembly_name>.<orfcaller_name>.kofamscan.tsv.gz`: reformatted kofamscan output
   - `<assembly_name>.<orfcaller_name>.kofamscan-uniq.tsv.gz`: reformatted kofamscan output subset to the best hit for each ORF

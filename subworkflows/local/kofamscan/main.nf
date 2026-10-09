@@ -32,9 +32,9 @@ workflow KOFAMSCAN {
     KOFAMSCAN_SCAN(
         ch_kofamscan_split.other
             .splitFasta(size: batchsize, file: true, elem: 1)
-            .map { meta, faa -> [ meta, faa, faa.baseName.tokenize('.').last() ] }
-            .mix( ch_kofamscan_split.empty.map { meta, faa -> [ meta, faa, '1' ] } )
-            .map { meta, faa, n -> [ meta + [ id: "${meta.id}.${n}", parent: meta ], faa ] },
+            .map { meta, faa -> [ meta, faa, faa.baseName.tokenize('.').last() as Integer ] }
+            .mix( ch_kofamscan_split.empty.map { meta, faa -> [ meta, faa, 1 ] } )
+            .map { meta, faa, n -> [ meta + [ id: String.format('%s.%03d', meta.id, n), parent: meta ], faa ] },
         KOFAMSCAN_DOWNLOAD.out.koprofiles,
         KOFAMSCAN_DOWNLOAD.out.ko_list
     )
