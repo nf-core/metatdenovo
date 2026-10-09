@@ -104,6 +104,9 @@
                 "FORMAT_LOCUSFAA": {
                     "gzip": 1.11
                 },
+                "FORMAT_STRIPCDSPREFIX": {
+                    "gzip": 1.11
+                },
                 "GFF_CAT": {
                     "coreutils": 9.4,
                     "find": "4.6.0",
@@ -211,12 +214,6 @@
                 "SUM_EUKULELE_TAXONOMY": {
                     "R": "4.0,",
                     "tidyverse": 2.0
-                },
-                "TIDYVERSE_STRIPCDSPREFIX": {
-                    "R": "4.1.0",
-                    "dplyr": "1.0.7",
-                    "readr": "2.0.0",
-                    "stringr": "1.5.0"
                 },
                 "TRANSDECODER_BED_CAT": {
                     "coreutils": 9.4,
