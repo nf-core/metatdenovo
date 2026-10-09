@@ -1,0 +1,95 @@
+// Proteins and database: https://github.com/nf-core/test-datasets/tree/metatdenovo#kofamscan-subworkflow-test-proteins
+def inputs = """
+    def faa = file(params.pipelines_testdata_base_path + 'test_data/kofamscan/proteins.faa.gz', checkIfExists: true)
+
+    // S1 counts every protein once, S2 one protein with two KO hits and one without hits
+    def counts = file("\${workDir}/test.counts.tsv.gz")
+    new java.util.zip.GZIPOutputStream(counts.newOutputStream()).withWriter { w ->
+        w << 'orf\\tsample\\tcount\\n'
+        faa.splitFasta(record: [id: true]).each { r -> w << "\${r.id}\\tS1\\t1\\n" }
+        w << 'k141_479_4\\tS2\\t5\\n'
+        w << 'k141_0_1\\tS2\\t3\\n'
+    }
+
+    def meta = [ id: 'test', caller: 'prodigal' ]
+    input[0] = channel.of([ meta, faa ])
+    input[1] = channel.of([ meta, counts ])
+    input[2] = params.pipelines_testdata_base_path + 'test_data/kofamscan/ko_list.gz'
+    input[3] = params.pipelines_testdata_base_path + 'test_data/kofamscan/profiles.tar.gz'
+    input[4] = params.batchsize
+"""
+
+// Best KO per protein from running exec_annotation once on all proteins
+def expected_best = [
+    'k141_1023_4':  'K03590', 'k141_1034_10': 'K06142', 'k141_1034_23': 'K23514',
+    'k141_1034_28': 'K21572', 'k141_1034_59': 'K07407', 'k141_1034_61': 'K21572',
+    'k141_1034_62': 'K21573', 'k141_1034_63': 'K07165', 'k141_1034_64': 'K23514',
+    'k141_1051_1':  'K15633', 'k141_1060_12': 'K15633', 'k141_1071_2':  'K07497',
+    'k141_1071_3':  'K07483', 'k141_1071_4':  'K07483', 'k141_1072_13': 'K08218',
+    'k141_1095_2':  'K01546', 'k141_1138_1':  'K07126', 'k141_119_1':   'K02968',
+    'k141_1232_1':  'K15633', 'k141_1278_5':  'K04079', 'k141_1546_12': 'K07042',
+    'k141_1679_1':  'K24119', 'k141_324_27':  'K09955', 'k141_4_1':     'K03531',
+    'k141_479_4':   'K07497', 'k141_580_1':   'K07480', 'k141_756_25':  'K03590'
+]
+
+nextflow_workflow {
+
+    name "Test Subworkflow KOFAMSCAN"
+    script "../main.nf"
+    workflow "KOFAMSCAN"
+
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "kofamscan"
+
+    test("proteins in several batches - same annotation as one KofamScan run") {
+
+        when {
+            params {
+                batchsize = 3000
+            }
+            workflow {
+                inputs
+            }
+        }
+
+        then {
+            def rows = { ch -> path(ch[0][1]).linesGzip.drop(1).collect { l -> l.split('\t') } }
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.kofam_table_out[0][1].size() > 1 },
+                { assert rows(workflow.out.kofam_table_uniq).collectEntries { r -> [ r[0], r[1] ] } == expected_best },
+                // All 29 hits, including the weaker second KO of two proteins
+                { assert rows(workflow.out.kofam_table_tsv).size() == 29 },
+                { assert rows(workflow.out.kofam_table_tsv).collect { r -> r[0..1].join(" ") }.containsAll([ 'k141_479_4 K07483', 'k141_1034_23 K07483' ]) },
+                // Proteins with hits counted once each; proteins without hits not at all
+                { assert rows(workflow.out.kofamscan_summary).collectEntries { r -> [ r[0], r[3] ] } == [ S1: '27', S2: '5' ] },
+                { assert snapshot(sanitizeOutput(workflow.out)).match() }
+            )
+        }
+    }
+
+    test("proteins in one batch - same annotation as one KofamScan run") {
+
+        when {
+            params {
+                batchsize = 1000000000
+            }
+            workflow {
+                inputs
+            }
+        }
+
+        then {
+            def rows = { ch -> path(ch[0][1]).linesGzip.drop(1).collect { l -> l.split('\t') } }
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.kofam_table_out[0][1].size() == 1 },
+                { assert rows(workflow.out.kofam_table_uniq).collectEntries { r -> [ r[0], r[1] ] } == expected_best },
+                { assert rows(workflow.out.kofam_table_tsv).size() == 29 },
+                { assert rows(workflow.out.kofamscan_summary).collectEntries { r -> [ r[0], r[3] ] } == [ S1: '27', S2: '5' ] },
+                { assert snapshot(sanitizeOutput(workflow.out)).match() }
+            )
+        }
+    }
+}

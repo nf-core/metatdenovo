@@ -323,11 +323,14 @@ Quantification of CDS features with `featureCounts` from the [subread](https://s
 
 [KOfamScan](https://github.com/takaram/kofam_scan) will perform an analysis to assign KEGG orthologs to ORFs.
 
+The tables keep hits below the KO's own score threshold (`thrshld`), since fragmented genes from community data often score below it; filter on `score`, `thrshld` and `evalue` as needed.
+E-values are computed per batch, so they scale with the number of proteins in a batch and are only comparable between runs with the same `--kofamscan_batchsize`.
+
 <details markdown="1">
 <summary>Output files</summary>
 
 - `kofamscan/`
-  - `<assembly_name>.<orfcaller_name>.kofamscan_output.tsv.gz`: kofamscan output.
+  - `<assembly_name>.<orfcaller_name>.<nnn>.kofamscan_output.tsv.gz`: kofamscan output, one file per batch of proteins, numbered `001`, `002`, ... (see `--kofamscan_batchsize`).
 - `summary_tables/`
   - `<assembly_name>.<orfcaller_name>.kofamscan.tsv.gz`: reformatted kofamscan output
   - `<assembly_name>.<orfcaller_name>.kofamscan-uniq.tsv.gz`: reformatted kofamscan output subset to the best hit for each ORF
