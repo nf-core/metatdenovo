@@ -1,4 +1,4 @@
-process TIDYVERSE_STRIPCDSPREFIX {
+process FORMAT_STRIPCDSPREFIX {
     tag "$meta.id"
     label 'process_single'
 

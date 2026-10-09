@@ -1,13 +1,13 @@
 nextflow_process {
 
-    name "Test Process TIDYVERSE_STRIPCDSPREFIX"
+    name "Test Process FORMAT_STRIPCDSPREFIX"
     script "../main.nf"
-    process "TIDYVERSE_STRIPCDSPREFIX"
+    process "FORMAT_STRIPCDSPREFIX"
 
     tag "modules"
     tag "modules_local"
     tag "tidyverse"
-    tag "tidyverse/stripcdsprefix"
+    tag "format/stripcdsprefix"
 
     // Shape of CUSTOM_COLLECTFEATURECOUNTS output; one "cds."-prefixed ID, one clean ID that must pass through.
 

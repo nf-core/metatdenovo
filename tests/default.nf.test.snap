@@ -79,6 +79,9 @@
                 "FORMAT_PRODIGAL_GFF": {
                     "gzip": 1.11
                 },
+                "FORMAT_STRIPCDSPREFIX": {
+                    "gzip": 1.11
+                },
                 "HMMER_HMMRANK": {
                     "r-base": "4.2.3",
                     "r-tidyverse": "2.0.0"
@@ -136,9 +139,6 @@
                 },
                 "SEQTK_MERGEPE": {
                     "seqtk": "1.4-r122"
-                },
-                "TIDYVERSE_STRIPCDSPREFIX": {
-                    "gzip": 1.11
                 },
                 "TRIMGALORE": {
                     "trimgalore": "2.3.0"

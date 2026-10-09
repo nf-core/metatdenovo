@@ -63,6 +63,9 @@
                 "FORMAT_PRODIGAL_GFF": {
                     "gzip": 1.11
                 },
+                "FORMAT_STRIPCDSPREFIX": {
+                    "gzip": 1.11
+                },
                 "PIGZ_PE_READS_FWD": {
                     "pigz": 2.8
                 },
@@ -95,9 +98,6 @@
                 },
                 "SPADES": {
                     "spades": "4.1.0"
-                },
-                "TIDYVERSE_STRIPCDSPREFIX": {
-                    "gzip": 1.11
                 },
                 "TRIMGALORE": {
                     "trimgalore": "2.3.0"

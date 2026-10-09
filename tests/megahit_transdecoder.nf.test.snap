@@ -57,6 +57,9 @@
                 "FORMAT_LOCUSCONSOLIDATE": {
                     "gzip": 1.11
                 },
+                "FORMAT_STRIPCDSPREFIX": {
+                    "gzip": 1.11
+                },
                 "MEGAHIT": {
                     "megahit": "1.2.9"
                 },
@@ -98,9 +101,6 @@
                 },
                 "SEQTK_MERGEPE": {
                     "seqtk": "1.4-r122"
-                },
-                "TIDYVERSE_STRIPCDSPREFIX": {
-                    "gzip": 1.11
                 },
                 "TRANSDECODER_BED_CAT": {
                     "coreutils": 9.4,

@@ -81,6 +81,9 @@
                 "FORMAT_LOCUSCONSOLIDATE": {
                     "gzip": 1.11
                 },
+                "FORMAT_STRIPCDSPREFIX": {
+                    "gzip": 1.11
+                },
                 "GFF_CAT": {
                     "coreutils": 9.4,
                     "find": "4.6.0",
@@ -159,9 +162,6 @@
                 },
                 "TAXONKIT_LINEAGE": {
                     "taxonkit": "0.18.0"
-                },
-                "TIDYVERSE_STRIPCDSPREFIX": {
-                    "gzip": 1.11
                 },
                 "TRANSDECODER_BED_CAT": {
                     "coreutils": 9.4,

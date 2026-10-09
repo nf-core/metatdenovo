@@ -29,7 +29,7 @@
                 ],
                 "1": [
                     [
-                        "TIDYVERSE_STRIPCDSPREFIX",
+                        "FORMAT_STRIPCDSPREFIX",
                         "gzip",
                         "1.11"
                     ]
@@ -44,14 +44,14 @@
                 ],
                 "versions_gzip": [
                     [
-                        "TIDYVERSE_STRIPCDSPREFIX",
+                        "FORMAT_STRIPCDSPREFIX",
                         "gzip",
                         "1.11"
                     ]
                 ]
             }
         ],
-        "timestamp": "2026-10-08T08:27:14.689938218",
+        "timestamp": "2026-10-09T11:36:36.934600849",
         "meta": {
             "nf-test": "0.9.4",
             "nextflow": "26.04.6"

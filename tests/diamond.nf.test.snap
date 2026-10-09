@@ -74,6 +74,9 @@
                 "FORMAT_PRODIGAL_GFF": {
                     "gzip": 1.11
                 },
+                "FORMAT_STRIPCDSPREFIX": {
+                    "gzip": 1.11
+                },
                 "MEGAHIT": {
                     "megahit": "1.2.9"
                 },
@@ -126,9 +129,6 @@
                 },
                 "TAXONKIT_LINEAGE": {
                     "taxonkit": "0.18.0"
-                },
-                "TIDYVERSE_STRIPCDSPREFIX": {
-                    "gzip": 1.11
                 },
                 "TRIMGALORE": {
                     "trimgalore": "2.3.0"
