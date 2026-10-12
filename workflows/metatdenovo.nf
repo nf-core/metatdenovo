@@ -836,7 +836,7 @@ workflow METATDENOVO {
     // SUBWORKFLOW: run InterProScan on the ORF-called amino acid sequences
     //
     if ( ! skip_interproscan ) {
-        INTERPROSCAN_ANNOTATION( ch_protein, ch_fcs_for_summary )
+        INTERPROSCAN_ANNOTATION( ch_protein, ch_fcs_for_summary, params.interproscan_db_url )
         ch_merge_tables   = ch_merge_tables.mix ( INTERPROSCAN_ANNOTATION.out.sumtable )
         ch_parquet_tables = ch_parquet_tables.mix( INTERPROSCAN_ANNOTATION.out.annotation.map { _meta, tsv -> tsv } )
     }
