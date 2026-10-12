@@ -10,7 +10,7 @@ process INTERPROSCAN_DATABASE {
         'community.wave.seqera.io/library/wget_awscli:9510e6a6af2abe94' }"
 
     input:
-    val database_url
+    path database_targz
 
     output:
     path "interproscan_db", emit: db
@@ -20,21 +20,18 @@ process INTERPROSCAN_DATABASE {
 
     script:
     """
-    wget ${database_url} -O interproscan_db.tar.gz
-
     # The full upstream release tarball extracts to interproscan-<version>/{bin,data,lib,...} --
     # the module supplies its own bin/lib via the container's conda install, so only the (large)
     # data/ subdirectory is needed, staged directly as INTERPROSCAN's `data` input. The small
     # test-only archive (nf-core/test-datasets, used by the vendored module's own tests) instead
     # extracts data/ directly at the tarball's top level, with no version-named wrapper directory.
-    tar -zxf interproscan_db.tar.gz
+    tar -zxf ${database_targz}
     if [ -d data ]; then
         mv data interproscan_db
     else
         mv interproscan-*/data interproscan_db
         rm -rf interproscan-*
     fi
-    rm -f interproscan_db.tar.gz
     """
 
     stub:

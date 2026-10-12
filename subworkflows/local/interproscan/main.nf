@@ -12,10 +12,11 @@ workflow INTERPROSCAN_ANNOTATION {
     take:
     faa            // channel: [ val(meta), path(faa) ]
     feature_counts // channel: [ val(meta), path(fcs) ] -- meta.caller must match faa's
+    db_url         // string: URL of the InterProScan data release tarball
 
     main:
 
-    INTERPROSCAN_DATABASE(params.interproscan_db_url)
+    INTERPROSCAN_DATABASE( file(db_url) )
 
     INTERPROSCAN_STRIPASTERISK(faa)
 

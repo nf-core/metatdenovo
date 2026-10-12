@@ -7,9 +7,9 @@ keywords:
   - download
 
 input:
-  - database_url:
-      type: string
-      description: URL to the InterProScan `-64-bit.tar.gz` release archive to download
+  - database_targz:
+      type: file
+      description: InterProScan `-64-bit.tar.gz` release archive, staged from a URL via Nextflow's own file() so it works on network-isolated compute nodes
 
 output:
   - db:

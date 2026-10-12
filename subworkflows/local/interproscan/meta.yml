@@ -19,6 +19,9 @@ input:
       type: file
       description: Feature count files
       pattern: "*.counts.tsv.gz"
+  - db_url:
+      type: string
+      description: URL of the InterProScan `-64-bit.tar.gz` release archive
 output:
   - annotation:
       type: file
