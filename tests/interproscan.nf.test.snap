@@ -151,11 +151,7 @@
                 "featurecounts/SAMPLE3_PE_1.locus_consolidate.featureCounts.tsv.summary",
                 "featurecounts/SAMPLE3_PE_1.prodigal.featureCounts.tsv",
                 "featurecounts/SAMPLE3_PE_1.prodigal.featureCounts.tsv.summary",
-                [
-                    [
-                        
-                    ]
-                ],
+                "interproscan",
                 "interproscan/megahit.prodigal.001.gff3",
                 "interproscan/megahit.prodigal.001.json",
                 "interproscan/megahit.prodigal.001.tsv",
