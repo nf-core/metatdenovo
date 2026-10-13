@@ -492,11 +492,13 @@ database assets to save space and time.
 
 A fourth option is [InterProScan](https://interproscan-docs.readthedocs.io) (Pfam, PANTHER, and other member-database domain/GO
 annotation), run by default and skippable with `--skip_interproscan`.
-Its (large) lookup-service database is downloaded automatically, with the path settable through `--interproscan_dbpath directory`
+Its (large) member-database data is downloaded automatically, with the path settable through `--interproscan_dbpath directory`
 (the same "let the pipeline download it once, then reuse the data" advice above applies here too).
 By default only a fast, curated subset of member databases is run (`--interproscan_applications Pfam,PANTHER`); widen this to run
 against more member databases (Gene3D, SMART, etc.) at the cost of runtime.
 GO term annotation (`--goterms`) is always enabled; pathway mapping (`--pathways`) is not run.
+Like KofamScan, InterProScan runs on batches of proteins, by default 1 billion amino acids each (`--interproscan_batchsize`), so a
+large protein set runs as parallel tasks and an interrupted run only repeats the unfinished batches.
 
 :::note
 The pipeline uses the InterProScan version pinned by the underlying nf-core/modules component (5.59-91.0, from 2022) -- not the
