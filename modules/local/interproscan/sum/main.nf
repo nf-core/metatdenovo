@@ -38,9 +38,8 @@ process INTERPROSCAN_SUM {
         mutate(sample = as.character(sample))
 
     counts %>%
-        inner_join(interproscan, by = 'orf') %>%
+        inner_join(distinct(interproscan, orf, .keep_all = TRUE), by = 'orf') %>%
         group_by(sample) %>%
-        drop_na() %>%
         summarise( value = sum(count), .groups = 'drop') %>%
         add_column(database = "interproscan", field = "n") %>%
         relocate(value, .after = last_col()) %>%
