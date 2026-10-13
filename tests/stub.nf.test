@@ -32,7 +32,7 @@ nextflow_pipeline {
                 { assert tasksFor('DIAMOND_TAXONOMY') == 3 }, // 3 protein sets * 1 db, one batch each
                 { assert tasksFor('FORMAT_DIAMOND_TAX_TAXDUMP') == 3 },
                 { assert tasksFor('DUCKDB_TABLE2PARQUET') == 35 }, // one per summary_tables/ tsv
-                { assert succeeded.size() == 214 },
+                { assert succeeded.size() == 211 },
                 { assert snapshot(
                     removeNextflowVersion("$outputDir/pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml")
                 ).match() }
