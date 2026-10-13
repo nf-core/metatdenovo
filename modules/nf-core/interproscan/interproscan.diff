@@ -1,0 +1,28 @@
+Changes in component 'nf-core/interproscan'
+'modules/nf-core/interproscan/environment.yml' is unchanged
+'modules/nf-core/interproscan/meta.yml' is unchanged
+Changes in 'interproscan/main.nf':
+--- modules/nf-core/interproscan/main.nf
++++ modules/nf-core/interproscan/main.nf
+@@ -27,8 +27,13 @@
+     def args             = task.ext.args ?: ''
+     def prefix           = task.ext.prefix ?: "${meta.id}"
+     def is_compressed    = fasta.getExtension() == "gz"
+-    def fasta_name       = is_compressed ? fasta.getBaseName() : fasta
+-    def uncompress_input = is_compressed ? "gzip -c -d ${fasta} > ${fasta_name}" : ''
++    def fasta_name       = is_compressed ? fasta.getBaseName() : "stripped_${fasta}"
++    // InterProScan hard-rejects '*' (the stop-codon marker Prodigal/TransDecoder/etc. leave on
++    // every protein), so strip it here, in the step that already rewrites the input either way.
++    // nf-core/modules#13130.
++    def uncompress_input = is_compressed ?
++        "gzip -c -d ${fasta} | sed '/^>/! s/\\*//g' > ${fasta_name}" :
++        "sed '/^>/! s/\\*//g' ${fasta} > ${fasta_name}"
+     """
+     $uncompress_input
+ 
+
+'modules/nf-core/interproscan/tests/nextflow_database.config' is unchanged
+'modules/nf-core/interproscan/tests/main.nf.test.snap' is unchanged
+'modules/nf-core/interproscan/tests/nextflow.config' is unchanged
+'modules/nf-core/interproscan/tests/main.nf.test' is unchanged
+************************************************************
