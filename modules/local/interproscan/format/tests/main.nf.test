@@ -1,0 +1,69 @@
+nextflow_process {
+
+    name "Test Process INTERPROSCAN_FORMAT"
+    script "../main.nf"
+    process "INTERPROSCAN_FORMAT"
+
+    tag "modules"
+    tag "modules_local"
+    tag "interproscan"
+    tag "interproscan/format"
+
+    test("ragged rows padded to a rectangular 15 columns") {
+
+        when {
+            process {
+                """
+                // InterProScan's raw TSV has no header and is ragged: a match with no InterPro
+                // entry (protA) stops at 13 columns (the iprlookup columns are still written as
+                // '-', but go_terms is omitted entirely, not blank); a match with one (protB)
+                // has 14, since --pathways isn't passed.
+                def tsv = file("\${workDir}/test.tsv")
+                tsv.text = [
+                    'protA\\tmd5A\\t100\\tSFLD\\tSFLDS00057\\tGlutaminase/Asparaginase\\t1\\t90\\t0.0\\tT\\t01-01-2026\\t-\\t-',
+                    'protB\\tmd5B\\t120\\tPfam\\tPF00001\\t7tm_1\\t5\\t110\\t1.2E-30\\tT\\t01-01-2026\\tIPR000276\\tGPCR rhodopsin-like\\tGO:0004930',
+                    ''
+                ].join('\\n')
+
+                input[0] = [ [ id: 'test' ], tsv ]
+                """
+            }
+        }
+
+        then {
+            def lines = path(process.out.tsv[0][1]).linesGzip
+            assertAll(
+                { assert process.success },
+                { assert lines[0].tokenize('\t') ==
+                    ['orf', 'md5', 'length', 'analysis', 'signature_accession', 'signature_description', 'start', 'stop', 'score', 'status', 'date', 'interpro_accession', 'interpro_description', 'go_terms', 'pathways'] },
+                { assert lines[1].tokenize('\t') ==
+                    ['protA', 'md5A', '100', 'SFLD', 'SFLDS00057', 'Glutaminase/Asparaginase', '1', '90', '0.0', 'T', '01-01-2026', '-', '-', '-', '-'] },
+                { assert lines[2].tokenize('\t') ==
+                    ['protB', 'md5B', '120', 'Pfam', 'PF00001', '7tm_1', '5', '110', '1.2E-30', 'T', '01-01-2026', 'IPR000276', 'GPCR rhodopsin-like', 'GO:0004930', '-'] },
+            )
+        }
+    }
+
+    test("interproscan_format - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                def tsv = file("\${workDir}/test.tsv")
+                tsv.text = 'protA\\tmd5A\\t100\\tSFLD\\tSFLDS00057\\tGlutaminase/Asparaginase\\t1\\t90\\t0.0\\tT\\t01-01-2026\\t-\\t-\\n'
+
+                input[0] = [ [ id: 'test' ], tsv ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(sanitizeOutput(process.out)).match() }
+            )
+        }
+    }
+}

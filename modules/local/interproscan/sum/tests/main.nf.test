@@ -1,0 +1,81 @@
+nextflow_process {
+
+    name "Test Process INTERPROSCAN_SUM"
+    script "../main.nf"
+    process "INTERPROSCAN_SUM"
+
+    tag "modules"
+    tag "modules_local"
+    tag "interproscan"
+    tag "interproscan/sum"
+
+    test("one ORF matched twice is counted once, not per match") {
+
+        when {
+            process {
+                """
+                // orfA has two signature matches (as InterProScan commonly produces with
+                // e.g. Pfam,PANTHER both hitting), orfB has one with no InterPro entry. The
+                // correct summed value is 10 + 5 = 15, not 10*2 + 5 = 25.
+                def interproscan = file("\${workDir}/test.interproscan.tsv")
+                interproscan.text = [
+                    'orf\\tmd5\\tlength\\tanalysis\\tsignature_accession\\tsignature_description\\tstart\\tstop\\tscore\\tstatus\\tdate\\tinterpro_accession\\tinterpro_description\\tgo_terms\\tpathways',
+                    'orfA\\tmd5A\\t100\\tSFLD\\tSFLDS00057\\tGlutaminase/Asparaginase\\t1\\t90\\t0.0\\tT\\t01-01-2026\\t-\\t-\\t-\\t-',
+                    'orfA\\tmd5A\\t100\\tPfam\\tPF00001\\tSomeOtherFamily\\t10\\t80\\t1e-10\\tT\\t01-01-2026\\tIPR000001\\tSome Entry\\tGO:0000001\\t-',
+                    'orfB\\tmd5B\\t80\\tSFLD\\tSFLDS00058\\tSomeFamily\\t1\\t70\\t0.0\\tT\\t01-01-2026\\t-\\t-\\t-\\t-',
+                    ''
+                ].join('\\n')
+
+                def rows = [
+                    ['sample', 'orf', 'count'],
+                    ['sample1', 'orfA', '10'],
+                    ['sample1', 'orfB', '5']
+                ].collect { r -> r.join('\\t') }.join('\\n') + '\\n'
+
+                def baos = new java.io.ByteArrayOutputStream()
+                new java.util.zip.GZIPOutputStream(baos).withCloseable { gz -> gz.write(rows.getBytes('UTF-8')) }
+
+                def fcs = file("\${workDir}/test.counts.tsv.gz")
+                fcs.bytes = baos.toByteArray()
+
+                input[0] = [ [ id: 'test' ], interproscan, fcs ]
+                """
+            }
+        }
+
+        then {
+            def table = path(process.out.interproscan_summary[0][1]).csv(sep: '\t', decompress: true, header: true)
+            assertAll(
+                { assert process.success },
+                { assert table.columns["sample"] == ["sample1"] },
+                { assert table.columns["value"] == [15] },
+            )
+        }
+    }
+
+    test("interproscan_sum - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                def interproscan = file("\${workDir}/test.interproscan.tsv")
+                interproscan.text = 'orf\\tmd5\\n'
+
+                def fcs = file("\${workDir}/test.counts.tsv.gz")
+                fcs.bytes = []
+
+                input[0] = [ [ id: 'test' ], interproscan, fcs ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(sanitizeOutput(process.out)).match() }
+            )
+        }
+    }
+}
