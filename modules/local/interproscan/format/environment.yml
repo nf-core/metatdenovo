@@ -5,3 +5,4 @@ channels:
   - bioconda
 dependencies:
   - conda-forge::gzip=1.11
+  - conda-forge::gawk=5.3.0
