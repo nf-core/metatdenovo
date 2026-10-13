@@ -1,7 +1,7 @@
 {
     "-profile test_interproscan": {
         "content": [
-            57,
+            58,
             {
                 "BBMAP_ALIGN": {
                     "bbmap": 39.18
@@ -156,10 +156,14 @@
                         
                     ]
                 ],
-                "interproscan/megahit.prodigal.gff3",
-                "interproscan/megahit.prodigal.json",
-                "interproscan/megahit.prodigal.tsv",
-                "interproscan/megahit.prodigal.xml",
+                "interproscan/megahit.prodigal.001.gff3",
+                "interproscan/megahit.prodigal.001.json",
+                "interproscan/megahit.prodigal.001.tsv",
+                "interproscan/megahit.prodigal.001.xml",
+                "interproscan/megahit.prodigal.002.gff3",
+                "interproscan/megahit.prodigal.002.json",
+                "interproscan/megahit.prodigal.002.tsv",
+                "interproscan/megahit.prodigal.002.xml",
                 "megahit",
                 "megahit/megahit_assembly.contigs.fa.gz",
                 "megahit/megahit_assembly.log",
@@ -253,7 +257,7 @@
                 "multiqc_citations.txt:md5,2d1a8ef8ba06c7eada06ab3e96552ea4"
             ]
         ],
-        "timestamp": "2026-10-13T10:32:05.542444",
+        "timestamp": "2026-10-13T11:43:25.734882",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

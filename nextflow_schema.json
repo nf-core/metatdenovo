@@ -546,7 +546,7 @@
                     "default": "interproscan",
                     "description": "Specify the InterProScan database path.",
                     "fa_icon": "far fa-file-code",
-                    "help_text": "InterProScan's lookup-service data will be downloaded to this directory if it doesn't already exist there."
+                    "help_text": "InterProScan's (large) member-database data will be downloaded to this directory if it doesn't already exist there."
                 },
                 "interproscan_applications": {
                     "type": "string",
@@ -560,6 +560,14 @@
                     "description": "URL to download the InterProScan data archive from.",
                     "fa_icon": "fas fa-link",
                     "hidden": true
+                },
+                "interproscan_batchsize": {
+                    "type": "integer",
+                    "description": "Number of amino acid residues per batch InterProScan is run on.",
+                    "default": 1000000000,
+                    "minimum": 1,
+                    "hidden": true,
+                    "help_text": "InterProScan runs on batches of the protein fasta so that large sets run in parallel tasks and an interrupted run loses at most the unfinished batches. The size counts sequence residues only, not header lines. Each sequence is scored independently against the (fixed) member-database profiles, so reported scores are unaffected by batch size."
                 },
                 "hmmdir": {
                     "type": "string",

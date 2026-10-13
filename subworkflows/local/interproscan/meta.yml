@@ -21,6 +21,9 @@ input:
   - db_url:
       type: string
       description: URL of the InterProScan `-64-bit.tar.gz` release archive
+  - batchsize:
+      type: integer
+      description: Number of amino acid residues per InterProScan batch
 output:
   - annotation:
       type: file

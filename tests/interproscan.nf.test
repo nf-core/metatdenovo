@@ -18,6 +18,10 @@ nextflow_pipeline {
             def stable_name = getAllFilesFromDir(params.outdir, relative: true, includeDir: true, ignore: ['pipeline_info/*.{html,json,txt}', 'multiqc/multiqc_plots', 'multiqc/multiqc_plots/**' ])
             // stable_path: All files in ${params.outdir}/ with stable content
             def stable_path = getAllFilesFromDir(params.outdir, ignoreFile: 'tests/.nftignore')
+            // overall_stats: MERGE_TABLES pivots each annotation tool's summary (database, field,
+            // value) into a "<field>_<database>" column -- interproscan's is n_interproscan.
+            def overallStats = path("${params.outdir}/summary_tables/megahit.prodigal.overall_stats.tsv.gz").linesGzip
+            def interproscanCol = overallStats[0].tokenize('\t').indexOf('n_interproscan')
             assertAll(
                 { assert workflow.success },
                 { assert snapshot(
@@ -38,6 +42,12 @@ nextflow_pipeline {
                 // on -- see tests/.nftignore.
                 { assert path("${params.outdir}/summary_tables/megahit.prodigal.interproscan.tsv.gz").linesGzip.size() > 1 },
                 { assert path("${params.outdir}/summary_tables/megahit.prodigal.interproscan.tsv.gz").linesGzip.findAll { l -> l.contains('SFLDS00057') && l.contains('Glutaminase/Asparaginase') }.size() > 0 },
+                // Reads actually annotated by InterProScan reach overall_stats with a sane,
+                // non-double-counted value -- catches both the join and the ragged-column bugs.
+                { assert interproscanCol >= 0 },
+                { assert overallStats[1..-1].any { l -> (l.tokenize('\t')[interproscanCol] ?: '').isInteger() && (l.tokenize('\t')[interproscanCol] as int) > 0 } },
+                // interproscan_batchsize in test_interproscan gives several batches
+                { assert file("${params.outdir}/interproscan").listFiles().findAll { f -> f.name.endsWith('.tsv') }.size() > 1 },
             )
         }
     }
