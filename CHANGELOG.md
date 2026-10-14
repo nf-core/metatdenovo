@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Fixed`
 
-- [#NN](https://github.com/nf-core/metatdenovo/pull/NN) - dbCAN uses only the CPUs it was given, instead of every core on the machine (@erikrikarddaniel)
+- [#594](https://github.com/nf-core/metatdenovo/pull/594) - dbCAN uses only the CPUs it was given, instead of every core on the machine (@erikrikarddaniel)
 - [#588](https://github.com/nf-core/metatdenovo/pull/588) - A task that fails again after its last retry no longer kills other running tasks; they now finish first (@erikrikarddaniel)
 - [#587](https://github.com/nf-core/metatdenovo/pull/587) - Protein-cluster count summary uses far less memory on large assemblies (@erikrikarddaniel)
 - [#581](https://github.com/nf-core/metatdenovo/pull/581) - Fix the step that tidies TransDecoder ORF names in count tables running out of memory on large runs (@erikrikarddaniel)
