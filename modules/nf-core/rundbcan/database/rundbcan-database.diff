@@ -1,25 +1,14 @@
 Changes in component 'nf-core/rundbcan/database'
-Changes in 'rundbcan/database/environment.yml':
---- modules/nf-core/rundbcan/database/environment.yml
-+++ modules/nf-core/rundbcan/database/environment.yml
-@@ -5,3 +5,4 @@
-   - bioconda
- dependencies:
-   - bioconda::dbcan=5.2.9
-+  - conda-forge::awscli=2.36.42
-
 'modules/nf-core/rundbcan/database/meta.yml' is unchanged
 Changes in 'rundbcan/database/main.nf':
 --- modules/nf-core/rundbcan/database/main.nf
 +++ modules/nf-core/rundbcan/database/main.nf
-@@ -2,20 +2,28 @@
+@@ -2,20 +2,26 @@
      label 'process_low'
  
      conda "${moduleDir}/environment.yml"
-+    // Bundles awscli alongside dbcan: this process' storeDir can point at an s3:// path (via
-+    // --dbcan_dbpath), and Nextflow's AWS Batch executor stages storeDir output to S3 by
-+    // shelling out to `aws` from inside the task's own container -- which the plain dbcan image
-+    // doesn't have, addresses #471.
++    // storeDir can point at an s3:// path; Nextflow's AWS Batch executor stages that copy by
++    // shelling out to `aws` inside the task's own container, which the plain dbcan image lacks.
      container "${ workflow.containerEngine in ['singularity', 'apptainer'] && !task.ext.singularity_pull_docker_container ?
 -        'https://depot.galaxyproject.org/singularity/dbcan:5.2.9--pyhdfd78af_0' :
 -        'quay.io/biocontainers/dbcan:5.2.9--pyhdfd78af_0' }"
@@ -44,6 +33,15 @@ Changes in 'rundbcan/database/main.nf':
          --db_dir dbcan_db \\
          --aws_s3
      """
+
+Changes in 'rundbcan/database/environment.yml':
+--- modules/nf-core/rundbcan/database/environment.yml
++++ modules/nf-core/rundbcan/database/environment.yml
+@@ -5,3 +5,4 @@
+   - bioconda
+ dependencies:
+   - bioconda::dbcan=5.2.9
++  - conda-forge::awscli=2.36.42
 
 'modules/nf-core/rundbcan/database/tests/main.nf.test.snap' is unchanged
 'modules/nf-core/rundbcan/database/tests/main.nf.test' is unchanged
