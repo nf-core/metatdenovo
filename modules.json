@@ -101,7 +101,8 @@
                     "metaeuk/easypredict": {
                         "branch": "master",
                         "git_sha": "ad5daf951b6b4ab49fcf2547c1c1e8f0cd5a6ce7",
-                        "installed_by": ["modules"]
+                        "installed_by": ["modules"],
+                        "patch": "modules/nf-core/metaeuk/easypredict/metaeuk-easypredict.diff"
                     },
                     "mmseqs/cluster": {
                         "branch": "master",

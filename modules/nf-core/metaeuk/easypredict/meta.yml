@@ -89,6 +89,16 @@ output:
       - "metaeuk | sed -n 's/.*Version: //p'":
           type: eval
           description: The expression to obtain the version of the tool
+  versions_metaeuk_db:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - metaeuk_db:
+          type: string
+          description: The name of the database
+      - db_version:
+          type: string
+          description: Content of the database directory's *.version file, written by `metaeuk databases`
 
 topics:
   versions:
@@ -101,6 +111,15 @@ topics:
       - "metaeuk | sed -n 's/.*Version: //p'":
           type: eval
           description: The expression to obtain the version of the tool
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - metaeuk_db:
+          type: string
+          description: The name of the database
+      - db_version:
+          type: string
+          description: Content of the database directory's *.version file, written by `metaeuk databases`
 
 authors:
   - "@prototaxites"
