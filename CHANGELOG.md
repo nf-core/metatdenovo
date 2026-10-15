@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### `Added`
 
 - [#589](https://github.com/nf-core/metatdenovo/pull/589) - KofamScan runs on batches of proteins, in parallel and resumable per batch (`--kofamscan_batchsize`) (@erikrikarddaniel)
+- Reference-database versions (EggNOG, KofamScan, dbCAN, EUKulele, MetaEuk) are now reported in `pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml` and MultiQC, alongside tool versions; where a database has no upstream release tag, its source and local retrieval date are recorded instead, closes [#184](https://github.com/nf-core/metatdenovo/issues/184) (@danilodileo)
 
 ### `Changed`
 
