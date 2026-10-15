@@ -157,7 +157,8 @@
                     "rundbcan/cazymeannotation": {
                         "branch": "master",
                         "git_sha": "f29db1d96ea56989d8eee0b9780580b676862773",
-                        "installed_by": ["modules"]
+                        "installed_by": ["modules"],
+                        "patch": "modules/nf-core/rundbcan/cazymeannotation/rundbcan-cazymeannotation.diff"
                     },
                     "rundbcan/database": {
                         "branch": "master",
