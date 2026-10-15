@@ -15,12 +15,17 @@ process EUKULELE_SEARCH {
     tuple val(meta), path("${prefix}/taxonomy_counts/*.csv.gz")                      , emit: taxonomy_counts, optional: true
     tuple val(meta), path("${prefix}/mets_full/diamond/*")                           , emit: diamond
     path("versions.yml"), emit: versions, topic: versions
+    tuple val("${task.process}"), val('eukulele_db'), val(eukulele_db_provenance), emit: versions_db, topic: versions
 
     script:
     def args     = task.ext.args ?: ''
     prefix       = task.ext.prefix ?: ("${dbname}" ? "${meta.id}_${dbname}" : "${meta.id}")
     def gunzip   = fasta =~ /\.gz$/ ? "gunzip -c ${fasta} > ./contigs/proteins.faa" : "mv ${fasta} contigs/proteins.faa"
     def database = dbname ? "--database ${dbname}" : ''
+    // eukdb is a user-supplied directory with no upstream release tag the pipeline can read, so
+    // record what IS knowable: the database name (if any) and when this local copy was last
+    // touched, from eukdb's own mtime.
+    eukulele_db_provenance = "${dbname ?: 'user-provided'} (retrieved=${new Date(eukdb.lastModified()).format('yyyy-MM-dd')})"
 
     """
     rc=0
@@ -54,6 +59,7 @@ process EUKULELE_SEARCH {
 
     stub:
     prefix   = task.ext.prefix ?: ("${dbname}" ? "${meta.id}_${dbname}" : "${meta.id}")
+    eukulele_db_provenance = "${dbname ?: 'user-provided'} (retrieved=${new Date(eukdb.lastModified()).format('yyyy-MM-dd')})"
     """
     mkdir -p ${prefix}/taxonomy_estimation ${prefix}/taxonomy_counts ${prefix}/mets_full/diamond
     gzip -c /dev/null > ${prefix}/taxonomy_estimation/empty.out.gz
