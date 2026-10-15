@@ -1,10 +1,60 @@
 Changes in component 'nf-core/kofamscan'
-'modules/nf-core/kofamscan/meta.yml' is unchanged
+'modules/nf-core/kofamscan/environment.yml' is unchanged
+Changes in 'kofamscan/meta.yml':
+--- modules/nf-core/kofamscan/meta.yml
++++ modules/nf-core/kofamscan/meta.yml
+@@ -36,6 +36,9 @@
+       description: File containing list of KO entries with their data
+       pattern: "*.{fa,fasta}"
+       ontologies: []
++  - ko_list_url:
++      type: string
++      description: URL ko_list was downloaded from, recorded as database provenance since KEGG publishes no release/date tag
+ output:
+   txt:
+     - - meta:
+@@ -70,6 +73,16 @@
+       - "exec_annotation --version 2>&1 | sed 's/exec_annotation //;'":
+           type: eval
+           description: The expression to obtain the version of the tool
++  versions_kofamscan_db:
++    - - ${task.process}:
++          type: string
++          description: The name of the process
++      - kofamscan_db:
++          type: string
++          description: The name of the database
++      - kofamscan_db_provenance:
++          type: string
++          description: Source URL and local-copy retrieval date, since KEGG publishes no release/date tag
+ topics:
+   versions:
+     - - ${task.process}:
+@@ -81,6 +94,15 @@
+       - "exec_annotation --version 2>&1 | sed 's/exec_annotation //;'":
+           type: eval
+           description: The expression to obtain the version of the tool
++    - - ${task.process}:
++          type: string
++          description: The name of the process
++      - kofamscan_db:
++          type: string
++          description: The name of the database
++      - kofamscan_db_provenance:
++          type: string
++          description: Source URL and local-copy retrieval date, since KEGG publishes no release/date tag
+ authors:
+   - "@toniher"
+ maintainers:
+
 Changes in 'kofamscan/main.nf':
 --- modules/nf-core/kofamscan/main.nf
 +++ modules/nf-core/kofamscan/main.nf
-@@ -13,8 +13,8 @@
+@@ -11,11 +11,13 @@
+     tuple val(meta), path(fasta)
+     path profiles
      path ko_list
++    val  ko_list_url
  
      output:
 -    tuple val(meta), path('*.txt'), optional: true, emit: txt
@@ -12,9 +62,11 @@ Changes in 'kofamscan/main.nf':
 +    tuple val(meta), path('*.txt.gz'), optional: true, emit: txt
 +    tuple val(meta), path('*.tsv.gz'), optional: true, emit: tsv
      tuple val("${task.process}"), val('kofamscan'), eval("exec_annotation --version 2>&1 | sed 's/exec_annotation //;'"), topic: versions, emit: versions_kofamscan
++    tuple val("${task.process}"), val('kofamscan_db'), val(kofamscan_db_provenance), topic: versions, emit: versions_kofamscan_db
  
      when:
-@@ -25,14 +25,24 @@
+     task.ext.when == null || task.ext.when
+@@ -25,14 +27,32 @@
      def prefix = task.ext.prefix ?: "${meta.id}"
      def extension = args.contains("--format detail-tsv") ? "tsv" :
                      "txt"
@@ -22,6 +74,14 @@ Changes in 'kofamscan/main.nf':
 +    def fasta_name     = is_compressed ? fasta.toString() - '.gz' : "$fasta"
 +    def gunzip         = is_compressed ? "gunzip -c ${fasta} > ${fasta_name}" : ''
 +    def cleanup        = is_compressed ? "rm -f ${fasta_name}" : ''
++    // KEGG's FTP mirror has no release/date field of its own -- genome.jp always serves "latest"
++    // at a stable path -- so record what IS knowable: the source URL and the date this local
++    // copy was obtained, from ko_list's mtime. Read here (not in KOFAMSCAN_DOWNLOAD, and not with
++    // eval()): ko_list is an already-completed upstream task's output, so it's guaranteed
++    // materialized by the time this preamble runs, unlike reading it inside the same process
++    // that's still staging a remote file(url) input, or a storeDir-cached process that may never
++    // actually run its script again.
++    kofamscan_db_provenance = "source=${ko_list_url}; retrieved=${new Date(ko_list.lastModified()).format('yyyy-MM-dd')}"
      """
 +    $gunzip
 +
@@ -40,8 +100,11 @@ Changes in 'kofamscan/main.nf':
      """
  
      stub:
-@@ -42,5 +52,7 @@
+@@ -40,7 +60,10 @@
+     def prefix = task.ext.prefix ?: "${meta.id}"
+     def extension = args.contains("--format detail-tsv") ? "tsv" :
                      "txt"
++    kofamscan_db_provenance = "source=${ko_list_url}; retrieved=${new Date(ko_list.lastModified()).format('yyyy-MM-dd')}"
      """
      touch ${prefix}.${extension}
 +
@@ -49,8 +112,7 @@ Changes in 'kofamscan/main.nf':
      """
  }
 
-'modules/nf-core/kofamscan/environment.yml' is unchanged
-'modules/nf-core/kofamscan/tests/nextflow.config' is unchanged
 'modules/nf-core/kofamscan/tests/main.nf.test.snap' is unchanged
+'modules/nf-core/kofamscan/tests/nextflow.config' is unchanged
 'modules/nf-core/kofamscan/tests/main.nf.test' is unchanged
 ************************************************************

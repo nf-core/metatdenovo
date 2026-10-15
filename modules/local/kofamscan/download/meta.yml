@@ -21,27 +21,6 @@ output:
     type: directory
     description: Directory containing KEGG Orthology profiles
     pattern: "profiles"
-  versions_kofamscan:
-    - - "${task.process}":
-          type: string
-          description: The name of the process
-      - gzip:
-          type: string
-          description: The name of the tool
-      - gzip --version | head -n 1 | awk "{print \$2}":
-          type: eval
-          description: The expression to obtain the version of the tool
-topics:
-  versions:
-    - - "${task.process}":
-          type: string
-          description: The name of the process
-      - gzip:
-          type: string
-          description: The name of the tool
-      - gzip --version | head -n 1 | awk "{print \$2}":
-          type: eval
-          description: The expression to obtain the version of the tool
 authors:
   - "@danilodileo"
 containers:
