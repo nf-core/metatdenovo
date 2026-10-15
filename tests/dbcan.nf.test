@@ -1,0 +1,47 @@
+nextflow_pipeline {
+
+    name "Test pipeline"
+    script "../main.nf"
+    tag "pipeline"
+    profile "test_dbcan"
+
+    test("-profile test_dbcan") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+        }
+
+        then {
+            // stable_name: All files + folders in ${params.outdir}/ with a stable name
+            def stable_name = getAllFilesFromDir(params.outdir, relative: true, includeDir: true, ignore: ['pipeline_info/*.{html,json,txt}', 'multiqc/multiqc_plots', 'multiqc/multiqc_plots/**' ])
+            // stable_path: All files in ${params.outdir}/ with stable content
+            def stable_path = getAllFilesFromDir(params.outdir, ignoreFile: 'tests/.nftignore')
+            assertAll(
+                { assert workflow.success },
+                { assert snapshot(
+                    // Number of successful tasks
+                    workflow.trace.succeeded().size(),
+                    // pipeline versions.yml file for multiqc from which Nextflow version is removed because we test pipelines on multiple Nextflow versions
+                    removeNextflowVersion("$outputDir/pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml"),
+                    // All stable path name, with a relative path
+                    stable_name,
+                    // All files with stable contents
+                    stable_path,
+                ).match() },
+                { assert path("${params.outdir}/summary_tables/megahit.prodigal.dbcan.tsv.gz").linesGzip.size() > 1 },
+                // overall_stats: MERGE_TABLES pivots each annotation tool's summary (database, field,
+                // value) into a "<field>_<database>" column -- dbcan's is n_dbcan.
+                {
+                    def overallStats = path("${params.outdir}/summary_tables/megahit.prodigal.overall_stats.tsv.gz").linesGzip
+                    def dbcanCol = overallStats[0].tokenize('\t').indexOf('n_dbcan')
+                    assert dbcanCol >= 0
+                    assert overallStats[1..-1].any { l -> (l.tokenize('\t')[dbcanCol] ?: '').isInteger() && (l.tokenize('\t')[dbcanCol] as int) > 0 }
+                },
+                // dbCAN's built-in default mirror has no release tag; provenance is source+retrieval date.
+                { assert path("${params.outdir}/pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml").text =~ /dbcan_db: source=.*; retrieved=\d{4}-\d{2}-\d{2}/ },
+            )
+        }
+    }
+}
