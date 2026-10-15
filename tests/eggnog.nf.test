@@ -1,0 +1,47 @@
+nextflow_pipeline {
+
+    name "Test pipeline"
+    script "../main.nf"
+    tag "pipeline"
+    profile "test_eggnog"
+
+    test("-profile test_eggnog") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+        }
+
+        then {
+            // stable_name: All files + folders in ${params.outdir}/ with a stable name
+            def stable_name = getAllFilesFromDir(params.outdir, relative: true, includeDir: true, ignore: ['pipeline_info/*.{html,json,txt}', 'multiqc/multiqc_plots', 'multiqc/multiqc_plots/**' ])
+            // stable_path: All files in ${params.outdir}/ with stable content
+            def stable_path = getAllFilesFromDir(params.outdir, ignoreFile: 'tests/.nftignore')
+            assertAll(
+                { assert workflow.success },
+                { assert snapshot(
+                    // Number of successful tasks
+                    workflow.trace.succeeded().size(),
+                    // pipeline versions.yml file for multiqc from which Nextflow version is removed because we test pipelines on multiple Nextflow versions
+                    removeNextflowVersion("$outputDir/pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml"),
+                    // All stable path name, with a relative path
+                    stable_name,
+                    // All files with stable contents
+                    stable_path,
+                ).match() },
+                { assert path("${params.outdir}/summary_tables/megahit.prodigal.emapper.tsv.gz").linesGzip.size() > 1 },
+                // overall_stats: MERGE_TABLES pivots each annotation tool's summary (database, field,
+                // value) into a "<field>_<database>" column -- eggnog's is n_eggnog.
+                {
+                    def overallStats = path("${params.outdir}/summary_tables/megahit.prodigal.overall_stats.tsv.gz").linesGzip
+                    def eggnogCol = overallStats[0].tokenize('\t').indexOf('n_eggnog')
+                    assert eggnogCol >= 0
+                    assert overallStats[1..-1].any { l -> (l.tokenize('\t')[eggnogCol] ?: '').isInteger() && (l.tokenize('\t')[eggnogCol] as int) > 0 }
+                },
+                // --eggnog_db_url pins emapperdb-5.0.2; the version is parsed from that URL.
+                { assert path("${params.outdir}/pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml").text.contains('eggnog_db: 5.0.2') },
+            )
+        }
+    }
+}
