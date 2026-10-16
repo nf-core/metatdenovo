@@ -564,10 +564,10 @@
                 "interproscan_batchsize": {
                     "type": "integer",
                     "description": "Number of amino acid residues per batch InterProScan is run on.",
-                    "default": 1000000000,
+                    "default": 2000000,
                     "minimum": 1,
                     "hidden": true,
-                    "help_text": "InterProScan runs on batches of the protein fasta so that large sets run in parallel tasks and an interrupted run loses at most the unfinished batches. The size counts sequence residues only, not header lines. Each sequence is scored independently against the (fixed) member-database profiles, so reported scores are unaffected by batch size."
+                    "help_text": "InterProScan runs on batches of the protein fasta so that large sets run in parallel tasks and an interrupted run loses at most the unfinished batches. The size counts sequence residues only, not header lines. Each sequence is scored independently against the (fixed) member-database profiles, so reported scores are unaffected by batch size.\n\nThe default is chosen from measured timing, not an arbitrary round number: with the default `--interproscan_applications Pfam,PANTHER --goterms --iprlookup`, on a single CPU (InterProScan's module is hard-pinned to 1 cpu), real batches of 100k/200k/400k residues took 1380s/2354s/3485s -- about 900s of fixed per-task overhead (mostly loading PANTHER's ~15k HMMs) plus roughly 0.0064s per residue after that. At 2,000,000 residues that's ~3.8h, leaving comfortable headroom under the 12h task time limit even if real throughput turns out several times slower than measured."
                 },
                 "hmmdir": {
                     "type": "string",
