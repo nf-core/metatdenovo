@@ -497,8 +497,10 @@ Its (large) member-database data is downloaded automatically, with the path sett
 By default only a fast, curated subset of member databases is run (`--interproscan_applications Pfam,PANTHER`); widen this to run
 against more member databases (Gene3D, SMART, etc.) at the cost of runtime.
 GO term annotation (`--goterms`) is always enabled; pathway mapping (`--pathways`) is not run.
-Like KofamScan, InterProScan runs on batches of proteins, by default 1 billion amino acids each (`--interproscan_batchsize`), so a
-large protein set runs as parallel tasks and an interrupted run only repeats the unfinished batches.
+Like KofamScan, InterProScan runs on batches of proteins (`--interproscan_batchsize`, 2 million amino acids by default), so a
+large protein set runs as parallel tasks and an interrupted run only repeats the unfinished batches. Unlike KofamScan, this default
+is small: InterProScan's module is pinned to 1 CPU, and with the default `Pfam,PANTHER` applications a 2-million-residue batch
+takes on the order of a few hours, leaving headroom under the pipeline's 12-hour task time limit.
 
 :::note
 The pipeline uses the InterProScan version pinned by the underlying nf-core/modules component (5.59-91.0, from 2022) -- not the
