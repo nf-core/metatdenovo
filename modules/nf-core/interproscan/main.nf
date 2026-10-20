@@ -28,12 +28,10 @@ process INTERPROSCAN {
     def prefix           = task.ext.prefix ?: "${meta.id}"
     def is_compressed    = fasta.getExtension() == "gz"
     def fasta_name       = is_compressed ? fasta.getBaseName() : "stripped_${fasta}"
-    // InterProScan hard-rejects '*' (the stop-codon marker Prodigal/TransDecoder/etc. leave on
-    // every protein), so strip it here, in the step that already rewrites the input either way.
-    // nf-core/modules#13130.
+    // InterProScan rejects '*': drop the trailing stop, mask internal ones as X so coordinates still match the input.
     def uncompress_input = is_compressed ?
-        "gzip -c -d ${fasta} | sed '/^>/! s/\\*//g' > ${fasta_name}" :
-        "sed '/^>/! s/\\*//g' ${fasta} > ${fasta_name}"
+        "gzip -c -d ${fasta} | sed '/^>/!{s/\\*\$//; s/\\*/X/g}' > ${fasta_name}" :
+        "sed '/^>/!{s/\\*\$//; s/\\*/X/g}' ${fasta} > ${fasta_name}"
     """
     $uncompress_input
 
@@ -42,8 +40,12 @@ process INTERPROSCAN {
         INTERPROSCAN_DIR="\$( dirname "\$( dirname "\$( which interproscan.sh )" )" )"
         INTERPROSCAN_PROPERTIES="\$( find "\$INTERPROSCAN_DIR/share" -name "interproscan.properties" )"
         cp "\$INTERPROSCAN_PROPERTIES" .
-        sed -i "/^bin\\.directory=/ s|.*|bin.directory=\$INTERPROSCAN_DIR/bin|" interproscan.properties
-        export INTERPROSCAN_CONF=interproscan.properties
+        sed -i \\
+            -e "s|^bin\\.directory=.*|bin.directory=\$( dirname "\$INTERPROSCAN_PROPERTIES" )/bin|" \\
+            -e "s|^data\\.directory=.*|data.directory=\$PWD/data|" \\
+            interproscan.properties
+        # must be absolute: interproscan.sh cd's into its install dir before reading it
+        export INTERPROSCAN_CONF=\$PWD/interproscan.properties
     fi # else use sample DB included with conda ( testing only! )
 
     interproscan.sh \\
