@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Fixed`
 
+- [#598](https://github.com/nf-core/metatdenovo/pull/598) - `--trim_nextseq` is typed as an integer, matching how it's actually used (`params.trim_nextseq > 0`) instead of a string that happened to reject numeric CLI values (@danilodileo)
 - [#594](https://github.com/nf-core/metatdenovo/pull/594) - dbCAN uses only the CPUs it was given, instead of every core on the machine (@erikrikarddaniel)
 - [#588](https://github.com/nf-core/metatdenovo/pull/588) - A task that fails again after its last retry no longer kills other running tasks; they now finish first (@erikrikarddaniel)
 - [#587](https://github.com/nf-core/metatdenovo/pull/587) - Protein-cluster count summary uses far less memory on large assemblies (@erikrikarddaniel)
