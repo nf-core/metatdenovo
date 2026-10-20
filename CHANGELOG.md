@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Added`
 
-- [#NN](https://github.com/nf-core/metatdenovo/pull/NN) - Diamond taxonomy runs on batches of proteins, in parallel and resumable per batch (`--diamond_batchsize`); its raw output in `diamond_taxonomy/` is now one file per batch (@erikrikarddaniel)
+- [#597](https://github.com/nf-core/metatdenovo/pull/597) - Diamond taxonomy runs on batches of proteins, in parallel and resumable per batch (`--diamond_batchsize`); its raw output in `diamond_taxonomy/` is now one file per batch (@erikrikarddaniel)
 - [#589](https://github.com/nf-core/metatdenovo/pull/589) - KofamScan runs on batches of proteins, in parallel and resumable per batch (`--kofamscan_batchsize`) (@erikrikarddaniel)
 
 ### `Changed`
