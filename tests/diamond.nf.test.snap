@@ -1,7 +1,7 @@
 {
     "-profile test_diamond": {
         "content": [
-            64,
+            68,
             {
                 "BBMAP_ALIGN": {
                     "bbmap": 39.18
@@ -147,10 +147,14 @@
                 "bbmap/bbmap/SAMPLE2_PE.bbmap.log",
                 "bbmap/bbmap/SAMPLE3_PE_1.bbmap.log",
                 "diamond_taxonomy",
+                "diamond_taxonomy/megahit.prodigal.001.gtdb-r220-test.tsv.gz",
+                "diamond_taxonomy/megahit.prodigal.001.ncbi-refseq-test.tsv.gz",
+                "diamond_taxonomy/megahit.prodigal.002.gtdb-r220-test.tsv.gz",
+                "diamond_taxonomy/megahit.prodigal.002.ncbi-refseq-test.tsv.gz",
+                "diamond_taxonomy/megahit.prodigal.003.gtdb-r220-test.tsv.gz",
+                "diamond_taxonomy/megahit.prodigal.003.ncbi-refseq-test.tsv.gz",
                 "diamond_taxonomy/megahit.prodigal.gtdb-r220-test.lineage.tsv.gz",
-                "diamond_taxonomy/megahit.prodigal.gtdb-r220-test.tsv.gz",
                 "diamond_taxonomy/megahit.prodigal.ncbi-refseq-test.lineage.tsv.gz",
-                "diamond_taxonomy/megahit.prodigal.ncbi-refseq-test.tsv.gz",
                 "featurecounts",
                 "featurecounts/SAMPLE1_PE.locus_consolidate.featureCounts.tsv",
                 "featurecounts/SAMPLE1_PE.locus_consolidate.featureCounts.tsv.summary",
@@ -259,10 +263,10 @@
                 "multiqc_citations.txt:md5,2d1a8ef8ba06c7eada06ab3e96552ea4"
             ]
         ],
+        "timestamp": "2026-10-20T09:41:46.03911319",
         "meta": {
-            "nf-test": "0.9.3",
-            "nextflow": "25.10.4"
-        },
-        "timestamp": "2026-09-15T20:07:52.838989"
+            "nf-test": "0.9.4",
+            "nextflow": "26.04.6"
+        }
     }
 }

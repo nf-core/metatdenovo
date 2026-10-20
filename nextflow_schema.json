@@ -605,6 +605,15 @@
                     "description": "Argument to Diamond's `--top` that controls the percentage of hits to include in the LCA.",
                     "fa_icon": "fas fa-align-justify"
                 },
+                "diamond_batchsize": {
+                    "type": "integer",
+                    "description": "Number of amino acid residues per batch Diamond taxonomy is run on.",
+                    "default": 500000000,
+                    "minimum": 1,
+                    "hidden": true,
+                    "help_text": "Diamond taxonomy runs on batches of the protein fasta so that large sets run in parallel tasks and an interrupted run loses at most the unfinished batches. The size counts sequence residues only, not header lines. Each batch reads the whole database once, so smaller batches add run time. E-values depend on the database size, not the number of proteins, so batching does not change them.",
+                    "fa_icon": "fas fa-expand-alt"
+                },
                 "skip_eukulele": {
                     "type": "boolean",
                     "description": "If enabled, skips the run of EUKulele",

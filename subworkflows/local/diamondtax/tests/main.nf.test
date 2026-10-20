@@ -1,0 +1,96 @@
+// Proteins and databases: https://github.com/nf-core/test-datasets/tree/metatdenovo#diamond-taxonomy-subworkflow-test-proteins
+def inputs = """
+    def faa = file(params.pipelines_testdata_base_path + 'test_data/diamond_taxonomy/proteins.faa.gz', checkIfExists: true)
+    def db  = params.pipelines_testdata_base_path + 'test_data/diamond_taxonomy/'
+
+    def counts = file("\${workDir}/test.counts.tsv.gz")
+    new java.util.zip.GZIPOutputStream(counts.newOutputStream()).withWriter { w ->
+        w << 'orf\\tsample\\tcount\\n'
+        faa.splitFasta(record: [id: true]).each { r -> w << "\${r.id}\\tS1\\t1\\n" }
+    }
+
+    def meta = [ id: 'test', caller: 'prodigal' ]
+    input[0] = channel.of([ meta, faa ])
+    input[1] = channel.of(
+        [ [ id: 'ncbi-refseq-test' ], file(db + 'ncbi-refseq-test.dmnd'), file(db + 'ncbi_taxdump/names.dmp'), file(db + 'ncbi_taxdump/nodes.dmp'), '', true ],
+        [ [ id: 'gtdb-r220-test' ], file(db + 'gtdb-r220-test.dmnd'), file(db + 'gtdb_taxdump/names.dmp'), file(db + 'gtdb_taxdump/nodes.dmp'), 'domain;phylum;class;order;family;genus;species', false ]
+    )
+    input[2] = channel.of([ meta, counts ])
+    input[3] = params.batchsize
+"""
+
+// Reference sequences are named <db>_<taxid>_<n>, so each one's taxid in its own database is in its name
+def lineage = { out, db -> path(out.lineage.find { m, _f -> m.db == db }[1]).linesGzip.collect { l -> l.split('\t') } }
+def own_hits = { rows, prefix -> rows.findAll { r -> r[0].startsWith(prefix) } }
+def expected_taxid = { r -> r[0].tokenize('_')[1] }
+def summary = { out, db -> path(out.taxonomy_summary.find { m, _f -> m.db == db }[1]).linesGzip.drop(1).collect { l -> l.split('\t') } }
+
+def checks = { out ->
+    [
+        { assert own_hits(lineage(out, 'ncbi-refseq-test'), 'refseq_').size() == 22 },
+        { assert own_hits(lineage(out, 'ncbi-refseq-test'), 'refseq_').every { r -> r[1] == expected_taxid(r) } },
+        { assert own_hits(lineage(out, 'gtdb-r220-test'), 'gtdb_').size() == 27 },
+        { assert own_hits(lineage(out, 'gtdb-r220-test'), 'gtdb_').every { r -> r[1] == expected_taxid(r) } },
+        // KofamScan test proteins, which hit neither database
+        { assert lineage(out, 'ncbi-refseq-test').every { r -> r[0].startsWith('refseq_') || r[0].startsWith('gtdb_') } },
+        { assert lineage(out, 'gtdb-r220-test').every { r -> r[0].startsWith('refseq_') || r[0].startsWith('gtdb_') } },
+        // Each protein with a hit counted once
+        { assert summary(out, 'ncbi-refseq-test').collect { r -> [ r[0], r[3] ] } == [ [ 'S1', lineage(out, 'ncbi-refseq-test').size().toString() ] ] },
+        { assert summary(out, 'gtdb-r220-test').collect { r -> [ r[0], r[3] ] } == [ [ 'S1', lineage(out, 'gtdb-r220-test').size().toString() ] ] },
+    ]
+}
+
+nextflow_workflow {
+
+    name "Test Subworkflow DIAMONDTAX"
+    script "../main.nf"
+    workflow "DIAMONDTAX"
+
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "diamondtax"
+
+    test("proteins in several batches - same taxonomy as one Diamond run") {
+
+        when {
+            params {
+                batchsize = 2000
+            }
+            workflow {
+                inputs
+            }
+        }
+
+        then {
+            assertAll(*(
+                [
+                    { assert workflow.success },
+                    { assert workflow.out.tsv.every { _m, tsvs -> tsvs.size() > 1 } },
+                    { assert snapshot(sanitizeOutput(workflow.out)).match() }
+                ] + checks(workflow.out)
+            ))
+        }
+    }
+
+    test("proteins in one batch - same taxonomy as one Diamond run") {
+
+        when {
+            params {
+                batchsize = 1000000000
+            }
+            workflow {
+                inputs
+            }
+        }
+
+        then {
+            assertAll(*(
+                [
+                    { assert workflow.success },
+                    { assert workflow.out.tsv.every { _m, tsvs -> tsvs.size() == 1 } },
+                    { assert snapshot(sanitizeOutput(workflow.out)).match() }
+                ] + checks(workflow.out)
+            ))
+        }
+    }
+}

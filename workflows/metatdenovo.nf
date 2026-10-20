@@ -16,9 +16,6 @@ include { FORMAT_LOCUSCONSOLIDATE            } from '../modules/local/format/loc
 include { FORMAT_LOCUSFAA                    } from '../modules/local/format/locusfaa/'
 include { FORMATSPADES                       } from '../modules/local/format/spades/'
 include { MERGE_TABLES                       } from '../modules/local/merge/summary/'
-include { FORMAT_DIAMOND_TAX_RANKLIST        } from '../modules/local/diamond/format_tax/ranklist/'
-include { FORMAT_DIAMOND_TAX_TAXDUMP         } from '../modules/local/diamond/format_tax/taxdump/'
-include { SUMTAXONOMY as SUM_DIAMONDTAX      } from '../modules/local/sumtaxonomy/'
 include { FORMAT_STRIPCDSPREFIX              } from '../modules/local/format/stripcdsprefix/'
 include { WRITESPADESYAML                    } from '../modules/local/spades/writeyaml/'
 
@@ -41,6 +38,7 @@ include { FASTQC_TRIMGALORE       } from '../subworkflows/local/fastqc/trimgalor
 include { PRODIGAL                } from '../subworkflows/local/prodigal/'
 include { KOFAMSCAN               } from '../subworkflows/local/kofamscan/'
 include { DBCAN                   } from '../subworkflows/local/dbcan/'
+include { DIAMONDTAX              } from '../subworkflows/local/diamondtax/'
 include { TRANSDECODER            } from '../subworkflows/local/transdecoder/'
 include { METAEUK                 } from '../subworkflows/local/metaeuk/'
 include { USER_ORFS               } from '../subworkflows/local/user_orfs/'
@@ -65,13 +63,11 @@ include { SEQKIT_GREP                                } from '../modules/nf-core/
 include { CAT_FASTQ            	                     } from '../modules/nf-core/cat/fastq/'
 include { CUSTOM_COLLECTFEATURECOUNTS                } from '../modules/nf-core/custom/collectfeaturecounts/main'
 include { CUSTOM_COLLECTSTATS                        } from '../modules/nf-core/custom/collectstats/main'
-include { DIAMOND_BLASTP as DIAMOND_TAXONOMY         } from '../modules/nf-core/diamond/blastp/'
 include { DUCKDB_TABLE2PARQUET                       } from '../modules/nf-core/duckdb/table2parquet/main'
 include { FASTQC                                     } from '../modules/nf-core/fastqc/'
 include { MEGAHIT                                    } from '../modules/nf-core/megahit/'
 include { MULTIQC                                    } from '../modules/nf-core/multiqc/'
 include { PIGZ_COMPRESS as PIGZ_ASSEMBLY             } from '../modules/nf-core/pigz/compress/'
-include { PIGZ_COMPRESS as PIGZ_DIAMOND_LINEAGE      } from '../modules/nf-core/pigz/compress/'
 include { PIGZ_COMPRESS as PIGZ_PE_READS_FWD         } from '../modules/nf-core/pigz/compress/'
 include { PIGZ_COMPRESS as PIGZ_PE_READS_REV         } from '../modules/nf-core/pigz/compress/'
 include { PIGZ_COMPRESS as PIGZ_SE_READS             } from '../modules/nf-core/pigz/compress/'
@@ -86,7 +82,6 @@ include { SEQTK_MERGEPE                              } from '../modules/nf-core/
 include { SEQTK_SEQ as SEQTK_SEQ_CONTIG_FILTER       } from '../modules/nf-core/seqtk/seq/'
 include { SPADES                                     } from '../modules/nf-core/spades/'
 include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS_CDS } from '../modules/nf-core/subread/featurecounts/'
-include { TAXONKIT_LINEAGE                           } from '../modules/nf-core/taxonkit/lineage/'
 
 //
 // SUBWORKFLOWS: Installed directly from nf-core/modules
@@ -878,56 +873,17 @@ workflow METATDENOVO {
     }
 
     //
-    // MODULE: Diamond taxonomy, every caller x every db
+    // SUBWORKFLOW: Diamond taxonomy, every caller x every db
     //
-    def ch_diamond_input = ch_protein.combine( ch_diamond_dbs.map { db -> [ db[0], db[1] ] } )
+    // Guarded although ch_diamond_dbs is empty without it: splitFasta would still copy every protein set
+    if ( params.diamond_dbs ) {
+        DIAMONDTAX( ch_protein, ch_diamond_dbs, ch_fcs_for_summary, params.diamond_batchsize )
 
-    DIAMOND_TAXONOMY(
-        ch_diamond_input.map { pm, protein, _dm, _db -> [ pm, protein ] },
-        ch_diamond_input.map { _pm, _protein, dm, db -> [ dm, db ] },
-        102,
-        []
-    )
-
-    // Not .join(): callers share db names, and join mishandles duplicate keys
-    def ch_taxonkit_lineage = DIAMOND_TAXONOMY.out.tsv
-        .map { it -> [ [ id: "${it[0].id}.${it[0].db}.lineage", db: it[0].db, caller: it[0].caller ], it[1] ] }
-        .combine(ch_diamond_dbs)
-        .filter { meta, _tsv, dbMeta, _dmnd, _names, _nodes, _ranks, _parse -> meta.db == dbMeta.id }
-
-    TAXONKIT_LINEAGE(
-        ch_taxonkit_lineage.map { it -> [ it[0], [], it[1] ] },
-        ch_taxonkit_lineage.map { it -> it[4] },
-        ch_taxonkit_lineage.map { it -> it[5] }
-    )
-
-    PIGZ_DIAMOND_LINEAGE(
-        TAXONKIT_LINEAGE.out.tsv
-    )
-
-    FORMAT_DIAMOND_TAX_RANKLIST(
-        PIGZ_DIAMOND_LINEAGE.out.archive
-            .combine(ch_diamond_dbs)
-            .filter { archiveMeta, _archiveFile, dbMeta, _dmnd, _names, _nodes, _ranks, _parse -> archiveMeta.db == dbMeta.id }
-            .map { archiveMeta, archiveFile, _dbMeta, _dmnd, _names, _nodes, ranks, _parse -> [ [ id: archiveMeta.id - ".lineage" + ".diamond", db: archiveMeta.db, caller: archiveMeta.caller ], archiveFile, ranks ] }
-    )
-
-    FORMAT_DIAMOND_TAX_TAXDUMP(
-        PIGZ_DIAMOND_LINEAGE.out.archive
-            .combine(ch_diamond_dbs.filter { it -> it[5] })
-            .filter { archiveMeta, _archiveFile, dbMeta, _dmnd, _names, _nodes, _ranks, _parse -> archiveMeta.db == dbMeta.id }
-            .map { archiveMeta, archiveFile, _dbMeta, _dmnd, names, nodes, ranks, _parse -> [ [ id: archiveMeta.id - ".lineage" + ".diamond", db: archiveMeta.db, caller: archiveMeta.caller ], archiveFile, names, nodes, ranks ] }
-    )
-
-    // Not .join(): dbs share caller names
-    def ch_diamondtax_sum_input = FORMAT_DIAMOND_TAX_RANKLIST.out.taxonomy
-        .combine( ch_fcs_for_summary )
-        .filter { meta, _taxonomy, fcsMeta, _fcs -> meta.caller == fcsMeta.caller }
-        .map { meta, taxonomy, _fcsMeta, fcs -> [ meta, meta.db, taxonomy, fcs ] }
-
-    SUM_DIAMONDTAX(ch_diamondtax_sum_input, 'diamondtax')
-
-    ch_merge_tables = ch_merge_tables.mix ( SUM_DIAMONDTAX.out.taxonomy_summary )
+        ch_merge_tables   = ch_merge_tables.mix ( DIAMONDTAX.out.taxonomy_summary )
+        ch_parquet_tables = ch_parquet_tables
+            .mix( DIAMONDTAX.out.taxonomy.map { _meta, tsv -> tsv } )
+            .mix( DIAMONDTAX.out.taxonomy_taxdump.map { _meta, tsv -> tsv } )
+    }
 
     //
     // MODULE: Collect statistics from mapping analysis
@@ -979,8 +935,6 @@ workflow METATDENOVO {
                 .mix( ch_counts_per_caller.map { _meta, tsv -> tsv } )
                 .mix( COLLECT_LOCUSCONSOLIDATE.out.counts.map { _meta, tsv -> tsv } )
                 .mix( HMMCLASSIFY.out.hmmrank.map { _meta, tsv -> tsv } )
-                .mix( FORMAT_DIAMOND_TAX_RANKLIST.out.taxonomy.map { _meta, tsv -> tsv } )
-                .mix( FORMAT_DIAMOND_TAX_TAXDUMP.out.taxonomy.map { _meta, tsv -> tsv } )
                 .mix( CUSTOM_COLLECTSTATS.out.overall_stats.map { _meta, tsv -> tsv } )
                 .map { tsv -> [ [ id: tsv.name.replaceAll(/\.tsv(\.gz)?$/, '') ], tsv ] }
         )
