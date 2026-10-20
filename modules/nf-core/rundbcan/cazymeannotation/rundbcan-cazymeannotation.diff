@@ -60,7 +60,7 @@ Changes in 'rundbcan/cazymeannotation/main.nf':
      """
      run_dbcan CAZyme_annotation \\
          --mode protein \\
-@@ -40,6 +46,7 @@
+@@ -41,6 +47,7 @@
  
      stub:
      prefix = task.ext.prefix ?: "${meta.id}"
