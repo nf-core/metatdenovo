@@ -19,15 +19,18 @@ workflow DIAMONDTAX {
 
     main:
 
-    // splitFasta cannot read a zero-byte gzip, which stub runs produce
+    // splitFasta cannot read a zero-byte gzip, which stub runs produce.
+    // Once a splitFasta has read a gzip file it reads every later file as gzip, so plain files get their own.
     def ch_proteins_split = proteins
         .branch { _meta, faa ->
             empty: faa.size() == 0
-            other: true
+            gz:    faa.name.endsWith('.gz')
+            plain: true
         }
 
-    def ch_batches = ch_proteins_split.other
+    def ch_batches = ch_proteins_split.gz
         .splitFasta(size: batchsize, file: true, elem: 1)
+        .mix( ch_proteins_split.plain.splitFasta(size: batchsize, file: true, elem: 1) )
         .map { meta, faa -> [ meta, faa, faa.baseName.tokenize('.').last() as Integer ] }
         .mix( ch_proteins_split.empty.map { meta, faa -> [ meta, faa, 1 ] } )
         .map { meta, faa, n -> [ meta + [ id: String.format('%s.%03d', meta.id, n), batch: n, parent: meta ], faa ] }

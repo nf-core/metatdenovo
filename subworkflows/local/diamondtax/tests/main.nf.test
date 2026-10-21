@@ -93,4 +93,34 @@ nextflow_workflow {
             ))
         }
     }
+
+    // A splitFasta that has read a gzip file reads every later file as gzip
+    test("gzipped protein set before a plain one - same taxonomy for both") {
+
+        when {
+            params {
+                batchsize = 2000
+            }
+            workflow {
+                inputs + """
+                    def plain = file("\${workDir}/test.plain.faa")
+                    plain.text = new java.util.zip.GZIPInputStream(faa.newInputStream()).text
+                    def plain_meta = [ id: 'plain', caller: 'plain' ]
+                    input[0] = channel.of([ meta, faa ], [ plain_meta, plain ])
+                    input[2] = channel.of([ meta, counts ], [ plain_meta, counts ])
+                """
+            }
+        }
+
+        then {
+            def lineages = { db -> workflow.out.lineage.findAll { m, _f -> m.db == db }.collectEntries { m, f -> [ m.caller, path(f).linesGzip ] } }
+            assertAll(
+                { assert workflow.success },
+                { assert lineages('ncbi-refseq-test').keySet() == [ 'prodigal', 'plain' ] as Set },
+                { assert lineages('ncbi-refseq-test')['prodigal'].size() > 0 },
+                { assert lineages('ncbi-refseq-test')['plain'] == lineages('ncbi-refseq-test')['prodigal'] },
+                { assert lineages('gtdb-r220-test')['plain'] == lineages('gtdb-r220-test')['prodigal'] }
+            )
+        }
+    }
 }
