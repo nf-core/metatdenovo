@@ -68,7 +68,7 @@
                 },
                 "KOFAMSCAN_SCAN": {
                     "kofamscan": "1.3.0",
-                    "kofamscan_db": "source=https://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/test_data/kofamscan/ko_list.gz; retrieved=2026-10-15"
+                    "kofamscan_db": "source=https://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/test_data/kofamscan/ko_list.gz; retrieved=[DATE]"
                 },
                 "KOFAMSCAN_SUM": {
                     "R": "4.2.3",
