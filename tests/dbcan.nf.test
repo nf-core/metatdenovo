@@ -5,6 +5,18 @@ nextflow_pipeline {
     tag "pipeline"
     profile "test_dbcan"
 
+    // dbcan_db's provenance date is a real retrieval mtime (today, in CI), so it can't be snapshotted
+    // literally; mask it the same way removeNextflowVersion masks the Nextflow version.
+    def maskRetrievedDate
+    maskRetrievedDate = { obj ->
+        if (obj instanceof Map) {
+            return obj.collectEntries { k, v -> [ k, maskRetrievedDate(v) ] }
+        } else if (obj instanceof String) {
+            return obj.replaceAll(/retrieved=\d{4}-\d{2}-\d{2}/, 'retrieved=[DATE]')
+        }
+        return obj
+    }
+
     test("-profile test_dbcan") {
 
         when {
@@ -24,7 +36,7 @@ nextflow_pipeline {
                     // Number of successful tasks
                     workflow.trace.succeeded().size(),
                     // pipeline versions.yml file for multiqc from which Nextflow version is removed because we test pipelines on multiple Nextflow versions
-                    removeNextflowVersion("$outputDir/pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml"),
+                    maskRetrievedDate(removeNextflowVersion("$outputDir/pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml")),
                     // All stable path name, with a relative path
                     stable_name,
                     // All files with stable contents
