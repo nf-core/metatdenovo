@@ -1,0 +1,38 @@
+nextflow_pipeline {
+
+    name "Test pipeline"
+    script "../main.nf"
+    tag "pipeline"
+    profile "test_stub"
+
+    // A CLI value stays a String even after nf-schema validation, so an untyped boolean/integer
+    // param reads wrong internally (e.g. the string "false" is truthy). main.nf's params block
+    // types these, so Nextflow casts them once at launch instead.
+    test("-profile test_stub -stub, boolean and integer params given on the command line") {
+
+        options "-stub --bbnorm false --trim_nextseq 20 --save_bbduk_removed_fastq true"
+
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+        }
+
+        then {
+            def succeeded = workflow.trace.succeeded()
+            def countsByProcess = succeeded.collect { it.name.replaceAll(/ \(.*\)$/, '') }.countBy { it }
+            def tasksFor = { String processName -> countsByProcess.findAll { name, _n -> name.endsWith(":${processName}") }.values().sum() ?: 0 }
+
+            assertAll(
+                { assert workflow.success },
+                // pipeline versions.yml file for multiqc from which Nextflow version is removed because we test pipelines on multiple Nextflow versions
+                { assert snapshot(removeNextflowVersion("$outputDir/pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml")).match() },
+                // Explicit "false" must stay off: a buggy untyped param reads any non-empty
+                // string as truthy and would run BBNORM anyway.
+                { assert tasksFor('BBMAP_BBNORM') == 0 },
+                // "20" must be usable as a real integer, not just avoid a crash.
+                { assert tasksFor('FASTQC_TRIMGALORE:TRIMGALORE') > 0 },
+            )
+        }
+    }
+}
