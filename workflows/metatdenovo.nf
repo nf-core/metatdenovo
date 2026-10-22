@@ -27,8 +27,6 @@ include { WRITESPADESYAML                    } from '../modules/local/spades/wri
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
 include { validateInputSamplesheet       } from '../subworkflows/local/utils_nfcore_metatdenovo_pipeline'
-include { typecastBooleanParam           } from '../subworkflows/local/utils_nfcore_metatdenovo_pipeline'
-include { typecastIntegerParam           } from '../subworkflows/local/utils_nfcore_metatdenovo_pipeline'
 
 //
 // SUBWORKFLOW: Consisting of local modules
@@ -119,18 +117,18 @@ workflow METATDENOVO {
 
     main:
 
-    // CLI params arrive as strings, and 'false' is truthy; nf-schema does not cast them
-    def annotate_only_consolidated = typecastBooleanParam('annotate_only_consolidated')
-    def save_parquet               = typecastBooleanParam('save_parquet')
-    def skip_dbcan                 = typecastBooleanParam('skip_dbcan')
-    def skip_eggnog                = typecastBooleanParam('skip_eggnog')
-    def skip_eukulele              = typecastBooleanParam('skip_eukulele')
-    def skip_fastqc                = typecastBooleanParam('skip_fastqc')
-    def skip_kofamscan             = typecastBooleanParam('skip_kofamscan')
-    def skip_protein_consolidation = typecastBooleanParam('skip_protein_consolidation')
-    def skip_trimming              = typecastBooleanParam('skip_trimming')
-    def min_contig_length          = typecastIntegerParam('min_contig_length')
-    def trim_bam_header_above      = typecastIntegerParam('trim_bam_header_above')
+    // Typed in main.nf's params block, so these are already real Booleans/Integers
+    def annotate_only_consolidated = params.annotate_only_consolidated
+    def save_parquet               = params.save_parquet
+    def skip_dbcan                 = params.skip_dbcan
+    def skip_eggnog                = params.skip_eggnog
+    def skip_eukulele              = params.skip_eukulele
+    def skip_fastqc                = params.skip_fastqc
+    def skip_kofamscan             = params.skip_kofamscan
+    def skip_protein_consolidation = params.skip_protein_consolidation
+    def skip_trimming              = params.skip_trimming
+    def min_contig_length          = params.min_contig_length
+    def trim_bam_header_above      = params.trim_bam_header_above
 
     if ( ( params.assembler && params.user_assembly ) || ( ! params.assembler && ! params.user_assembly ) ) {
         error "Provide either `--assembler` or `--user_assembly`!"
