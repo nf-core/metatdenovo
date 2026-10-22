@@ -18,16 +18,19 @@ workflow INTERPROSCAN_ANNOTATION {
 
     INTERPROSCAN_DATABASE( file(db_url) )
 
-    // splitFasta cannot read a zero-byte gzip, which stub runs produce
+    // splitFasta cannot read a zero-byte gzip, which stub runs produce.
+    // Once a splitFasta has read a gzip file it reads every later file as gzip, so plain files get their own.
     ch_interproscan_split = faa
         .branch { _meta, f ->
             empty: f.size() == 0
-            other: true
+            gz:    f.name.endsWith('.gz')
+            plain: true
         }
 
     INTERPROSCAN(
-        ch_interproscan_split.other
+        ch_interproscan_split.gz
             .splitFasta(size: batchsize, file: true, elem: 1)
+            .mix( ch_interproscan_split.plain.splitFasta(size: batchsize, file: true, elem: 1) )
             .map { meta, f -> [ meta, f, f.baseName.tokenize('.').last() as Integer ] }
             .mix( ch_interproscan_split.empty.map { meta, f -> [ meta, f, 1 ] } )
             .map { meta, f, n -> [ meta + [ id: String.format('%s.%03d', meta.id, n), parent: meta ], f ] },
