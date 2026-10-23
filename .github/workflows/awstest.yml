@@ -11,7 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Launch workflow via Seqera Platform
-        uses: seqeralabs/action-seqera-launch@v1
+        id: launch
+        uses: seqeralabs/action-seqera-launch@f7b1a39afc8bb65f58b84150cd214b33fe416fef # v1.0.0
         with:
           wait: running
           syntax-parser: v2
@@ -25,3 +26,8 @@ jobs:
               "outdir": "s3://${{ vars.AWS_S3_BUCKET }}/metatdenovo/results-test-${{ github.sha }}"
             }
           profiles: test
+      - name: Link to the Seqera Platform run
+        env:
+          WORKFLOW_URL: ${{ steps.launch.outputs.workflow-url }}
+        run: |
+          echo "Seqera Platform run: $WORKFLOW_URL" >> "$GITHUB_STEP_SUMMARY"
