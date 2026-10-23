@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Changed`
 
-- [#NN](https://github.com/nf-core/metatdenovo/pull/NN) - `--save_parquet` reads `NA` as missing, so missing values are NULL in the Parquet tables instead of the text `NA`, and an `NA` in a numeric column no longer fails or turns the column into text (@erikrikarddaniel)
+- [#608](https://github.com/nf-core/metatdenovo/pull/608) - `--save_parquet` reads `NA` as missing, so missing values are NULL in the Parquet tables instead of the text `NA`, and an `NA` in a numeric column no longer fails or turns the column into text (@erikrikarddaniel)
 
 ### `Fixed`
 
