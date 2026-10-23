@@ -36,6 +36,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and the results
     - [EggNOG](#eggnog) - Output from EggNOG-mapper (default; optional)
     - [KOfamSCAN](#kofamscan) - Output KOfamSCAN (optional)
     - [dbCAN](#dbcan) - Output from dbCAN CAZyme annotation (default; optional)
+    - [InterProScan](#interproscan) - Output from InterProScan functional annotation (default; optional)
     - [EUKulele](#eukulele) - Output from EUKulele taxonomy annotation (default; optional)
     - [Diamond taxonomy](#diamond-taxonomy) - Output from the Diamond-based taxonomy processing (optional)
     - [Hmmsearch](#hmmsearch) - Output from HMMER run with user-supplied HMM profiles (optional)
@@ -350,6 +351,21 @@ Only ORFs with at least one hit from any of the underlying tools appear in the o
 
 </details>
 
+#### InterProScan
+
+[InterProScan](https://interproscan-docs.readthedocs.io) will perform domain/GO annotation on the ORFs against a curated subset of
+member databases (Pfam and PANTHER by default, configurable with `--interproscan_applications`).
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `interproscan/`
+  - `<assembly_name>.<orfcaller_name>.{tsv,xml,gff3,json}`: raw InterProScan output, in each of its supported formats.
+- `summary_tables/`
+  - `<assembly_name>.<orfcaller_name>.interproscan.tsv.gz`: reformatted InterProScan output, with a header row added
+
+</details>
+
 #### EUKulele
 
 [EUKulele](https://github.com/AlexanderLabWHOI/EUKulele) will perform an analysis to assign taxonomy to the ORFs.
@@ -422,6 +438,7 @@ Filenames start with assembly program and ORF caller, to allow reruns of the pip
   - `<assembly_name>.<orfcaller_name>.kofamscan.tsv.gz`: reformatted output from Kofamscan.
   - `<assembly_name>.<orfcaller_name>.kofamscan-uniq.tsv.gz`: reformatted output from Kofamscan with a _single_ row per ORF in contrast to the above.
   - `<assembly_name>.<orfcaller_name>.dbcan.tsv.gz`: reformatted CAZyme annotation overview table from dbCAN.
+  - `<assembly_name>.<orfcaller_name>.interproscan.tsv.gz`: reformatted InterProScan output, with a header row added.
   - `<assembly_name>.<orfcaller_name>.<database>.eukulele.taxonomy.tsv.gz`: taxonomic annotation per ORF for specific database.
   - `<assembly_name>.<orfcaller_name>.prokka-annotations.tsv.gz`: reformatted annotation output from Prokka.
   - `<assembly_name>.<orfcaller_name>.<database>.diamond.taxonomy.tsv.gz`: diamond taxonomy parsed into individual taxa
