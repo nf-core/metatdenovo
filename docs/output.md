@@ -378,8 +378,8 @@ A GTDB database is provided, and you can build your own, see the [usage document
 <summary>Output files</summary>
 
 - `diamond_taxonomy/`
-  - `<assembly_name>.<orfcaller_name>.<database>.tsv.gz`: Output directly from the Diamond aligner
-  - `<assembly_name>.<orfcaller_name>.<database>.lineage.tsv.gz`: Output after `taxonkit lineage` added the full taxonomic lineage to the above
+  - `<assembly_name>.<orfcaller_name>.<nnn>.<database>.tsv.gz`: Output directly from the Diamond aligner, one file per batch of proteins, numbered `001`, `002`, ... (see `--diamond_batchsize`)
+  - `<assembly_name>.<orfcaller_name>.<database>.lineage.tsv.gz`: Output of all batches after `taxonkit lineage` added the full taxonomic lineage
 - `summary_tables/`
   - `<assembly_name>.<orfcaller_name>.<database>.diamond.taxonomy.tsv.gz`: Cleaned up output, including addition of a header row and, if a list of ranks was given, the taxonomy parsed into individual taxa
   - `<assembly_name>.<orfcaller_name>.<database>.taxonomy-taxdump.tsv.gz`: Only if `parse_with_taxdump` was set in the input file; like the above, but with the taxonomy parsed using the taxonomy dump files

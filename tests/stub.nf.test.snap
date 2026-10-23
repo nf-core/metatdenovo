@@ -57,6 +57,9 @@
                 "DBCAN_SUM": {
                     "R": 4.0
                 },
+                "DIAMOND_TAXONOMY": {
+                    "diamond": "2.2.1"
+                },
                 "DUCKDB_TABLE2PARQUET": {
                     "duckdb": "1.5.5"
                 },
@@ -90,6 +93,18 @@
                 },
                 "FORMAT_CLUSTERREPS": {
                     "gzip": 1.11
+                },
+                "FORMAT_DIAMOND_TAX_RANKLIST": {
+                    "R": "4.2.3",
+                    "tidyverse": "2.0.0"
+                },
+                "FORMAT_DIAMOND_TAX_TAXDUMP": {
+                    "R": "4.5.3",
+                    "data.table": "1.17.8",
+                    "dplyr": "1.2.1",
+                    "dtplyr": "1.3.3",
+                    "readr": "2.2.0",
+                    "tidyr": "1.3.2"
                 },
                 "FORMAT_EUKULELE_TAX": {
                     "R": "4.5.3",
@@ -151,6 +166,9 @@
                 "MMSEQS_LINCLUST": {
                     "mmseqs": "18.8cc5c"
                 },
+                "PIGZ_DIAMOND_LINEAGE": {
+                    "pigz": 2.8
+                },
                 "PIGZ_PE_READS_FWD": {
                     "pigz": 2.8
                 },
@@ -211,9 +229,16 @@
                 "SEQTK_MERGEPE": {
                     "seqtk": "1.4-r122"
                 },
+                "SUM_DIAMONDTAX": {
+                    "R": "4.0,",
+                    "tidyverse": 2.0
+                },
                 "SUM_EUKULELE_TAXONOMY": {
                     "R": "4.0,",
                     "tidyverse": 2.0
+                },
+                "TAXONKIT_LINEAGE": {
+                    "taxonkit": "0.18.0"
                 },
                 "TRANSDECODER_BED_CAT": {
                     "coreutils": 9.4,
@@ -252,7 +277,7 @@
                 }
             }
         ],
-        "timestamp": "2026-09-17T14:52:35.245420423",
+        "timestamp": "2026-10-20T10:01:44.494443171",
         "meta": {
             "nf-test": "0.9.4",
             "nextflow": "26.04.6"

@@ -314,6 +314,10 @@ The Diamond taxonomy-annotation process uses Diamond database files (`.dmnd` fil
 We supply a single standard database, for GTDB release R09-RS220.
 This is provided in collaboration with SciLifeLab Data Center and can be downloaded from here: [GTDB (R09RS220) taxonomy database](https://figshare.scilifelab.se/articles/dataset/nf-core_metatdenovo_taxonomy/28211678), DOI: https://doi.org/10.17044/scilifelab.28211678.
 
+Diamond runs on batches of proteins, by default 500 million amino acids each (`--diamond_batchsize`), so a large protein set runs as parallel tasks and an interrupted run only repeats the unfinished batches.
+Each batch reads the whole database once, which takes about an hour for NCBI RefSeq on 12 CPUs, so very small batches add a lot of run time.
+Batching does not change the E-values, since they depend on the database size, not the number of proteins searched.
+
 To make your own database, you will need to collect four files: a protein fasta file, the `names.dmp` and `nodes.dmp` files from an
 NCBI-style taxon dump plus a mapping file in which protein accessions are translated into taxon ids.
 
