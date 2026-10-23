@@ -56,5 +56,14 @@ topics:
       - EUKulele --version 2>&1:
           type: eval
           description: The expression to obtain the version of the tool
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - eukulele_db:
+          type: string
+          description: The name of the database
+      - eukulele_db_provenance:
+          type: string
+          description: Database name (if any) and the retrieval date of the user-supplied reference directory, since it carries no upstream release tag
 authors:
   - "@danilodileo"

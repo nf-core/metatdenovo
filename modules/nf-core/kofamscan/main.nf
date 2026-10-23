@@ -11,11 +11,13 @@ process KOFAMSCAN {
     tuple val(meta), path(fasta)
     path profiles
     path ko_list
+    val  ko_list_url
 
     output:
     tuple val(meta), path('*.txt.gz'), optional: true, emit: txt
     tuple val(meta), path('*.tsv.gz'), optional: true, emit: tsv
     tuple val("${task.process}"), val('kofamscan'), eval("exec_annotation --version 2>&1 | sed 's/exec_annotation //;'"), topic: versions, emit: versions_kofamscan
+    tuple val("${task.process}"), val('kofamscan_db'), val(kofamscan_db_provenance), topic: versions, emit: versions_kofamscan_db
 
     when:
     task.ext.when == null || task.ext.when
@@ -29,6 +31,14 @@ process KOFAMSCAN {
     def fasta_name     = is_compressed ? fasta.toString() - '.gz' : "$fasta"
     def gunzip         = is_compressed ? "gunzip -c ${fasta} > ${fasta_name}" : ''
     def cleanup        = is_compressed ? "rm -f ${fasta_name}" : ''
+    // KEGG's FTP mirror has no release/date field of its own -- genome.jp always serves "latest"
+    // at a stable path -- so record what IS knowable: the source URL and the date this local
+    // copy was obtained, from ko_list's mtime. Read here (not in KOFAMSCAN_DOWNLOAD, and not with
+    // eval()): ko_list is an already-completed upstream task's output, so it's guaranteed
+    // materialized by the time this preamble runs, unlike reading it inside the same process
+    // that's still staging a remote file(url) input, or a storeDir-cached process that may never
+    // actually run its script again.
+    kofamscan_db_provenance = "source=${ko_list_url}; retrieved=${new Date(ko_list.lastModified()).format('yyyy-MM-dd')}"
     """
     $gunzip
 
@@ -50,6 +60,7 @@ process KOFAMSCAN {
     def prefix = task.ext.prefix ?: "${meta.id}"
     def extension = args.contains("--format detail-tsv") ? "tsv" :
                     "txt"
+    kofamscan_db_provenance = "source=${ko_list_url}; retrieved=${new Date(ko_list.lastModified()).format('yyyy-MM-dd')}"
     """
     touch ${prefix}.${extension}
 

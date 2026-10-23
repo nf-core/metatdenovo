@@ -81,7 +81,8 @@
                     "megahit": "1.2.9"
                 },
                 "METAEUK_EASYPREDICT": {
-                    "metaeuk": "6.a5d39d9"
+                    "metaeuk": "6.a5d39d9",
+                    "metaeuk_db": "unknown"
                 },
                 "METAEUK_FAA_CAT": {
                     "coreutils": 9.4,
@@ -319,10 +320,10 @@
                 "k59_1.p1\tk59_1\t183\t611\t+\t429\tRPL28_GENOMIC\t12\t153410.553411\ttransdecoder\t1\t1\tk59_1.p1"
             ]
         ],
+        "timestamp": "2026-10-14T11:31:40.604117",
         "meta": {
-            "nf-test": "0.9.3",
-            "nextflow": "25.10.4"
-        },
-        "timestamp": "2026-09-15T17:47:04.138452"
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
     }
 }

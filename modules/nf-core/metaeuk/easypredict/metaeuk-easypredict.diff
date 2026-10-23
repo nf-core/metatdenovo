@@ -1,0 +1,75 @@
+Changes in component 'nf-core/metaeuk/easypredict'
+'modules/nf-core/metaeuk/easypredict/environment.yml' is unchanged
+Changes in 'metaeuk/easypredict/meta.yml':
+--- modules/nf-core/metaeuk/easypredict/meta.yml
++++ modules/nf-core/metaeuk/easypredict/meta.yml
+@@ -89,6 +89,16 @@
+       - "metaeuk | sed -n 's/.*Version: //p'":
+           type: eval
+           description: The expression to obtain the version of the tool
++  versions_metaeuk_db:
++    - - ${task.process}:
++          type: string
++          description: The name of the process
++      - metaeuk_db:
++          type: string
++          description: The name of the database
++      - db_version:
++          type: string
++          description: Content of the database directory's *.version file, written by `metaeuk databases`
+ 
+ topics:
+   versions:
+@@ -101,6 +111,15 @@
+       - "metaeuk | sed -n 's/.*Version: //p'":
+           type: eval
+           description: The expression to obtain the version of the tool
++    - - ${task.process}:
++          type: string
++          description: The name of the process
++      - metaeuk_db:
++          type: string
++          description: The name of the database
++      - db_version:
++          type: string
++          description: Content of the database directory's *.version file, written by `metaeuk databases`
+ 
+ authors:
+   - "@prototaxites"
+
+Changes in 'metaeuk/easypredict/main.nf':
+--- modules/nf-core/metaeuk/easypredict/main.nf
++++ modules/nf-core/metaeuk/easypredict/main.nf
+@@ -17,6 +17,7 @@
+     tuple val(meta), path("*.tsv")              , emit: tsv
+     tuple val(meta), path("*.gff")              , emit: gff
+     tuple val("${task.process}"), val('metaeuk'), eval("metaeuk | sed -n 's/.*Version: //p'"), emit: versions_metaeuk, topic: versions
++    tuple val("${task.process}"), val('metaeuk_db'), val(db_version), emit: versions_metaeuk_db, topic: versions
+ 
+     when:
+     task.ext.when == null || task.ext.when
+@@ -24,6 +25,11 @@
+     script:
+     def args = task.ext.args   ?: ''
+     prefix   = task.ext.prefix ?: "${meta.id}"
++    // `database` is already staged on disk by the time this preamble runs, so its *.version file
++    // (written by `metaeuk databases`, same file checked by workflows/metatdenovo.nf) can be read
++    // here directly -- unlike `eval()`, this doesn't need the task to actually execute.
++    def db_version_file = database.isDirectory() ? database.listFiles().find { f -> f.name.endsWith('.version') } : null
++    db_version = db_version_file ? db_version_file.text.trim() : 'unknown'
+     """
+     if [ -d ${database} ]; then
+         ## if supplying an mmseqs database as a directory, metaeuk requires the basename of the database
+@@ -44,6 +50,8 @@
+ 
+     stub:
+     prefix = task.ext.prefix ?: "${meta.id}"
++    def db_version_file = database.isDirectory() ? database.listFiles().find { f -> f.name.endsWith('.version') } : null
++    db_version = db_version_file ? db_version_file.text.trim() : 'unknown'
+     """
+     touch ${prefix}.fas
+     touch ${prefix}.codon.fas
+
+'modules/nf-core/metaeuk/easypredict/tests/main.nf.test.snap' is unchanged
+'modules/nf-core/metaeuk/easypredict/tests/main.nf.test' is unchanged
+************************************************************

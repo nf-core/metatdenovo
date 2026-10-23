@@ -31,7 +31,7 @@ nextflow_pipeline {
                 { assert tasksFor('DUCKDB_TABLE2PARQUET') == 26 }, // one per summary_tables/ tsv
                 { assert succeeded.size() == 174 },
                 { assert snapshot(
-                    removeNextflowVersion("$outputDir/pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml")
+                    VersionsYaml.maskRetrievedDate(removeNextflowVersion("$outputDir/pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml"))
                 ).match() }
             )
         }

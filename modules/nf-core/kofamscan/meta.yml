@@ -36,6 +36,9 @@ input:
       description: File containing list of KO entries with their data
       pattern: "*.{fa,fasta}"
       ontologies: []
+  - ko_list_url:
+      type: string
+      description: URL ko_list was downloaded from, recorded as database provenance since KEGG publishes no release/date tag
 output:
   txt:
     - - meta:
@@ -70,6 +73,16 @@ output:
       - "exec_annotation --version 2>&1 | sed 's/exec_annotation //;'":
           type: eval
           description: The expression to obtain the version of the tool
+  versions_kofamscan_db:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - kofamscan_db:
+          type: string
+          description: The name of the database
+      - kofamscan_db_provenance:
+          type: string
+          description: Source URL and local-copy retrieval date, since KEGG publishes no release/date tag
 topics:
   versions:
     - - ${task.process}:
@@ -81,6 +94,15 @@ topics:
       - "exec_annotation --version 2>&1 | sed 's/exec_annotation //;'":
           type: eval
           description: The expression to obtain the version of the tool
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - kofamscan_db:
+          type: string
+          description: The name of the database
+      - kofamscan_db_provenance:
+          type: string
+          description: Source URL and local-copy retrieval date, since KEGG publishes no release/date tag
 authors:
   - "@toniher"
 maintainers:

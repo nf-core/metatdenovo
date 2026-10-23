@@ -90,6 +90,16 @@ output:
       - "run_dbcan version | sed 's/dbCAN version: //g'":
           type: eval
           description: The expression to obtain the version of the tool
+  versions_dbcan_db:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - dbcan_db:
+          type: string
+          description: The name of the database
+      - dbcan_db_provenance:
+          type: string
+          description: Source and local-copy retrieval date, since dbCAN's built-in default mirror publishes no release/date tag
 topics:
   versions:
     - - ${task.process}:
@@ -101,6 +111,15 @@ topics:
       - "run_dbcan version | sed 's/dbCAN version: //g'":
           type: eval
           description: The expression to obtain the version of the tool
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - dbcan_db:
+          type: string
+          description: The name of the database
+      - dbcan_db_provenance:
+          type: string
+          description: Source and local-copy retrieval date, since dbCAN's built-in default mirror publishes no release/date tag
 authors:
   - "@Xinpeng021001"
 maintainers:
