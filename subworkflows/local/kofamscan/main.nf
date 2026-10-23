@@ -21,17 +21,20 @@ workflow KOFAMSCAN {
 
     KOFAMSCAN_DOWNLOAD( file(ko_list_url), file(profiles_url) )
 
-    // splitFasta cannot read a zero-byte gzip, which stub runs produce
+    // splitFasta cannot read a zero-byte gzip, which stub runs produce.
+    // Once a splitFasta has read a gzip file it reads every later file as gzip, so plain files get their own.
     ch_kofamscan_split = kofamscan
         .branch { _meta, faa ->
             empty: faa.size() == 0
-            other: true
+            gz:    faa.name.endsWith('.gz')
+            plain: true
         }
 
     // E-values are relative to each batch's size; KO assignment uses score thresholds only
     KOFAMSCAN_SCAN(
-        ch_kofamscan_split.other
+        ch_kofamscan_split.gz
             .splitFasta(size: batchsize, file: true, elem: 1)
+            .mix( ch_kofamscan_split.plain.splitFasta(size: batchsize, file: true, elem: 1) )
             .map { meta, faa -> [ meta, faa, faa.baseName.tokenize('.').last() as Integer ] }
             .mix( ch_kofamscan_split.empty.map { meta, faa -> [ meta, faa, 1 ] } )
             .map { meta, faa, n -> [ meta + [ id: String.format('%s.%03d', meta.id, n), parent: meta ], faa ] },
