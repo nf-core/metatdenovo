@@ -1,9 +1,9 @@
 nextflow_process {
 
-    name "Test DUCKDB_TABLE2PARQUET with the pipeline's modules.config"
+    name "Test DUCKDB_TABLE2PARQUET with the pipeline config"
     script "../../modules/nf-core/duckdb/table2parquet/main.nf"
     process "DUCKDB_TABLE2PARQUET"
-    config "../../conf/modules.config"
+    config "../../nextflow.config"
 
     tag "modules"
     tag "duckdb/table2parquet"
