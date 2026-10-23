@@ -18,7 +18,19 @@ nextflow_pipeline {
             def stable_name = getAllFilesFromDir(params.outdir, relative: true, includeDir: true, ignore: ['pipeline_info/*.{html,json,txt}', 'multiqc/multiqc_plots', 'multiqc/multiqc_plots/**' ])
             // stable_path: All files in ${params.outdir}/ with stable content
             def stable_path = getAllFilesFromDir(params.outdir, ignoreFile: 'tests/.nftignore')
+            // MEGAHIT numbers the two contigs in either order between runs, so name them by length.
+            def contig_names = path("${params.outdir}/megahit/megahit_assembly.contigs.fa.gz").linesGzip
+                .findAll { l -> l.startsWith('>') }
+                .collect { l -> [ l.substring(1).tokenize(' ')[0], (l =~ /len=(\d+)/)[0][1] as Integer ] }
+                .sort { c -> c[1] }
+                .with { cs -> [ (cs[0][0]): 'mrna_contig', (cs[1][0]): 'genomic_contig' ] }
+            def renamed = { String s -> s.replaceAll(/k\d+_\d+/) { id -> contig_names[id] ?: id } }
+            def table = { String name ->
+                path("${params.outdir}/summary_tables/${name}").csv(sep: '\t', decompress: true, header: true).rows
+                    .collect { r -> r.collectEntries { k, v -> [ (k): v instanceof String ? renamed(v) : v ] } }
+            }
             assertAll(
+                { assert contig_names.size() == 2 },
                 { assert workflow.success },
                 { assert snapshot(
                     // Number of successful tasks
@@ -33,41 +45,37 @@ nextflow_pipeline {
                     path("${params.outdir}/summary_tables/megahit.metaeuk.counts.tsv.gz").linesGzip.findAll { l -> l.contains('orf') },
                     path("${params.outdir}/summary_tables/megahit.transdecoder.counts.tsv.gz").linesGzip.findAll { l -> l.contains('orf') },
                     // Small enough to snapshot verbatim.
-                    path("${params.outdir}/summary_tables/megahit.locus_consolidate.counts.tsv.gz").linesGzip,
+                    path("${params.outdir}/summary_tables/megahit.locus_consolidate.counts.tsv.gz").linesGzip.collect(renamed),
                     // Likewise the protein-consolidated table.
-                    path("${params.outdir}/summary_tables/megahit.protein_consolidate_99.counts.tsv.gz").linesGzip,
+                    path("${params.outdir}/summary_tables/megahit.protein_consolidate_99.counts.tsv.gz").linesGzip.collect(renamed),
                 ).match() },
                 { assert path("${params.outdir}/megahit/megahit_assembly.log").readLines().any { l -> l.contains('ALL DONE') } },
                 { assert path("${params.outdir}/megahit/megahit_assembly.contigs.fa.gz").linesGzip.size() >= 4 },
 
-                // Both callers call k59_0 at 1-447 (+) with 400 reads each; the consolidated count must be 400, not 800.
+                // Both callers call mrna_contig at 1-447 (+) with 400 reads each; the consolidated count must be 400, not 800.
                 { assert (
-                    path("${params.outdir}/summary_tables/megahit.locus_consolidate.counts.tsv.gz")
-                        .csv(sep: '\t', decompress: true, header: true).rows
+                    table('megahit.locus_consolidate.counts.tsv.gz')
                         .findAll { r -> r["sample"] == 'RPL28_MRNA_RECODED' }
                         .sum { r -> r["count"] as int }
                 ) == 400 },
                 // Both callers contributed, two calls.
                 { assert (
-                    path("${params.outdir}/summary_tables/megahit.locus_consolidate.counts.tsv.gz")
-                        .csv(sep: '\t', decompress: true, header: true).rows
+                    table('megahit.locus_consolidate.counts.tsv.gz')
                         .find { r -> r["sample"] == 'RPL28_MRNA_RECODED' }
                         .with { r -> [ r["callers"].tokenize(',').toSet(), r["n_calls"] as int ] }
                 ) == [ ['metaeuk', 'transdecoder'] as Set, 2 ] },
 
-                // k59_1: MetaEuk (-) and TransDecoder (+) overlap on opposite strands, so must stay two loci.
+                // genomic_contig: MetaEuk (-) and TransDecoder (+) overlap on opposite strands, so must stay two loci.
                 { assert (
-                    path("${params.outdir}/summary_tables/megahit.locus_consolidate.counts.tsv.gz")
-                        .csv(sep: '\t', decompress: true, header: true).rows
-                        .findAll { r -> r["orf"] == 'k59_1.p1' || r["orf"].startsWith('NP_011412.1|k59_1') }
+                    table('megahit.locus_consolidate.counts.tsv.gz')
+                        .findAll { r -> r["orf"] == 'genomic_contig.p1' || r["orf"].startsWith('NP_011412.1|genomic_contig') }
                         .every { r -> (r["n_calls"] as int) == 1 }
                 ) },
 
                 // No sample's locus counts may exceed its aligned reads (samtools flagstat).
                 { assert (
                     ['RPL28_GENOMIC', 'RPL28_MRNA', 'RPL28_MRNA_RECODED'].every { sample ->
-                        def consolidated_total = path("${params.outdir}/summary_tables/megahit.locus_consolidate.counts.tsv.gz")
-                            .csv(sep: '\t', decompress: true, header: true).rows
+                        def consolidated_total = table('megahit.locus_consolidate.counts.tsv.gz')
                             .findAll { r -> r["sample"] == sample }
                             .sum { r -> r["count"] as int } ?: 0
                         def flagstat_total = path("${params.outdir}/samtools/megahit.${sample}.flagstat").readLines()[0].tokenize(' ')[0] as int
@@ -75,30 +83,28 @@ nextflow_pipeline {
                     }
                 ) },
 
-                // k59_1 (spliced, -) and k59_0 (recoded mRNA, +) are the same gene on different contigs.
+                // genomic_contig (spliced, -) and mrna_contig (recoded mRNA, +) are the same gene on different contigs.
                 // Locus consolidation cannot merge them; protein clustering must, with provenance from both.
                 { assert (
-                    path("${params.outdir}/summary_tables/megahit.protein_consolidate_99.counts.tsv.gz")
-                        .csv(sep: '\t', decompress: true, header: true).rows
+                    table('megahit.protein_consolidate_99.counts.tsv.gz')
                         .findAll { r -> (r["n_loci"] as int) == 2 }
                         .every { r ->
-                            r["loci"].tokenize(',').toSet() == [ 'NP_011412.1|k59_1|-|191', 'locus_k59_0_1_447_+' ] as Set &&
+                            r["loci"].tokenize(',').toSet() == [ 'NP_011412.1|genomic_contig|-|191', 'locus_mrna_contig_1_447_+' ] as Set &&
                             r["callers"].tokenize(',').toSet() == [ 'metaeuk', 'transdecoder' ] as Set &&
                             (r["n_calls"] as int) == 3
                         }
                 ) },
-                // The opposite-strand TransDecoder call on k59_1 is a different protein and must stay out.
+                // The opposite-strand TransDecoder call on genomic_contig is a different protein and must stay out.
                 { assert (
-                    path("${params.outdir}/summary_tables/megahit.protein_consolidate_99.counts.tsv.gz")
-                        .csv(sep: '\t', decompress: true, header: true).rows
-                        .findAll { r -> r["orf"] == 'k59_1.p1' }
+                    table('megahit.protein_consolidate_99.counts.tsv.gz')
+                        .findAll { r -> r["orf"] == 'genomic_contig.p1' }
                         .every { r -> (r["n_loci"] as int) == 1 && r["callers"] == 'transdecoder' }
                 ) },
                 // Clustering regroups rows: per-sample totals equal the locus level.
                 { assert (
                     ['RPL28_GENOMIC', 'RPL28_MRNA', 'RPL28_MRNA_RECODED'].every { sample ->
-                        def total = { table ->
-                            path("${params.outdir}/summary_tables/${table}").csv(sep: '\t', decompress: true, header: true).rows
+                        def total = { name ->
+                            table(name)
                                 .findAll { r -> r["sample"] == sample }
                                 .sum { r -> r["count"] as int } ?: 0
                         }
