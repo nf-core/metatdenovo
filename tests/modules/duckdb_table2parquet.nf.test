@@ -1,0 +1,74 @@
+nextflow_process {
+
+    name "Test DUCKDB_TABLE2PARQUET with the pipeline's modules.config"
+    script "../../modules/nf-core/duckdb/table2parquet/main.nf"
+    process "DUCKDB_TABLE2PARQUET"
+    config "../../conf/modules.config"
+
+    tag "modules"
+    tag "duckdb/table2parquet"
+
+    // DuckDB infers column types from the first 20480 rows, so the input has an NA in a numeric
+    // column and in a text column well beyond that. The input is built inline: 24000 rows with a
+    // number, then 1000 rows with NA.
+
+    test("NA beyond the type-detection sample does not fail the conversion") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                publish_dir_mode = 'copy'
+            }
+            process {
+                """
+                def table = file("\${workDir}/na.tsv.gz")
+                table.withOutputStream { os ->
+                    new java.util.zip.GZIPOutputStream(os).withWriter { w ->
+                        w << 'accno\\tstrain_heterogeneity\\ttaxonomy\\n'
+                        (1..25000).each { i ->
+                            w << "g\${i}\\t\${i <= 24000 ? i / 8 : 'NA'}\\t\${i % 5 == 0 ? 'NA' : 'd__Archaea'}\\n"
+                        }
+                    }
+                }
+                input[0] = [ [ id: 'na' ], table ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert process.out.parquet[0][1].toString().endsWith('na.parquet') },
+                { assert path(process.out.parquet[0][1].toString()).size() > 0 },
+            )
+        }
+    }
+
+    // An NA in the first rows makes DuckDB type the whole column VARCHAR, which then keeps the
+    // text "NA" in the file. A DOUBLE column holds no text, so "NA" in the bytes means the
+    // column was typed VARCHAR.
+    test("NA in the first rows keeps a numeric column numeric") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                publish_dir_mode = 'copy'
+            }
+            process {
+                """
+                def table = file("\${workDir}/early_na.tsv")
+                table.text = 'accno\\tstrain_heterogeneity\\n' +
+                    (1..30).collect { i -> "g\${i}\\t\${i <= 3 ? 'NA' : i % 5}\\n" }.join()
+                input[0] = [ [ id: 'early_na' ], table ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert !new String(new File(process.out.parquet[0][1].toString()).bytes, 'ISO-8859-1').contains('NA') },
+            )
+        }
+    }
+}
