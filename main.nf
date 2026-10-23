@@ -30,7 +30,7 @@ params {
     bbnorm:                     Boolean
     featurecounts_fraction:     Boolean
     save_bbduk_removed_fastq:   Boolean
-    trim_nextseq:               Integer
+    trim_nextseq:               Integer?
     min_contig_length:          Integer
     trim_bam_header_above:      Integer
     version:                    Boolean

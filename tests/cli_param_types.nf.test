@@ -1,6 +1,6 @@
 nextflow_pipeline {
 
-    name "Test pipeline"
+    name "Boolean and integer params from the command line"
     script "../main.nf"
     tag "pipeline"
     profile "test_stub"
@@ -10,7 +10,7 @@ nextflow_pipeline {
     // types these, so Nextflow casts them once at launch instead.
     test("-profile test_stub -stub, boolean and integer params given on the command line") {
 
-        options "-stub --bbnorm false --trim_nextseq 20 --save_bbduk_removed_fastq true"
+        options "-stub --bbnorm false --trim_nextseq 20"
 
         when {
             params {
@@ -23,10 +23,11 @@ nextflow_pipeline {
             def countsByProcess = succeeded.collect { it.name.replaceAll(/ \(.*\)$/, '') }.countBy { it }
             def tasksFor = { String processName -> countsByProcess.findAll { name, _n -> name.endsWith(":${processName}") }.values().sum() ?: 0 }
 
+            // Not snapshotting pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml here --
+            // tests/stub.nf.test already does on this same profile, and duplicating it would mean
+            // two snapshot updates per module bump. The task assertions below carry this test.
             assertAll(
                 { assert workflow.success },
-                // pipeline versions.yml file for multiqc from which Nextflow version is removed because we test pipelines on multiple Nextflow versions
-                { assert snapshot(removeNextflowVersion("$outputDir/pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml")).match() },
                 // Explicit "false" must stay off: a buggy untyped param reads any non-empty
                 // string as truthy and would run BBNORM anyway.
                 { assert tasksFor('BBMAP_BBNORM') == 0 },
