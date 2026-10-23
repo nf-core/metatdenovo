@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Changed`
 
+- [#608](https://github.com/nf-core/metatdenovo/pull/608) - `--save_parquet` reads `NA` as missing, so missing values are NULL in the Parquet tables instead of the text `NA`, and an `NA` in a numeric column no longer fails or turns the column into text (@erikrikarddaniel)
+
 ### `Fixed`
 
 - [#606](https://github.com/nf-core/metatdenovo/pull/606) - Launch the AWS tests with `seqeralabs/action-seqera-launch` and the v2 syntax parser, and stop uploading the debug log as an artifact (@erikrikarddaniel)
