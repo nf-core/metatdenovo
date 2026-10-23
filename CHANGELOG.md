@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Fixed`
 
+- [#606](https://github.com/nf-core/metatdenovo/pull/606) - Launch the AWS tests with `seqeralabs/action-seqera-launch` and the v2 syntax parser, and stop uploading the debug log as an artifact (@erikrikarddaniel)
+- [#603](https://github.com/nf-core/metatdenovo/pull/603) - KofamScan no longer fails at random with "Not in GZIP format" when some protein files are gzipped and others not (@erikrikarddaniel)
 - [#598](https://github.com/nf-core/metatdenovo/pull/598) - Boolean and numeric parameters (including `--trim_nextseq`) are typed in `main.nf`, so a value given on the command line such as `--bbnorm false` or `--trim_nextseq 20` is accepted and a wrong one is rejected at launch, and a parameter the pipeline does not define is now an error instead of a warning. Requires Nextflow `!>=26.04.0`. Also drops 4 unused params (`clip_r1`, `clip_r2`, `three_prime_clip_r1`, `three_prime_clip_r2`) that have never been wired into any option (@danilodileo, reviewed by @erikrikarddaniel)
 - [#594](https://github.com/nf-core/metatdenovo/pull/594) - dbCAN uses only the CPUs it was given, instead of every core on the machine (@erikrikarddaniel)
 - [#588](https://github.com/nf-core/metatdenovo/pull/588) - A task that fails again after its last retry no longer kills other running tasks; they now finish first (@erikrikarddaniel)

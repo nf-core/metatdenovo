@@ -92,4 +92,32 @@ nextflow_workflow {
             )
         }
     }
+
+    // A splitFasta that has read a gzip file reads every later file as gzip
+    test("gzipped protein set before a plain one - same annotation for both") {
+
+        when {
+            params {
+                batchsize = 1000000000
+            }
+            workflow {
+                inputs + """
+                    def plain = file("\${workDir}/test.plain.faa")
+                    plain.text = new java.util.zip.GZIPInputStream(faa.newInputStream()).text
+                    def plain_meta = [ id: 'plain', caller: 'plain' ]
+                    input[0] = channel.of([ meta, faa ], [ plain_meta, plain ])
+                    input[1] = channel.of([ meta, counts ], [ plain_meta, counts ])
+                """
+            }
+        }
+
+        then {
+            def best = { caller -> path(workflow.out.kofam_table_uniq.find { m, _f -> m.caller == caller }[1]).linesGzip.drop(1).collectEntries { l -> l.split('\t')[0..1] } }
+            assertAll(
+                { assert workflow.success },
+                { assert best('prodigal') == expected_best },
+                { assert best('plain') == expected_best }
+            )
+        }
+    }
 }
