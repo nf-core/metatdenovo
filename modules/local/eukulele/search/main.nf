@@ -15,7 +15,6 @@ process EUKULELE_SEARCH {
     tuple val(meta), path("${prefix}/taxonomy_counts/*.csv.gz")                      , emit: taxonomy_counts, optional: true
     tuple val(meta), path("${prefix}/mets_full/diamond/*")                           , emit: diamond
     path("versions.yml"), emit: versions, topic: versions
-    tuple val("${task.process}"), val('eukulele_db'), val(eukulele_db_provenance), emit: versions_db, topic: versions
 
     script:
     def args     = task.ext.args ?: ''
