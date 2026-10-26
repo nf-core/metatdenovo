@@ -17,8 +17,7 @@ workflow EGGNOG {
 
     main:
 
-    // The eggnog5.embl.de URLs are the only place this release number is published, e.g.
-    // ".../emapperdb-5.0.2/eggnog.db.gz" -- a custom --eggnog_db_url falls back to 'unknown'.
+    // Only the default eggnog5.embl.de URLs carry the release (emapperdb-5.0.2); other URLs give 'unknown'.
     def eggnog_version_matcher = (db_url =~ /emapperdb-([0-9.]+)/)
     def eggnog_version = eggnog_version_matcher.find() ? eggnog_version_matcher.group(1) : 'unknown'
 
