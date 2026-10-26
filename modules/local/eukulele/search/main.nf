@@ -54,7 +54,6 @@ process EUKULELE_SEARCH {
 
     stub:
     prefix   = task.ext.prefix ?: ("${dbname}" ? "${meta.id}_${dbname}" : "${meta.id}")
-    eukulele_db_provenance = "${dbname ?: 'user-provided'} (retrieved=${new Date(eukdb.lastModified()).format('yyyy-MM-dd')})"
     """
     mkdir -p ${prefix}/taxonomy_estimation ${prefix}/taxonomy_counts ${prefix}/mets_full/diamond
     gzip -c /dev/null > ${prefix}/taxonomy_estimation/empty.out.gz
