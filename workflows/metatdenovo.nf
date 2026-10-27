@@ -37,6 +37,7 @@ include { PRODIGAL                } from '../subworkflows/local/prodigal/'
 include { KOFAMSCAN               } from '../subworkflows/local/kofamscan/'
 include { DBCAN                   } from '../subworkflows/local/dbcan/'
 include { DIAMONDTAX              } from '../subworkflows/local/diamondtax/'
+include { INTERPROSCAN_ANNOTATION } from '../subworkflows/local/interproscan/'
 include { TRANSDECODER            } from '../subworkflows/local/transdecoder/'
 include { METAEUK                 } from '../subworkflows/local/metaeuk/'
 include { USER_ORFS               } from '../subworkflows/local/user_orfs/'
@@ -119,6 +120,7 @@ workflow METATDENOVO {
     def skip_eggnog                = params.skip_eggnog
     def skip_eukulele              = params.skip_eukulele
     def skip_fastqc                = params.skip_fastqc
+    def skip_interproscan          = params.skip_interproscan
     def skip_kofamscan             = params.skip_kofamscan
     def skip_protein_consolidation = params.skip_protein_consolidation
     def skip_trimming              = params.skip_trimming
@@ -831,7 +833,16 @@ workflow METATDENOVO {
     }
 
     //
-    // MODULE: QUAST assembly statistics
+    // SUBWORKFLOW: run InterProScan on the ORF-called amino acid sequences
+    //
+    if ( ! skip_interproscan ) {
+        INTERPROSCAN_ANNOTATION( ch_protein, ch_fcs_for_summary, params.interproscan_db_url, params.interproscan_batchsize )
+        ch_merge_tables   = ch_merge_tables.mix ( INTERPROSCAN_ANNOTATION.out.sumtable )
+        ch_parquet_tables = ch_parquet_tables.mix( INTERPROSCAN_ANNOTATION.out.annotation.map { _meta, tsv -> tsv } )
+    }
+
+    //
+    // MODULE: Use QUAST to judge assembly quality, piped into MultiQC via its native report.tsv parser
     //
     QUAST(
         ch_assembly_contigs,

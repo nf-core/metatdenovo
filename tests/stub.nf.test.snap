@@ -134,6 +134,15 @@
                 "HMMER_HMMSEARCH": {
                     "hmmer": 3.4
                 },
+                "INTERPROSCAN": {
+                    "interproscan": "5.59-91.0"
+                },
+                "INTERPROSCAN_FORMAT": {
+                    "gzip": 1.11
+                },
+                "INTERPROSCAN_SUM": {
+                    "R": 4.0
+                },
                 "KOFAMSCAN_FORMAT": {
                     "gzip": 1.11
                 },
@@ -279,7 +288,7 @@
         ],
         "timestamp": "2026-10-20T10:01:44.494443171",
         "meta": {
-            "nf-test": "0.9.4",
+            "nf-test": "0.9.5",
             "nextflow": "26.04.6"
         }
     }
