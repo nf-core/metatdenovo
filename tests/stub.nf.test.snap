@@ -137,6 +137,15 @@
                 "HMMER_HMMSEARCH": {
                     "hmmer": 3.4
                 },
+                "INTERPROSCAN": {
+                    "interproscan": "5.59-91.0"
+                },
+                "INTERPROSCAN_FORMAT": {
+                    "gzip": 1.11
+                },
+                "INTERPROSCAN_SUM": {
+                    "R": 4.0
+                },
                 "KOFAMSCAN_FORMAT": {
                     "gzip": 1.11
                 },
