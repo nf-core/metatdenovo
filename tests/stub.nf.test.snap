@@ -76,7 +76,7 @@
                     "R": 4.0
                 },
                 "EUKULELE_SEARCH": {
-                    "eukulele_db": "phylodb (retrieved=[DATE])"
+                    "eukulele": "2.1.2"
                 },
                 "FAA_CAT": {
                     "coreutils": 9.4,
@@ -282,7 +282,7 @@
                 }
             }
         ],
-        "timestamp": "2026-10-20T10:01:44.494443171",
+        "timestamp": "2026-10-27T09:38:26.433727",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"
