@@ -1,10 +1,12 @@
 lint:
+  files_exist:
+    - conf/igenomes.config
   files_unchanged:
     - assets/nf-core-metatdenovo_logo_light.png
     - assets/nf-core-metatdenovo_logo_dark.png
     - docs/images/nf-core-metatdenovo_logo_light.png
     - docs/images/nf-core-metatdenovo_logo_dark.png
-nf_core_version: 4.0.3
+nf_core_version: 4.2.1
 repository_type: pipeline
 template:
   author: Danilo Di Leo, Emelie Nilsson, & Daniel Lundin
@@ -15,4 +17,4 @@ template:
   name: metatdenovo
   org: nf-core
   outdir: .
-  version: 1.5.0dev
+  version: 2.1.0dev
