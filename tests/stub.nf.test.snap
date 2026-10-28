@@ -75,6 +75,9 @@
                 "EGGNOG_SUM": {
                     "R": 4.0
                 },
+                "EUKULELE_DB": {
+                    "eukulele_db": "phylodb (retrieved=[DATE])"
+                },
                 "EUKULELE_SEARCH": {
                     "eukulele": "2.1.2"
                 },
@@ -291,7 +294,7 @@
                 }
             }
         ],
-        "timestamp": "2026-10-27T09:38:26.433727",
+        "timestamp": "2026-10-27T11:43:59.82384",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"
