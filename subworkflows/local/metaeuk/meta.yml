@@ -59,6 +59,11 @@ output:
         File containing software versions
         Structure: [ path(versions.yml) ]
       pattern: "versions.yml"
+  - database:
+      type: file
+      description: |
+        The resolved database (file or directory), for version provenance
+        Structure: value
 authors:
   - "@erikrikarddaniel"
 maintainers:

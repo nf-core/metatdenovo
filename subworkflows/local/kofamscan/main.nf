@@ -39,8 +39,7 @@ workflow KOFAMSCAN {
             .mix( ch_kofamscan_split.empty.map { meta, faa -> [ meta, faa, 1 ] } )
             .map { meta, faa, n -> [ meta + [ id: String.format('%s.%03d', meta.id, n), parent: meta ], faa ] },
         KOFAMSCAN_DOWNLOAD.out.koprofiles,
-        KOFAMSCAN_DOWNLOAD.out.ko_list,
-        ko_list_url
+        KOFAMSCAN_DOWNLOAD.out.ko_list
     )
 
     // Sorted by batch number: input order is part of the downstream task hashes and the merged row order
@@ -64,4 +63,5 @@ workflow KOFAMSCAN {
     kofam_table_tsv   = KOFAMSCAN_FORMAT.out.kofamtsv
     kofam_table_uniq  = KOFAMSCAN_UNIQUE.out.kofamuniq
     kofamscan_summary = KOFAMSCAN_SUM.out.kofamscan_summary
+    ko_list           = KOFAMSCAN_DOWNLOAD.out.ko_list // path: the KO list file, for version provenance
 }
