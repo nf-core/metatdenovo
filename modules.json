@@ -106,8 +106,7 @@
                     "metaeuk/easypredict": {
                         "branch": "master",
                         "git_sha": "ad5daf951b6b4ab49fcf2547c1c1e8f0cd5a6ce7",
-                        "installed_by": ["modules"],
-                        "patch": "modules/nf-core/metaeuk/easypredict/metaeuk-easypredict.diff"
+                        "installed_by": ["modules"]
                     },
                     "mmseqs/cluster": {
                         "branch": "master",
@@ -162,8 +161,7 @@
                     "rundbcan/cazymeannotation": {
                         "branch": "master",
                         "git_sha": "f29db1d96ea56989d8eee0b9780580b676862773",
-                        "installed_by": ["modules"],
-                        "patch": "modules/nf-core/rundbcan/cazymeannotation/rundbcan-cazymeannotation.diff"
+                        "installed_by": ["modules"]
                     },
                     "rundbcan/database": {
                         "branch": "master",

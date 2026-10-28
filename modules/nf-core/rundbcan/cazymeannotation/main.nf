@@ -17,7 +17,6 @@ process RUNDBCAN_CAZYMEANNOTATION {
     tuple val(meta), path("${prefix}_dbCANsub_hmm_results.tsv"), emit: dbcansub_results
     tuple val(meta), path("${prefix}_diamond.out"), emit: dbcandiamond_results
     tuple val("${task.process}"), val('rundbcan'), eval("run_dbcan version | sed 's/dbCAN version: //g'"), emit: versions_rundbcan, topic: versions
-    tuple val("${task.process}"), val('dbcan_db'), val(dbcan_db_provenance), emit: versions_dbcan_db, topic: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -25,11 +24,6 @@ process RUNDBCAN_CAZYMEANNOTATION {
     script:
     def args = task.ext.args ?: ''
     prefix = task.ext.prefix ?: "${meta.id}"
-    // RUNDBCAN_DATABASE's own output has no version/release tag (it's always "latest" from
-    // dbCAN's built-in default mirror), so record what IS knowable: the date this local copy
-    // was obtained, from the directory's mtime -- read here, not with eval(), since dbcan_db is
-    // storeDir-cached and may never actually run its script again.
-    dbcan_db_provenance = "source=run_dbcan database (built-in default mirror); retrieved=${new Date(dbcan_db.lastModified()).format('yyyy-MM-dd')}"
     """
     run_dbcan CAZyme_annotation \\
         --mode protein \\
@@ -47,7 +41,6 @@ process RUNDBCAN_CAZYMEANNOTATION {
 
     stub:
     prefix = task.ext.prefix ?: "${meta.id}"
-    dbcan_db_provenance = "source=run_dbcan database (built-in default mirror); retrieved=${new Date(dbcan_db.lastModified()).format('yyyy-MM-dd')}"
     """
     touch ${prefix}_overview.tsv
     touch ${prefix}_dbCAN_hmm_results.tsv
