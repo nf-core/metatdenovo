@@ -1,0 +1,72 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "diamondtax"
+description: Assigns taxonomy to proteins with Diamond against one or more databases, in batches of proteins, and summarises it per sample
+keywords:
+  - diamond
+  - taxonomy
+  - lca
+  - proteins
+components:
+  - diamond/blastp
+  - taxonkit/lineage
+  - pigz/compress
+  - diamond/format_tax/ranklist
+  - diamond/format_tax/taxdump
+  - sumtaxonomy
+input:
+  - proteins:
+      type: file
+      description: |
+        Protein fasta files, one per ORF source; meta.caller names the source
+        Structure: [ val(meta), path(faa) ]
+      pattern: "*.{faa,faa.gz}"
+  - dbs:
+      type: file
+      description: |
+        Diamond taxonomy databases with their taxdump files, as read from --diamond_dbs
+        Structure: [ val(meta), path(dmnd), path(names), path(nodes), val(ranks), val(parse_with_taxdump) ]
+      pattern: "*.dmnd"
+  - fcs:
+      type: file
+      description: |
+        Feature counts per ORF and sample; meta.caller must match the proteins'
+        Structure: [ val(meta), path(fcs) ]
+      pattern: "*.tsv.gz"
+  - batchsize:
+      type: integer
+      description: Number of amino acid residues per Diamond batch
+output:
+  - tsv:
+      type: file
+      description: |
+        Diamond output, one file per batch, sorted by batch number
+        Structure: [ val(meta), [ path(tsv) ] ]
+      pattern: "*.tsv.gz"
+  - lineage:
+      type: file
+      description: |
+        Diamond output of all batches with the full lineage added
+        Structure: [ val(meta), path(tsv.gz) ]
+      pattern: "*.lineage.tsv.gz"
+  - taxonomy:
+      type: file
+      description: |
+        Taxonomy per ORF, split into the ranks of the database
+        Structure: [ val(meta), path(tsv.gz) ]
+      pattern: "*.taxonomy.tsv.gz"
+  - taxonomy_taxdump:
+      type: file
+      description: |
+        Taxonomy per ORF parsed with the taxdump files, for databases with parse_with_taxdump set
+        Structure: [ val(meta), path(tsv.gz) ]
+      pattern: "*.taxonomy-taxdump.tsv.gz"
+  - taxonomy_summary:
+      type: file
+      description: |
+        Counts of ORFs with a taxonomy per sample
+        Structure: [ val(meta), path(tsv.gz) ]
+      pattern: "*_summary.tsv.gz"
+authors:
+  - "@erikrikarddaniel"
+maintainers:
+  - "@erikrikarddaniel"

@@ -27,9 +27,12 @@ nextflow_pipeline {
                 { assert tasksFor('KOFAMSCAN_SCAN') == 3 },
                 { assert tasksFor('RUNDBCAN_CAZYMEANNOTATION') == 3 },
                 { assert tasksFor('EUKULELE_SEARCH') == 3 },
+                { assert tasksFor('INTERPROSCAN') == 3 },
                 { assert tasksFor('HMMER_HMMSEARCH') == 12 }, // 3 protein sets * 4 hmmfiles
-                { assert tasksFor('DUCKDB_TABLE2PARQUET') == 26 }, // one per summary_tables/ tsv
-                { assert succeeded.size() == 174 },
+                { assert tasksFor('DIAMOND_TAXONOMY') == 3 }, // 3 protein sets * 1 db, one batch each
+                { assert tasksFor('FORMAT_DIAMOND_TAX_TAXDUMP') == 3 },
+                { assert tasksFor('DUCKDB_TABLE2PARQUET') == 35 }, // one per summary_tables/ tsv
+                { assert succeeded.size() == 211 },
                 { assert snapshot(
                     removeNextflowVersion("$outputDir/pipeline_info/nf_core_metatdenovo_software_mqc_versions.yml")
                 ).match() }

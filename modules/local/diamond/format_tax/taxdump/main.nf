@@ -82,7 +82,7 @@ process FORMAT_DIAMOND_TAX_TAXDUMP {
     """
 
     stub:
-
+    prefix = task.ext.prefix ?: "${meta.id}"
     """
     gzip -c /dev/null > ${prefix}.taxonomy-taxdump.tsv.gz
 

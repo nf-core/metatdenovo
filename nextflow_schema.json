@@ -536,6 +536,39 @@
                     "fa_icon": "far fa-file-code",
                     "help_text": "The dbCAN CAZyme database will be downloaded to this directory if it doesn't already exist there."
                 },
+                "skip_interproscan": {
+                    "type": "boolean",
+                    "description": "If enabled, skips InterProScan functional annotation.",
+                    "fa_icon": "fas fa-forward"
+                },
+                "interproscan_dbpath": {
+                    "type": "string",
+                    "default": "interproscan",
+                    "description": "Specify the InterProScan database path.",
+                    "fa_icon": "far fa-file-code",
+                    "help_text": "InterProScan's (large) member-database data will be downloaded to this directory if it doesn't already exist there."
+                },
+                "interproscan_applications": {
+                    "type": "string",
+                    "default": "Pfam,PANTHER",
+                    "description": "Comma-separated list of InterProScan member databases to run (passed to --applications).",
+                    "fa_icon": "fas fa-list"
+                },
+                "interproscan_db_url": {
+                    "type": "string",
+                    "default": "https://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/5.59-91.0/interproscan-5.59-91.0-64-bit.tar.gz",
+                    "description": "URL to download the InterProScan data archive from.",
+                    "fa_icon": "fas fa-link",
+                    "hidden": true
+                },
+                "interproscan_batchsize": {
+                    "type": "integer",
+                    "description": "Number of amino acid residues per batch InterProScan is run on.",
+                    "default": 2000000,
+                    "minimum": 1,
+                    "hidden": true,
+                    "help_text": "InterProScan runs on batches of the protein fasta so that large sets run in parallel tasks and an interrupted run loses at most the unfinished batches. The size counts sequence residues only, not header lines. Each sequence is scored independently against the (fixed) member-database profiles, so reported scores are unaffected by batch size.\n\nEach batch runs on one CPU. With the default applications (Pfam, PANTHER), a batch of 2 million residues takes about 4 hours, including about 15 minutes to load the profiles."
+                },
                 "hmmdir": {
                     "type": "string",
                     "default": null,
@@ -584,6 +617,15 @@
                     "default": 10,
                     "description": "Argument to Diamond's `--top` that controls the percentage of hits to include in the LCA.",
                     "fa_icon": "fas fa-align-justify"
+                },
+                "diamond_batchsize": {
+                    "type": "integer",
+                    "description": "Number of amino acid residues per batch Diamond taxonomy is run on.",
+                    "default": 500000000,
+                    "minimum": 1,
+                    "hidden": true,
+                    "help_text": "Diamond taxonomy runs on batches of the protein fasta so that large sets run in parallel tasks and an interrupted run loses at most the unfinished batches. The size counts sequence residues only, not header lines. Each batch reads the whole database once, so smaller batches add run time. E-values depend on the database size, not the number of proteins, so batching does not change them.",
+                    "fa_icon": "fas fa-expand-alt"
                 },
                 "skip_eukulele": {
                     "type": "boolean",
@@ -752,7 +794,7 @@
                 },
                 "trace_report_suffix": {
                     "type": "string",
-                    "fa_icon": "far calendar",
+                    "fa_icon": "far fa-calendar",
                     "description": "Suffix to add to the trace report filename. Default is the date and time in the format yyyy-MM-dd_HH-mm-ss.",
                     "hidden": true
                 },

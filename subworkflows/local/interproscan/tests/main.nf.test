@@ -1,0 +1,50 @@
+nextflow_workflow {
+
+    name "Test Subworkflow INTERPROSCAN_ANNOTATION"
+    script "../main.nf"
+    workflow "INTERPROSCAN_ANNOTATION"
+    config "./nextflow.config"
+
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "interproscan"
+
+    // A splitFasta that has read a gzip file reads every later file as gzip
+    test("gzipped protein set before a plain one - same annotation for both") {
+
+        when {
+            workflow {
+                """
+                def faa = file(params.modules_testdata_base_path + 'proteomics/interproscan/l_arginase.faa', checkIfExists: true)
+
+                def gz = file("\${workDir}/test.l_arginase.faa.gz")
+                new java.util.zip.GZIPOutputStream(gz.newOutputStream()).withWriter { w -> w << faa.text }
+
+                def counts = file("\${workDir}/test.counts.tsv.gz")
+                new java.util.zip.GZIPOutputStream(counts.newOutputStream()).withWriter { w ->
+                    w << 'orf\\tsample\\tcount\\n'
+                    w << 'GI|225038609|EFDID|719595|FULL\\tS1\\t1\\n'
+                }
+
+                def gz_meta    = [ id: 'gz', caller: 'gz' ]
+                def plain_meta = [ id: 'plain', caller: 'plain' ]
+                input[0] = channel.of([ gz_meta, gz ], [ plain_meta, faa ])
+                input[1] = channel.of([ gz_meta, counts ], [ plain_meta, counts ])
+                input[2] = params.modules_testdata_base_path + 'proteomics/interproscan/interproscan_test.tar.gz'
+                input[3] = 1000000000
+                """
+            }
+        }
+
+        then {
+            // Known SFLD hit shared with the vendored module's own test data (nf-core/modules).
+            // The raw/formatted tsv's run-date column is non-deterministic, so check content, not a snapshot.
+            def hit = { caller -> path(workflow.out.annotation.find { m, _f -> m.caller == caller }[1]).linesGzip.findAll { l -> l.contains('SFLDS00057') && l.contains('Glutaminase/Asparaginase') }.size() > 0 }
+            assertAll(
+                { assert workflow.success },
+                { assert hit('gz') },
+                { assert hit('plain') }
+            )
+        }
+    }
+}
