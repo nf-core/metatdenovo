@@ -473,7 +473,8 @@ The tools use large databases which are downloaded automatically but paths can b
 and `--kofam_dbpath dir` parameters respectively.
 It is practical to let the pipeline download the files on the first run, and then reuse the data by setting the parameters.
 
-KofamScan runs on batches of proteins, by default 1 billion amino acids each (`--kofamscan_batchsize`), so a large protein set runs as parallel tasks and an interrupted run only repeats the unfinished batches.
+KofamScan runs on batches of proteins, by default 50 million amino acids each (`--kofamscan_batchsize`), so a large protein set runs as parallel tasks and an interrupted run only repeats the unfinished batches.
+A batch of the default size takes about 3 to 4 hours with the default 6 CPUs, within the default 8 hour time limit for `KOFAMSCAN_SCAN`; raise the time limit too if you raise the batch size.
 KO assignments do not depend on the batch size, but the reported E-values do, since they scale with the number of sequences searched.
 
 :::note
