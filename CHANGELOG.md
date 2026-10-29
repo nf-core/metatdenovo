@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#599](https://github.com/nf-core/metatdenovo/pull/599) - Reference database versions, or retrieval dates where a database has no version, are reported with the software versions, closes [#184](https://github.com/nf-core/metatdenovo/issues/184) (@danilodileo)
 - [#597](https://github.com/nf-core/metatdenovo/pull/597) - Diamond taxonomy runs on batches of proteins, in parallel and resumable per batch (`--diamond_batchsize`); its raw output in `diamond_taxonomy/` is now one file per batch (@erikrikarddaniel)
-- [#589](https://github.com/nf-core/metatdenovo/pull/589) - KofamScan runs on batches of proteins, in parallel and resumable per batch (`--kofamscan_batchsize`) (@erikrikarddaniel)
+- [#589](https://github.com/nf-core/metatdenovo/pull/589) - KofamScan runs on batches of proteins, in parallel and resumable per batch (`--kofamscan_batchsize`); batching makes KofamScan's reported E-values depend on the batch size, so they are no longer comparable to earlier releases' or to a run using a different `--kofamscan_batchsize`, see [#591](https://github.com/nf-core/metatdenovo/issues/591) (@erikrikarddaniel)
 - [#593](https://github.com/nf-core/metatdenovo/pull/593) - Add InterProScan annotation, Pfam and PANTHER by default (`--interproscan_applications`), batched with `--interproscan_batchsize` and skipped with `--skip_interproscan`, addresses [#413](https://github.com/nf-core/metatdenovo/issues/413) (@danilodileo, reviewed by @erikrikarddaniel)
 - [#526](https://github.com/nf-core/metatdenovo/pull/526) - Add `--save_parquet` to also write every `summary_tables/` tsv as Parquet, alongside the default gzipped TSV, using the shared `nf-core/modules` component `duckdb/table2parquet` (ported from nf-core/magmap). Off by default; the TSVs are unaffected either way, addresses [#473](https://github.com/nf-core/metatdenovo/issues/473) (@erikrikarddaniel)
 - [#506](https://github.com/nf-core/metatdenovo/pull/506) - Add a `-stub` pipeline test (`test_stub`) covering multiple ORF callers with every annotation tool enabled at once, catching channel-wiring bugs that the per-tool test profiles can't afford to run for real, addresses [#476](https://github.com/nf-core/metatdenovo/issues/476) (@erikrikarddaniel)
@@ -37,6 +37,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Changed`
 
+- [#614](https://github.com/nf-core/metatdenovo/pull/614) - Template updated to nf-core/tools 4.2.1 and FastQC updated to 0.13.0 (@erikrikarddaniel)
+- [#609](https://github.com/nf-core/metatdenovo/pull/609) - The default `--kofamscan_batchsize` is 50 million residues, so a KofamScan batch finishes within the default time limit (@erikrikarddaniel)
 - [#608](https://github.com/nf-core/metatdenovo/pull/608) - `--save_parquet` reads `NA` as missing, so missing values are NULL in the Parquet tables instead of the text `NA`, and an `NA` in a numeric column no longer fails or turns the column into text (@erikrikarddaniel)
 
 ### `Fixed`
@@ -51,8 +53,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Dependencies`
 
-| Tool | Previous version | New version |
-| ---- | ---------------- | ----------- |
+| Tool   | Previous version | New version |
+| ------ | ---------------- | ----------- |
+| fastqc | 0.12.1           | 0.13.0      |
 
 ### `Deprecated`
 

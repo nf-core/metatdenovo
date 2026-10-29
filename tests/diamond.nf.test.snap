@@ -49,7 +49,7 @@
                     "diamond": "2.2.1"
                 },
                 "FASTQC": {
-                    "fastqc": "0.12.1"
+                    "fastqc": "0.13.0"
                 },
                 "FEATURECOUNTS_CDS": {
                     "subread": "2.1.1"
