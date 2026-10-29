@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Changed`
 
+- [#614](https://github.com/nf-core/metatdenovo/pull/614) - Template updated to nf-core/tools 4.2.1 and FastQC updated to 0.13.0 (@erikrikarddaniel)
 - [#608](https://github.com/nf-core/metatdenovo/pull/608) - `--save_parquet` reads `NA` as missing, so missing values are NULL in the Parquet tables instead of the text `NA`, and an `NA` in a numeric column no longer fails or turns the column into text (@erikrikarddaniel)
 
 ### `Fixed`
@@ -50,8 +51,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Dependencies`
 
-| Tool | Previous version | New version |
-| ---- | ---------------- | ----------- |
+| Tool   | Previous version | New version |
+| ------ | ---------------- | ----------- |
+| fastqc | 0.12.1           | 0.13.0      |
 
 ### `Deprecated`
 
