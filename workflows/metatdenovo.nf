@@ -830,8 +830,7 @@ workflow METATDENOVO {
         DBCAN( ch_protein, ch_fcs_for_summary )
         ch_merge_tables   = ch_merge_tables.mix ( DBCAN.out.sumtable )
         ch_parquet_tables = ch_parquet_tables.mix( DBCAN.out.cazyme_annotation.map { _meta, tsv -> tsv } )
-        // dbCAN's own database output has no version/release tag (it's always "latest" from its
-        // built-in default mirror), so record what IS knowable: the date this local copy was obtained.
+        // dbCAN has no release tag: record the date of the local copy.
         ch_db_versions = ch_db_versions.mix(
             DBCAN.out.database.map { dbcan_db ->
                 [ 'RUNDBCAN_CAZYMEANNOTATION', 'dbcan_db', "source=run_dbcan database (built-in default mirror); retrieved=${new Date(dbcan_db.lastModified()).format('yyyy-MM-dd')}" ]
