@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Added`
 
+- [#599](https://github.com/nf-core/metatdenovo/pull/599) - Reference database versions, or retrieval dates where a database has no version, are reported with the software versions, closes [#184](https://github.com/nf-core/metatdenovo/issues/184) (@danilodileo)
 - [#597](https://github.com/nf-core/metatdenovo/pull/597) - Diamond taxonomy runs on batches of proteins, in parallel and resumable per batch (`--diamond_batchsize`); its raw output in `diamond_taxonomy/` is now one file per batch (@erikrikarddaniel)
 - [#589](https://github.com/nf-core/metatdenovo/pull/589) - KofamScan runs on batches of proteins, in parallel and resumable per batch (`--kofamscan_batchsize`); batching makes KofamScan's reported E-values depend on the batch size, so they are no longer comparable to earlier releases' or to a run using a different `--kofamscan_batchsize`, see [#591](https://github.com/nf-core/metatdenovo/issues/591) (@erikrikarddaniel)
 - [#593](https://github.com/nf-core/metatdenovo/pull/593) - Add InterProScan annotation, Pfam and PANTHER by default (`--interproscan_applications`), batched with `--interproscan_batchsize` and skipped with `--skip_interproscan`, addresses [#413](https://github.com/nf-core/metatdenovo/issues/413) (@danilodileo, reviewed by @erikrikarddaniel)

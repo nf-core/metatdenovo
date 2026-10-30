@@ -63,4 +63,5 @@ workflow KOFAMSCAN {
     kofam_table_tsv   = KOFAMSCAN_FORMAT.out.kofamtsv
     kofam_table_uniq  = KOFAMSCAN_UNIQUE.out.kofamuniq
     kofamscan_summary = KOFAMSCAN_SUM.out.kofamscan_summary
+    ko_list           = KOFAMSCAN_DOWNLOAD.out.ko_list // path: the KO list file, for version provenance
 }

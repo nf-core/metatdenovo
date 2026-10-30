@@ -94,6 +94,15 @@ include { UTILS_NEXTFLOW_PIPELINE                    } from '../subworkflows/nf-
 include { UTILS_NFCORE_PIPELINE                      } from '../subworkflows/nf-core/utils_nfcore_pipeline/'
 include { methodsDescriptionText                     } from '../subworkflows/local/utils_nfcore_metatdenovo_pipeline'
 
+// EUKulele writes its Diamond index into the reference dir, so the directory mtime is not the download date.
+def eukuleleDbOldestMtime(dir) {
+    if (dir.isDirectory()) {
+        def entries = dir.listFiles()
+        return entries ? entries.collect { f -> eukuleleDbOldestMtime(f) }.min() : dir.lastModified()
+    }
+    dir.lastModified()
+}
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN MAIN WORKFLOW
@@ -212,6 +221,7 @@ workflow METATDENOVO {
 
     def ch_versions = channel.empty()
     def ch_multiqc_files = channel.empty()
+    def ch_db_versions = channel.empty()
 
     // DL: I'm not sure which parts are still required after nf-schema. The branch { } certainly is needed.
     def ch_fastq = ch_samplesheet
@@ -534,6 +544,13 @@ workflow METATDENOVO {
             params.metaeuk_db_name,
             params.metaeuk_batchsize
         )
+        // database is a file or a directory; only `metaeuk databases` writes a *.version file, into a directory.
+        ch_db_versions = ch_db_versions.mix(
+            METAEUK.out.database.map { database ->
+                def version_file = database instanceof Path && database.isDirectory() ? database.listFiles().find { f -> f.name.endsWith('.version') } : null
+                [ 'METAEUK_EASYPREDICT', 'metaeuk_db', version_file ? version_file.text.trim() : 'unknown' ]
+            }
+        )
         ch_protein = ch_protein.mix(METAEUK.out.faa)
 
         ch_gff_gz  = ch_gff_gz.mix(METAEUK.out.gff)
@@ -686,35 +703,6 @@ workflow METATDENOVO {
     FEATURECOUNTS_CDS ( ch_featurecounts)
 
     //
-    // Collate and save software versions
-    //
-    def topic_versions = channel.topic("versions")
-        .distinct()
-        .branch { entry ->
-            versions_file: entry instanceof Path
-            versions_tuple: true
-        }
-
-    def topic_versions_string = topic_versions.versions_tuple
-        .map { process, tool, version ->
-            [ process[process.lastIndexOf(':')+1..-1], "  ${tool}: ${version}" ]
-        }
-        .groupTuple(by:0)
-        .map { process, tool_versions ->
-            tool_versions.unique().sort()
-            "${process}:\n${tool_versions.join('\n')}"
-        }
-
-    def ch_collated_versions = softwareVersionsToYAML(ch_versions.mix(topic_versions.versions_file))
-        .mix(topic_versions_string)
-        .collectFile(
-            storeDir: "${outdir}/pipeline_info",
-            name: 'nf_core_'  +  'metatdenovo_software_'  + 'mqc_'  + 'versions.yml',
-            sort: true,
-            newLine: true
-        )
-
-    //
     // MODULE: Collect featurecounts output counts in one table
     //
     def ch_collect_feature = FEATURECOUNTS_CDS.out.counts
@@ -821,6 +809,12 @@ workflow METATDENOVO {
         ch_parquet_tables = ch_parquet_tables
             .mix( KOFAMSCAN.out.kofam_table_tsv.map { _meta, tsv -> tsv } )
             .mix( KOFAMSCAN.out.kofam_table_uniq.map { _meta, tsv -> tsv } )
+        // KEGG has no release tag: record the source and the date of the local copy.
+        ch_db_versions = ch_db_versions.mix(
+            KOFAMSCAN.out.ko_list.map { ko_list ->
+                [ 'KOFAMSCAN_SCAN', 'kofamscan_db', "source=${params.kofam_ko_list_url}; retrieved=${new Date(ko_list.lastModified()).format('yyyy-MM-dd')}" ]
+            }
+        )
     }
 
     //
@@ -830,6 +824,12 @@ workflow METATDENOVO {
         DBCAN( ch_protein, ch_fcs_for_summary )
         ch_merge_tables   = ch_merge_tables.mix ( DBCAN.out.sumtable )
         ch_parquet_tables = ch_parquet_tables.mix( DBCAN.out.cazyme_annotation.map { _meta, tsv -> tsv } )
+        // dbCAN has no release tag: record the date of the local copy.
+        ch_db_versions = ch_db_versions.mix(
+            DBCAN.out.database.map { dbcan_db ->
+                [ 'RUNDBCAN_CAZYMEANNOTATION', 'dbcan_db', "source=run_dbcan database (built-in default mirror); retrieved=${new Date(dbcan_db.lastModified()).format('yyyy-MM-dd')}" ]
+            }
+        )
     }
 
     //
@@ -879,6 +879,13 @@ workflow METATDENOVO {
 
         ch_merge_tables   = ch_merge_tables.mix(EUKULELE.out.taxonomy_summary)
         ch_parquet_tables = ch_parquet_tables.mix( EUKULELE.out.tax.map { _meta, tsv -> tsv } )
+
+        // Not EUKULELE_SEARCH: its versions.yml would replace a tuple under the same key.
+        ch_db_versions = ch_db_versions.mix(
+            ch_eukulele_db.map { db, directory ->
+                [ 'EUKULELE_DB', 'eukulele_db', "source=${db ?: 'user-provided'}; retrieved=${new Date(eukuleleDbOldestMtime(directory)).format('yyyy-MM-dd')}" ]
+            }
+        )
     }
 
     //
@@ -948,6 +955,37 @@ workflow METATDENOVO {
                 .map { tsv -> [ [ id: tsv.name.replaceAll(/\.tsv(\.gz)?$/, '') ], tsv ] }
         )
     }
+
+    //
+    // Collate and save software versions
+    //
+    // Must come after the last mix into ch_versions or ch_db_versions.
+    def topic_versions = channel.topic("versions")
+        .distinct()
+        .branch { entry ->
+            versions_file: entry instanceof Path
+            versions_tuple: true
+        }
+
+    def topic_versions_string = topic_versions.versions_tuple
+        .mix(ch_db_versions)
+        .map { process, tool, version ->
+            [ process[process.lastIndexOf(':')+1..-1], "  ${tool}: ${version}" ]
+        }
+        .groupTuple(by:0)
+        .map { process, tool_versions ->
+            tool_versions.unique().sort()
+            "${process}:\n${tool_versions.join('\n')}"
+        }
+
+    def ch_collated_versions = softwareVersionsToYAML(ch_versions.mix(topic_versions.versions_file))
+        .mix(topic_versions_string)
+        .collectFile(
+            storeDir: "${outdir}/pipeline_info",
+            name: 'nf_core_'  +  'metatdenovo_software_'  + 'mqc_'  + 'versions.yml',
+            sort: true,
+            newLine: true
+        )
 
     //
     // MODULE: MultiQC

@@ -42,5 +42,8 @@ output:
       type: file
       description: File containing software versions
       pattern: "versions.yml"
+  - ko_list:
+      type: file
+      description: The downloaded KO list file, for database version provenance
 authors:
   - "@danilodileo"
