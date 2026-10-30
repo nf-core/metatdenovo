@@ -887,12 +887,10 @@ workflow METATDENOVO {
         ch_merge_tables   = ch_merge_tables.mix(EUKULELE.out.taxonomy_summary)
         ch_parquet_tables = ch_parquet_tables.mix( EUKULELE.out.tax.map { _meta, tsv -> tsv } )
 
-        // Keyed under a process name with no versions.yml of its own: EUKULELE_SEARCH already
-        // writes one for the eukulele tool itself, and a second entry under the same key would
-        // make the two collide, with only the last-written one surviving.
+        // Not EUKULELE_SEARCH: its versions.yml would replace a tuple under the same key.
         ch_db_versions = ch_db_versions.mix(
             ch_eukulele_db.map { db, directory ->
-                [ 'EUKULELE_DB', 'eukulele_db', "${db ?: 'user-provided'} (retrieved=${new Date(eukuleleDbOldestMtime(directory)).format('yyyy-MM-dd')})" ]
+                [ 'EUKULELE_DB', 'eukulele_db', "source=${db ?: 'user-provided'}; retrieved=${new Date(eukuleleDbOldestMtime(directory)).format('yyyy-MM-dd')}" ]
             }
         )
     }
