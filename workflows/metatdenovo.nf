@@ -968,9 +968,7 @@ workflow METATDENOVO {
     //
     // Collate and save software versions
     //
-    // Moved here, after every subworkflow that contributes to ch_versions or ch_db_versions has
-    // run: `def x = ...; x = x.mix(...)` rebinds x to a new channel, so a use of x captured before
-    // a later mix wouldn't see it.
+    // Must come after the last mix into ch_versions or ch_db_versions.
     def topic_versions = channel.topic("versions")
         .distinct()
         .branch { entry ->
