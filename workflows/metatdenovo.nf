@@ -814,8 +814,7 @@ workflow METATDENOVO {
         ch_parquet_tables = ch_parquet_tables
             .mix( KOFAMSCAN.out.kofam_table_tsv.map { _meta, tsv -> tsv } )
             .mix( KOFAMSCAN.out.kofam_table_uniq.map { _meta, tsv -> tsv } )
-        // KEGG's FTP mirror has no release/date field of its own, so record what IS knowable:
-        // the source URL and the date this local copy was obtained, from ko_list's mtime.
+        // KEGG has no release tag: record the source and the date of the local copy.
         ch_db_versions = ch_db_versions.mix(
             KOFAMSCAN.out.ko_list.map { ko_list ->
                 [ 'KOFAMSCAN_SCAN', 'kofamscan_db', "source=${params.kofam_ko_list_url}; retrieved=${new Date(ko_list.lastModified()).format('yyyy-MM-dd')}" ]
