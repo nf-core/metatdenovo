@@ -223,9 +223,6 @@ workflow METATDENOVO {
 
     def ch_versions = channel.empty()
     def ch_multiqc_files = channel.empty()
-    // Database provenance tuples built here, not in patched nf-core/modules components -- a patch
-    // has to be carried through every `nf-core modules update`, which is too costly just to report
-    // a version. Mixed into topic_versions.versions_tuple once every contributor below has run.
     def ch_db_versions = channel.empty()
 
     // DL: I'm not sure which parts are still required after nf-schema. The branch { } certainly is needed.
