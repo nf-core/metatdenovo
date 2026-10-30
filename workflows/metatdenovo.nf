@@ -94,9 +94,7 @@ include { UTILS_NEXTFLOW_PIPELINE                    } from '../subworkflows/nf-
 include { UTILS_NFCORE_PIPELINE                      } from '../subworkflows/nf-core/utils_nfcore_pipeline/'
 include { methodsDescriptionText                     } from '../subworkflows/local/utils_nfcore_metatdenovo_pipeline'
 
-// EUKulele writes its own Diamond index into the reference dir it's given (#585), so the
-// directory's own mtime is the index build date, not the download. The oldest file in the
-// tree predates any such run.
+// EUKulele writes its Diamond index into the reference dir, so the directory mtime is not the download date.
 def eukuleleDbOldestMtime(dir) {
     if (dir.isDirectory()) {
         def entries = dir.listFiles()
