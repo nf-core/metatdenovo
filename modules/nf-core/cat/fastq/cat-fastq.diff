@@ -4,7 +4,7 @@ Changes in component 'nf-core/cat/fastq'
 Changes in 'cat/fastq/main.nf':
 --- modules/nf-core/cat/fastq/main.nf
 +++ modules/nf-core/cat/fastq/main.nf
-@@ -19,12 +19,17 @@
+@@ -22,12 +22,17 @@
  
      script:
      def prefix = task.ext.prefix ?: "${meta.id}"
@@ -25,7 +25,7 @@ Changes in 'cat/fastq/main.nf':
              """
          } else {
              error("Could not find any FASTQ files to concatenate in the process input")
-@@ -36,31 +41,20 @@
+@@ -39,31 +44,20 @@
              def read2 = []
              readList.eachWithIndex { v, ix -> (ix & 1 ? read2 : read1) << v }
              """
@@ -72,6 +72,6 @@ Changes in 'cat/fastq/main.nf':
          } else {
              error("Could not find any FASTQ file pairs to concatenate in the process input")
 
-'modules/nf-core/cat/fastq/tests/main.nf.test' is unchanged
 'modules/nf-core/cat/fastq/tests/main.nf.test.snap' is unchanged
+'modules/nf-core/cat/fastq/tests/main.nf.test' is unchanged
 ************************************************************

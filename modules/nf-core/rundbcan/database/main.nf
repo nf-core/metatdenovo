@@ -1,12 +1,15 @@
+// Copyright (c) the nf-core community under an open-source MIT license.
+// See https://github.com/nf-core/modules for full license, file patching instructions and upstream contributing.
+
 process RUNDBCAN_DATABASE {
     label 'process_low'
 
     conda "${moduleDir}/environment.yml"
     // storeDir can point at an s3:// path; Nextflow's AWS Batch executor stages that copy by
     // shelling out to `aws` inside the task's own container, which the plain dbcan image lacks.
-    container "${ workflow.containerEngine in ['singularity', 'apptainer'] && !task.ext.singularity_pull_docker_container ?
-        'oras://community.wave.seqera.io/library/dbcan_awscli:6aa905a698f38e78' :
-        'community.wave.seqera.io/library/dbcan_awscli:ef0587e28e88d850' }"
+    container "${workflow.containerEngine in ['singularity', 'apptainer'] && !task.ext.singularity_pull_docker_container
+        ? 'oras://community.wave.seqera.io/library/dbcan_awscli:6aa905a698f38e78'
+        : 'community.wave.seqera.io/library/dbcan_awscli:ef0587e28e88d850'}"
 
     output:
     path "dbcan_db", emit: dbcan_db

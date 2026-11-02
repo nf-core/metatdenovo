@@ -1,4 +1,5 @@
 Changes in component 'nf-core/megahit'
+'modules/nf-core/megahit/environment.yml' is unchanged
 Changes in 'megahit/meta.yml':
 --- modules/nf-core/megahit/meta.yml
 +++ modules/nf-core/megahit/meta.yml
@@ -20,7 +21,7 @@ Changes in 'megahit/meta.yml':
 Changes in 'megahit/main.nf':
 --- modules/nf-core/megahit/main.nf
 +++ modules/nf-core/megahit/main.nf
-@@ -8,6 +8,7 @@
+@@ -11,6 +11,7 @@
  
      input:
      tuple val(meta), path(reads1), path(reads2)
@@ -28,7 +29,7 @@ Changes in 'megahit/main.nf':
  
      output:
      tuple val(meta), path("*.contigs.fa.gz")                            , emit: contigs
-@@ -25,12 +26,16 @@
+@@ -28,12 +29,16 @@
      def args = task.ext.args ?: ''
      def args2 = task.ext.args2 ?: ''
      def prefix = task.ext.prefix ?: "${meta.id}"
@@ -47,7 +48,6 @@ Changes in 'megahit/main.nf':
  
      pigz \\
 
-'modules/nf-core/megahit/environment.yml' is unchanged
 'modules/nf-core/megahit/tests/main.nf.test.snap' is unchanged
 'modules/nf-core/megahit/tests/main.nf.test' is unchanged
 ************************************************************
