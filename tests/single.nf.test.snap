@@ -41,11 +41,11 @@
                     "stringr": "1.6.0"
                 },
                 "CUSTOM_COLLECTSTATS": {
-                    "R": "4.3.1",
-                    "dplyr": "1.1.4",
+                    "R": "4.5.3",
+                    "dplyr": "1.2.1",
                     "purrr": "1.1.0",
-                    "readr": "2.1.5",
-                    "stringr": "1.5.2",
+                    "readr": "2.2.0",
+                    "stringr": "1.6.0",
                     "tidyr": "1.3.1"
                 },
                 "FASTQC": {
@@ -82,19 +82,19 @@
                     "quast": "5.3.0"
                 },
                 "SAMTOOLS_FLAGSTAT": {
-                    "samtools": 1.24
+                    "samtools": 1.25
                 },
                 "SAMTOOLS_IDXSTATS": {
-                    "samtools": 1.24
+                    "samtools": 1.25
                 },
                 "SAMTOOLS_INDEX": {
-                    "samtools": 1.24
+                    "samtools": 1.25
                 },
                 "SAMTOOLS_SORT": {
-                    "samtools": 1.24
+                    "samtools": 1.25
                 },
                 "SAMTOOLS_STATS": {
-                    "samtools": 1.24
+                    "samtools": 1.25
                 },
                 "SEQTK_MERGEPE": {
                     "seqtk": "1.4-r122"
@@ -253,10 +253,10 @@
                 "sample\tn_post_trimming\tn_non_contaminated\tidxs_n_mapped\tidxs_n_unmapped\tUnassigned_Ambiguity\tUnassigned_Chimera\tUnassigned_Duplicate\tUnassigned_FragmentLength\tUnassigned_MappingQuality\tUnassigned_MultiMapping\tUnassigned_NoFeatures\tUnassigned_NonSplit\tUnassigned_Overlapping_Length\tUnassigned_Read_Type\tUnassigned_Secondary\tUnassigned_Singleton\tUnassigned_Unmapped\tprodigal"
             ]
         ],
+        "timestamp": "2026-11-02T15:39:23.750361",
         "meta": {
-            "nf-test": "0.9.3",
-            "nextflow": "25.10.4"
-        },
-        "timestamp": "2026-09-15T17:52:47.331518"
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
     }
 }
