@@ -78,7 +78,7 @@
                     },
                     "hmmer/hmmrank": {
                         "branch": "master",
-                        "git_sha": "7b3452a23773f687ededb4befd037920e5a51341",
+                        "git_sha": "f2bed902e13076698e7d59d1fedf5c083f6f17c0",
                         "installed_by": ["modules"]
                     },
                     "hmmer/hmmsearch": {
