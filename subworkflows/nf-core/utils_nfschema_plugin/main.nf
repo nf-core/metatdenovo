@@ -56,7 +56,7 @@ workflow UTILS_NFSCHEMA_PLUGIN {
         summary_options << [parameters_schema: parameters_schema]
     }
     log.info before_text
-    log.info paramsSummaryLog(summary_options)
+    log.info paramsSummaryLog(summary_options, input_workflow)
     log.info after_text
 
     //
