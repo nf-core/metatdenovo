@@ -132,7 +132,7 @@
                     "trimgalore": "2.3.0"
                 },
                 "Workflow": {
-                    "nf-core/metatdenovo": "v2.1.0dev"
+                    "nf-core/metatdenovo": "v2.1.0"
                 }
             },
             [
