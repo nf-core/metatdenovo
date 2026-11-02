@@ -30,4 +30,5 @@ workflow DBCAN {
     emit:
     cazyme_annotation = DBCAN_FORMAT.out.dbcantsv
     sumtable          = DBCAN_SUM.out.dbcan_summary
+    database          = RUNDBCAN_DATABASE.out.dbcan_db // path: the database directory, for version provenance
 }

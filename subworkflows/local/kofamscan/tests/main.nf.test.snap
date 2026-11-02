@@ -2,6 +2,9 @@
     "proteins in several batches - same annotation as one KofamScan run": {
         "content": [
             {
+                "ko_list": [
+                    "ko_list:md5,cc7bf3705f577ff4f9146f1a6bea5fc0"
+                ],
                 "kofam_table_out": [
                     [
                         {
@@ -45,15 +48,18 @@
                 ]
             }
         ],
-        "timestamp": "2026-10-09T15:11:31.836948268",
+        "timestamp": "2026-10-29T11:52:47.710432",
         "meta": {
-            "nf-test": "0.9.4",
+            "nf-test": "0.9.5",
             "nextflow": "26.04.6"
         }
     },
     "proteins in one batch - same annotation as one KofamScan run": {
         "content": [
             {
+                "ko_list": [
+                    "ko_list:md5,cc7bf3705f577ff4f9146f1a6bea5fc0"
+                ],
                 "kofam_table_out": [
                     [
                         {
@@ -94,9 +100,9 @@
                 ]
             }
         ],
-        "timestamp": "2026-10-09T17:15:36.5841113",
+        "timestamp": "2026-10-29T11:53:03.75087",
         "meta": {
-            "nf-test": "0.9.4",
+            "nf-test": "0.9.5",
             "nextflow": "26.04.6"
         }
     }
