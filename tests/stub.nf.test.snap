@@ -76,7 +76,7 @@
                     "R": 4.0
                 },
                 "EUKULELE_DB": {
-                    "eukulele_db": "phylodb (retrieved=[DATE])"
+                    "eukulele_db": "source=phylodb; retrieved=[DATE]"
                 },
                 "EUKULELE_SEARCH": {
                     "eukulele": "2.1.2"
