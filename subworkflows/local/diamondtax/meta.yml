@@ -10,8 +10,8 @@ components:
   - diamond/blastp
   - taxonkit/lineage
   - pigz/compress
-  - diamond/format_tax/ranklist
-  - diamond/format_tax/taxdump
+  - format/diamond/tax/ranklist
+  - format/diamond/tax/taxdump
   - sumtaxonomy
 input:
   - proteins:
