@@ -63,4 +63,27 @@ process CAT_FASTQ {
             error("Could not find any FASTQ file pairs to concatenate in the process input")
         }
     }
+
+    stub:
+    def prefix = task.ext.prefix ?: "${meta.id}"
+    def readList = reads instanceof List ? reads.collect { item -> item.toString() } : [reads.toString()]
+    if (meta.single_end) {
+        if (readList.size >= 1) {
+            """
+            echo '' | gzip > ${prefix}.merged.fastq.gz
+            """
+        } else {
+            error("Could not find any FASTQ files to concatenate in the process input")
+        }
+    }
+    else {
+        if (readList.size >= 2) {
+            """
+            echo '' | gzip > ${prefix}_1.merged.fastq.gz
+            echo '' | gzip > ${prefix}_2.merged.fastq.gz
+            """
+        } else {
+            error("Could not find any FASTQ file pairs to concatenate in the process input")
+        }
+    }
 }

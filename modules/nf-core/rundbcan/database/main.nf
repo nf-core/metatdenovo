@@ -8,7 +8,7 @@ process RUNDBCAN_DATABASE {
     // storeDir can point at an s3:// path; Nextflow's AWS Batch executor stages that copy by
     // shelling out to `aws` inside the task's own container, which the plain dbcan image lacks.
     container "${workflow.containerEngine in ['singularity', 'apptainer'] && !task.ext.singularity_pull_docker_container
-        ? 'oras://community.wave.seqera.io/library/dbcan_awscli:6aa905a698f38e78'
+        ? 'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/16/16fffafdded200123a7ee3b452d4b3d96375670abfbc0922c2e5f778ca7c989c/data'
         : 'community.wave.seqera.io/library/dbcan_awscli:ef0587e28e88d850'}"
 
     output:
