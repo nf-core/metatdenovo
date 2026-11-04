@@ -4,7 +4,7 @@ Changes in component 'nf-core/kofamscan'
 Changes in 'kofamscan/main.nf':
 --- modules/nf-core/kofamscan/main.nf
 +++ modules/nf-core/kofamscan/main.nf
-@@ -13,8 +13,8 @@
+@@ -16,8 +16,8 @@
      path ko_list
  
      output:
@@ -15,7 +15,7 @@ Changes in 'kofamscan/main.nf':
      tuple val("${task.process}"), val('kofamscan'), eval("exec_annotation --version 2>&1 | sed 's/exec_annotation //;'"), topic: versions, emit: versions_kofamscan
  
      when:
-@@ -25,14 +25,24 @@
+@@ -28,14 +28,24 @@
      def prefix = task.ext.prefix ?: "${meta.id}"
      def extension = args.contains("--format detail-tsv") ? "tsv" :
                      "txt"
@@ -41,7 +41,7 @@ Changes in 'kofamscan/main.nf':
      """
  
      stub:
-@@ -42,5 +52,7 @@
+@@ -45,5 +55,7 @@
                      "txt"
      """
      touch ${prefix}.${extension}

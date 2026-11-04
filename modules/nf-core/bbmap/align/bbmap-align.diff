@@ -4,7 +4,7 @@ Changes in component 'nf-core/bbmap/align'
 Changes in 'bbmap/align/main.nf':
 --- modules/nf-core/bbmap/align/main.nf
 +++ modules/nf-core/bbmap/align/main.nf
-@@ -38,6 +38,13 @@
+@@ -57,6 +57,13 @@
          db = "ref=${ref}"
      }
  
@@ -18,15 +18,15 @@ Changes in 'bbmap/align/main.nf':
      """
      bbmap.sh \\
          $db \\
-@@ -45,7 +52,7 @@
-         out=${prefix}.bam \\
+@@ -64,7 +71,7 @@
+         $output \\
          $args \\
          threads=$task.cpus \\
 -        -Xmx${task.memory.toGiga()}g \\
 +        $memory \\
          &> ${prefix}.bbmap.log
-     """
-     stub:
+ 
+     ${check_outputs}
 
 'modules/nf-core/bbmap/align/tests/main.nf.test.snap' is unchanged
 'modules/nf-core/bbmap/align/tests/nextflow.config' is unchanged

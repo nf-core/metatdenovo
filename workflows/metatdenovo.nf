@@ -602,7 +602,7 @@ workflow METATDENOVO {
         .collectFile(name: "${assembly_name}.combined.bed", sort: true)
         .map { bed -> [ [ id: "${assembly_name}.locus_consolidate", caller: 'locus_consolidate' ], bed ] }
 
-    BEDTOOLS_SORT ( ch_locus_bed, [] )
+    BEDTOOLS_SORT ( ch_locus_bed, [], [] )
     FORMAT_LOCUSCONSOLIDATE ( BEDTOOLS_SORT.out.sorted )
 
     ch_gff = ch_gff.mix(FORMAT_LOCUSCONSOLIDATE.out.gff)
@@ -660,7 +660,7 @@ workflow METATDENOVO {
     //
     // MODULE: Call BBMap with the index once per sample
     //
-    BBMAP_ALIGN ( ch_clean_reads, BBMAP_INDEX.out.index )
+    BBMAP_ALIGN ( ch_clean_reads, BBMAP_INDEX.out.index, [ [], [], false ] )
 
     //
     // SUBWORKFLOW: classify ORFs with a set of hmm files
