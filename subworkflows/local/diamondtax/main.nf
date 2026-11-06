@@ -5,8 +5,8 @@
 include { DIAMOND_BLASTP as DIAMOND_TAXONOMY         } from '../../../modules/nf-core/diamond/blastp/main'
 include { TAXONKIT_LINEAGE                           } from '../../../modules/nf-core/taxonkit/lineage/main'
 include { PIGZ_COMPRESS as PIGZ_DIAMOND_LINEAGE      } from '../../../modules/nf-core/pigz/compress/main'
-include { FORMAT_DIAMOND_TAX_RANKLIST                } from '../../../modules/local/diamond/format_tax/ranklist/main'
-include { FORMAT_DIAMOND_TAX_TAXDUMP                 } from '../../../modules/local/diamond/format_tax/taxdump/main'
+include { FORMAT_DIAMOND_TAX_RANKLIST                } from '../../../modules/local/format/diamond/tax/ranklist/main'
+include { FORMAT_DIAMOND_TAX_TAXDUMP                 } from '../../../modules/local/format/diamond/tax/taxdump/main'
 include { SUMTAXONOMY as SUM_DIAMONDTAX              } from '../../../modules/local/sumtaxonomy/main'
 
 workflow DIAMONDTAX {
