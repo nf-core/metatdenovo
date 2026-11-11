@@ -1,6 +1,4 @@
 Changes in component 'nf-core/bbmap/bbduk'
-'modules/nf-core/bbmap/bbduk/environment.yml' is unchanged
-'modules/nf-core/bbmap/bbduk/main.nf.orig' was created
 Changes in 'bbmap/bbduk/meta.yml':
 --- modules/nf-core/bbmap/bbduk/meta.yml
 +++ modules/nf-core/bbmap/bbduk/meta.yml
@@ -79,8 +77,7 @@ Changes in 'bbmap/bbduk/main.nf':
      """
  }
 
-'modules/nf-core/bbmap/bbduk/tests/main.nf.test.snap' is unchanged
-'modules/nf-core/bbmap/bbduk/tests/nextflow_no_save_removed.config' was created
+'modules/nf-core/bbmap/bbduk/environment.yml' is unchanged
 Changes in 'bbmap/bbduk/tests/nextflow.config':
 --- modules/nf-core/bbmap/bbduk/tests/nextflow.config
 +++ modules/nf-core/bbmap/bbduk/tests/nextflow.config
@@ -93,6 +90,8 @@ Changes in 'bbmap/bbduk/tests/nextflow.config':
  
  }
 
+'modules/nf-core/bbmap/bbduk/tests/main.nf.test.snap' is unchanged
+'modules/nf-core/bbmap/bbduk/tests/nextflow_no_save_removed.config' was created
 Changes in 'bbmap/bbduk/tests/main.nf.test':
 --- modules/nf-core/bbmap/bbduk/tests/main.nf.test
 +++ modules/nf-core/bbmap/bbduk/tests/main.nf.test
