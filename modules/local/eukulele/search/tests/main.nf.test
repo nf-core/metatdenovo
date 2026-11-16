@@ -1,0 +1,87 @@
+nextflow_process {
+
+    name "Test Process EUKULELE_SEARCH"
+    script "../main.nf"
+    process "EUKULELE_SEARCH"
+
+    tag "modules"
+    tag "modules_local"
+    tag "eukulele"
+    tag "eukulele/search"
+
+    // 20 random proteins serve as both reference and query; protein pN belongs to source S(N % 4).
+    // sourceIdColumn names the taxonomy table's id column, which EUKulele requires to be Source_ID.
+    def inputs = { String sourceIdColumn ->
+        """
+        def rng  = new Random(1)
+        def aa   = 'ACDEFGHIKLMNPQRSTVWY'
+        def seqs = (0..<20).collect { i -> 'M' + (1..250).collect { aa[rng.nextInt(20)] }.join('') }
+
+        def db = file("\${workDir}/eukdb")
+        db.mkdirs()
+        db.resolve('reference.pep.fa').text = seqs.withIndex().collect { s, i -> ">p\${i}\\n\${s}\\n" }.join('')
+        db.resolve('prot-map.json').text = '{' + (0..<20).collect { i -> "\\"p\${i}\\": \\"S\${i % 4}\\"" }.join(', ') + '}'
+        db.resolve('tax-table.txt').text = (
+            [ "\\tDomain\\tSupergroup\\tDivision\\tClass\\tOrder\\tFamily\\tGenus\\tSpecies\\t${sourceIdColumn}" ] +
+            (0..<4).collect { s -> "\${s}\\tEukaryota\\tSAR\\tOchrophyta\\tBacillariophyta\\tO\${s}\\tF\${s}\\tG\${s}\\tG\${s}_sp\\tS\${s}" }
+        ).join('\\n') + '\\n'
+
+        def faa = file("\${workDir}/test.faa")
+        faa.text = seqs.withIndex().collect { s, i -> ">q\${i}\\n\${s}\\n" }.join('')
+
+        input[0] = [ [ id:'test' ], faa, '', db ]
+        """
+    }
+
+    test("custom database - every protein gets its own species") {
+
+        when {
+            process { inputs('Source_ID') }
+        }
+
+        then {
+            def estimation = path(process.out.taxonomy_estimation[0][1]).linesGzip
+                .drop(1)
+                .collect { line -> line.split('\t') }
+                .collectEntries { f -> [ (f[1]): f[4] ] }
+            assertAll(
+                { assert process.success },
+                { assert estimation.size() == 20 },
+                { assert estimation == (0..<20).collectEntries { i -> [ ("q${i}".toString()): "G${i % 4}_sp".toString() ] } },
+                // EUKulele's counts tables change column order between runs
+                { assert snapshot(sanitizeOutput(process.out, unstableKeys: ["taxonomy_counts"])).match() }
+            )
+        }
+    }
+
+    test("taxonomy table without Source_ID - fails with EUKulele's own error") {
+
+        when {
+            process { inputs('Something') }
+        }
+
+        then {
+            assertAll(
+                { assert process.failed },
+                { assert process.exitStatus == 1 },
+                { assert process.errorReport.contains("has no attribute 'source_id'") }
+            )
+        }
+    }
+
+    test("custom database - stub") {
+
+        options "-stub"
+
+        when {
+            process { inputs('Source_ID') }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(sanitizeOutput(process.out)).match() }
+            )
+        }
+    }
+}
