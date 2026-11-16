@@ -3,7 +3,28 @@ Changes in component 'nf-core/utils_nfschema_plugin'
 Changes in 'utils_nfschema_plugin/main.nf':
 --- subworkflows/nf-core/utils_nfschema_plugin/main.nf
 +++ subworkflows/nf-core/utils_nfschema_plugin/main.nf
-@@ -56,7 +56,7 @@
+@@ -31,7 +31,6 @@
+ 
+     if(help || help_full) {
+         help_options = [
+-            parameter: (help instanceof String && help != "true") ? help : null,
+             beforeText: before_text,
+             afterText: after_text,
+             command: command,
+@@ -41,8 +40,10 @@
+         if(parameters_schema) {
+             help_options << [parameters_schema: parameters_schema]
+         }
+-
+-        log.info paramsHelp(help_options)
++        log.info paramsHelp(
++            help_options,
++            (help instanceof String && help != "true") ? help : "",
++        )
+         exit 0
+     }
+ 
+@@ -56,7 +57,7 @@
          summary_options << [parameters_schema: parameters_schema]
      }
      log.info before_text
