@@ -3,7 +3,7 @@ bbmap/bbduk/*.fastq.gz
 bbmap/bbduk/*.matched.fq.gz
 bbmap/bbduk/*.bbduk.log
 bbmap/bbnorm/all_samples.bbnorm.log
-bbmap/bbmap/*.log
+bbmap/bbmap/*.{bam,log}
 bbmap/logs/*.log
 fastqc/*_fastqc.{html,zip}
 diamond_taxonomy/*.tsv.gz
