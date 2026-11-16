@@ -59,7 +59,7 @@ Local modules with nontrivial logic have their own `tests/main.nf.test`, with th
 - MEGAHIT output differs between runs and has no seed. Snapshot entries that depend on the assembly can fail intermittently.
 - CLI parameters arrive as strings, and `'false'` is truthy. Give a boolean or numeric parameter a type in the `params {}` block of `main.nf` if code tests or compares its value.
 - A parameter typed there without `?` is required: Nextflow 26.10 stops at launch if it has no value. Declare optional ones nullable, e.g. `Integer?`.
-- featureCounts crashes on a BAM header over 2 GiB, about 75 million contigs. `SAMTOOLS_TRIMHEADER` handles this case.
+- featureCounts crashes when the binary BAM header, the header text plus the contig list, reaches 2 GiB: about 40 million contigs. `SAMTOOLS_TRIMHEADER` handles this case.
 - Container awk is mawk or busybox awk, not gawk. Test awk in module scripts in the container, and avoid apostrophes inside `awk '...'`, comments included.
 - CI runs on 4-cpu runners. Local timings on a larger machine do not carry over.
 - Conda and Singularity tests run only on pull requests to `master`.
