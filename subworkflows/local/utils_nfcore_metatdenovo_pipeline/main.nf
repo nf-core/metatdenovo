@@ -186,7 +186,7 @@ workflow PIPELINE_COMPLETION {
                 plaintext_email,
                 outdir,
                 _monochrome_logs,
-                multiqc_reports.getVal(),
+                multiqc_reports.isBound() ? multiqc_reports.getVal() : [],
             )
         }
 
@@ -228,31 +228,6 @@ def validateInputSamplesheet(input) {
     return [ metas[0], fastqs ]
 }
 
-//
-// CLI params arrive as strings ('false' is truthy) and nf-schema does not coerce `params` itself.
-//
-def typecastBooleanParam(String name) {
-    def value = params.get(name)
-    if (value instanceof Boolean) {
-        return value
-    }
-    def s = value.toString()
-    if (s == 'true')  { return true }
-    if (s == 'false') { return false }
-    error("--${name} must be true or false, got '${value}'")
-}
-
-def typecastIntegerParam(String name) {
-    def value = params.get(name)
-    if (value instanceof Integer) {
-        return value
-    }
-    try {
-        return value.toString().toInteger()
-    } catch (NumberFormatException _e) {
-        error("--${name} must be an integer, got '${value}'")
-    }
-}
 //
 // Generate methods description for MultiQC
 //

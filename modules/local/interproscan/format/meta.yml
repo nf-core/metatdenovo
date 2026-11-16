@@ -1,0 +1,62 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "interproscan_format"
+description: Add a header row to InterProScan's raw TSV output and reformat it into a summary-table-ready TSV
+keywords:
+  - interproscan
+  - format
+tools:
+  - "gzip":
+      description: Compression utility
+      homepage: https://www.gnu.org/software/gzip/
+      documentation: https://www.gnu.org/software/gzip/manual/gzip.html
+      licence: ["GPL-3.0-or-later"]
+      identifier: null
+
+input:
+  - - meta:
+        type: map
+        description: |
+          Groovy Map containing sample information
+          e.g. `[ id:'sample1' ]`
+    - tsv:
+        type: file
+        description: Raw InterProScan TSV output
+        pattern: "*.tsv"
+
+output:
+  tsv:
+    - - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. `[ id:'sample1' ]`
+      - "*.interproscan.tsv.gz":
+          type: file
+          description: Reformatted InterProScan annotation for summary tables
+          pattern: "*.interproscan.tsv.gz"
+  versions_gzip:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - "gzip":
+          type: string
+          description: The name of the tool
+      - "gzip --version":
+          type: eval
+          description: The expression to obtain the version of the tool
+
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - gzip:
+          type: string
+          description: The name of the tool
+      - gzip --version:
+          type: eval
+          description: The expression to obtain the version of the tool
+authors:
+  - "@danilodileo"
+maintainers:
+  - "@danilodileo"

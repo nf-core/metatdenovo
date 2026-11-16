@@ -12,6 +12,10 @@ featurecounts/*.featureCounts.tsv
 featurecounts/*.featureCounts.tsv.summary
 hmmer/*.tbl.gz
 hmmer/hits/*.faa.gz
+# InterProScan's own raw output (all formats) embeds the run date, so its content isn't stable
+# day to day -- presence is checked via stable_name, content via explicit line assertions in
+# tests/interproscan.nf.test that don't touch the date field.
+interproscan/*.{tsv,xml,json,gff3}
 kofamscan/*.tsv.gz
 megahit/megahit_assembly.{contigs.fa.gz,log}
 multiqc/multiqc_data/fastqc*.txt

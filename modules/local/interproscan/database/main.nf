@@ -1,0 +1,41 @@
+process INTERPROSCAN_DATABASE {
+    tag "InterProScan data"
+    label 'process_long'
+
+    conda "${moduleDir}/environment.yml"
+    // storeDir can point at an s3:// path; Nextflow's AWS Batch executor stages that copy by
+    // shelling out to `aws` inside the task's own container, which the plain wget image lacks.
+    container "${ workflow.containerEngine in ['singularity', 'apptainer'] && !task.ext.singularity_pull_docker_container ?
+        'oras://community.wave.seqera.io/library/wget_awscli:340260e7e9dd32f7':
+        'community.wave.seqera.io/library/wget_awscli:9510e6a6af2abe94' }"
+
+    input:
+    path database_targz
+
+    output:
+    path "interproscan_db", emit: db
+
+    when:
+    task.ext.when == null || task.ext.when
+
+    script:
+    """
+    # The full upstream release tarball extracts to interproscan-<version>/{bin,data,lib,...} --
+    # the module supplies its own bin/lib via the container's conda install, so only the (large)
+    # data/ subdirectory is needed, staged directly as INTERPROSCAN's `data` input. The small
+    # test-only archive (nf-core/test-datasets, used by the vendored module's own tests) instead
+    # extracts data/ directly at the tarball's top level, with no version-named wrapper directory.
+    tar -zxf ${database_targz}
+    if [ -d data ]; then
+        mv data interproscan_db
+    else
+        mv interproscan-*/data interproscan_db
+        rm -rf interproscan-*
+    fi
+    """
+
+    stub:
+    """
+    mkdir interproscan_db
+    """
+}

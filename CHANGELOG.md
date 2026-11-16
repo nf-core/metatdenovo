@@ -3,6 +3,43 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.1.0 - [2026-11-16]
+
+### `Added`
+
+- [#599](https://github.com/nf-core/metatdenovo/pull/599) - Reference database versions, or retrieval dates where a database has no version, are reported with the software versions, closes [#184](https://github.com/nf-core/metatdenovo/issues/184) (@danilodileo, reviewed by @erikrikarddaniel)
+- [#597](https://github.com/nf-core/metatdenovo/pull/597) - Diamond taxonomy runs on batches of proteins, in parallel and resumable per batch (`--diamond_batchsize`); its raw output in `diamond_taxonomy/` is now one file per batch (@erikrikarddaniel, reviewed by @danilodileo)
+- [#589](https://github.com/nf-core/metatdenovo/pull/589) - KofamScan runs on batches of proteins, in parallel and resumable per batch (`--kofamscan_batchsize`); batching makes KofamScan's reported E-values depend on the batch size, so they are no longer comparable to earlier releases' or to a run using a different `--kofamscan_batchsize`, see [#591](https://github.com/nf-core/metatdenovo/issues/591) (@erikrikarddaniel, reviewed by @LouisLeNezet)
+- [#593](https://github.com/nf-core/metatdenovo/pull/593) - Add InterProScan annotation, Pfam and PANTHER by default (`--interproscan_applications`), batched with `--interproscan_batchsize` and skipped with `--skip_interproscan`, addresses [#413](https://github.com/nf-core/metatdenovo/issues/413) (@danilodileo, reviewed by @erikrikarddaniel)
+
+### `Changed`
+
+- [#616](https://github.com/nf-core/metatdenovo/pull/616) - All nf-core modules and subworkflows updated to their latest versions (@danilodileo, reviewed by @mashehu)
+- [#614](https://github.com/nf-core/metatdenovo/pull/614) - Template updated to nf-core/tools 4.2.1 and FastQC updated to 0.13.0 (@erikrikarddaniel, reviewed by @danilodileo)
+- [#609](https://github.com/nf-core/metatdenovo/pull/609) - The default `--kofamscan_batchsize` is 50 million residues, so a KofamScan batch finishes within the default time limit (@erikrikarddaniel, reviewed by @danilodileo)
+- [#608](https://github.com/nf-core/metatdenovo/pull/608) - `--save_parquet` reads `NA` as missing, so missing values are NULL in the Parquet tables instead of the text `NA`, and an `NA` in a numeric column no longer fails or turns the column into text (@erikrikarddaniel, reviewed by @danilodileo)
+
+### `Fixed`
+
+- [#617](https://github.com/nf-core/metatdenovo/pull/617) - Move the `diamondtax` subworkflow's two local format modules to `modules/local/format/diamond/tax/{ranklist,taxdump}`, matching the naming nf-core lint expects from their process names, clearing two `meta_include` warnings (@danilodileo, reviewed by @d4straub)
+- [#606](https://github.com/nf-core/metatdenovo/pull/606) - Launch the AWS tests with `seqeralabs/action-seqera-launch` and the v2 syntax parser, and stop uploading the debug log as an artifact (@erikrikarddaniel, reviewed by @piplus2)
+- [#603](https://github.com/nf-core/metatdenovo/pull/603) - KofamScan no longer fails at random with "Not in GZIP format" when some protein files are gzipped and others not (@erikrikarddaniel, reviewed by @danilodileo)
+- [#598](https://github.com/nf-core/metatdenovo/pull/598) - Boolean and numeric parameters (including `--trim_nextseq`) are typed in `main.nf`, so a value given on the command line such as `--bbnorm false` or `--trim_nextseq 20` is accepted and a wrong one is rejected at launch, and a parameter the pipeline does not define is now an error instead of a warning. Requires Nextflow `!>=26.04.0`. Also drops 4 unused params (`clip_r1`, `clip_r2`, `three_prime_clip_r1`, `three_prime_clip_r2`) that have never been wired into any option (@danilodileo, reviewed by @erikrikarddaniel, @mashehu)
+- [#594](https://github.com/nf-core/metatdenovo/pull/594) - dbCAN uses only the CPUs it was given, instead of every core on the machine (@erikrikarddaniel, reviewed by @piplus2)
+- [#588](https://github.com/nf-core/metatdenovo/pull/588) - A task that fails again after its last retry no longer kills other running tasks; they now finish first (@erikrikarddaniel, reviewed by @vagkaratzas)
+- [#587](https://github.com/nf-core/metatdenovo/pull/587) - Protein-cluster count summary uses far less memory on large assemblies (@erikrikarddaniel, reviewed by @d4straub)
+- [#581](https://github.com/nf-core/metatdenovo/pull/581) - Fix the step that tidies TransDecoder ORF names in count tables running out of memory on large runs (@erikrikarddaniel, reviewed by @nschan, @vagkaratzas)
+
+### `Dependencies`
+
+| Tool         | Previous version | New version |
+| ------------ | ---------------- | ----------- |
+| fastqc       | 0.12.1           | 0.13.0      |
+| interproscan |                  | 5.59_91.0   |
+| samtools     | 1.24             | 1.25        |
+
+### `Deprecated`
+
 ## v2.0.0 - [2026-10-07]
 
 Better support for mixed communities and mixed data types.

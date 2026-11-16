@@ -1,0 +1,60 @@
+{
+    "cds. prefix is stripped, other IDs untouched": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test.counts.tsv.gz:md5,c1fbf93fc3605a4c3c66abe78cb194b8"
+                ]
+            ]
+        ],
+        "timestamp": "2026-10-08T08:27:07.709457498",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "26.04.6"
+        }
+    },
+    "cds. prefix is stripped, other IDs untouched - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.counts.tsv.gz:md5,68b329da9893e34099c7d8ad5cb9c940"
+                    ]
+                ],
+                "1": [
+                    [
+                        "FORMAT_STRIPCDSPREFIX",
+                        "gzip",
+                        "1.11"
+                    ]
+                ],
+                "counts": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.counts.tsv.gz:md5,68b329da9893e34099c7d8ad5cb9c940"
+                    ]
+                ],
+                "versions_gzip": [
+                    [
+                        "FORMAT_STRIPCDSPREFIX",
+                        "gzip",
+                        "1.11"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-10-09T11:36:36.934600849",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "26.04.6"
+        }
+    }
+}

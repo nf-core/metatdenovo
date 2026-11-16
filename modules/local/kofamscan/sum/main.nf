@@ -28,9 +28,11 @@ process KOFAMSCAN_SUM {
     library(stringr)
     library(tidyverse)
 
-    kofams <- read_tsv("$kofmascan", show_col_types = FALSE ) %>%
-        select(-"#") %>%
-        slice(-1) %>%
+    # One table per batch, each with a header line and a separator line
+    kofams <- map_df(
+        c("${[kofmascan].flatten().join('", "')}"),
+        ~ read_tsv(.x, col_types = cols(.default = 'c')) %>% select(-"#") %>% slice(-1)
+    ) %>%
         rename(orf = "gene name") %>%
         distinct(orf, .keep_all = TRUE)
 

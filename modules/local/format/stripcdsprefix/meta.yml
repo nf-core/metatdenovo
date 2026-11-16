@@ -1,0 +1,56 @@
+name: "format_stripcdsprefix"
+description: Strip the "cds." prefix Transdecoder adds to ORF IDs in its GFF (but not
+  its FASTA), so a collected featureCounts table's ORF IDs match the FASTA-derived IDs
+  used elsewhere in the pipeline
+keywords:
+  - featurecounts
+  - transdecoder
+  - orf
+input:
+  - - meta:
+        type: map
+        description: |
+          Groovy Map containing sample information
+          e.g. `[ id:'test', single_end:false ]`
+    - counts:
+        type: file
+        description: Collected featureCounts long-format table, as produced by COLLECT_FEATURECOUNTS
+        pattern: "*.counts.tsv.gz"
+
+output:
+  counts:
+    - - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. `[ id:'test', single_end:false ]`
+      - "${prefix}.counts.tsv.gz":
+          type: file
+          description: Counts TSV file with the Transdecoder "cds." ORF ID prefix removed
+          pattern: "*.counts.tsv.gz"
+  versions_gzip:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - "gzip":
+          type: string
+          description: The name of the tool
+      - "gzip --version":
+          type: eval
+          description: The expression to obtain the version of the tool
+
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - gzip:
+          type: string
+          description: The name of the tool
+      - gzip --version:
+          type: eval
+          description: The expression to obtain the version of the tool
+authors:
+  - "@erikrikarddaniel"
+maintainers:
+  - "@erikrikarddaniel"

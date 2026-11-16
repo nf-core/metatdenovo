@@ -1,4 +1,5 @@
 Changes in component 'nf-core/eggnogmapper'
+'modules/nf-core/eggnogmapper/environment.yml' is unchanged
 Changes in 'eggnogmapper/meta.yml':
 --- modules/nf-core/eggnogmapper/meta.yml
 +++ modules/nf-core/eggnogmapper/meta.yml
@@ -53,7 +54,7 @@ Changes in 'eggnogmapper/meta.yml':
 Changes in 'eggnogmapper/main.nf':
 --- modules/nf-core/eggnogmapper/main.nf
 +++ modules/nf-core/eggnogmapper/main.nf
-@@ -10,12 +10,12 @@
+@@ -13,12 +13,12 @@
      input:
      tuple val(meta), path(fasta)
      tuple val(search_mode), path(db)
@@ -70,7 +71,7 @@ Changes in 'eggnogmapper/main.nf':
      // emapper.py --version reports the enclosing repository's git tag when the package sits inside one, as it does under conda.
      tuple val("${task.process}"), val('eggnog-mapper'), eval('python -c "from importlib.metadata import version; import sys; print(version(sys.argv[1]))" eggnog-mapper'), topic: versions, emit: versions_eggnogmapper
  
-@@ -25,7 +25,7 @@
+@@ -28,7 +28,7 @@
      script:
      def args          = task.ext.args   ?: ''
      def prefix        = task.ext.prefix ?: "${meta.id}"
@@ -79,7 +80,7 @@ Changes in 'eggnogmapper/main.nf':
      def fasta_name    = is_compressed ? fasta.baseName : "$fasta"
      def db_flags = ['diamond': '--dmnd_db', 'novel_fams': '--dmnd_db', 'mmseqs': '--mmseqs_db', 'hmmer': '--database', 'no_search': '--annotate_hits_table', 'cache': '--cache']
      def db_path  = (db instanceof Path && db.isDirectory()) ? "${db}/${db.name}"                    : "$db"
-@@ -40,11 +40,17 @@
+@@ -43,11 +43,17 @@
          $args \\
          --cpu ${task.cpus} \\
          -i ${fasta_name} \\
@@ -98,7 +99,7 @@ Changes in 'eggnogmapper/main.nf':
      """
  
      stub:
-@@ -55,5 +61,7 @@
+@@ -58,5 +64,7 @@
      touch ${prefix}.emapper.annotations
      touch ${prefix}.emapper.seed_orthologs
      touch ${prefix}.emapper.hits
@@ -107,7 +108,6 @@ Changes in 'eggnogmapper/main.nf':
      """
  }
 
-'modules/nf-core/eggnogmapper/environment.yml' is unchanged
 'modules/nf-core/eggnogmapper/tests/main.nf.test.snap' is unchanged
 'modules/nf-core/eggnogmapper/tests/main.nf.test' is unchanged
 ************************************************************

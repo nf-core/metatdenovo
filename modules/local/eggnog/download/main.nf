@@ -12,6 +12,7 @@ process EGGNOG_DOWNLOAD {
     path eggnog_db_gz
     path eggnog_dmnd_gz
     path eggnog_taxa_targz
+    val  eggnog_version
 
     output:
     path "eggnog.db"                  , emit: eggnog_db
@@ -19,6 +20,7 @@ process EGGNOG_DOWNLOAD {
     path "eggnog.taxa.db"             , emit: taxa_db
     path "eggnog.taxa.db.traverse.pkl", emit: pkl
     path "*"                          , emit: all
+    tuple val("${task.process}"), val('eggnog_db'), val(eggnog_version), emit: versions_db, topic: versions
 
     when:
     task.ext.when == null || task.ext.when

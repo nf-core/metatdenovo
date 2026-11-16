@@ -15,6 +15,9 @@ input:
   - eggnog_taxa_targz:
       type: file
       description: Gzipped tar archive of the EggNOG taxonomy database, staged from a URL via Nextflow's own file()
+  - eggnog_version:
+      type: string
+      description: EggNOG database release, parsed from the eggnog_db_gz download URL (e.g. "5.0.2"), or "unknown" if it couldn't be parsed
 output:
   eggnog_db:
     type: file
@@ -36,27 +39,27 @@ output:
     type: directory
     description: Directory containing all downloaded EggNOG files
     pattern: "*"
-  versions_emapper:
+  versions_db:
     - - "${task.process}":
           type: string
           description: The name of the process
-      - eggnog-mapper:
+      - eggnog_db:
           type: string
-          description: The name of the tool
-      - emapper.py --version | sed "s/.* emapper-//" | sed "s/ \\/ Expected.*//":
-          type: eval
-          description: The expression to obtain the version of the tool
+          description: The name of the database
+      - eggnog_version:
+          type: string
+          description: The EggNOG database release
 topics:
   versions:
     - - "${task.process}":
           type: string
           description: The name of the process
-      - eggnog-mapper:
+      - eggnog_db:
           type: string
-          description: The name of the tool
-      - emapper.py --version | sed "s/.* emapper-//" | sed "s/ \\/ Expected.*//":
-          type: eval
-          description: The expression to obtain the version of the tool
+          description: The name of the database
+      - eggnog_version:
+          type: string
+          description: The EggNOG database release
 authors:
   - "@danilodileo"
 containers:

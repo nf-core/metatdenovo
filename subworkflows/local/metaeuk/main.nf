@@ -21,7 +21,7 @@ workflow METAEUK {
     main:
 
     if ( db_path ) {
-        ch_database = file(db_path, checkIfExists: true)
+        ch_database = channel.value(file(db_path, checkIfExists: true))
     } else {
         METAEUK_DOWNLOAD( db_name )
         ch_database = METAEUK_DOWNLOAD.out.database
@@ -51,6 +51,7 @@ workflow METAEUK {
     FORMAT_METAEUK_GFF ( METAEUK_GFF_CAT.out.file_out )
 
     emit:
-    faa = FORMAT_METAEUKFAA.out.format_faa // channel: [ val(meta), path(faa) ]
-    gff = FORMAT_METAEUK_GFF.out.format_gff // channel: [ val(meta), path(gff) ]
+    faa      = FORMAT_METAEUKFAA.out.format_faa // channel: [ val(meta), path(faa) ]
+    gff      = FORMAT_METAEUK_GFF.out.format_gff // channel: [ val(meta), path(gff) ]
+    database = ch_database // path: the database (file or directory), for version provenance
 }

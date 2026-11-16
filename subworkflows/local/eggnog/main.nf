@@ -17,7 +17,11 @@ workflow EGGNOG {
 
     main:
 
-    EGGNOG_DOWNLOAD( file(db_url), file(dmnd_url), file(taxa_url) )
+    // Only the default eggnog5.embl.de URLs carry the release (emapperdb-5.0.2); other URLs give 'unknown'.
+    def eggnog_version_matcher = (db_url =~ /emapperdb-([0-9.]+)/)
+    def eggnog_version = eggnog_version_matcher.find() ? eggnog_version_matcher.group(1) : 'unknown'
+
+    EGGNOG_DOWNLOAD( file(db_url), file(dmnd_url), file(taxa_url), eggnog_version )
 
     ch_search_mode_db = EGGNOG_DOWNLOAD.out.dmnd.map { dmnd -> [ 'diamond', dmnd ] }
 

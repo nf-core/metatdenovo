@@ -314,6 +314,10 @@ The Diamond taxonomy-annotation process uses Diamond database files (`.dmnd` fil
 We supply a single standard database, for GTDB release R09-RS220.
 This is provided in collaboration with SciLifeLab Data Center and can be downloaded from here: [GTDB (R09RS220) taxonomy database](https://figshare.scilifelab.se/articles/dataset/nf-core_metatdenovo_taxonomy/28211678), DOI: https://doi.org/10.17044/scilifelab.28211678.
 
+Diamond runs on batches of proteins, by default 500 million amino acids each (`--diamond_batchsize`), so a large protein set runs as parallel tasks and an interrupted run only repeats the unfinished batches.
+Each batch reads the whole database once, which takes about an hour for NCBI RefSeq on 12 CPUs, so very small batches add a lot of run time.
+Batching does not change the E-values, since they depend on the database size, not the number of proteins searched.
+
 To make your own database, you will need to collect four files: a protein fasta file, the `names.dmp` and `nodes.dmp` files from an
 NCBI-style taxon dump plus a mapping file in which protein accessions are translated into taxon ids.
 
@@ -469,6 +473,10 @@ The tools use large databases which are downloaded automatically but paths can b
 and `--kofam_dbpath dir` parameters respectively.
 It is practical to let the pipeline download the files on the first run, and then reuse the data by setting the parameters.
 
+KofamScan runs on batches of proteins, by default 50 million amino acids each (`--kofamscan_batchsize`), so a large protein set runs as parallel tasks and an interrupted run only repeats the unfinished batches.
+A batch of the default size takes about 3 to 4 hours with the default 6 CPUs, within the default 8 hour time limit for `KOFAMSCAN_SCAN`; raise the time limit too if you raise the batch size.
+KO assignments do not depend on the batch size, but the reported E-values do, since they scale with the number of sequences searched.
+
 :::note
 Currently, the standard download procedure for the eggNOG database using the `download_eggnog_data.py` tool (v.2.1.9) doesn't work because the domain it tries to download from doesn't exist.
 The pipeline instead fetches the files directly from [the current download site](http://eggnog5.embl.de/download/emapperdb-5.0.2), using Nextflow's own file staging so it works even on compute nodes without network access.
@@ -487,6 +495,23 @@ once, then reuse the data" advice above applies here too).
 Since the pipeline only runs dbCAN's protein-mode CAZyme annotation (not its gene-cluster/CGC analysis), the download skips the CGC-related
 database assets to save space and time.
 
+A fourth option is [InterProScan](https://interproscan-docs.readthedocs.io) (Pfam, PANTHER, and other member-database domain/GO
+annotation), run by default and skippable with `--skip_interproscan`.
+Its (large) member-database data is downloaded automatically, with the path settable through `--interproscan_dbpath directory`
+(the same "let the pipeline download it once, then reuse the data" advice above applies here too).
+By default only a fast, curated subset of member databases is run (`--interproscan_applications Pfam,PANTHER`); widen this to run
+against more member databases (Gene3D, SMART, etc.) at the cost of runtime.
+GO term annotation (`--goterms`) is always enabled; pathway mapping (`--pathways`) is not run.
+Like KofamScan, InterProScan runs on batches of proteins (`--interproscan_batchsize`, 2 million amino acids by default), so a
+large protein set runs as parallel tasks and an interrupted run only repeats the unfinished batches. Unlike KofamScan, this default
+is small: InterProScan's module is pinned to 1 CPU, and with the default `Pfam,PANTHER` applications a 2-million-residue batch
+takes on the order of a few hours, leaving headroom under the pipeline's 12-hour task time limit.
+
+:::note
+The pipeline uses the InterProScan version pinned by the underlying nf-core/modules component (5.59-91.0, from 2022) -- not the
+current InterProScan release -- since that is what its container ships.
+:::
+
 A more targeted annotation option offered by the workflow is the possibility for the user to provide a set of
 [HMMER HMM profiles](http://eddylab.org/software/hmmer/Userguide.pdf) through the `--hmmdir dir` or `--hmmfiles file0.hmm,file1.hmm,...,filen.hmm`
 parameters.
@@ -495,7 +520,7 @@ which each ORF-HMM combination will be ranked according to score and E-value.
 
 #### How to manually download the databases for functional annotation
 
-There are some cases (e.g. offline run) where you prefer to download the databases before running the pipeline. Currently, `eggnog-mapper`, `kofamscan` and `dbcan` use databases that can be downloaded.
+There are some cases (e.g. offline run) where you prefer to download the databases before running the pipeline. Currently, `eggnog-mapper`, `kofamscan`, `dbcan` and `interproscan` use databases that can be downloaded.
 
 ##### Eggnog databases
 
@@ -537,6 +562,17 @@ The `--no-cgc` flag matches what the pipeline itself uses, since only protein-mo
 
 ```bash
 run_dbcan database --db_dir dbcan --aws_s3 --no-cgc
+```
+
+##### InterProScan database
+
+Download and extract the release archive matching the pipeline's pinned InterProScan version (5.59-91.0), then point
+`--interproscan_dbpath` at the extracted `data/` directory:
+
+```bash
+wget https://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/5.59-91.0/interproscan-5.59-91.0-64-bit.tar.gz
+tar -zxf interproscan-5.59-91.0-64-bit.tar.gz
+mv interproscan-5.59-91.0/data interproscan
 ```
 
 ## Example pipeline command with some common features
@@ -639,7 +675,7 @@ If `-profile` is not specified, the pipeline will run locally and expect all sof
 - `apptainer`
   - A generic configuration profile to be used with [Apptainer](https://apptainer.org/)
 - `wave`
-  - A generic configuration profile to enable [Wave](https://seqera.io/wave/) containers. Use together with one of the above (requires Nextflow ` 24.03.0-edge` or later).
+  - A generic configuration profile to enable [Wave](https://seqera.io/wave/) containers. Use together with one of the above (requires Nextflow `24.03.0-edge` or later).
 - `conda`
   - A generic configuration profile to be used with [Conda](https://conda.io/docs/). Please only use Conda as a last resort i.e. when it's not possible to run the pipeline with Docker, Singularity, Podman, Shifter, Charliecloud, or Apptainer.
 

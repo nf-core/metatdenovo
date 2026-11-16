@@ -1,0 +1,24 @@
+{
+    "interproscan_sum - stub": {
+        "content": [
+            {
+                "interproscan_summary": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.interproscan_summary.tsv.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "versions": [
+                    "versions.yml:md5,a65785af5b140fd9822ea26cce5e8947"
+                ]
+            }
+        ],
+        "timestamp": "2026-10-13T11:52:12.858929",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
+    }
+}

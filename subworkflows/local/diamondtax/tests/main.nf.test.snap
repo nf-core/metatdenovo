@@ -1,0 +1,204 @@
+{
+    "proteins in one batch - same taxonomy as one Diamond run": {
+        "content": [
+            {
+                "lineage": [
+                    [
+                        {
+                            "caller": "prodigal",
+                            "db": "gtdb-r220-test",
+                            "id": "test.gtdb-r220-test.lineage"
+                        },
+                        "test.gtdb-r220-test.lineage.tsv.gz:md5,6a47c5edf0cefd043770acc5ffc3a968"
+                    ],
+                    [
+                        {
+                            "caller": "prodigal",
+                            "db": "ncbi-refseq-test",
+                            "id": "test.ncbi-refseq-test.lineage"
+                        },
+                        "test.ncbi-refseq-test.lineage.tsv.gz:md5,f8289266f0f55e6f22bfd42807947bb6"
+                    ]
+                ],
+                "taxonomy": [
+                    [
+                        {
+                            "caller": "prodigal",
+                            "db": "gtdb-r220-test",
+                            "id": "test.gtdb-r220-test.diamond"
+                        },
+                        "test.gtdb-r220-test.diamond.taxonomy.tsv.gz:md5,6244ba02be8b7d43f5c9a52172ed31f6"
+                    ],
+                    [
+                        {
+                            "caller": "prodigal",
+                            "db": "ncbi-refseq-test",
+                            "id": "test.ncbi-refseq-test.diamond"
+                        },
+                        "test.ncbi-refseq-test.diamond.taxonomy.tsv.gz:md5,b4ab613452f3baa538400b226538e8cf"
+                    ]
+                ],
+                "taxonomy_summary": [
+                    [
+                        {
+                            "caller": "prodigal",
+                            "db": "gtdb-r220-test",
+                            "id": "test.gtdb-r220-test.diamond"
+                        },
+                        "test.gtdb-r220-test.diamond_summary.tsv.gz:md5,99054c7415b3edf45ba928776408b917"
+                    ],
+                    [
+                        {
+                            "caller": "prodigal",
+                            "db": "ncbi-refseq-test",
+                            "id": "test.ncbi-refseq-test.diamond"
+                        },
+                        "test.ncbi-refseq-test.diamond_summary.tsv.gz:md5,ccfcb510a6830a68df785b3e055f86d6"
+                    ]
+                ],
+                "taxonomy_taxdump": [
+                    [
+                        {
+                            "caller": "prodigal",
+                            "db": "ncbi-refseq-test",
+                            "id": "test.ncbi-refseq-test.diamond"
+                        },
+                        "test.ncbi-refseq-test.diamond.taxonomy-taxdump.tsv.gz:md5,4a16a72843661a463216c1db55323608"
+                    ]
+                ],
+                "tsv": [
+                    [
+                        {
+                            "caller": "prodigal",
+                            "db": "gtdb-r220-test",
+                            "id": "test"
+                        },
+                        [
+                            "test.001.gtdb-r220-test.tsv.gz:md5,0e55511a7381c61caea840b3a720d2c4"
+                        ]
+                    ],
+                    [
+                        {
+                            "caller": "prodigal",
+                            "db": "ncbi-refseq-test",
+                            "id": "test"
+                        },
+                        [
+                            "test.001.ncbi-refseq-test.tsv.gz:md5,f8990c13506684d3a8c684d52161aeaf"
+                        ]
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-10-20T09:34:04.521189674",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "26.04.6"
+        }
+    },
+    "proteins in several batches - same taxonomy as one Diamond run": {
+        "content": [
+            {
+                "lineage": [
+                    [
+                        {
+                            "caller": "prodigal",
+                            "db": "gtdb-r220-test",
+                            "id": "test.gtdb-r220-test.lineage"
+                        },
+                        "test.gtdb-r220-test.lineage.tsv.gz:md5,6a47c5edf0cefd043770acc5ffc3a968"
+                    ],
+                    [
+                        {
+                            "caller": "prodigal",
+                            "db": "ncbi-refseq-test",
+                            "id": "test.ncbi-refseq-test.lineage"
+                        },
+                        "test.ncbi-refseq-test.lineage.tsv.gz:md5,f8289266f0f55e6f22bfd42807947bb6"
+                    ]
+                ],
+                "taxonomy": [
+                    [
+                        {
+                            "caller": "prodigal",
+                            "db": "gtdb-r220-test",
+                            "id": "test.gtdb-r220-test.diamond"
+                        },
+                        "test.gtdb-r220-test.diamond.taxonomy.tsv.gz:md5,6244ba02be8b7d43f5c9a52172ed31f6"
+                    ],
+                    [
+                        {
+                            "caller": "prodigal",
+                            "db": "ncbi-refseq-test",
+                            "id": "test.ncbi-refseq-test.diamond"
+                        },
+                        "test.ncbi-refseq-test.diamond.taxonomy.tsv.gz:md5,b4ab613452f3baa538400b226538e8cf"
+                    ]
+                ],
+                "taxonomy_summary": [
+                    [
+                        {
+                            "caller": "prodigal",
+                            "db": "gtdb-r220-test",
+                            "id": "test.gtdb-r220-test.diamond"
+                        },
+                        "test.gtdb-r220-test.diamond_summary.tsv.gz:md5,99054c7415b3edf45ba928776408b917"
+                    ],
+                    [
+                        {
+                            "caller": "prodigal",
+                            "db": "ncbi-refseq-test",
+                            "id": "test.ncbi-refseq-test.diamond"
+                        },
+                        "test.ncbi-refseq-test.diamond_summary.tsv.gz:md5,ccfcb510a6830a68df785b3e055f86d6"
+                    ]
+                ],
+                "taxonomy_taxdump": [
+                    [
+                        {
+                            "caller": "prodigal",
+                            "db": "ncbi-refseq-test",
+                            "id": "test.ncbi-refseq-test.diamond"
+                        },
+                        "test.ncbi-refseq-test.diamond.taxonomy-taxdump.tsv.gz:md5,4a16a72843661a463216c1db55323608"
+                    ]
+                ],
+                "tsv": [
+                    [
+                        {
+                            "caller": "prodigal",
+                            "db": "gtdb-r220-test",
+                            "id": "test"
+                        },
+                        [
+                            "test.001.gtdb-r220-test.tsv.gz:md5,4f13bb33f8cab75764e844867ff5fcfc",
+                            "test.002.gtdb-r220-test.tsv.gz:md5,de91f1009e18722f9a287916690d9798",
+                            "test.003.gtdb-r220-test.tsv.gz:md5,2b0f56c06a18861229fdba6fe8fe40da",
+                            "test.004.gtdb-r220-test.tsv.gz:md5,89df99f97fd975ca0bbb1f3e0e8296f0",
+                            "test.005.gtdb-r220-test.tsv.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
+                        ]
+                    ],
+                    [
+                        {
+                            "caller": "prodigal",
+                            "db": "ncbi-refseq-test",
+                            "id": "test"
+                        },
+                        [
+                            "test.001.ncbi-refseq-test.tsv.gz:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "test.002.ncbi-refseq-test.tsv.gz:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "test.003.ncbi-refseq-test.tsv.gz:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "test.004.ncbi-refseq-test.tsv.gz:md5,bc2620b3808b75c194956670848ad23a",
+                            "test.005.ncbi-refseq-test.tsv.gz:md5,68a66c863067ba52c7d3133b7f914573"
+                        ]
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-10-20T09:33:36.280819751",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "26.04.6"
+        }
+    }
+}

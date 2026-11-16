@@ -16,10 +16,7 @@ include { FORMAT_LOCUSCONSOLIDATE            } from '../modules/local/format/loc
 include { FORMAT_LOCUSFAA                    } from '../modules/local/format/locusfaa/'
 include { FORMATSPADES                       } from '../modules/local/format/spades/'
 include { MERGE_TABLES                       } from '../modules/local/merge/summary/'
-include { FORMAT_DIAMOND_TAX_RANKLIST        } from '../modules/local/diamond/format_tax/ranklist/'
-include { FORMAT_DIAMOND_TAX_TAXDUMP         } from '../modules/local/diamond/format_tax/taxdump/'
-include { SUMTAXONOMY as SUM_DIAMONDTAX      } from '../modules/local/sumtaxonomy/'
-include { TIDYVERSE_STRIPCDSPREFIX           } from '../modules/local/tidyverse/stripcdsprefix/'
+include { FORMAT_STRIPCDSPREFIX              } from '../modules/local/format/stripcdsprefix/'
 include { WRITESPADESYAML                    } from '../modules/local/spades/writeyaml/'
 
 
@@ -27,8 +24,6 @@ include { WRITESPADESYAML                    } from '../modules/local/spades/wri
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
 include { validateInputSamplesheet       } from '../subworkflows/local/utils_nfcore_metatdenovo_pipeline'
-include { typecastBooleanParam           } from '../subworkflows/local/utils_nfcore_metatdenovo_pipeline'
-include { typecastIntegerParam           } from '../subworkflows/local/utils_nfcore_metatdenovo_pipeline'
 
 //
 // SUBWORKFLOW: Consisting of local modules
@@ -41,6 +36,8 @@ include { FASTQC_TRIMGALORE       } from '../subworkflows/local/fastqc/trimgalor
 include { PRODIGAL                } from '../subworkflows/local/prodigal/'
 include { KOFAMSCAN               } from '../subworkflows/local/kofamscan/'
 include { DBCAN                   } from '../subworkflows/local/dbcan/'
+include { DIAMONDTAX              } from '../subworkflows/local/diamondtax/'
+include { INTERPROSCAN_ANNOTATION } from '../subworkflows/local/interproscan/'
 include { TRANSDECODER            } from '../subworkflows/local/transdecoder/'
 include { METAEUK                 } from '../subworkflows/local/metaeuk/'
 include { USER_ORFS               } from '../subworkflows/local/user_orfs/'
@@ -65,13 +62,11 @@ include { SEQKIT_GREP                                } from '../modules/nf-core/
 include { CAT_FASTQ            	                     } from '../modules/nf-core/cat/fastq/'
 include { CUSTOM_COLLECTFEATURECOUNTS                } from '../modules/nf-core/custom/collectfeaturecounts/main'
 include { CUSTOM_COLLECTSTATS                        } from '../modules/nf-core/custom/collectstats/main'
-include { DIAMOND_BLASTP as DIAMOND_TAXONOMY         } from '../modules/nf-core/diamond/blastp/'
 include { DUCKDB_TABLE2PARQUET                       } from '../modules/nf-core/duckdb/table2parquet/main'
 include { FASTQC                                     } from '../modules/nf-core/fastqc/'
 include { MEGAHIT                                    } from '../modules/nf-core/megahit/'
 include { MULTIQC                                    } from '../modules/nf-core/multiqc/'
 include { PIGZ_COMPRESS as PIGZ_ASSEMBLY             } from '../modules/nf-core/pigz/compress/'
-include { PIGZ_COMPRESS as PIGZ_DIAMOND_LINEAGE      } from '../modules/nf-core/pigz/compress/'
 include { PIGZ_COMPRESS as PIGZ_PE_READS_FWD         } from '../modules/nf-core/pigz/compress/'
 include { PIGZ_COMPRESS as PIGZ_PE_READS_REV         } from '../modules/nf-core/pigz/compress/'
 include { PIGZ_COMPRESS as PIGZ_SE_READS             } from '../modules/nf-core/pigz/compress/'
@@ -86,7 +81,6 @@ include { SEQTK_MERGEPE                              } from '../modules/nf-core/
 include { SEQTK_SEQ as SEQTK_SEQ_CONTIG_FILTER       } from '../modules/nf-core/seqtk/seq/'
 include { SPADES                                     } from '../modules/nf-core/spades/'
 include { SUBREAD_FEATURECOUNTS as FEATURECOUNTS_CDS } from '../modules/nf-core/subread/featurecounts/'
-include { TAXONKIT_LINEAGE                           } from '../modules/nf-core/taxonkit/lineage/'
 
 //
 // SUBWORKFLOWS: Installed directly from nf-core/modules
@@ -99,6 +93,15 @@ include { MMSEQS_FASTA_CLUSTER                       } from '../subworkflows/nf-
 include { UTILS_NEXTFLOW_PIPELINE                    } from '../subworkflows/nf-core/utils_nextflow_pipeline/'
 include { UTILS_NFCORE_PIPELINE                      } from '../subworkflows/nf-core/utils_nfcore_pipeline/'
 include { methodsDescriptionText                     } from '../subworkflows/local/utils_nfcore_metatdenovo_pipeline'
+
+// EUKulele writes its Diamond index into the reference dir, so the directory mtime is not the download date.
+def eukuleleDbOldestMtime(dir) {
+    if (dir.isDirectory()) {
+        def entries = dir.listFiles()
+        return entries ? entries.collect { f -> eukuleleDbOldestMtime(f) }.min() : dir.lastModified()
+    }
+    dir.lastModified()
+}
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -119,18 +122,19 @@ workflow METATDENOVO {
 
     main:
 
-    // CLI params arrive as strings, and 'false' is truthy; nf-schema does not cast them
-    def annotate_only_consolidated = typecastBooleanParam('annotate_only_consolidated')
-    def save_parquet               = typecastBooleanParam('save_parquet')
-    def skip_dbcan                 = typecastBooleanParam('skip_dbcan')
-    def skip_eggnog                = typecastBooleanParam('skip_eggnog')
-    def skip_eukulele              = typecastBooleanParam('skip_eukulele')
-    def skip_fastqc                = typecastBooleanParam('skip_fastqc')
-    def skip_kofamscan             = typecastBooleanParam('skip_kofamscan')
-    def skip_protein_consolidation = typecastBooleanParam('skip_protein_consolidation')
-    def skip_trimming              = typecastBooleanParam('skip_trimming')
-    def min_contig_length          = typecastIntegerParam('min_contig_length')
-    def trim_bam_header_above      = typecastIntegerParam('trim_bam_header_above')
+    // Typed in main.nf's params block, so these are already real Booleans/Integers
+    def annotate_only_consolidated = params.annotate_only_consolidated
+    def save_parquet               = params.save_parquet
+    def skip_dbcan                 = params.skip_dbcan
+    def skip_eggnog                = params.skip_eggnog
+    def skip_eukulele              = params.skip_eukulele
+    def skip_fastqc                = params.skip_fastqc
+    def skip_interproscan          = params.skip_interproscan
+    def skip_kofamscan             = params.skip_kofamscan
+    def skip_protein_consolidation = params.skip_protein_consolidation
+    def skip_trimming              = params.skip_trimming
+    def min_contig_length          = params.min_contig_length
+    def trim_bam_header_above      = params.trim_bam_header_above
 
     if ( ( params.assembler && params.user_assembly ) || ( ! params.assembler && ! params.user_assembly ) ) {
         error "Provide either `--assembler` or `--user_assembly`!"
@@ -217,6 +221,7 @@ workflow METATDENOVO {
 
     def ch_versions = channel.empty()
     def ch_multiqc_files = channel.empty()
+    def ch_db_versions = channel.empty()
 
     // DL: I'm not sure which parts are still required after nf-schema. The branch { } certainly is needed.
     def ch_fastq = ch_samplesheet
@@ -539,6 +544,13 @@ workflow METATDENOVO {
             params.metaeuk_db_name,
             params.metaeuk_batchsize
         )
+        // database is a file or a directory; only `metaeuk databases` writes a *.version file, into a directory.
+        ch_db_versions = ch_db_versions.mix(
+            METAEUK.out.database.map { database ->
+                def version_file = database instanceof Path && database.isDirectory() ? database.listFiles().find { f -> f.name.endsWith('.version') } : null
+                [ 'METAEUK_EASYPREDICT', 'metaeuk_db', version_file ? version_file.text.trim() : 'unknown' ]
+            }
+        )
         ch_protein = ch_protein.mix(METAEUK.out.faa)
 
         ch_gff_gz  = ch_gff_gz.mix(METAEUK.out.gff)
@@ -590,7 +602,7 @@ workflow METATDENOVO {
         .collectFile(name: "${assembly_name}.combined.bed", sort: true)
         .map { bed -> [ [ id: "${assembly_name}.locus_consolidate", caller: 'locus_consolidate' ], bed ] }
 
-    BEDTOOLS_SORT ( ch_locus_bed, [] )
+    BEDTOOLS_SORT ( ch_locus_bed, [], [] )
     FORMAT_LOCUSCONSOLIDATE ( BEDTOOLS_SORT.out.sorted )
 
     ch_gff = ch_gff.mix(FORMAT_LOCUSCONSOLIDATE.out.gff)
@@ -648,7 +660,7 @@ workflow METATDENOVO {
     //
     // MODULE: Call BBMap with the index once per sample
     //
-    BBMAP_ALIGN ( ch_clean_reads, BBMAP_INDEX.out.index )
+    BBMAP_ALIGN ( ch_clean_reads, BBMAP_INDEX.out.index, [ [], [], false ] )
 
     //
     // SUBWORKFLOW: classify ORFs with a set of hmm files
@@ -689,35 +701,6 @@ workflow METATDENOVO {
         .combine(BAM_SORT_STATS_SAMTOOLS.out.idxstats.collect { _meta, idxstats -> idxstats }.map { idxstats -> [ idxstats ] } )
 
     FEATURECOUNTS_CDS ( ch_featurecounts)
-
-    //
-    // Collate and save software versions
-    //
-    def topic_versions = channel.topic("versions")
-        .distinct()
-        .branch { entry ->
-            versions_file: entry instanceof Path
-            versions_tuple: true
-        }
-
-    def topic_versions_string = topic_versions.versions_tuple
-        .map { process, tool, version ->
-            [ process[process.lastIndexOf(':')+1..-1], "  ${tool}: ${version}" ]
-        }
-        .groupTuple(by:0)
-        .map { process, tool_versions ->
-            tool_versions.unique().sort()
-            "${process}:\n${tool_versions.join('\n')}"
-        }
-
-    def ch_collated_versions = softwareVersionsToYAML(ch_versions.mix(topic_versions.versions_file))
-        .mix(topic_versions_string)
-        .collectFile(
-            storeDir: "${outdir}/pipeline_info",
-            name: 'nf_core_'  +  'metatdenovo_software_'  + 'mqc_'  + 'versions.yml',
-            sort: true,
-            newLine: true
-        )
 
     //
     // MODULE: Collect featurecounts output counts in one table
@@ -799,11 +782,10 @@ workflow METATDENOVO {
     CUSTOM_COLLECTFEATURECOUNTS ( ch_collect_feature.other )
 
     // Strips TransDecoder's cds. prefix; a no-op for other callers
-    TIDYVERSE_STRIPCDSPREFIX ( CUSTOM_COLLECTFEATURECOUNTS.out.counts )
-    ch_versions           = ch_versions.mix(TIDYVERSE_STRIPCDSPREFIX.out.versions)
+    FORMAT_STRIPCDSPREFIX ( CUSTOM_COLLECTFEATURECOUNTS.out.counts )
 
     // Must hold every annotated caller: CUSTOM_COLLECTSTATS left-joins onto it
-    def ch_counts_per_caller  = TIDYVERSE_STRIPCDSPREFIX.out.counts.mix(ch_protein_consolidate_counts)
+    def ch_counts_per_caller  = FORMAT_STRIPCDSPREFIX.out.counts.mix(ch_protein_consolidate_counts)
     def ch_fcs_for_summary    = ch_counts_per_caller
 
     def ch_merge_tables = channel.empty()
@@ -822,11 +804,17 @@ workflow METATDENOVO {
     //
     if( !skip_kofamscan ) {
         def ch_kofamscan = ch_protein.map { meta, protein -> [ meta, protein ] }
-        KOFAMSCAN( ch_kofamscan, ch_fcs_for_summary, params.kofam_ko_list_url, params.kofam_profiles_url )
+        KOFAMSCAN( ch_kofamscan, ch_fcs_for_summary, params.kofam_ko_list_url, params.kofam_profiles_url, params.kofamscan_batchsize )
         ch_merge_tables   = ch_merge_tables.mix ( KOFAMSCAN.out.kofamscan_summary )
         ch_parquet_tables = ch_parquet_tables
             .mix( KOFAMSCAN.out.kofam_table_tsv.map { _meta, tsv -> tsv } )
             .mix( KOFAMSCAN.out.kofam_table_uniq.map { _meta, tsv -> tsv } )
+        // KEGG has no release tag: record the source and the date of the local copy.
+        ch_db_versions = ch_db_versions.mix(
+            KOFAMSCAN.out.ko_list.map { ko_list ->
+                [ 'KOFAMSCAN_SCAN', 'kofamscan_db', "source=${params.kofam_ko_list_url}; retrieved=${new Date(ko_list.lastModified()).format('yyyy-MM-dd')}" ]
+            }
+        )
     }
 
     //
@@ -836,10 +824,25 @@ workflow METATDENOVO {
         DBCAN( ch_protein, ch_fcs_for_summary )
         ch_merge_tables   = ch_merge_tables.mix ( DBCAN.out.sumtable )
         ch_parquet_tables = ch_parquet_tables.mix( DBCAN.out.cazyme_annotation.map { _meta, tsv -> tsv } )
+        // dbCAN has no release tag: record the date of the local copy.
+        ch_db_versions = ch_db_versions.mix(
+            DBCAN.out.database.map { dbcan_db ->
+                [ 'RUNDBCAN_CAZYMEANNOTATION', 'dbcan_db', "source=run_dbcan database (built-in default mirror); retrieved=${new Date(dbcan_db.lastModified()).format('yyyy-MM-dd')}" ]
+            }
+        )
     }
 
     //
-    // MODULE: QUAST assembly statistics
+    // SUBWORKFLOW: run InterProScan on the ORF-called amino acid sequences
+    //
+    if ( ! skip_interproscan ) {
+        INTERPROSCAN_ANNOTATION( ch_protein, ch_fcs_for_summary, params.interproscan_db_url, params.interproscan_batchsize )
+        ch_merge_tables   = ch_merge_tables.mix ( INTERPROSCAN_ANNOTATION.out.sumtable )
+        ch_parquet_tables = ch_parquet_tables.mix( INTERPROSCAN_ANNOTATION.out.annotation.map { _meta, tsv -> tsv } )
+    }
+
+    //
+    // MODULE: Use QUAST to judge assembly quality, piped into MultiQC via its native report.tsv parser
     //
     QUAST(
         ch_assembly_contigs,
@@ -876,59 +879,27 @@ workflow METATDENOVO {
 
         ch_merge_tables   = ch_merge_tables.mix(EUKULELE.out.taxonomy_summary)
         ch_parquet_tables = ch_parquet_tables.mix( EUKULELE.out.tax.map { _meta, tsv -> tsv } )
+
+        // Not EUKULELE_SEARCH: its versions.yml would replace a tuple under the same key.
+        ch_db_versions = ch_db_versions.mix(
+            ch_eukulele_db.map { db, directory ->
+                [ 'EUKULELE_DB', 'eukulele_db', "source=${db ?: 'user-provided'}; retrieved=${new Date(eukuleleDbOldestMtime(directory)).format('yyyy-MM-dd')}" ]
+            }
+        )
     }
 
     //
-    // MODULE: Diamond taxonomy, every caller x every db
+    // SUBWORKFLOW: Diamond taxonomy, every caller x every db
     //
-    def ch_diamond_input = ch_protein.combine( ch_diamond_dbs.map { db -> [ db[0], db[1] ] } )
+    // Guarded although ch_diamond_dbs is empty without it: splitFasta would still copy every protein set
+    if ( params.diamond_dbs ) {
+        DIAMONDTAX( ch_protein, ch_diamond_dbs, ch_fcs_for_summary, params.diamond_batchsize )
 
-    DIAMOND_TAXONOMY(
-        ch_diamond_input.map { pm, protein, _dm, _db -> [ pm, protein ] },
-        ch_diamond_input.map { _pm, _protein, dm, db -> [ dm, db ] },
-        102,
-        []
-    )
-
-    // Not .join(): callers share db names, and join mishandles duplicate keys
-    def ch_taxonkit_lineage = DIAMOND_TAXONOMY.out.tsv
-        .map { it -> [ [ id: "${it[0].id}.${it[0].db}.lineage", db: it[0].db, caller: it[0].caller ], it[1] ] }
-        .combine(ch_diamond_dbs)
-        .filter { meta, _tsv, dbMeta, _dmnd, _names, _nodes, _ranks, _parse -> meta.db == dbMeta.id }
-
-    TAXONKIT_LINEAGE(
-        ch_taxonkit_lineage.map { it -> [ it[0], [], it[1] ] },
-        ch_taxonkit_lineage.map { it -> it[4] },
-        ch_taxonkit_lineage.map { it -> it[5] }
-    )
-
-    PIGZ_DIAMOND_LINEAGE(
-        TAXONKIT_LINEAGE.out.tsv
-    )
-
-    FORMAT_DIAMOND_TAX_RANKLIST(
-        PIGZ_DIAMOND_LINEAGE.out.archive
-            .combine(ch_diamond_dbs)
-            .filter { archiveMeta, _archiveFile, dbMeta, _dmnd, _names, _nodes, _ranks, _parse -> archiveMeta.db == dbMeta.id }
-            .map { archiveMeta, archiveFile, _dbMeta, _dmnd, _names, _nodes, ranks, _parse -> [ [ id: archiveMeta.id - ".lineage" + ".diamond", db: archiveMeta.db, caller: archiveMeta.caller ], archiveFile, ranks ] }
-    )
-
-    FORMAT_DIAMOND_TAX_TAXDUMP(
-        PIGZ_DIAMOND_LINEAGE.out.archive
-            .combine(ch_diamond_dbs.filter { it -> it[5] })
-            .filter { archiveMeta, _archiveFile, dbMeta, _dmnd, _names, _nodes, _ranks, _parse -> archiveMeta.db == dbMeta.id }
-            .map { archiveMeta, archiveFile, _dbMeta, _dmnd, names, nodes, ranks, _parse -> [ [ id: archiveMeta.id - ".lineage" + ".diamond", db: archiveMeta.db, caller: archiveMeta.caller ], archiveFile, names, nodes, ranks ] }
-    )
-
-    // Not .join(): dbs share caller names
-    def ch_diamondtax_sum_input = FORMAT_DIAMOND_TAX_RANKLIST.out.taxonomy
-        .combine( ch_fcs_for_summary )
-        .filter { meta, _taxonomy, fcsMeta, _fcs -> meta.caller == fcsMeta.caller }
-        .map { meta, taxonomy, _fcsMeta, fcs -> [ meta, meta.db, taxonomy, fcs ] }
-
-    SUM_DIAMONDTAX(ch_diamondtax_sum_input, 'diamondtax')
-
-    ch_merge_tables = ch_merge_tables.mix ( SUM_DIAMONDTAX.out.taxonomy_summary )
+        ch_merge_tables   = ch_merge_tables.mix ( DIAMONDTAX.out.taxonomy_summary )
+        ch_parquet_tables = ch_parquet_tables
+            .mix( DIAMONDTAX.out.taxonomy.map { _meta, tsv -> tsv } )
+            .mix( DIAMONDTAX.out.taxonomy_taxdump.map { _meta, tsv -> tsv } )
+    }
 
     //
     // MODULE: Collect statistics from mapping analysis
@@ -980,12 +951,41 @@ workflow METATDENOVO {
                 .mix( ch_counts_per_caller.map { _meta, tsv -> tsv } )
                 .mix( COLLECT_LOCUSCONSOLIDATE.out.counts.map { _meta, tsv -> tsv } )
                 .mix( HMMCLASSIFY.out.hmmrank.map { _meta, tsv -> tsv } )
-                .mix( FORMAT_DIAMOND_TAX_RANKLIST.out.taxonomy.map { _meta, tsv -> tsv } )
-                .mix( FORMAT_DIAMOND_TAX_TAXDUMP.out.taxonomy.map { _meta, tsv -> tsv } )
                 .mix( CUSTOM_COLLECTSTATS.out.overall_stats.map { _meta, tsv -> tsv } )
                 .map { tsv -> [ [ id: tsv.name.replaceAll(/\.tsv(\.gz)?$/, '') ], tsv ] }
         )
     }
+
+    //
+    // Collate and save software versions
+    //
+    // Must come after the last mix into ch_versions or ch_db_versions.
+    def topic_versions = channel.topic("versions")
+        .distinct()
+        .branch { entry ->
+            versions_file: entry instanceof Path
+            versions_tuple: true
+        }
+
+    def topic_versions_string = topic_versions.versions_tuple
+        .mix(ch_db_versions)
+        .map { process, tool, version ->
+            [ process[process.lastIndexOf(':')+1..-1], "  ${tool}: ${version}" ]
+        }
+        .groupTuple(by:0)
+        .map { process, tool_versions ->
+            tool_versions.unique().sort()
+            "${process}:\n${tool_versions.join('\n')}"
+        }
+
+    def ch_collated_versions = softwareVersionsToYAML(ch_versions.mix(topic_versions.versions_file))
+        .mix(topic_versions_string)
+        .collectFile(
+            storeDir: "${outdir}/pipeline_info",
+            name: 'nf_core_'  +  'metatdenovo_software_'  + 'mqc_'  + 'versions.yml',
+            sort: true,
+            newLine: true
+        )
 
     //
     // MODULE: MultiQC

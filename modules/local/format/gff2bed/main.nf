@@ -23,7 +23,7 @@ process FORMAT_GFF2BED {
 
     // BED is 0-based half-open, GFF 1-based inclusive: start shifts by one.
     // "(^|;)ID=" skips MetaEuk's Target_ID=/TCS_ID=; no match must fail, since empty ids merge
-    // unrelated loci (same guard as FORMAT_METAEUK_GFF). Strip "cds." like TIDYVERSE_STRIPCDSPREFIX.
+    // unrelated loci (same guard as FORMAT_METAEUK_GFF). Strip "cds." like FORMAT_STRIPCDSPREFIX.
     """
     $cat_input \\
         | awk -v caller="${meta.caller}" 'BEGIN{FS="\\t"; OFS="\\t"}
