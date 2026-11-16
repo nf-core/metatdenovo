@@ -283,11 +283,11 @@
                 },
                 "trim_bam_header_above": {
                     "type": "integer",
-                    "default": 1073741824,
+                    "default": 536870912,
                     "minimum": 0,
                     "fa_icon": "fas fa-cut",
-                    "description": "Header size in bytes above which contigs without reads are removed from a BAM file before featureCounts",
-                    "help_text": "featureCounts cannot read a BAM header larger than 2 GiB, which an assembly of about 75 million contigs produces. Samples whose header, estimated from the size of their idxstats file, exceeds this size get a copy of their BAM file with only the contigs that have reads.",
+                    "description": "Size in bytes of a sample's idxstats file above which contigs without reads are removed from its BAM file before featureCounts",
+                    "help_text": "featureCounts fails when the binary BAM header, the header text plus the list of contigs, reaches 2 GiB, which an assembly of about 40 million contigs produces. The idxstats file is about half that size. Samples whose idxstats file exceeds this size get a copy of their BAM file with only the contigs that have reads.",
                     "hidden": true
                 }
             },
