@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Fixed`
 
+- [#622](https://github.com/nf-core/metatdenovo/pull/622) - With `--save_bam`, `samtools/*.sorted.bam` is no longer replaced by the copy with a trimmed header that featureCounts reads, which did not match its `.bai` (@erikrikarddaniel)
 - [#621](https://github.com/nf-core/metatdenovo/pull/621) - EUKulele failures stop the pipeline with EUKulele's own error message, instead of an unrelated `gzip` error (@erikrikarddaniel)
 - [#617](https://github.com/nf-core/metatdenovo/pull/617) - Move the `diamondtax` subworkflow's two local format modules to `modules/local/format/diamond/tax/{ranklist,taxdump}`, matching the naming nf-core lint expects from their process names, clearing two `meta_include` warnings (@danilodileo, reviewed by @d4straub)
 - [#606](https://github.com/nf-core/metatdenovo/pull/606) - Launch the AWS tests with `seqeralabs/action-seqera-launch` and the v2 syntax parser, and stop uploading the debug log as an artifact (@erikrikarddaniel, reviewed by @piplus2)
