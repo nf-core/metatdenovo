@@ -55,7 +55,7 @@
                     "gzip": 1.11
                 },
                 "DBCAN_SUM": {
-                    "R": 4.0
+                    "R": "4.0"
                 },
                 "DIAMOND_TAXONOMY": {
                     "diamond": "2.2.1"
@@ -73,7 +73,7 @@
                     "gzip": 1.11
                 },
                 "EGGNOG_SUM": {
-                    "R": 4.0
+                    "R": "4.0"
                 },
                 "EUKULELE_DB": {
                     "eukulele_db": "source=phylodb; retrieved=[DATE]"
@@ -147,7 +147,7 @@
                     "gzip": 1.11
                 },
                 "INTERPROSCAN_SUM": {
-                    "R": 4.0
+                    "R": "4.0"
                 },
                 "KOFAMSCAN_FORMAT": {
                     "gzip": 1.11
@@ -157,7 +157,7 @@
                     "kofamscan_db": "source=https://raw.githubusercontent.com/nf-core/test-datasets/metatdenovo/test_data/kofamscan/ko_list.gz; retrieved=[DATE]"
                 },
                 "KOFAMSCAN_SUM": {
-                    "R": 4.0
+                    "R": "4.0"
                 },
                 "KOFAMSCAN_UNIQUE": {
                     "R": "4.1.0",
@@ -171,7 +171,7 @@
                     "megahit": "1.2.9"
                 },
                 "MERGE_TABLES": {
-                    "R": 4.0
+                    "R": "4.0"
                 },
                 "MMSEQS_CREATEDB": {
                     "mmseqs": "18.8cc5c"
@@ -248,11 +248,11 @@
                 },
                 "SUM_DIAMONDTAX": {
                     "R": "4.0,",
-                    "tidyverse": 2.0
+                    "tidyverse": "2.0"
                 },
                 "SUM_EUKULELE_TAXONOMY": {
                     "R": "4.0,",
-                    "tidyverse": 2.0
+                    "tidyverse": "2.0"
                 },
                 "TAXONKIT_LINEAGE": {
                     "taxonkit": "0.18.0"
