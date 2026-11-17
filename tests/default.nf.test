@@ -14,6 +14,7 @@ nextflow_pipeline {
                 megahit_k_min  = 25
                 megahit_k_max  = 49
                 megahit_k_step = 12
+                save_bam       = true
             }
         }
 
@@ -95,6 +96,9 @@ nextflow_pipeline {
                 { assert path("${params.outdir}/megahit/megahit_assembly.log").readLines().any { l -> l.contains('k list: 25,37,49') } },
                 { assert path("${params.outdir}/megahit/megahit_assembly.contigs.fa.gz").linesGzip.size() > 3000 },
                 { assert path("${params.outdir}/samtools/megahit.SAMPLE1_PE.idxstats").readLines().size() > 1600 },
+                // conf/test.config trims every header for featureCounts; the published BAM must keep the full one
+                { assert bam("${params.outdir}/samtools/SAMPLE1_PE.sorted.bam", stringency: 'silent').getHeader().count { l -> l.startsWith('@SQ') } ==
+                    path("${params.outdir}/megahit/megahit_assembly.contigs.fa.gz").linesGzip.count { l -> l.startsWith('>') } },
                 { assert path("${params.outdir}/prodigal/megahit.prodigal.gff.gz").linesGzip.findAll { l -> l.contains('CDS') }.size() > 3000 },
                 { assert path("${params.outdir}/summary_tables/megahit.prodigal.counts.tsv.gz").linesGzip.size() > 3000 },
                 { assert path("${params.outdir}/summary_tables/megahit.prodigal.counts.tsv.gz").csv(sep: '\t', decompress: true, header: true).columns["count"].sum() > 28000 },
