@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Changed`
 
+- [#624](https://github.com/nf-core/metatdenovo/pull/624) - Template updated to nf-core/tools 4.2.2 (@danilodileo)
 - [#616](https://github.com/nf-core/metatdenovo/pull/616) - All nf-core modules and subworkflows updated to their latest versions (@danilodileo, reviewed by @mashehu)
 - [#614](https://github.com/nf-core/metatdenovo/pull/614) - Template updated to nf-core/tools 4.2.1 and FastQC updated to 0.13.0 (@erikrikarddaniel, reviewed by @danilodileo)
 - [#609](https://github.com/nf-core/metatdenovo/pull/609) - The default `--kofamscan_batchsize` is 50 million residues, so a KofamScan batch finishes within the default time limit (@erikrikarddaniel, reviewed by @danilodileo)
