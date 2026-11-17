@@ -678,7 +678,7 @@ workflow METATDENOVO {
         ch_assembly_contigs.map { meta, fasta -> [meta, fasta, []] }
     )
 
-    // featureCounts crashes on a BAM header over 2 GiB, i.e. about 75M contigs; idxstats is about as large as the header
+    // featureCounts crashes when the binary BAM header reaches 2 GiB, about 40M contigs; idxstats is about half that size
     def ch_sorted_bam = BAM_SORT_STATS_SAMTOOLS.out.bam
         .join(BAM_SORT_STATS_SAMTOOLS.out.index)
         .join(BAM_SORT_STATS_SAMTOOLS.out.idxstats)
