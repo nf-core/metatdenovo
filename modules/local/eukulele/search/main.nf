@@ -22,8 +22,9 @@ process EUKULELE_SEARCH {
     def gunzip   = fasta =~ /\.gz$/ ? "gunzip -c ${fasta} > ./contigs/proteins.faa" : "mv ${fasta} contigs/proteins.faa"
     def database = dbname ? "--database ${dbname}" : ''
 
+    // BUSCO is not in the container, so without --no_busco every run exits 1.
+    // EUKulele writes its errors only to ${prefix}/log/*.err, hence the tail on failure.
     """
-    rc=0
     mkdir contigs
     $gunzip
     EUKulele \\
@@ -33,23 +34,18 @@ process EUKULELE_SEARCH {
         --reference_dir $eukdb \\
         -o ${prefix} \\
         --CPUs ${task.cpus} \\
+        --no_busco \\
         -s \\
-        contigs || rc=\$?
+        contigs || { rc=\$?; tail -n 20 ${prefix}/log/*.err >&2 || true; exit \$rc; }
 
     gzip ${prefix}/*_full/diamond/*.out
-    find ${prefix}/ -name "*.csv" | xargs gzip
+    find ${prefix}/ -name "*.csv" -exec gzip {} +
     gzip ${prefix}/taxonomy_estimation/*.out
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         eukulele: \$(EUKulele --version 2>&1 | grep "current EUKulele version" | sed "s/The current EUKulele version is //")
     END_VERSIONS
-
-    if [ \$rc -le 1 ]; then
-        exit 0
-    else
-        exit \$rc;
-    fi
     """
 
     stub:

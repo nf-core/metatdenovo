@@ -1,0 +1,87 @@
+{
+    "custom database - stub": {
+        "content": [
+            {
+                "diamond": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "empty:md5,7029066c27ac6f5ef18d660d5741979a"
+                    ]
+                ],
+                "taxonomy_counts": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "empty.csv.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "taxonomy_estimation": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "empty.out.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "versions": [
+                    "versions.yml:md5,bf2979d2cb5878f80639ce5f28738249"
+                ]
+            }
+        ],
+        "timestamp": "2026-11-16T09:08:36.981488853",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
+    },
+    "custom database - every protein gets its own species": {
+        "content": [
+            {
+                "diamond": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "proteins.diamond.out.gz:md5,d64a9bc608855f2faec8f0a5a3f03bee"
+                    ]
+                ],
+                "taxonomy_counts": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        [
+                            "test_all_class_counts.csv.gz",
+                            "test_all_division_counts.csv.gz",
+                            "test_all_domain_counts.csv.gz",
+                            "test_all_family_counts.csv.gz",
+                            "test_all_genus_counts.csv.gz",
+                            "test_all_order_counts.csv.gz",
+                            "test_all_species_counts.csv.gz",
+                            "test_all_supergroup_counts.csv.gz"
+                        ]
+                    ]
+                ],
+                "taxonomy_estimation": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "proteins-estimated-taxonomy.out.gz:md5,75b5b53b384e25fbe417e51fb0810fa4"
+                    ]
+                ],
+                "versions": [
+                    "versions.yml:md5,bf2979d2cb5878f80639ce5f28738249"
+                ]
+            }
+        ],
+        "timestamp": "2026-11-16T09:18:03.104039246",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
+    }
+}
