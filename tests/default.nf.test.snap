@@ -157,8 +157,11 @@
                 "bbmap/bbduk/SAMPLE2_PE.bbduk.log",
                 "bbmap/bbduk/SAMPLE3_PE_1.bbduk.log",
                 "bbmap/bbmap",
+                "bbmap/bbmap/SAMPLE1_PE.bam",
                 "bbmap/bbmap/SAMPLE1_PE.bbmap.log",
+                "bbmap/bbmap/SAMPLE2_PE.bam",
                 "bbmap/bbmap/SAMPLE2_PE.bbmap.log",
+                "bbmap/bbmap/SAMPLE3_PE_1.bam",
                 "bbmap/bbmap/SAMPLE3_PE_1.bbmap.log",
                 "featurecounts",
                 "featurecounts/SAMPLE1_PE.locus_consolidate.featureCounts.tsv",
@@ -253,6 +256,12 @@
                 "quast/megahit/transposed_report.tsv",
                 "quast/megahit/transposed_report.txt",
                 "samtools",
+                "samtools/SAMPLE1_PE.sorted.bam",
+                "samtools/SAMPLE1_PE.sorted.bam.bai",
+                "samtools/SAMPLE2_PE.sorted.bam",
+                "samtools/SAMPLE2_PE.sorted.bam.bai",
+                "samtools/SAMPLE3_PE_1.sorted.bam",
+                "samtools/SAMPLE3_PE_1.sorted.bam.bai",
                 "samtools/megahit.SAMPLE1_PE.flagstat",
                 "samtools/megahit.SAMPLE1_PE.idxstats",
                 "samtools/megahit.SAMPLE2_PE.flagstat",
@@ -311,7 +320,7 @@
                 "sample\tn_post_trimming\tn_non_contaminated\tidxs_n_mapped\tidxs_n_unmapped\tUnassigned_Ambiguity\tUnassigned_Chimera\tUnassigned_Duplicate\tUnassigned_FragmentLength\tUnassigned_MappingQuality\tUnassigned_MultiMapping\tUnassigned_NoFeatures\tUnassigned_NonSplit\tUnassigned_Overlapping_Length\tUnassigned_Read_Type\tUnassigned_Secondary\tUnassigned_Singleton\tUnassigned_Unmapped\tprodigal"
             ]
         ],
-        "timestamp": "2026-11-02T16:30:54.296528",
+        "timestamp": "2026-11-16T12:36:59.156417547",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"
